@@ -1,0 +1,24 @@
+appId: com.hyrkul.likan
+name: Checkbox toggles both ways
+tags: [smoke, storybook]
+env:
+  STORYBOOK_URL: myappexpo://storybook
+---
+- runFlow:
+    file: ../helpers/open-story.yaml
+    env:
+      STORY_ID: expo-ui-universal-checkbox--unchecked
+      READY_ID: expo-ui-checkbox
+- assertVisible:
+    id: expo-ui-checkbox-value
+    text: 'Value: Unchecked'
+- tapOn:
+    id: expo-ui-checkbox
+- assertVisible:
+    id: expo-ui-checkbox-value
+    text: 'Value: Checked'
+- tapOn:
+    id: expo-ui-checkbox
+- assertVisible:
+    id: expo-ui-checkbox-value
+    text: 'Value: Unchecked'

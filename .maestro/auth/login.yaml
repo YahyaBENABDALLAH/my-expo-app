@@ -1,0 +1,55 @@
+appId: com.hyrkul.likan
+name: Login validation and correction
+tags: [smoke, auth]
+---
+- runFlow:
+    file: ../helpers/open-auth.yaml
+    env:
+      AUTH_ROUTE: login
+      READY_ID: auth-login-submit
+- assertNotVisible:
+    id: auth-login-email-error
+- assertNotVisible:
+    id: auth-login-password-error
+- tapOn:
+    id: auth-login-email
+- assertNotVisible:
+    id: auth-login-email-error
+- tapOn:
+    id: auth-login-password
+- assertVisible:
+    id: auth-login-email-error
+    text: Enter your email address.
+- assertNotVisible:
+    id: auth-login-password-error
+- hideKeyboard
+- tapOn:
+    id: auth-login-submit
+- hideKeyboard
+- assertVisible:
+    id: auth-login-email-error
+    text: Enter your email address.
+- assertVisible:
+    id: auth-login-password-error
+    text: Enter your password.
+- tapOn:
+    id: auth-login-email
+- inputText: alex@example.com
+- hideKeyboard
+- tapOn:
+    id: auth-login-password
+- inputText: example-password
+- hideKeyboard
+- tapOn:
+    id: auth-login-submit
+- assertVisible:
+    id: auth-login-submit-status
+    text: Your sign-in details look good.
+- assertNotVisible:
+    id: auth-login-email-error
+- assertNotVisible:
+    id: auth-login-password-error
+- tapOn:
+    id: auth-login-forgot-password
+- assertVisible:
+    id: auth-forgot-password-email

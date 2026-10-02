@@ -1,0 +1,19 @@
+appId: com.hyrkul.likan
+name: List row press updates selected row
+tags: [smoke, storybook]
+env:
+  STORYBOOK_URL: myappexpo://storybook
+---
+- runFlow:
+    file: ../helpers/open-story.yaml
+    env:
+      STORY_ID: expo-ui-universal-list--default
+      READY_ID: expo-ui-list-row-2
+- assertVisible:
+    id: expo-ui-list-status
+    text: 'Selected row: None.*'
+- tapOn:
+    id: expo-ui-list-row-2
+- assertVisible:
+    id: expo-ui-list-status
+    text: 'Selected row: 2.*'

@@ -67,6 +67,7 @@
     "@types/react": "~19.2.2",
     "eslint": "^9.0.0",
     "eslint-config-expo": "~57.0.2",
+    "prettier": "^3.9.9",
     "storybook": "10.4.0",
     "typescript": "~6.0.3"
   },
@@ -76,7 +77,17 @@
     "@storybook/react-native-ui": "10.4.0",
     "@storybook/react-native-ui-common": "10.4.0",
     "@storybook/react-native-theming": "10.4.0",
-    "@storybook/react-dom-shim": "10.4.0"
+    "@storybook/react-dom-shim": "10.4.0",
+    "@firebase/firestore": {
+      "@grpc/grpc-js": "^1.14.5"
+    },
+    "@storybook/mcp": {
+      "valibot": "^1.5.0"
+    },
+    "xcode": {
+      "uuid": "^11.1.1"
+    },
+    "esbuild": "~0.26.0"
   },
   "scripts": {
     "start": "expo start",
@@ -84,7 +95,20 @@
     "android": "expo run:android",
     "ios": "expo run:ios",
     "storybook:generate": "sb-rn-get-stories",
-    "lint": "expo lint"
+    "lint": "expo lint . --max-warnings=0",
+    "typecheck": "tsc --noEmit",
+    "test:validation": "node --test tests/validation/auth.test.mjs",
+    "test:navigation": "node --test tests/navigation/router.test.mjs",
+    "test:e2e": "maestro test .maestro",
+    "test:e2e:auth": "maestro test .maestro/auth",
+    "test:e2e:input": "maestro test .maestro/storybook/text-input-empty.yaml",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "npm run test:validation && npm run test:navigation",
+    "check": "npm run typecheck && npm run lint && npm run format:check && npm test"
   },
-  "private": true
+  "private": true,
+  "engines": {
+    "node": ">=22.18.0"
+  }
 }

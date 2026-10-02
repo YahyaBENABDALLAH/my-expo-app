@@ -1,0 +1,24 @@
+appId: com.hyrkul.likan
+name: Switch changes value and resets
+tags: [smoke, storybook]
+env:
+  STORYBOOK_URL: myappexpo://storybook
+---
+- runFlow:
+    file: ../helpers/open-story.yaml
+    env:
+      STORY_ID: expo-ui-universal-switch--off
+      READY_ID: expo-ui-switch
+- assertVisible:
+    id: expo-ui-switch-value
+    text: 'Value: Off'
+- tapOn:
+    id: expo-ui-switch
+- assertVisible:
+    id: expo-ui-switch-value
+    text: 'Value: On'
+- tapOn:
+    id: expo-ui-switch-reset
+- assertVisible:
+    id: expo-ui-switch-value
+    text: 'Value: Off'

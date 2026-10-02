@@ -1,0 +1,13 @@
+appId: com.hyrkul.likan
+---
+- runFlow: bootstrap-app.yaml
+- openLink: '${STORYBOOK_URL}?mode=canvas'
+- extendedWaitUntil:
+    visible:
+      id: expo-ui-button
+    timeout: 60000
+- openLink: '${STORYBOOK_URL}?STORYBOOK_STORY_ID=${STORY_ID}&mode=canvas'
+- extendedWaitUntil:
+    visible:
+      id: '${READY_ID}'
+    timeout: 60000

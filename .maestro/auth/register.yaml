@@ -1,0 +1,63 @@
+appId: com.hyrkul.likan
+name: Registration rejects mismatched passwords then accepts correction
+tags: [smoke, auth]
+---
+- runFlow:
+    file: ../helpers/open-auth.yaml
+    env:
+      AUTH_ROUTE: register
+      READY_ID: auth-register-name
+- assertNotVisible:
+    id: auth-register-name-error
+- assertNotVisible:
+    id: auth-register-email-error
+- tapOn:
+    id: auth-register-name
+- inputText: Alex Morgan
+- hideKeyboard
+- tapOn:
+    id: auth-register-email
+- inputText: alex@example.com
+- hideKeyboard
+- scrollUntilVisible:
+    element:
+      id: auth-register-password
+- tapOn:
+    id: auth-register-password
+- inputText: example-password
+- hideKeyboard
+- scrollUntilVisible:
+    element:
+      id: auth-register-confirm-password
+- tapOn:
+    id: auth-register-confirm-password
+- inputText: wrong-password
+- hideKeyboard
+- scrollUntilVisible:
+    element:
+      id: auth-register-submit
+- tapOn:
+    id: auth-register-submit
+- hideKeyboard
+- scrollUntilVisible:
+    element:
+      id: auth-register-confirm-password-error
+- assertVisible:
+    id: auth-register-confirm-password-error
+    text: Passwords do not match.
+- tapOn:
+    id: auth-register-confirm-password
+- eraseText
+- inputText: example-password
+- hideKeyboard
+- scrollUntilVisible:
+    element:
+      id: auth-register-submit
+- tapOn:
+    id: auth-register-submit
+- scrollUntilVisible:
+    element:
+      id: auth-register-submit-status
+- assertVisible:
+    id: auth-register-submit-status
+    text: Your registration details look good.

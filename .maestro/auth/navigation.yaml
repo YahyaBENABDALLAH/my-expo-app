@@ -1,0 +1,45 @@
+appId: com.hyrkul.likan
+name: Account auth navigation preserves login state
+tags: [smoke, auth, navigation]
+---
+- runFlow:
+    file: ../helpers/open-auth.yaml
+    env:
+      AUTH_ROUTE: account
+      READY_ID: auth-login-email
+- tapOn:
+    id: auth-login-email
+- inputText: alex@example.com
+- hideKeyboard
+- scrollUntilVisible:
+    element:
+      id: auth-login-register
+- tapOn:
+    id: auth-login-register
+- assertVisible:
+    id: auth-register-name
+- assertNotVisible:
+    id: auth-register-name-error
+- scrollUntilVisible:
+    element:
+      id: auth-register-login
+- tapOn:
+    id: auth-register-login
+- scrollUntilVisible:
+    element:
+      id: auth-login-email
+    direction: UP
+- assertVisible:
+    id: auth-login-email
+    text: alex@example.com
+- tapOn:
+    id: auth-login-forgot-password
+- assertVisible:
+    id: auth-forgot-password-email
+- assertNotVisible:
+    id: auth-forgot-password-email-error
+- tapOn:
+    id: auth-forgot-password-login
+- assertVisible:
+    id: auth-login-email
+    text: alex@example.com

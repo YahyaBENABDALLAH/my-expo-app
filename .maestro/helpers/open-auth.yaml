@@ -1,0 +1,8 @@
+appId: com.hyrkul.likan
+---
+- runFlow: bootstrap-app.yaml
+- openLink: 'myappexpo://${AUTH_ROUTE}'
+- extendedWaitUntil:
+    visible:
+      id: '${READY_ID}'
+    timeout: 60000
