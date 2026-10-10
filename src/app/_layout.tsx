@@ -8,6 +8,7 @@ import {
   LoadingContent,
   nativeFillSize,
   PageFrame,
+  PageMotionOverlay,
   Spacer,
   UniversalButtonContent,
   useAuthTheme,
@@ -115,6 +116,7 @@ function RootLayoutContent() {
         style={{ position: 'absolute', top: 0, right: 0, bottom: 0, left: 0 }}
       />
       {ready || !showBrandScreen ? <RootLayoutNav /> : null}
+      <PageMotionOverlay animate={!showBrandScreen} />
       {showBrandScreen && (
         <LaunchScreen
           exiting={ready && brandDurationElapsed}

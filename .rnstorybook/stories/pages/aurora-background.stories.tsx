@@ -1,6 +1,7 @@
 import {
   AuroraBackground,
   PageScreen,
+  PageMotionOverlay,
   UniversalButtonContent,
   UniversalTextContent as Text,
 } from '@components/ui';
@@ -35,7 +36,7 @@ function BackgroundDemo({
       />
       <PageScreen
         title="My recipes"
-        description="The shared Skia aurora sits behind page titles, content and native controls."
+        description="The shared Skia aurora sits behind the page, with the original animated header wave above it."
         colorScheme={colorScheme}
         tab
       >
@@ -57,6 +58,7 @@ function BackgroundDemo({
           {animate && !paused ? 'Motion requested' : 'Static background'}
         </Text>
       </PageScreen>
+      <PageMotionOverlay animate={animate && !paused} colorScheme={colorScheme} />
     </View>
   );
 }

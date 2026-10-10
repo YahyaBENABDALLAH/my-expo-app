@@ -388,6 +388,7 @@ for (const authenticated of [false, true]) {
       useAuthTheme: () => ({ buttonPalette: {} }),
       LaunchScreen: s.native('LaunchScreen'),
       AuroraBackground: s.native('AuroraBackground'),
+      PageMotionOverlay: s.native('PageMotionOverlay'),
       ErrorToastHost: s.native('ErrorToastHost'),
       PageFrame: s.native('RestorationPanel'),
       Column: s.native('Column'),
@@ -437,8 +438,10 @@ for (const authenticated of [false, true]) {
     const queryProvider = view.findAll('AppQueryProvider')[0];
     const authProvider = view.findAll('AuthProvider')[0];
     const background = view.findAll('AuroraBackground')[0];
+    const headerWave = view.findAll('PageMotionOverlay')[0];
     const launch = view.findAll('LaunchScreen')[0];
     assert.equal(background.props.animate, false);
+    assert.equal(headerWave.props.animate, false);
     assert.equal(launch.props.exiting, false);
     // Asset loading before native layout must not consume the visible branding time.
     view.flush(() => t.mock.timers.tick(5_000));
@@ -474,6 +477,9 @@ for (const authenticated of [false, true]) {
     assert.equal(view.findAll('LaunchScreen').length, 0);
     assert.equal(view.findAll('AuroraBackground')[0], background);
     assert.equal(background.props.animate, true);
+    assert.equal(view.findAll('PageMotionOverlay').length, 1);
+    assert.equal(view.findAll('PageMotionOverlay')[0], headerWave);
+    assert.equal(headerWave.props.animate, true);
     assert.equal(
       view.findAll('View').some((node) => node.props.testID === 'app-ready'),
       true,
@@ -490,6 +496,7 @@ for (const authenticated of [false, true]) {
       assert.equal(stack.props.screenOptions.contentStyle.direction, direction);
       assert.equal(view.findAll('AppQueryProvider')[0], queryProvider);
       assert.equal(view.findAll('AuthProvider')[0], authProvider);
+      assert.equal(view.findAll('PageMotionOverlay')[0], headerWave);
     }
     view.unmount();
   });

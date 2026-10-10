@@ -88,8 +88,9 @@ replayable ThreeSeconds preview. Root JS fixtures exercise fast/slow restoration
 the timing boundary. These statements supersede the readiness-only startup behavior
 recorded later in this catalog; actual native rendering and timing remain unverified.
 
-The following top-edge wave is retained as optional artwork and a composition story;
-it is no longer the root default:
+The following top-edge wave is mounted above root navigation alongside the full-screen
+aurora behind navigation. Both layers pause while the splash covers them. The aurora
+composition stories also include the header wave; focused wave stories remain available:
 
 `PageMotionOverlay` (`src/components/ui/page/page-motion-overlay.tsx`) provides a single 144-point-tall Skia canvas above the root navigation tree. It covers all routed pages, including authentication, details, and utility screens, without modifying their native control trees. `animate` defaults to true; optional `colorScheme` supplies deterministic light/dark previews. It consumes existing `tint` and `tabIconSelected` colors. Two oversized paths drift gently in opposite directions on a shared 12-second UI-thread loop. Width follows the wrapper's `onLayout` event, with no per-frame measurement or React updates. `useMotionEnabled` cancels/resets motion during background/inactive states, live Reduce Motion changes, and explicit static mode. The root keeps it static beneath the launch screen.
 
