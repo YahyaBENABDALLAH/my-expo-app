@@ -70,6 +70,13 @@ content. These checks establish JS behavior; native rendering still requires dev
 
 ### Shared page motion
 
+`PageMotionOverlay.variant` defaults to `overlay` for the page header. Its `splash`
+variant reuses the same drifting paths and crest in normal flow with opaque theme
+fills, replacing the launch screen's fixed bottom curves. Both placements use
+`PAGE_WAVE_HEIGHT` (144) and the existing activity/reduced-motion guards. The
+replayable Animated splash story covers this moving edge during the two-second exit;
+actual native wave continuity remains unverified.
+
 The current default is the full-screen `AuroraBackground`, mounted behind root
 navigation. Stack/tab scenes, page frames, headers, auth forms, loading and recovery
 boundaries reveal the theme-aware shader through transparent containers. It supports

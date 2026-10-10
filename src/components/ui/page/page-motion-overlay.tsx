@@ -14,7 +14,7 @@ import {
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useMotionEnabled } from '@/hooks/use-motion-enabled';
 
-const WAVE_HEIGHT = 144;
+export const PAGE_WAVE_HEIGHT = 144;
 const WAVE_WIDTH = 1000;
 // Oversized paths keep the sides covered throughout the horizontal drift.
 const frontWave =
@@ -22,17 +22,20 @@ const frontWave =
 const backWave =
   'M -500 -16 H 1500 V 46 C 1280 98 1060 20 780 56 S 300 112 20 74 S -260 12 -500 48 Z';
 
-/** One touch-transparent Skia accent shared by the entire native navigation tree. */
+/** Shared wave artwork for the page header and the splash's moving bottom edge. */
 export function PageMotionOverlay({
   animate = true,
   colorScheme,
+  variant = 'overlay',
 }: {
   animate?: boolean;
   colorScheme?: 'light' | 'dark';
+  variant?: 'overlay' | 'splash';
 }) {
   const scheme = useColorScheme(colorScheme);
   const colors = useThemeColors(scheme);
   const enabled = useMotionEnabled(animate);
+  const splash = variant === 'splash';
   const phase = useSharedValue(0);
   const width = useSharedValue(0);
 
@@ -70,31 +73,40 @@ export function PageMotionOverlay({
 
   return (
     <View
-      testID="page-motion-overlay"
+      testID={splash ? 'launch-wave-edge' : 'page-motion-overlay'}
       pointerEvents="none"
       accessible={false}
       accessibilityElementsHidden
       importantForAccessibility="no-hide-descendants"
       collapsable={false}
       onLayout={({ nativeEvent }) => width.set(nativeEvent.layout.width)}
-      style={{ position: 'absolute', top: 0, left: 0, right: 0, height: WAVE_HEIGHT }}
+      style={
+        splash
+          ? { height: PAGE_WAVE_HEIGHT }
+          : { position: 'absolute', top: 0, left: 0, right: 0, height: PAGE_WAVE_HEIGHT }
+      }
     >
       <Canvas pointerEvents="none" style={{ flex: 1 }}>
         <Group transform={fit}>
           <Group transform={backDrift}>
-            <Path path={backWave} opacity={scheme === 'dark' ? 0.12 : 0.08}>
+            <Path path={backWave} opacity={splash ? 1 : scheme === 'dark' ? 0.12 : 0.08}>
               <LinearGradient
                 start={vec(0, 0)}
-                end={vec(0, WAVE_HEIGHT)}
-                colors={[colors.tabIconSelected, `${colors.tabIconSelected}00`]}
+                end={vec(0, PAGE_WAVE_HEIGHT)}
+                colors={
+                  splash
+                    ? [colors.tint, colors.tabIconSelected]
+                    : [colors.tabIconSelected, `${colors.tabIconSelected}00`]
+                }
               />
             </Path>
           </Group>
           <Group transform={frontDrift}>
+            {splash ? <Path path={frontWave} color={colors.background} /> : null}
             <Path path={frontWave} opacity={scheme === 'dark' ? 0.2 : 0.12}>
               <LinearGradient
                 start={vec(0, 0)}
-                end={vec(0, WAVE_HEIGHT)}
+                end={vec(0, PAGE_WAVE_HEIGHT)}
                 colors={[colors.tint, `${colors.tint}00`]}
               />
             </Path>

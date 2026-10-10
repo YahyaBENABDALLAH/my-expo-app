@@ -6,6 +6,9 @@ Exports: `PageScreen`, `PageFrame`, `PageHeader` and `PageMotionOverlay`.
 `page-frame.tsx` handles title/content/footer safe-area boundaries.
 `page-header.tsx` uses the private `page-back-button.*` adapters.
 `page-motion-overlay.tsx` contains the shared animated top-edge wave artwork.
+Its default `overlay` variant decorates headers; `variant="splash"` places the
+same moving paths in normal flow with opaque fills for the launch screen's bottom
+edge. Both use the exported `PAGE_WAVE_HEIGHT` and the same motion guards.
 The root mounts it above navigation, alongside `AuroraBackground` behind navigation
 as the default background.
 Frames, headers and page content are transparent so they reveal that shared

@@ -50,7 +50,15 @@ function StartupDemo() {
 const meta = {
   title: 'Pages/Animated splash',
   component: StartupDemo,
-  parameters: { layout: 'fullscreen' },
+  parameters: {
+    layout: 'fullscreen',
+    docs: {
+      description: {
+        component:
+          'Three-second splash followed by a two-second upward reveal, using the same moving wave paths as the page header.',
+      },
+    },
+  },
 } satisfies Meta<typeof StartupDemo>;
 export default meta;
 type Story = StoryObj<typeof meta>;

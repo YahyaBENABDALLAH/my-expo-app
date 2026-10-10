@@ -1,6 +1,5 @@
 import { useTranslation } from 'react-i18next';
 import { useThemeColors } from '@/hooks/use-theme';
-import { Canvas, Path } from '@shopify/react-native-skia';
 import { Column, RNHostView, Spacer } from '@expo/ui';
 import { useEffect } from 'react';
 import LottieView from 'lottie-react-native';
@@ -23,8 +22,8 @@ import { AuroraBackground } from '../aurora-background/aurora-background';
 import { UniversalHost } from '../host/universal-host';
 import { UniversalTextContent } from '../text/universal-text';
 import { nativeFillSize } from '../native/native-fill-width';
+import { PageMotionOverlay, PAGE_WAVE_HEIGHT as WAVE_HEIGHT } from '../page/page-motion-overlay';
 
-const WAVE_HEIGHT = 144;
 const EXIT_DURATION_MS = 2000;
 // LottieView accepts Metro's numeric asset ID on native, though its source type omits it.
 const bluePepeSource = bluePepe as unknown as string;
@@ -133,10 +132,7 @@ export function LaunchScreen({
           </Column>
         </UniversalHost>
       </View>
-      <Canvas style={{ width, height: WAVE_HEIGHT }}>
-        <Path path={`M 0 0 H ${width} V 34 Q ${width / 2} 178 0 34 Z`} color={colors.tint} />
-        <Path path={`M 0 0 H ${width} V 20 Q ${width / 2} 150 0 20 Z`} color={colors.background} />
-      </Canvas>
+      <PageMotionOverlay variant="splash" colorScheme={scheme} />
     </Animated.View>
   );
 }

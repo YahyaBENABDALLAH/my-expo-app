@@ -13,6 +13,12 @@ completes the exit immediately, while retaining the three-second display.
 
 Keep startup state in the root. This component owns presentation.
 
+The bottom edge reuses `PageMotionOverlay`'s `splash` variant: the same two
+oppositely drifting paths, 12-second cycle and crest as the header wave, with an
+opaque foreground matching the splash background. It replaces the fixed quadratic
+curves and continues moving during the two-second upward exit. Both placements
+share `PAGE_WAVE_HEIGHT` and respect live reduced motion and app activity.
+
 `Pages/Animated splash/ThreeSeconds` previews the production artwork and supports
 replaying the three-second presentation. Root fixture checks cover fast and slow
 restoration, the timer beginning after native layout, and readiness after exit.
