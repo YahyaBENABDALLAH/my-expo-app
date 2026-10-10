@@ -1,0 +1,24 @@
+appId: com.hyrkul.likan
+name: Skeleton placeholders support native pause and resume
+tags: [storybook, motion]
+env:
+  STORYBOOK_URL: myappexpo://storybook
+  STORY_ID: expo-ui-skeleton--animation-controls
+  READY_ID: skeleton-toggle-animation
+---
+- runFlow: ../helpers/open-story.yaml
+- assertVisible:
+    id: skeleton-reference-image
+- assertVisible:
+    id: skeleton-reference-title
+- assertVisible:
+    id: skeleton-reference-full-width
+- assertVisible: Animation playing
+- tapOn:
+    id: skeleton-toggle-animation
+    waitToSettleTimeoutMs: 1000
+- assertVisible: Animation paused
+- tapOn:
+    id: skeleton-toggle-animation
+    waitToSettleTimeoutMs: 1000
+- assertVisible: Animation playing

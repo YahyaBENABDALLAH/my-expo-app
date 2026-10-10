@@ -1,7 +1,7 @@
+import Colors from '@/constants/colors';
+import { UniversalText } from '@components/ui';
 import type { Meta, StoryObj } from '@storybook/react-native';
 import { View } from 'react-native';
-
-import { UniversalText } from '@/components/ui/universal-text';
 
 const meta = {
   title: 'Expo UI/Universal Text',
@@ -11,8 +11,8 @@ const meta = {
     children: 'Make every word count',
     variant: 'heading',
     colorScheme: 'dark',
-    lightColor: '#173C65',
-    darkColor: '#DBEDF4',
+    lightColor: Colors.light.text,
+    darkColor: Colors.dark.text,
   },
   argTypes: {
     testID: { control: 'text' },
@@ -32,7 +32,8 @@ const meta = {
       testID={`${args.testID}-canvas`}
       style={{
         flex: 1,
-        backgroundColor: args.colorScheme === 'dark' ? '#081224' : '#F4F8FC',
+        backgroundColor:
+          args.colorScheme === 'dark' ? Colors.dark.background : Colors.light.background,
         padding: 24,
       }}
     >

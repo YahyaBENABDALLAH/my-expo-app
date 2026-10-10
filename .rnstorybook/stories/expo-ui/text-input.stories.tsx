@@ -1,14 +1,33 @@
-import { Button, Column, Host, Text, useNativeState, type TextInputRef } from '@expo/ui';
+import {
+  Column,
+  UniversalHost as Host,
+  Icon,
+  RNHostView,
+  ScrollView,
+  Text,
+  useNativeState,
+  type TextInputRef,
+  UniversalButtonContent,
+  UniversalTextInput,
+  UniversalTextInputContent,
+  type UniversalTextInputProps,
+} from '@components/ui';
 import type { Meta, StoryObj } from '@storybook/react-native';
-import { useCallback, useRef } from 'react';
-import { Platform, ScrollView, View } from 'react-native';
+import { useCallback, useRef, useState } from 'react';
+import { Platform, View } from 'react-native';
 import { scheduleOnRN } from 'react-native-worklets';
 import { action } from 'storybook/actions';
 
-import {
-  UniversalTextInput,
-  type UniversalTextInputProps,
-} from '@/components/ui/universal-text-input';
+import Colors from '@/constants/colors';
+
+const searchIcon = Icon.select({
+  ios: 'magnifyingglass',
+  android: require('@expo/material-symbols/search.xml'),
+});
+const clearIcon = Icon.select({
+  ios: 'xmark.circle.fill',
+  android: require('@expo/material-symbols/cancel.xml'),
+});
 
 const selectionNote =
   'Select-all and programmatic selection require iOS 18+; supported on Android. Secure fields ignore selection and multiline props on iOS.';
@@ -99,6 +118,10 @@ const meta = {
     value: { control: false },
     selection: { control: false },
     ref: { control: false },
+    leftIcon: { control: false },
+    rightIcon: { control: false },
+    rightIconAccessibilityLabel: { control: 'text' },
+    onRightIconPress: { action: 'right icon pressed', control: false },
     modifiers: { control: false },
     onPress: { action: 'input pressed', control: false },
     onChangeText: { action: 'text changed' },
@@ -113,17 +136,23 @@ const meta = {
       // These stories are for the on-device iOS/Android Storybook only.
       if (Platform.OS !== 'ios' && Platform.OS !== 'android') return <></>;
       return (
-        <ScrollView
-          testID={`${context.args.testID}-canvas`}
-          keyboardShouldPersistTaps="handled"
-          contentContainerStyle={{
-            flexGrow: 1,
-            padding: 24,
-            backgroundColor: context.args.colorScheme === 'light' ? '#F4F8FC' : '#081224',
-          }}
-        >
-          <Story />
-        </ScrollView>
+        <Host colorScheme={context.args.colorScheme} style={{ flex: 1 }}>
+          <ScrollView testID={`${context.args.testID}-canvas`}>
+            <RNHostView matchContents>
+              <View
+                style={{
+                  padding: 24,
+                  backgroundColor:
+                    context.args.colorScheme === 'light'
+                      ? Colors.light.background
+                      : Colors.dark.background,
+                }}
+              >
+                <Story />
+              </View>
+            </RNHostView>
+          </ScrollView>
+        </Host>
       );
     },
   ],
@@ -140,6 +169,89 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Empty: Story = {};
+export const LeftIcon: Story = { args: { leftIcon: searchIcon } };
+export const RightIcon: Story = { args: { rightIcon: clearIcon } };
+
+function IconInputDemo(args: UniversalTextInputProps) {
+  const value = useNativeState(args.defaultValue ?? '');
+  const [pressCount, setPressCount] = useState(0);
+  const [disabled, setDisabled] = useState(args.disabled ?? false);
+  return (
+    <View style={{ gap: 20 }}>
+      <UniversalTextInput
+        {...args}
+        value={value}
+        disabled={disabled}
+        onRightIconPress={() => {
+          value.set('');
+          setPressCount((count) => count + 1);
+          action('right icon pressed')();
+        }}
+      />
+      <Host
+        matchContents={{ vertical: true }}
+        colorScheme={args.colorScheme}
+        style={{ width: '100%' }}
+      >
+        <Column spacing={10}>
+          <Text
+            testID={`${args.testID}-press-count`}
+            textStyle={{ color: Colors[args.colorScheme ?? 'dark'].text }}
+          >
+            {`Right icon presses: ${pressCount}`}
+          </Text>
+          <UniversalButtonContent
+            variant="secondary"
+            testID={`${args.testID}-toggle-disabled`}
+            label={disabled ? 'Enable input' : 'Disable input'}
+            onPress={() => setDisabled((current) => !current)}
+          />
+        </Column>
+      </Host>
+    </View>
+  );
+}
+
+export const ClickableRightIcon: Story = {
+  args: {
+    label: 'Search',
+    placeholder: 'Search recipes',
+    defaultValue: 'Soup',
+    leftIcon: searchIcon,
+    rightIcon: clearIcon,
+    rightIconAccessibilityLabel: 'Clear search',
+    helperText: 'Compact icon action: tap to clear. Disable the field to check action suppression.',
+  },
+  render: (args) => <IconInputDemo key={`${args.defaultValue}-${args.disabled}`} {...args} />,
+};
+export const ClickableRightIconLight: Story = {
+  ...ClickableRightIcon,
+  args: { ...ClickableRightIcon.args, colorScheme: 'light' },
+};
+export const DisabledIcons: Story = {
+  ...ClickableRightIcon,
+  args: {
+    ...ClickableRightIcon.args,
+    disabled: true,
+    helperText: 'Text and icons dim while disabled. The border and background keep their colors.',
+  },
+};
+export const CustomPaddingIcons: Story = {
+  ...ClickableRightIcon,
+  args: {
+    ...ClickableRightIcon.args,
+    style: { paddingVertical: 6, paddingHorizontal: 10, paddingRight: 2 },
+    helperText: 'Custom padding applies once. The icon retains its native tap target.',
+  },
+};
+export const ReadOnlyIcons: Story = {
+  ...ClickableRightIcon,
+  args: {
+    ...ClickableRightIcon.args,
+    readOnly: true,
+    helperText: 'Text editing is blocked; the separate clear action is still available.',
+  },
+};
 export const Filled: Story = { args: { defaultValue: 'Alex Morgan' } };
 export const Focused: Story = {
   args: { autoFocus: true, helperText: 'The border responds to native focus and blur.' },
@@ -148,7 +260,8 @@ export const Disabled: Story = {
   args: {
     defaultValue: 'Unavailable',
     disabled: true,
-    helperText: 'Editing and touch interaction are disabled.',
+    helperText:
+      'Only the text dims while disabled. The border, background and label stay unchanged.',
   },
 };
 export const ReadOnly: Story = {
@@ -180,6 +293,35 @@ export const Warning: Story = {
 };
 export const LightTheme: Story = { args: { colorScheme: 'light' } };
 export const DarkTheme: Story = { args: { colorScheme: 'dark' } };
+
+function InheritedHostInputDemo(args: UniversalTextInputProps) {
+  return (
+    <Host colorScheme={args.colorScheme}>
+      <Column spacing={12}>
+        <UniversalTextInputContent
+          testID="inherited-host-input"
+          label={args.label}
+          placeholder={args.placeholder}
+          defaultValue={args.defaultValue}
+          helperText="This field inherits its owning Host's theme."
+          status={args.status}
+          disabled={args.disabled}
+          onChangeText={args.onChangeText}
+        />
+      </Column>
+    </Host>
+  );
+}
+
+export const InheritedHostLight: Story = {
+  args: { colorScheme: 'light' },
+  render: (args) => <InheritedHostInputDemo {...args} />,
+};
+export const InheritedHostDark: Story = {
+  ...InheritedHostLight,
+  args: { colorScheme: 'dark' },
+};
+
 export const Password: Story = {
   args: {
     label: 'Password',
@@ -293,9 +435,9 @@ export const HiddenCaret: Story = {
 export const CustomSelectionColors: Story = {
   args: {
     defaultValue: 'Long press to select',
-    selectionColor: '#A78BFA',
-    cursorColor: '#E5AD49',
-    selectionHandleColor: '#39B58D',
+    selectionColor: Colors.dark.secondary,
+    cursorColor: Colors.dark.warning,
+    selectionHandleColor: Colors.dark.primary,
     helperText: 'Handle color is Android-only. On iOS selection color also tints the cursor.',
   },
 };
@@ -320,7 +462,8 @@ function InputActionsDemo(args: UniversalTextInputProps) {
         style={{ width: '100%' }}
       >
         <Column testID={`${args.testID}-actions`} spacing={10}>
-          <Button
+          <UniversalButtonContent
+            variant="secondary"
             testID={`${args.testID}-focus`}
             label="Focus"
             onPress={() => {
@@ -328,7 +471,8 @@ function InputActionsDemo(args: UniversalTextInputProps) {
               ref.current?.focus();
             }}
           />
-          <Button
+          <UniversalButtonContent
+            variant="secondary"
             testID={`${args.testID}-blur`}
             label="Blur"
             onPress={() => {
@@ -336,7 +480,8 @@ function InputActionsDemo(args: UniversalTextInputProps) {
               ref.current?.blur();
             }}
           />
-          <Button
+          <UniversalButtonContent
+            variant="secondary"
             testID={`${args.testID}-clear`}
             label="Clear"
             onPress={() => {
@@ -344,7 +489,8 @@ function InputActionsDemo(args: UniversalTextInputProps) {
               ref.current?.clear();
             }}
           />
-          <Button
+          <UniversalButtonContent
+            variant="secondary"
             testID={`${args.testID}-select`}
             label="Select first five characters"
             onPress={() => {
@@ -387,11 +533,14 @@ function ControlledInputDemo(args: UniversalTextInputProps) {
         <Column testID={`${args.testID}-actions`} spacing={10}>
           <Text
             testID={`${args.testID}-description`}
-            textStyle={{ color: args.colorScheme === 'light' ? '#173C65' : '#DBEDF4' }}
+            textStyle={{
+              color: args.colorScheme === 'light' ? Colors.light.text : Colors.dark.text,
+            }}
           >
             Edits are uppercased on the UI thread.
           </Text>
-          <Button
+          <UniversalButtonContent
+            variant="secondary"
             testID={`${args.testID}-set-value`}
             label="Set value from JavaScript"
             onPress={() => {
@@ -399,7 +548,8 @@ function ControlledInputDemo(args: UniversalTextInputProps) {
               value.set('UPDATED');
             }}
           />
-          <Button
+          <UniversalButtonContent
+            variant="secondary"
             testID={`${args.testID}-reset`}
             label="Reset value"
             onPress={() => {

@@ -1,8 +1,18 @@
+import {
+  Column,
+  UniversalButton,
+  UniversalButtonContent,
+  UniversalTextContent,
+  UniversalHost,
+  authButtonPalettes,
+} from '@components/ui';
 import type { Meta, StoryObj } from '@storybook/react-native';
 import { View } from 'react-native';
+import { useState } from 'react';
+
 import { action } from 'storybook/actions';
 
-import { UniversalButton } from '@/components/ui/universal-button';
+import Colors from '@/constants/colors';
 
 const meta = {
   title: 'Expo UI/Universal Button',
@@ -11,9 +21,6 @@ const meta = {
     testID: 'expo-ui-button',
     label: 'Continue',
     variant: 'primary',
-    semanticVariant: 'primary',
-    size: 'regular',
-    rounded: false,
     colorScheme: 'dark',
     disabled: false,
     onPress: action('button pressed'),
@@ -21,13 +28,11 @@ const meta = {
   argTypes: {
     testID: { control: 'text' },
     label: { control: 'text' },
-    variant: { control: 'select', options: ['primary', 'secondary', 'link'] },
-    semanticVariant: {
+    variant: {
       control: 'select',
-      options: ['primary', 'success', 'warning', 'destructive'],
+      options: ['primary', 'secondary', 'link', 'success', 'warning', 'destructive'],
     },
-    size: { control: 'select', options: ['compact', 'regular', 'large'] },
-    rounded: { control: 'boolean' },
+    fullWidth: { control: 'boolean' },
     colorScheme: { control: 'select', options: ['light', 'dark'] },
     disabled: { control: 'boolean' },
     onPress: { action: 'pressed' },
@@ -37,7 +42,7 @@ const meta = {
       testID={`${args.testID}-canvas`}
       style={{
         flex: 1,
-        backgroundColor: args.colorScheme === 'dark' ? '#081224' : '#F4F8FC',
+        backgroundColor: Colors[args.colorScheme ?? 'dark'].background,
         padding: 24,
       }}
     >
@@ -74,21 +79,54 @@ export const Disabled: Story = {
 };
 
 export const Success: Story = {
-  args: { label: 'Save changes', semanticVariant: 'success' },
+  args: { label: 'Save changes', variant: 'success' },
 };
 
 export const Warning: Story = {
-  args: { label: 'Review warning', semanticVariant: 'warning' },
+  args: { label: 'Review warning', variant: 'warning' },
 };
 
 export const Destructive: Story = {
-  args: { label: 'Delete item', semanticVariant: 'destructive' },
+  args: { label: 'Delete item', variant: 'destructive' },
 };
 
-export const RoundedCompact: Story = {
-  args: { label: 'Add', rounded: true, size: 'compact' },
+export const FullWidth: Story = { args: { fullWidth: true } };
+
+export const AuthLightPalette: Story = {
+  args: { colorScheme: 'light', palette: authButtonPalettes.light, fullWidth: true },
+};
+export const AuthDarkPalette: Story = {
+  args: { colorScheme: 'dark', palette: authButtonPalettes.dark, fullWidth: true },
 };
 
-export const RoundedLarge: Story = {
-  args: { label: 'Get started', rounded: true, size: 'large' },
-};
+function InteractionDemo() {
+  const [presses, setPresses] = useState(0);
+  return (
+    <UniversalHost colorScheme="dark">
+      <Column spacing={16}>
+        <UniversalButtonContent
+          variant="primary"
+          label="Count press"
+          testID="button-count"
+          onPress={() => setPresses((value) => value + 1)}
+        />
+        <UniversalButtonContent
+          variant="secondary"
+          label="Disabled press"
+          testID="button-disabled"
+          disabled
+          onPress={() => setPresses((value) => value + 1)}
+        />
+        <UniversalTextContent testID="button-press-count">{`Presses: ${presses}`}</UniversalTextContent>
+        <UniversalButtonContent
+          variant="link"
+          label="Reset count"
+          testID="button-reset"
+          onPress={() => setPresses(0)}
+        />
+      </Column>
+    </UniversalHost>
+  );
+}
+
+export const Interaction: Story = { render: () => <InteractionDemo /> };

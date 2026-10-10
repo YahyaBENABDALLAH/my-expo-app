@@ -6,6 +6,7 @@
     "noUnusedParameters": true,
     "paths": {
       "@/*": ["./src/*"],
+      "@components/*": ["./src/components/*"],
       "@assets/*": ["./assets/*"],
       "@storybook": ["./.rnstorybook/index.tsx"]
     }

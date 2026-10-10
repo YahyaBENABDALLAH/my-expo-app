@@ -4,11 +4,12 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import StorybookUI, { StorybookCanvas } from '@storybook';
-import Colors from '@/constants/colors';
-import { TAB_BAR_CONTENT_HEIGHT } from '@/constants/layout';
+import { useAppTheme } from '@/hooks/use-theme';
+import { screenInsets } from '@/lib/screen-insets';
 
 export default function StorybookScreen() {
   const focused = useIsFocused();
+  const { scheme, colors } = useAppTheme();
   const insets = useSafeAreaInsets();
   const params = useLocalSearchParams<{ mode?: string }>();
 
@@ -17,12 +18,11 @@ export default function StorybookScreen() {
       testID="storybook-screen"
       style={{
         flex: 1,
-        paddingTop: insets.top,
-        paddingBottom: TAB_BAR_CONTENT_HEIGHT + insets.bottom,
-        backgroundColor: Colors.dark.background,
+        ...screenInsets(insets, { tabBarShown: true }),
+        backgroundColor: colors.background,
       }}
     >
-      {focused ? <StatusBar style="light" /> : null}
+      {focused ? <StatusBar style={scheme === 'dark' ? 'light' : 'dark'} /> : null}
       {params.mode === 'canvas' ? <StorybookCanvas /> : <StorybookUI />}
     </GestureHandlerRootView>
   );

@@ -1,96 +1,132 @@
-import { View } from 'react-native';
-import { useColorScheme } from '@/hooks/use-color-scheme';
-import { useAuthReturn } from '@/features/auth/hooks/use-auth-return';
+import { useTranslation } from 'react-i18next';
+import {
+  Column,
+  nativeFillWidth,
+  UniversalButtonContent,
+  AuthScreenFrame,
+  FormSubmit,
+  FormTextInput,
+  authInputIcons,
+} from '@components/ui';
+import { router } from 'expo-router';
 
-import { UniversalButton } from '@/components/ui/universal-button';
-import { AuthScreenFrame } from '@/features/auth/components/auth-screen-frame';
-import { AuthSubmit } from '@/features/auth/components/auth-submit';
-import { FormTextInput } from '@/features/auth/components/form-text-input';
-import { useValidatedAuthForm } from '@/features/auth/hooks/use-validated-auth-form';
+import { useAuthForm } from '../hooks/use-auth-form';
+import { useAuthFlow } from '../auth-flow.context';
 import { registerResolver } from '@/validation/resolvers/auth';
 import type { RegisterFormValues } from '@/validation/schemas/auth';
 
 export function RegisterScreen() {
-  const scheme = useColorScheme();
-  const returnToLogin = useAuthReturn();
-  const { form, notice, submit, onEdited } = useValidatedAuthForm<RegisterFormValues>(
+  const { t } = useTranslation();
+  const { register } = useAuthFlow();
+  const { form, submit, pending } = useAuthForm<RegisterFormValues>(
     registerResolver,
-    { name: '', email: '', password: '', confirmPassword: '' },
-    'Your registration details look good.',
+    { userName: '', firstName: '', lastName: '', email: '', password: '', confirmPassword: '' },
+    ({ confirmPassword: _confirmation, ...values }) =>
+      register({ ...values, preferredLanguage: 'en' }),
   );
+  const shared = { control: form.control, disabled: pending };
   return (
     <AuthScreenFrame
       testID="auth-register"
-      description="Start with your name, email, and a password for your account."
+      title={t('auth.signUpTitle')}
+      description={t('auth.registerDescription')}
     >
-      <View style={{ gap: 20 }}>
+      <Column spacing={20} modifiers={nativeFillWidth}>
         <FormTextInput
-          control={form.control}
-          name="name"
-          testID="auth-register-name"
-          label="Full name"
-          placeholder="Your name"
-          autoComplete="name"
-          autoCapitalize="words"
-          onEdited={onEdited}
+          {...shared}
+          name="userName"
+          testID="auth-register-username"
+          label={t('auth.username')}
+          leftIcon={authInputIcons.person}
+          placeholder={t('auth.usernamePlaceholder')}
+          autoComplete="username"
+          autoCapitalize="none"
+          autoCorrect={false}
+          returnKeyType="next"
+          onSubmitEditing={() => form.setFocus('firstName')}
         />
         <FormTextInput
-          control={form.control}
+          {...shared}
+          name="firstName"
+          testID="auth-register-first-name"
+          label={t('auth.firstName')}
+          leftIcon={authInputIcons.person}
+          placeholder={t('auth.firstName')}
+          autoComplete="given-name"
+          autoCapitalize="words"
+          returnKeyType="next"
+          onSubmitEditing={() => form.setFocus('lastName')}
+        />
+        <FormTextInput
+          {...shared}
+          name="lastName"
+          testID="auth-register-last-name"
+          label={t('auth.lastName')}
+          leftIcon={authInputIcons.person}
+          placeholder={t('auth.lastName')}
+          autoComplete="family-name"
+          autoCapitalize="words"
+          returnKeyType="next"
+          onSubmitEditing={() => form.setFocus('email')}
+        />
+        <FormTextInput
+          {...shared}
           name="email"
           testID="auth-register-email"
-          label="Email address"
-          placeholder="you@example.com"
+          label={t('auth.email')}
+          leftIcon={authInputIcons.email}
+          placeholder={t('auth.emailPlaceholder')}
           keyboardType="email-address"
           autoComplete="email"
           autoCapitalize="none"
           autoCorrect={false}
-          onEdited={onEdited}
+          returnKeyType="next"
+          onSubmitEditing={() => form.setFocus('password')}
         />
         <FormTextInput
-          control={form.control}
+          {...shared}
           name="password"
           testID="auth-register-password"
-          label="Password"
-          placeholder="Create a password"
-          helperText="Use at least 8 characters."
+          label={t('auth.password')}
+          leftIcon={authInputIcons.password}
+          passwordToggle="icon"
+          placeholder={t('auth.createPassword')}
+          helperText={t('auth.passwordMinLength')}
           password
           autoComplete="new-password"
           autoCapitalize="none"
           autoCorrect={false}
-          onEdited={onEdited}
+          returnKeyType="next"
+          onSubmitEditing={() => form.setFocus('confirmPassword')}
         />
         <FormTextInput
-          control={form.control}
+          {...shared}
           name="confirmPassword"
           testID="auth-register-confirm-password"
-          label="Confirm password"
-          placeholder="Re-enter your password"
+          label={t('auth.confirmPassword')}
+          leftIcon={authInputIcons.password}
+          passwordToggle="icon"
+          placeholder={t('auth.repeatPassword')}
           password
           autoComplete="new-password"
           autoCapitalize="none"
           autoCorrect={false}
-          returnKeyType="done"
-          onSubmitEditing={() => {
-            void submit();
-          }}
-          onEdited={onEdited}
+          returnKeyType="send"
+          onSubmitEditing={() => void submit()}
         />
-        <AuthSubmit
+        <FormSubmit
           testID="auth-register-submit"
-          label="Create account"
-          pending={form.formState.isSubmitting}
-          notice={notice}
-          onPress={() => {
-            void submit();
-          }}
+          label={t('auth.signUp')}
+          pending={pending}
+          onPress={() => void submit()}
         />
-      </View>
-      <UniversalButton
+      </Column>
+      <UniversalButtonContent
         testID="auth-register-login"
         variant="link"
-        colorScheme={scheme}
-        label="Already have an account? Log in"
-        onPress={returnToLogin}
+        label={t('auth.haveAccountLink')}
+        disabled={pending}
+        onPress={() => router.dismissTo('/login')}
       />
     </AuthScreenFrame>
   );

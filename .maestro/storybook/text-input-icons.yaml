@@ -1,0 +1,59 @@
+appId: com.hyrkul.likan
+name: Text input icons clear once and suppress disabled actions
+tags: [storybook, input]
+env:
+  STORYBOOK_URL: myappexpo://storybook
+---
+- runFlow:
+    file: ../helpers/open-story.yaml
+    env:
+      STORY_ID: expo-ui-universal-text-input--clickable-right-icon
+      READY_ID: expo-ui-text-input-right-icon
+- assertVisible:
+    id: expo-ui-text-input-left-icon
+- assertVisible:
+    id: expo-ui-text-input
+    text: Soup
+- tapOn:
+    id: expo-ui-text-input-right-icon
+- assertVisible: 'Right icon presses: 1'
+- assertNotVisible:
+    id: expo-ui-text-input
+    text: Soup
+- tapOn:
+    id: expo-ui-text-input
+- inputText: Pasta
+- assertVisible:
+    id: expo-ui-text-input
+    text: Pasta
+- tapOn:
+    id: expo-ui-text-input-right-icon
+- assertVisible: 'Right icon presses: 2'
+- assertNotVisible:
+    id: expo-ui-text-input
+    text: Pasta
+- hideKeyboard
+- tapOn:
+    id: expo-ui-text-input-toggle-disabled
+- tapOn:
+    id: expo-ui-text-input-right-icon
+- assertVisible: 'Right icon presses: 2'
+- tapOn:
+    id: expo-ui-text-input-toggle-disabled
+- tapOn:
+    id: expo-ui-text-input-right-icon
+- assertVisible: 'Right icon presses: 3'
+- runFlow:
+    file: ../helpers/open-story.yaml
+    env:
+      STORY_ID: expo-ui-universal-text-input--read-only-icons
+      READY_ID: expo-ui-text-input-right-icon
+- assertVisible:
+    id: expo-ui-text-input
+    text: Soup
+- tapOn:
+    id: expo-ui-text-input-right-icon
+- assertVisible: 'Right icon presses: 1'
+- assertNotVisible:
+    id: expo-ui-text-input
+    text: Soup

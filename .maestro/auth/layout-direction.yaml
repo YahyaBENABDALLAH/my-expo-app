@@ -1,0 +1,77 @@
+appId: com.hyrkul.likan
+name: Every auth page exposes a live direction footer and preserves the login draft
+tags: [auth, rtl, signed-out]
+---
+- runFlow:
+    file: ../helpers/open-auth.yaml
+    env:
+      AUTH_ROUTE: login
+      READY_ID: auth-login
+- scrollUntilVisible:
+    element:
+      id: page-appearance-footer
+- runFlow:
+    when:
+      visible:
+        id: page-layout-direction-switch
+        checked: true
+    commands:
+      - tapOn:
+          id: page-layout-direction-switch
+- assertVisible:
+    id: page-layout-direction-switch
+    checked: false
+- scrollUntilVisible:
+    element:
+      id: auth-login-email
+- tapOn:
+    id: auth-login-email
+- inputText: rtl-test@example.com
+- scrollUntilVisible:
+    element:
+      id: page-layout-direction-switch
+- tapOn:
+    id: page-layout-direction-switch
+- hideKeyboard
+- scrollUntilVisible:
+    element:
+      id: auth-login-email
+- assertVisible:
+    id: auth-login-email
+    text: rtl-test@example.com
+- scrollUntilVisible:
+    element:
+      id: page-layout-direction-switch
+- tapOn:
+    id: page-layout-direction-switch
+- scrollUntilVisible:
+    element:
+      id: auth-login-email
+- assertVisible:
+    id: auth-login-email
+    text: rtl-test@example.com
+- scrollUntilVisible:
+    element:
+      id: auth-login-forgot-password
+- tapOn:
+    id: auth-login-forgot-password
+- assertVisible:
+    id: auth-forgot-password
+- scrollUntilVisible:
+    element:
+      id: page-appearance-footer
+- scrollUntilVisible:
+    element:
+      id: page-layout-direction-switch
+- tapOn:
+    id: page-layout-direction-switch
+- scrollUntilVisible:
+    element:
+      id: auth-forgot-password-email
+- assertVisible:
+    id: auth-forgot-password-email
+- scrollUntilVisible:
+    element:
+      id: page-layout-direction-switch
+- tapOn:
+    id: page-layout-direction-switch

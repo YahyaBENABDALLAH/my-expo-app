@@ -1,4 +1,5 @@
-import { Column, Host, Row, Text, type SpacerProps } from '@expo/ui';
+import Colors from '@/constants/colors';
+import { Column, UniversalHost as Host, Row, Spacer, Text, type SpacerProps } from '@components/ui';
 import type { Meta, StoryObj } from '@storybook/react-native';
 import { action } from 'storybook/actions';
 import {
@@ -6,11 +7,11 @@ import {
   nativeThemeControls,
   type NativeStoryTheme,
 } from '../../components/native-story-frame';
-import { UniversalSpacer } from '@/components/ui/universal-spacer';
 
 type DemoProps = SpacerProps & NativeStoryTheme & { direction: 'vertical' | 'horizontal' };
 
 function SpacerDemo({ colorScheme, seedColor, direction, ...args }: DemoProps) {
+  const colors = Colors[colorScheme ?? 'dark'];
   const Container = direction === 'horizontal' ? Row : Column;
   return (
     <Host
@@ -26,22 +27,22 @@ function SpacerDemo({ colorScheme, seedColor, direction, ...args }: DemoProps) {
           width: 260,
           height: 240,
           padding: 16,
-          backgroundColor: colorScheme === 'light' ? '#DDEAF5' : '#101F34',
+          backgroundColor: colorScheme === 'light' ? Colors.light.surface : Colors.dark.surface,
           borderRadius: 12,
         }}
       >
         <Text
           testID={`${args.testID}-start`}
-          style={{ padding: 8, backgroundColor: '#173C65', borderRadius: 8 }}
-          textStyle={{ color: '#DBEDF4' }}
+          style={{ padding: 8, backgroundColor: colors.primaryContainer, borderRadius: 8 }}
+          textStyle={{ color: colors.onPrimaryContainer }}
         >
           Start
         </Text>
-        <UniversalSpacer {...args} />
+        <Spacer {...args} />
         <Text
           testID={`${args.testID}-end`}
-          style={{ padding: 8, backgroundColor: '#173C65', borderRadius: 8 }}
-          textStyle={{ color: '#DBEDF4' }}
+          style={{ padding: 8, backgroundColor: colors.primaryContainer, borderRadius: 8 }}
+          textStyle={{ color: colors.onPrimaryContainer }}
         >
           End
         </Text>
@@ -92,7 +93,9 @@ export const FlexibleVertical: Story = { args: { flexible: true, size: undefined
 export const FlexibleHorizontal: Story = {
   args: { direction: 'horizontal', flexible: true, size: undefined },
 };
-export const HighlightedSpace: Story = { args: { style: { backgroundColor: '#39B58D' } } };
+export const HighlightedSpace: Story = {
+  args: { style: { backgroundColor: Colors.dark.primary } },
+};
 export const Hidden: Story = { args: { hidden: true } };
 export const LightTheme: Story = { args: { colorScheme: 'light' } };
 export const DarkTheme: Story = { args: { colorScheme: 'dark' } };

@@ -1,9 +1,15 @@
+import Colors from '@/constants/colors';
+import { UniversalText as Text, UniversalButton } from '@components/ui';
+import {
+  UniversalPicker,
+  type UniversalPickerProps,
+} from '../../components/showcase/universal-picker';
 import type { Meta, StoryObj } from '@storybook/react-native';
 import { useState } from 'react';
-import { Text, View } from 'react-native';
+import { View } from 'react-native';
+
 import { action } from 'storybook/actions';
 import { NativeStoryFrame, nativeThemeControls } from '../../components/native-story-frame';
-import { UniversalPicker, type UniversalPickerProps } from '@/components/ui/universal-picker';
 
 const cities = [
   { label: 'Casablanca', value: 'casablanca' },
@@ -25,12 +31,24 @@ function PickerDemo(args: UniversalPickerProps) {
       />
       <Text
         testID={`${args.testID}-value`}
-        style={{ color: args.colorScheme === 'light' ? '#173C65' : '#DBEDF4' }}
+        textStyle={{ color: args.colorScheme === 'light' ? Colors.light.text : Colors.dark.text }}
       >
-        Selected: {String(selectedValue)}
+        {`Selected: ${String(selectedValue)}`}
       </Text>
+      <UniversalButton
+        variant="secondary"
+        label="Reset selection"
+        testID={`${args.testID}-reset`}
+        colorScheme={args.colorScheme}
+        disabled={!args.enabled}
+        onPress={() => setSelectedValue(args.selectedValue)}
+      />
       {args.appearance === 'wheel' ? (
-        <Text style={{ color: args.colorScheme === 'light' ? '#526C82' : '#98AEC2' }}>
+        <Text
+          textStyle={{
+            color: args.colorScheme === 'light' ? Colors.light.muted : Colors.dark.muted,
+          }}
+        >
           Wheel appearance is iOS-only. Android uses its native dropdown.
         </Text>
       ) : null}
@@ -48,7 +66,6 @@ const meta = {
     appearance: 'menu',
     enabled: true,
     colorScheme: 'dark',
-    seedColor: '#5AB9E8',
     onValueChange: action('picker changed'),
   },
   argTypes: {

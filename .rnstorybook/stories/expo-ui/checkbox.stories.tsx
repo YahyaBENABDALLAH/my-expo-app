@@ -1,9 +1,15 @@
+import Colors from '@/constants/colors';
+import { UniversalText as RNText } from '@components/ui';
+import {
+  UniversalCheckbox,
+  type UniversalCheckboxProps,
+} from '../../components/showcase/universal-checkbox';
 import type { Meta, StoryObj } from '@storybook/react-native';
 import { useState } from 'react';
-import { Text, View } from 'react-native';
+import { View } from 'react-native';
+
 import { action } from 'storybook/actions';
 import { NativeStoryFrame, nativeThemeControls } from '../../components/native-story-frame';
-import { UniversalCheckbox, type UniversalCheckboxProps } from '@/components/ui/universal-checkbox';
 
 function CheckboxDemo(args: UniversalCheckboxProps) {
   const [value, setValue] = useState(args.value);
@@ -17,15 +23,17 @@ function CheckboxDemo(args: UniversalCheckboxProps) {
           args.onValueChange(next);
         }}
       />
-      <Text
+      <RNText
         testID={`${args.testID}-value`}
-        style={{ color: args.colorScheme === 'light' ? '#173C65' : '#DBEDF4' }}
+        textStyle={{ color: args.colorScheme === 'light' ? Colors.light.text : Colors.dark.text }}
       >
-        Value: {value ? 'Checked' : 'Unchecked'}
-      </Text>
-      <Text style={{ color: args.colorScheme === 'light' ? '#526C82' : '#98AEC2' }}>
+        {`Value: ${value ? 'Checked' : 'Unchecked'}`}
+      </RNText>
+      <RNText
+        textStyle={{ color: args.colorScheme === 'light' ? Colors.light.muted : Colors.dark.muted }}
+      >
         Android uses a checkbox. iOS uses its native toggle appearance.
-      </Text>
+      </RNText>
     </View>
   );
 }
@@ -39,7 +47,6 @@ const meta = {
     label: 'Accept terms and conditions',
     disabled: false,
     colorScheme: 'dark',
-    seedColor: '#5AB9E8',
     onValueChange: action('checkbox changed'),
   },
   argTypes: {
@@ -68,6 +75,6 @@ export const WithoutLabel: Story = { args: { label: undefined } };
 export const LongLabel: Story = {
   args: { label: 'I agree to receive updates about my account, notifications, and new features' },
 };
-export const CustomTint: Story = { args: { seedColor: '#39B58D', value: true } };
+export const CustomTint: Story = { args: { seedColor: Colors.dark.primary, value: true } };
 export const LightTheme: Story = { args: { colorScheme: 'light' } };
 export const DarkTheme: Story = { args: { colorScheme: 'dark' } };

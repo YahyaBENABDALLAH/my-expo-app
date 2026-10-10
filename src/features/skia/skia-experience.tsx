@@ -1,68 +1,70 @@
+import { useTranslation } from 'react-i18next';
+import {
+  Column,
+  ScrollView,
+  Spacer,
+  UniversalHost,
+  UniversalTextContent as Text,
+  UniversalButtonContent,
+  nativeFillSize,
+  nativeFillWidth,
+  AuroraBackground,
+} from '@components/ui';
 import { useState } from 'react';
 import { useIsFocused } from 'expo-router';
-import { Pressable, ScrollView, Text, View, useWindowDimensions } from 'react-native';
+import { View } from 'react-native';
 import { useReducedMotion, useSharedValue, withTiming } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useColorScheme } from '@/hooks/use-color-scheme';
 
-import { AuroraBackground } from '@/components/visuals/aurora-background';
-import { TAB_BAR_CONTENT_HEIGHT } from '@/constants/layout';
-
-const paletteNames = ['Aurora', 'Prism', 'Tidal'];
+const paletteNames = ['canvas.aurora', 'canvas.prism', 'canvas.tidal'];
 
 export default function SkiaExperience() {
+  const { t } = useTranslation();
   const focused = useIsFocused();
-  const { height } = useWindowDimensions();
+  const scheme = useColorScheme();
   const insets = useSafeAreaInsets();
-  const tabBarHeight = TAB_BAR_CONTENT_HEIGHT + insets.bottom;
   const reduceMotion = useReducedMotion();
   const hue = useSharedValue(0);
   const [palette, setPalette] = useState(0);
-
   const changePalette = () => {
     const next = (palette + 1) % paletteNames.length;
     setPalette(next);
     hue.set(withTiming(next * 2.1, { duration: reduceMotion ? 0 : 250 }));
   };
-
   return (
     <View style={{ flex: 1 }}>
-      {focused ? <AuroraBackground hue={hue} style={{ flex: 1 }} /> : null}
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        style={{
-          position: 'absolute',
-          left: Math.max(24, insets.left + 16),
-          right: Math.max(24, insets.right + 16),
-          bottom: tabBarHeight + 24,
-          maxHeight: Math.max(0, height - insets.top - tabBarHeight - 48),
-        }}
-        contentContainerStyle={{ gap: 12 }}
+      {focused ? <AuroraBackground hue={hue} colorScheme={scheme} style={{ flex: 1 }} /> : null}
+      <UniversalHost
+        colorScheme={scheme}
+        matchContents={false}
+        ignoreSafeArea="all"
+        style={{ position: 'absolute', left: 0, right: 0, top: 0, bottom: 0 }}
       >
-        <Text style={{ color: '#B8E9FF', fontSize: 12, letterSpacing: 2 }}>LIVE CANVAS</Text>
-        <Text style={{ color: '#FFFFFF', fontFamily: 'Inter-Black', fontSize: 40 }}>
-          Light in motion
-        </Text>
-        <Text style={{ color: '#DBEDF4', fontSize: 15, lineHeight: 22 }}>
-          A Skia shader animated with Reanimated. Change the colors and watch the canvas respond.
-        </Text>
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel={`Change color palette, currently ${paletteNames[palette]}`}
-          onPress={changePalette}
+        <Column
+          modifiers={nativeFillSize}
           style={{
-            alignSelf: 'flex-start',
-            marginTop: 8,
-            paddingHorizontal: 18,
-            paddingVertical: 12,
-            borderRadius: 16,
-            backgroundColor: '#FFFFFF',
+            paddingTop: insets.top + 24,
+            paddingBottom: 24,
+            paddingLeft: Math.max(24, insets.left + 16),
+            paddingRight: Math.max(24, insets.right + 16),
           }}
         >
-          <Text style={{ color: '#132943', fontWeight: '700' }}>
-            Palette: {paletteNames[palette]}
-          </Text>
-        </Pressable>
-      </ScrollView>
+          <Spacer flexible />
+          <ScrollView showsIndicators={false}>
+            <Column spacing={12} modifiers={nativeFillWidth}>
+              <Text variant="caption">{t('canvas.live')}</Text>
+              <Text variant="heading">{t('canvas.title')}</Text>
+              <Text>{t('canvas.description')}</Text>
+              <UniversalButtonContent
+                variant="secondary"
+                label={t('canvas.palette', { palette: t(paletteNames[palette]) })}
+                onPress={changePalette}
+              />
+            </Column>
+          </ScrollView>
+        </Column>
+      </UniversalHost>
     </View>
   );
 }

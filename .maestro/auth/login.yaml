@@ -1,5 +1,5 @@
 appId: com.hyrkul.likan
-name: Login validation and correction
+name: Login validation and password visibility
 tags: [smoke, auth]
 ---
 - runFlow:
@@ -9,46 +9,38 @@ tags: [smoke, auth]
       READY_ID: auth-login-submit
 - assertNotVisible:
     id: auth-login-email-error
-- assertNotVisible:
-    id: auth-login-password-error
-- tapOn:
-    id: auth-login-email
-- assertNotVisible:
-    id: auth-login-email-error
-- tapOn:
-    id: auth-login-password
-- assertVisible:
-    id: auth-login-email-error
-    text: Enter your email address.
-- assertNotVisible:
-    id: auth-login-password-error
-- hideKeyboard
 - tapOn:
     id: auth-login-submit
 - hideKeyboard
 - assertVisible:
     id: auth-login-email-error
-    text: Enter your email address.
+    text: Enter your email or username.
 - assertVisible:
     id: auth-login-password-error
-    text: Enter your password.
+    text: Use at least 8 characters.
 - tapOn:
     id: auth-login-email
 - inputText: alex@example.com
-- hideKeyboard
 - tapOn:
     id: auth-login-password
 - inputText: example-password
 - hideKeyboard
-- tapOn:
-    id: auth-login-submit
-- assertVisible:
-    id: auth-login-submit-status
-    text: Your sign-in details look good.
 - assertNotVisible:
     id: auth-login-email-error
 - assertNotVisible:
     id: auth-login-password-error
+- tapOn:
+    id: auth-login-password-right-icon
+- assertVisible:
+    id: auth-login-password
+    text: example-password
+- assertVisible: Hide password
+- tapOn:
+    id: auth-login-password-right-icon
+- assertVisible: Show password
+- assertNotVisible:
+    id: auth-login-password
+    text: example-password
 - tapOn:
     id: auth-login-forgot-password
 - assertVisible:

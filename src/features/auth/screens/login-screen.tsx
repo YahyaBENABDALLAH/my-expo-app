@@ -1,83 +1,111 @@
-import { View } from 'react-native';
-import { useColorScheme } from '@/hooks/use-color-scheme';
+import { useTranslation } from 'react-i18next';
+import {
+  Column,
+  nativeFillWidth,
+  nativeFillWidthEnd,
+  UniversalButtonContent,
+  AuthScreenFrame,
+  FormSubmit,
+  FormTextInput,
+  authInputIcons,
+} from '@components/ui';
+import { router } from 'expo-router';
 
-import { UniversalButton } from '@/components/ui/universal-button';
-import { AuthScreenFrame } from '@/features/auth/components/auth-screen-frame';
-import { AuthSubmit } from '@/features/auth/components/auth-submit';
-import { FormTextInput } from '@/features/auth/components/form-text-input';
-import { useValidatedAuthForm } from '@/features/auth/hooks/use-validated-auth-form';
-import { useAuthNavigation } from '@/features/auth/hooks/use-auth-navigation';
+import { useAuthForm } from '../hooks/use-auth-form';
+import { useAuthFlow } from '../auth-flow.context';
 import { loginResolver } from '@/validation/resolvers/auth';
 import type { LoginFormValues } from '@/validation/schemas/auth';
+import { useAuthContext } from '@/context/auth.context';
+import { appDevEnabled } from '@/constants/app-dev';
+import { useEffect, useState } from 'react';
 
-export function LoginScreen({ tabbed = false }: { tabbed?: boolean }) {
-  const scheme = useColorScheme();
-  const { openRegister, openForgotPassword } = useAuthNavigation(tabbed);
-  const { form, notice, submit, onEdited } = useValidatedAuthForm<LoginFormValues>(
+export function LoginScreen() {
+  const { t } = useTranslation();
+  const { signIn } = useAuthFlow();
+  const { developmentGuest, enterDevelopmentGuest } = useAuthContext();
+  const [openGuestPages, setOpenGuestPages] = useState(false);
+  useEffect(() => {
+    if (openGuestPages && developmentGuest) router.replace('/development-pages');
+  }, [openGuestPages, developmentGuest]);
+  const { form, submit, pending } = useAuthForm<LoginFormValues>(
     loginResolver,
-    { email: '', password: '' },
-    'Your sign-in details look good.',
+    { login: '', password: '' },
+    signIn,
   );
   return (
     <AuthScreenFrame
       testID="auth-login"
-      description="Welcome back. Enter your email and password to continue."
-      tabbed={tabbed}
+      title={t('auth.welcomeBack')}
+      description={t('auth.loginDescription')}
     >
-      <View style={{ gap: 20 }}>
-        <FormTextInput
-          control={form.control}
-          name="email"
-          testID="auth-login-email"
-          label="Email address"
-          placeholder="you@example.com"
-          keyboardType="email-address"
-          autoComplete="email"
-          autoCapitalize="none"
-          autoCorrect={false}
-          onEdited={onEdited}
-        />
-        <FormTextInput
-          control={form.control}
-          name="password"
-          testID="auth-login-password"
-          label="Password"
-          placeholder="Enter your password"
-          password
-          autoComplete="current-password"
-          autoCapitalize="none"
-          autoCorrect={false}
-          returnKeyType="done"
-          onSubmitEditing={() => {
-            void submit();
-          }}
-          onEdited={onEdited}
-        />
-        <View style={{ alignSelf: 'flex-end' }}>
-          <UniversalButton
-            testID="auth-login-forgot-password"
-            variant="link"
-            colorScheme={scheme}
-            label="Forgot password?"
-            onPress={openForgotPassword}
-          />
-        </View>
-        <AuthSubmit
-          testID="auth-login-submit"
-          label="Log in"
-          pending={form.formState.isSubmitting}
-          notice={notice}
+      {appDevEnabled && (
+        <UniversalButtonContent
+          fullWidth
+          variant="secondary"
+          label={t('tools.guestEntry')}
+          testID="auth-development-guest"
+          disabled={pending}
           onPress={() => {
-            void submit();
+            setOpenGuestPages(true);
+            enterDevelopmentGuest();
           }}
         />
-      </View>
-      <UniversalButton
+      )}
+      <Column spacing={20} modifiers={nativeFillWidth}>
+        <FormTextInput
+          control={form.control}
+          name="login"
+          testID="auth-login-email"
+          label={t('auth.identity')}
+          leftIcon={authInputIcons.person}
+          placeholder={t('auth.emailPlaceholder')}
+          autoComplete="username"
+          autoCapitalize="none"
+          autoCorrect={false}
+          returnKeyType="next"
+          onSubmitEditing={() => form.setFocus('password')}
+          disabled={pending}
+        />
+        <Column spacing={2} modifiers={nativeFillWidth}>
+          <FormTextInput
+            control={form.control}
+            name="password"
+            testID="auth-login-password"
+            label={t('auth.password')}
+            leftIcon={authInputIcons.password}
+            passwordToggle="icon"
+            placeholder={t('auth.enterPassword')}
+            password
+            autoComplete="current-password"
+            autoCapitalize="none"
+            autoCorrect={false}
+            returnKeyType="send"
+            onSubmitEditing={() => void submit()}
+            disabled={pending}
+          />
+          <Column alignment="end" modifiers={nativeFillWidthEnd}>
+            <UniversalButtonContent
+              testID="auth-login-forgot-password"
+              variant="link"
+              label={t('auth.forgotPassword')}
+              disabled={pending}
+              onPress={() => router.push('/forgot-password')}
+            />
+          </Column>
+        </Column>
+        <FormSubmit
+          testID="auth-login-submit"
+          label={t('auth.signIn')}
+          pending={pending}
+          onPress={() => void submit()}
+        />
+      </Column>
+      <UniversalButtonContent
         testID="auth-login-register"
-        variant="secondary"
-        colorScheme={scheme}
-        label="Create an account"
-        onPress={openRegister}
+        variant="link"
+        label={t('auth.noAccountLink')}
+        disabled={pending}
+        onPress={() => router.push('/register')}
       />
     </AuthScreenFrame>
   );

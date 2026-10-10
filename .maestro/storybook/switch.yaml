@@ -1,5 +1,5 @@
 appId: com.hyrkul.likan
-name: Switch changes value and resets
+name: Switch changes value in both themes and suppresses disabled changes
 tags: [smoke, storybook]
 env:
   STORYBOOK_URL: myappexpo://storybook
@@ -22,3 +22,28 @@ env:
 - assertVisible:
     id: expo-ui-switch-value
     text: 'Value: Off'
+- runFlow:
+    file: ../helpers/open-story.yaml
+    env:
+      STORY_ID: expo-ui-universal-switch--light-theme
+      READY_ID: expo-ui-switch
+- tapOn:
+    id: expo-ui-switch
+- assertVisible:
+    id: expo-ui-switch-value
+    text: 'Value: On'
+- tapOn:
+    id: expo-ui-switch-reset
+- assertVisible:
+    id: expo-ui-switch-value
+    text: 'Value: Off'
+- runFlow:
+    file: ../helpers/open-story.yaml
+    env:
+      STORY_ID: expo-ui-universal-switch--disabled-on
+      READY_ID: expo-ui-switch
+- tapOn:
+    id: expo-ui-switch
+- assertVisible:
+    id: expo-ui-switch-value
+    text: 'Value: On'

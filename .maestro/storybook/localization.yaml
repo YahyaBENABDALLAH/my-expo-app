@@ -1,0 +1,61 @@
+appId: com.hyrkul.likan
+name: French English and Arabic labels preserve the draft and update direction
+tags: [storybook, localization, rtl]
+env:
+  STORYBOOK_URL: myappexpo://storybook
+---
+- runFlow:
+    file: ../helpers/open-story.yaml
+    env:
+      STORY_ID: pages-localization--default
+      READY_ID: locale-status
+- scrollUntilVisible:
+    element:
+      id: page-language-picker
+- tapOn:
+    id: page-language-picker
+- tapOn: Français
+- assertVisible:
+    id: locale-status
+    text: fr · ltr
+- scrollUntilVisible:
+    element:
+      id: locale-draft
+    direction: UP
+- tapOn:
+    id: locale-draft
+- inputText: Draft 123
+- hideKeyboard
+- assertVisible:
+    id: locale-draft-value
+    text: 'Brouillon : Draft 123'
+- scrollUntilVisible:
+    element:
+      id: page-language-picker
+- tapOn:
+    id: page-language-picker
+- tapOn: English
+- assertVisible:
+    id: locale-status
+    text: en · ltr
+- assertVisible:
+    id: locale-draft-value
+    text: 'Draft: Draft 123'
+- tapOn:
+    id: page-language-picker
+- tapOn: العربية
+- assertVisible:
+    id: locale-status
+    text: ar · rtl
+- assertVisible:
+    id: locale-draft-value
+    text: 'المسودّة: Draft 123'
+- tapOn:
+    id: page-language-picker
+- tapOn: English
+- assertVisible:
+    id: locale-status
+    text: en · ltr
+- assertVisible:
+    id: locale-draft-value
+    text: 'Draft: Draft 123'

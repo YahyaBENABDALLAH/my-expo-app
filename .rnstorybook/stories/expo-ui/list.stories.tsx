@@ -1,11 +1,12 @@
-import { Icon, ListItem, Text } from '@expo/ui';
+import Colors from '@/constants/colors';
+import { Icon, ListItem, Text, UniversalText as RNText, UniversalListItem } from '@components/ui';
+import { UniversalList, type UniversalListProps } from '../../components/showcase/universal-list';
 import type { Meta, StoryObj } from '@storybook/react-native';
 import { useState } from 'react';
-import { Text as RNText, View } from 'react-native';
+import { View } from 'react-native';
+
 import { action } from 'storybook/actions';
 import { NativeStoryFrame, nativeThemeControls } from '../../components/native-story-frame';
-import { UniversalList, type UniversalListProps } from '@/components/ui/universal-list';
-import { UniversalListItem } from '@/components/ui/universal-list-item';
 
 const leadingIcon = Icon.select({
   ios: 'star.fill',
@@ -35,11 +36,11 @@ function ListDemo({
 }: DemoProps) {
   const [selected, setSelected] = useState<number | null>(null);
   const [refreshCount, setRefreshCount] = useState(0);
-  const ink = args.colorScheme === 'light' ? '#173C65' : '#DBEDF4';
+  const ink = args.colorScheme === 'light' ? Colors.light.text : Colors.dark.text;
   return (
     <View style={{ gap: 16 }}>
-      <RNText testID={`${args.testID}-status`} style={{ color: ink }}>
-        Selected row: {selected ?? 'None'} · Refresh count: {refreshCount}
+      <RNText testID={`${args.testID}-status`} textStyle={{ color: ink }}>
+        {`Selected row: ${selected ?? 'None'} · Refresh count: ${refreshCount}`}
       </RNText>
       <UniversalList
         {...args}
@@ -115,7 +116,6 @@ const meta = {
     refreshable: false,
     viewportHeight: 400,
     colorScheme: 'dark',
-    seedColor: '#5AB9E8',
     onRowPress: action('list row pressed'),
     onRefreshRequested: action('list refresh requested'),
   },

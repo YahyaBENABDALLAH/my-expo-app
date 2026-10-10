@@ -1,5 +1,1 @@
-import { ListItem, type ListItemProps } from '@expo/ui';
-
-export function UniversalListItem(props: ListItemProps) {
-  return <ListItem {...props} />;
-}
+export { ListItem as UniversalListItem } from './list-item';

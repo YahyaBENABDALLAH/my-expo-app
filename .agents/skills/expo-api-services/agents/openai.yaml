@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Expo API Services'
+  short_description: 'Add and update typed services, hooks and cache behavior'
+  default_prompt: "Use $expo-api-services to add or update an entity API service and its TanStack Query hooks, following this project's contracts and cache conventions."

@@ -1,26 +1,34 @@
-import { Column, Text } from '@expo/ui';
+import Colors from '@/constants/colors';
+import { Column, Text } from '@components/ui';
+import {
+  UniversalColumn,
+  type UniversalColumnProps,
+} from '../../components/showcase/universal-column';
 import type { Meta, StoryObj } from '@storybook/react-native';
 import { action } from 'storybook/actions';
 import { NativeStoryFrame, nativeThemeControls } from '../../components/native-story-frame';
-import { UniversalColumn, type UniversalColumnProps } from '@/components/ui/universal-column';
 
 type DemoProps = UniversalColumnProps & { itemCount: number; nested: boolean };
 
 function ColumnDemo({ itemCount, nested, ...args }: DemoProps) {
+  const colors = Colors[args.colorScheme ?? 'dark'];
   return (
     <UniversalColumn {...args}>
       {Array.from({ length: itemCount }, (_, i) => (
         <Text
           key={i}
           testID={`${args.testID}-item-${i + 1}`}
-          style={{ padding: 12, borderRadius: 8, backgroundColor: '#173C65' }}
-          textStyle={{ color: '#DBEDF4', fontSize: 16 }}
+          style={{ padding: 12, borderRadius: 8, backgroundColor: colors.primaryContainer }}
+          textStyle={{ color: colors.onPrimaryContainer, fontSize: 16 }}
         >{`Item ${i + 1}`}</Text>
       ))}
       {nested ? (
-        <Column spacing={8} style={{ padding: 12, backgroundColor: '#254C68', borderRadius: 12 }}>
-          <Text textStyle={{ color: '#DBEDF4' }}>Nested column</Text>
-          <Text textStyle={{ color: '#DBEDF4' }}>Second nested item</Text>
+        <Column
+          spacing={8}
+          style={{ padding: 12, backgroundColor: colors.surfaceRaised, borderRadius: 12 }}
+        >
+          <Text textStyle={{ color: colors.text }}>Nested column</Text>
+          <Text textStyle={{ color: colors.text }}>Second nested item</Text>
         </Column>
       ) : null}
     </UniversalColumn>
@@ -38,7 +46,7 @@ const meta = {
     nested: false,
     disabled: false,
     hidden: false,
-    style: { width: 260, padding: 16, backgroundColor: '#101F34', borderRadius: 12 },
+    style: { width: 260, padding: 16, backgroundColor: Colors.dark.surface, borderRadius: 12 },
     colorScheme: 'dark',
     onPress: action('column pressed'),
     onAppear: action('column appeared'),
@@ -81,7 +89,7 @@ export const Hidden: Story = { args: { hidden: true } };
 export const LightTheme: Story = {
   args: {
     colorScheme: 'light',
-    style: { width: 260, padding: 16, backgroundColor: '#DDEAF5', borderRadius: 12 },
+    style: { width: 260, padding: 16, backgroundColor: Colors.light.surface, borderRadius: 12 },
   },
 };
 export const DarkTheme: Story = { args: { colorScheme: 'dark' } };

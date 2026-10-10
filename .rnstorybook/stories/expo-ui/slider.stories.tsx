@@ -1,10 +1,15 @@
+import Colors from '@/constants/colors';
+import { UniversalText as Text, UniversalButton } from '@components/ui';
+import {
+  UniversalSlider,
+  type UniversalSliderProps,
+} from '../../components/showcase/universal-slider';
 import type { Meta, StoryObj } from '@storybook/react-native';
 import { useState } from 'react';
-import { Text, View } from 'react-native';
+import { View } from 'react-native';
+
 import { action } from 'storybook/actions';
 import { NativeStoryFrame, nativeThemeControls } from '../../components/native-story-frame';
-import { UniversalSlider, type UniversalSliderProps } from '@/components/ui/universal-slider';
-import { UniversalButton } from '@/components/ui/universal-button';
 
 function SliderDemo(args: UniversalSliderProps) {
   const [value, setValue] = useState(args.value);
@@ -12,9 +17,9 @@ function SliderDemo(args: UniversalSliderProps) {
     <View style={{ gap: 16 }}>
       <Text
         testID={`${args.testID}-value`}
-        style={{ color: args.colorScheme === 'light' ? '#173C65' : '#DBEDF4' }}
+        textStyle={{ color: args.colorScheme === 'light' ? Colors.light.text : Colors.dark.text }}
       >
-        Value: {Number(value.toFixed(2))} · Range: {args.min}–{args.max}
+        {`Value: ${Number(value.toFixed(2))} · Range: ${args.min}–${args.max}`}
       </Text>
       <UniversalSlider
         {...args}
@@ -25,6 +30,7 @@ function SliderDemo(args: UniversalSliderProps) {
         }}
       />
       <UniversalButton
+        variant="secondary"
         testID={`${args.testID}-reset`}
         label="Reset slider"
         colorScheme={args.colorScheme}
@@ -48,7 +54,6 @@ const meta = {
     max: 100,
     disabled: false,
     colorScheme: 'dark',
-    seedColor: '#5AB9E8',
     onValueChange: action('slider changed'),
   },
   argTypes: {
@@ -82,4 +87,4 @@ export const DisabledMinimum: Story = { args: { disabled: true, value: 0 } };
 export const DisabledMaximum: Story = { args: { disabled: true, value: 100 } };
 export const LightTheme: Story = { args: { colorScheme: 'light' } };
 export const DarkTheme: Story = { args: { colorScheme: 'dark' } };
-export const CustomTint: Story = { args: { seedColor: '#A78BFA' } };
+export const CustomTint: Story = { args: { seedColor: Colors.dark.secondary } };

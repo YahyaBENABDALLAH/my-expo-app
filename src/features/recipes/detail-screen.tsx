@@ -1,0 +1,104 @@
+import { useTranslation } from 'react-i18next';
+import {
+  Column,
+  UniversalButtonContent,
+  PageScreen,
+  UniversalTextContent as Text,
+  QueryContent,
+} from '@components/ui';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useLocalSearchParams } from 'expo-router';
+import { useEffect } from 'react';
+
+import { useScreenRefresh } from '@/hooks/use-screen-refresh';
+import { isValidRouteIdentifier } from '@/lib/route-identifier';
+
+import { useAuthContext } from '@/context/auth.context';
+import { collectionMutationOptions, likeRecipeOptions } from './mutations';
+import { collectionOptions } from './collections';
+import { recipeDetailOptions } from './queries';
+
+export default function DetailScreen() {
+  const { t } = useTranslation();
+  const { uuid } = useLocalSearchParams<{ uuid?: string | string[] }>();
+  const valid = isValidRouteIdentifier(uuid);
+  const { user } = useAuthContext();
+  const userUuid = user?.uuid ?? '';
+  const client = useQueryClient();
+  const recipeOptions = recipeDetailOptions(valid ? uuid : '');
+  const favoriteOptions = collectionOptions(userUuid, 'favorites');
+  const recipe = useQuery({ ...recipeOptions, enabled: valid });
+  const favorites = useQuery(favoriteOptions);
+  const onRefresh = useScreenRefresh([recipeOptions.queryKey, favoriteOptions.queryKey]);
+  const favorite = favorites.data?.some((item) => item.uuid === uuid) ?? false;
+  const save = useMutation(collectionMutationOptions(client, userUuid, 'favorites'));
+  const { mutate: recordView } = useMutation(
+    collectionMutationOptions(client, userUuid, 'history'),
+  );
+  useEffect(() => {
+    if (recipe.data && userUuid) recordView({ recipe: recipe.data });
+  }, [recipe.data, userUuid, recordView]);
+  const like = useMutation(likeRecipeOptions(client, userUuid, valid ? uuid : ''));
+  return (
+    <PageScreen
+      title={valid ? t('common.recipeLabel') : t('recipes.invalidLink')}
+      onRefresh={valid ? onRefresh : undefined}
+      description={
+        valid ? (recipe.data?.summary ?? t('recipes.details')) : t('recipes.invalidLinkDescription')
+      }
+    >
+      {valid ? (
+        <QueryContent query={recipe}>
+          <Text variant="title">{recipe.data?.title ?? ''}</Text>
+          <Text>
+            {t('recipes.facts', {
+              minutes: recipe.data?.totalTimeMinutes ?? 0,
+              servings: recipe.data?.servings ?? 0,
+            })}
+          </Text>
+          {!userUuid ? <Text>{t('recipes.loginLike')}</Text> : null}
+          <UniversalButtonContent
+            variant={favorite ? 'destructive' : 'secondary'}
+            label={
+              save.isPending
+                ? t('recipes.saving')
+                : favorite
+                  ? t('recipes.removeFavorite')
+                  : t('recipes.saveFavorite')
+            }
+            testID="recipe-favorite"
+            disabled={!userUuid || !favorites.data || save.isPending}
+            onPress={() => save.mutate({ recipe: recipe.data, remove: favorite })}
+          />
+          {save.error ? <Text>{t('recipes.favoriteFailed')}</Text> : null}
+          <UniversalButtonContent
+            variant="secondary"
+            label={
+              like.isPending
+                ? t('recipes.liking')
+                : like.isSuccess
+                  ? t('common.likedOnly')
+                  : t('recipes.like')
+            }
+            disabled={like.isPending || like.isSuccess || !userUuid}
+            onPress={() => like.mutate()}
+          />
+          {like.error ? <Text>{t('recipes.likeFailed')}</Text> : null}
+          <Text variant="title">{t('common.ingredients')}</Text>
+          {recipe.data?.ingredients?.map((item, index) => (
+            <Text
+              key={index}
+            >{`${item.quantity ?? ''} ${item.unitLabel ?? ''} ${item.ingredientName}${item.isOptional ? t('recipes.optional') : ''}`}</Text>
+          ))}
+          <Text variant="title">{t('recipes.instructions')}</Text>
+          {recipe.data?.steps?.map((item) => (
+            <Column key={item.stepNumber} spacing={8}>
+              <Text fontWeight="600">{`${item.stepNumber}. ${item.title}`}</Text>
+              <Text>{item.instruction}</Text>
+            </Column>
+          ))}
+        </QueryContent>
+      ) : null}
+    </PageScreen>
+  );
+}

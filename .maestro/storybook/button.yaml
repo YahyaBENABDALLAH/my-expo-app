@@ -1,0 +1,23 @@
+appId: com.hyrkul.likan
+name: Explicit button variants deliver and suppress presses
+tags: [smoke, storybook]
+env:
+  STORYBOOK_URL: myappexpo://storybook
+---
+- runFlow:
+    file: ../helpers/open-story.yaml
+    env:
+      STORY_ID: expo-ui-universal-button--interaction
+      READY_ID: button-count
+- tapOn:
+    id: button-count
+- assertVisible: 'Presses: 1'
+- tapOn:
+    id: button-disabled
+- assertVisible: 'Presses: 1'
+- tapOn:
+    id: button-count
+- assertVisible: 'Presses: 2'
+- tapOn:
+    id: button-reset
+- assertVisible: 'Presses: 0'

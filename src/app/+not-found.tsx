@@ -1,40 +1,12 @@
-import { Link, Stack } from 'expo-router';
-import { StyleSheet } from 'react-native';
-
-import { Text, View } from '@/components/themed';
-
+import { useTranslation } from 'react-i18next';
+import { PageScreen } from '@components/ui';
 export default function NotFoundScreen() {
+  const { t } = useTranslation();
   return (
-    <>
-      <Stack.Screen options={{ title: 'Screen not found' }} />
-      <View style={styles.container}>
-        <Text style={styles.title}>This screen doesn&apos;t exist.</Text>
-
-        <Link href="/" style={styles.link}>
-          <Text style={styles.linkText}>Go to home screen!</Text>
-        </Link>
-      </View>
-    </>
+    <PageScreen
+      title={t('recovery.notFound')}
+      description={t('recovery.notFoundDescription')}
+      actions={[{ label: t('recovery.home'), testID: 'page-action-go-home', href: '/' }]}
+    />
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 20,
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-  },
-  link: {
-    marginTop: 15,
-    paddingVertical: 15,
-  },
-  linkText: {
-    fontSize: 14,
-    color: '#2e78b7',
-  },
-});

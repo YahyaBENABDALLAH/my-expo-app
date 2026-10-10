@@ -2,7 +2,7 @@
 
 The `.maestro/` workspace contains seven shared Android/iOS Storybook smoke tests. Tests target the installed development build (`com.hyrkul.likan`) and the native test IDs documented in [storybook-test-ids.md](storybook-test-ids.md).
 
-Four additional flows under `.maestro/auth/` cover login, registration, password-reset validation, and returning to Account without losing login input. Run `npm run test:e2e:auth` to run those separately. They test form feedback and navigation, with no authentication service attached; see [auth-forms.md](auth-forms.md).
+Four additional flows under `.maestro/auth/` cover login, registration, password-recovery validation, and returning to Login without losing input. Run `npm run test:e2e:auth` to run those separately while signed out. These smoke flows never submit valid credentials, create accounts, or send recovery emails; see [auth-forms.md](auth-forms.md). Storybook routes now require an authenticated session.
 
 ## Prepare a device
 

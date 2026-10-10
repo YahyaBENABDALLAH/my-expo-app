@@ -1,0 +1,107 @@
+appId: com.hyrkul.likan
+name: Live direction footer remains available on tabs, detail pages and Storybook
+tags: [pages, rtl, signed-in]
+---
+- runFlow:
+    file: ../helpers/open-page.yaml
+    env:
+      PAGE_ROUTE: more
+      PAGE_TITLE: More
+- scrollUntilVisible:
+    element:
+      id: page-appearance-footer
+- runFlow:
+    when:
+      visible:
+        id: page-layout-direction-switch
+        checked: true
+    commands:
+      - tapOn:
+          id: page-layout-direction-switch
+- scrollUntilVisible:
+    element:
+      id: page-layout-direction-switch
+- tapOn:
+    id: page-layout-direction-switch
+- assertVisible:
+    id: page-layout-direction-switch
+    checked: true
+- assertVisible:
+    id: page-title
+    text: More
+- tapOn:
+    id: tab-home
+- assertVisible:
+    id: page-title
+    text: Home
+- scrollUntilVisible:
+    element:
+      id: page-layout-direction-switch
+- tapOn:
+    id: page-layout-direction-switch
+- tapOn:
+    id: tab-search
+- assertVisible:
+    id: page-title
+    text: Search
+- scrollUntilVisible:
+    element:
+      id: page-layout-direction-switch
+- tapOn:
+    id: page-layout-direction-switch
+- tapOn:
+    id: tab-recipes
+- assertVisible:
+    id: page-title
+    text: My recipes
+- scrollUntilVisible:
+    element:
+      id: page-layout-direction-switch
+- tapOn:
+    id: page-layout-direction-switch
+- tapOn:
+    id: tab-more
+- scrollUntilVisible:
+    element:
+      id: page-action-device-information
+- tapOn:
+    id: page-action-device-information
+- assertVisible:
+    id: page-title
+    text: Device information
+- scrollUntilVisible:
+    element:
+      id: page-appearance-footer
+- scrollUntilVisible:
+    element:
+      id: page-layout-direction-switch
+- tapOn:
+    id: page-layout-direction-switch
+- tapOn:
+    id: page-back
+- assertVisible:
+    id: page-title
+    text: More
+- scrollUntilVisible:
+    element:
+      id: page-layout-direction-switch
+- tapOn:
+    id: page-layout-direction-switch
+- openLink: myappexpo://storybook
+- extendedWaitUntil:
+    visible:
+      id: storybook-screen
+    timeout: 60000
+- scrollUntilVisible:
+    element:
+      id: page-appearance-footer
+- scrollUntilVisible:
+    element:
+      id: page-layout-direction-switch
+- tapOn:
+    id: page-layout-direction-switch
+- scrollUntilVisible:
+    element:
+      id: page-layout-direction-switch
+- tapOn:
+    id: page-layout-direction-switch

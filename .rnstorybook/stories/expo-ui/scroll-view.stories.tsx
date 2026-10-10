@@ -1,11 +1,12 @@
-import { Column, Row, Text } from '@expo/ui';
-import type { Meta, StoryObj } from '@storybook/react-native';
-import { action } from 'storybook/actions';
-import { NativeStoryFrame, nativeThemeControls } from '../../components/native-story-frame';
+import Colors from '@/constants/colors';
+import { Column, Row, Text } from '@components/ui';
 import {
   UniversalScrollView,
   type UniversalScrollViewProps,
-} from '@/components/ui/universal-scroll-view';
+} from '../../components/showcase/universal-scroll-view';
+import type { Meta, StoryObj } from '@storybook/react-native';
+import { action } from 'storybook/actions';
+import { NativeStoryFrame, nativeThemeControls } from '../../components/native-story-frame';
 
 type DemoProps = UniversalScrollViewProps & {
   itemCount: number;
@@ -13,6 +14,7 @@ type DemoProps = UniversalScrollViewProps & {
 };
 
 function ScrollViewDemo({ itemCount, onItemPress, ...args }: DemoProps) {
+  const colors = Colors[args.colorScheme ?? 'dark'];
   const Container = args.direction === 'horizontal' ? Row : Column;
   return (
     <UniversalScrollView {...args}>
@@ -27,9 +29,9 @@ function ScrollViewDemo({ itemCount, onItemPress, ...args }: DemoProps) {
               height: 72,
               padding: 16,
               borderRadius: 12,
-              backgroundColor: '#173C65',
+              backgroundColor: colors.primaryContainer,
             }}
-            textStyle={{ fontSize: 16, color: '#DBEDF4' }}
+            textStyle={{ fontSize: 16, color: colors.onPrimaryContainer }}
           >{`Item ${i + 1}`}</Text>
         ))}
       </Container>

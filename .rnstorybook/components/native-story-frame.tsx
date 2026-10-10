@@ -1,7 +1,16 @@
+import {
+  Column,
+  RNHostView,
+  ScrollView,
+  UniversalHost,
+  nativeFillWidth,
+  type UniversalThemeProps,
+} from '@components/ui';
 import type { PropsWithChildren } from 'react';
-import { Platform, ScrollView } from 'react-native';
-import type { UniversalThemeProps } from '@/components/ui/types';
-import Colors from '@/constants/colors';
+
+import { View } from 'react-native';
+
+import { useThemeColors } from '@/hooks/use-theme';
 
 export type NativeStoryTheme = UniversalThemeProps;
 
@@ -11,19 +20,21 @@ export function NativeStoryFrame({
   colorScheme = 'dark',
   testID,
 }: PropsWithChildren<NativeStoryTheme>) {
-  if (Platform.OS !== 'ios' && Platform.OS !== 'android') return null;
+  const colors = useThemeColors(colorScheme);
   return (
-    <ScrollView
-      testID={testID ? `${testID}-canvas` : undefined}
-      keyboardShouldPersistTaps="handled"
-      contentContainerStyle={{
-        flexGrow: 1,
-        padding: 24,
-        backgroundColor: Colors[colorScheme].background,
-      }}
+    <UniversalHost
+      colorScheme={colorScheme}
+      matchContents={false}
+      style={{ flex: 1, backgroundColor: colors.background }}
     >
-      {children}
-    </ScrollView>
+      <ScrollView testID={testID ? `${testID}-canvas` : undefined}>
+        <Column modifiers={nativeFillWidth} style={{ padding: 24 }}>
+          <RNHostView matchContents>
+            <View>{children}</View>
+          </RNHostView>
+        </Column>
+      </ScrollView>
+    </UniversalHost>
   );
 }
 

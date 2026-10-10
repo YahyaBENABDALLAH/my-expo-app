@@ -21,6 +21,11 @@ Retained all existing dependencies for planned features, including `@stepperize/
 
 Configured Firebase, Image, Secure Store, Sharing, Updates, and framework infrastructure remain available. Storybook controls require the community slider, date picker, bottom sheet, and SVG peers even though app screens use Expo UI.
 
+The selected redundancy cleanup on 2026-10-05 removed the web-only CanvasKit copy
+script, generated WASM and unused favicon. Postinstall retains the Expo UI
+native-state lifecycle patch. Dependency declarations and lockfile resolution
+remain unchanged.
+
 The package lock is synchronized. The original dependency set remains available alongside the project cleanup and security fixes.
 
 ### Security overrides

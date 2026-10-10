@@ -1,5 +1,5 @@
 appId: com.hyrkul.likan
-name: Account auth navigation preserves login state
+name: Signed-out account guard and auth navigation preserve login input
 tags: [smoke, auth, navigation]
 ---
 - runFlow:
@@ -17,9 +17,9 @@ tags: [smoke, auth, navigation]
 - tapOn:
     id: auth-login-register
 - assertVisible:
-    id: auth-register-name
+    id: auth-register-username
 - assertNotVisible:
-    id: auth-register-name-error
+    id: auth-register-username-error
 - scrollUntilVisible:
     element:
       id: auth-register-login

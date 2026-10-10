@@ -1,0 +1,50 @@
+appId: com.hyrkul.likan
+name: Recipe stepper advances, reverses, and resets with validity feedback
+tags: [storybook, recipes]
+
+env:
+  STORYBOOK_URL: myappexpo://storybook
+---
+- runFlow:
+    file: ../helpers/open-story.yaml
+    env:
+      STORY_ID: pages-recipe-stepper--light
+      READY_ID: recipe-step-label
+- assertVisible: 'Step 1 of 4: Info'
+- assertVisible: Current step is incomplete
+- tapOn:
+    id: stepper-previous
+- assertVisible: 'Step 1 of 4: Info'
+- tapOn:
+    id: stepper-toggle-validity
+- assertVisible: Current step is valid
+- tapOn:
+    id: stepper-next
+- assertVisible: 'Step 2 of 4: Details'
+- assertVisible: Current step is incomplete
+- tapOn:
+    id: stepper-next
+- assertVisible: 'Step 3 of 4: Ingredients'
+- tapOn:
+    id: stepper-next
+- assertVisible: 'Step 4 of 4: Steps'
+- tapOn:
+    id: stepper-next
+- assertVisible: 'Step 4 of 4: Steps'
+- tapOn:
+    id: stepper-previous
+- assertVisible: 'Step 3 of 4: Ingredients'
+- tapOn:
+    id: stepper-reset
+- assertVisible: 'Step 1 of 4: Info'
+- assertVisible: Current step is incomplete
+- runFlow:
+    file: ../helpers/open-story.yaml
+    env:
+      STORY_ID: pages-recipe-stepper--static
+      READY_ID: recipe-step-label
+- assertVisible: 'Step 3 of 4: Ingredients'
+- assertVisible: Current step is valid
+- tapOn:
+    id: stepper-next
+- assertVisible: 'Step 4 of 4: Steps'

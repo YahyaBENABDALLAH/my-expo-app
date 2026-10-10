@@ -1,10 +1,15 @@
+import Colors from '@/constants/colors';
+import { UniversalText as Text, UniversalButton } from '@components/ui';
+import {
+  UniversalSwitch,
+  type UniversalSwitchProps,
+} from '../../components/showcase/universal-switch';
 import type { Meta, StoryObj } from '@storybook/react-native';
 import { useState } from 'react';
-import { Text, View } from 'react-native';
+import { View } from 'react-native';
+
 import { action } from 'storybook/actions';
 import { NativeStoryFrame, nativeThemeControls } from '../../components/native-story-frame';
-import { UniversalSwitch, type UniversalSwitchProps } from '@/components/ui/universal-switch';
-import { UniversalButton } from '@/components/ui/universal-button';
 
 function SwitchDemo(args: UniversalSwitchProps) {
   const [value, setValue] = useState(args.value);
@@ -20,11 +25,12 @@ function SwitchDemo(args: UniversalSwitchProps) {
       />
       <Text
         testID={`${args.testID}-value`}
-        style={{ color: args.colorScheme === 'light' ? '#173C65' : '#DBEDF4' }}
+        textStyle={{ color: args.colorScheme === 'light' ? Colors.light.text : Colors.dark.text }}
       >
-        Value: {value ? 'On' : 'Off'}
+        {`Value: ${value ? 'On' : 'Off'}`}
       </Text>
       <UniversalButton
+        variant="secondary"
         testID={`${args.testID}-reset`}
         label="Reset switch"
         colorScheme={args.colorScheme}
@@ -47,11 +53,11 @@ const meta = {
     label: 'Enable notifications',
     disabled: false,
     colorScheme: 'dark',
-    seedColor: '#5AB9E8',
     onValueChange: action('switch changed'),
   },
   argTypes: {
     ...nativeThemeControls,
+    seedColor: { control: false, description: 'Switch colors use shared theme tokens.' },
     value: { control: 'boolean' },
     label: { control: 'text' },
     disabled: { control: 'boolean' },
@@ -78,4 +84,4 @@ export const LongLabel: Story = {
 };
 export const LightTheme: Story = { args: { colorScheme: 'light' } };
 export const DarkTheme: Story = { args: { colorScheme: 'dark' } };
-export const CustomTint: Story = { args: { seedColor: '#39B58D', value: true } };
+export const TokenColors: Story = { args: { value: true, label: 'Shared green switch tokens' } };

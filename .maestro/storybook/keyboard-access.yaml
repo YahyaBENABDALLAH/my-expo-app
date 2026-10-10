@@ -1,0 +1,72 @@
+appId: com.hyrkul.likan
+name: Form and page buttons remain reachable with the keyboard open
+tags: [smoke, storybook, keyboard]
+env:
+  STORYBOOK_URL: myappexpo://storybook
+---
+- runFlow:
+    file: ../helpers/open-story.yaml
+    env:
+      STORY_ID: expo-ui-auth-screen--shared-host
+      READY_ID: native-form-submit
+- tapOn:
+    id: native-form-login
+- inputText: alex@example.com
+- scrollUntilVisible:
+    element:
+      id: native-form-password
+- tapOn:
+    id: native-form-password
+- inputText: example-password
+- scrollUntilVisible:
+    element:
+      id: native-form-submit
+- tapOn:
+    id: native-form-submit
+- scrollUntilVisible:
+    element:
+      id: native-form-submit-status
+- assertVisible:
+    id: native-form-submit-status
+    text: 'Submissions: 1'
+- hideKeyboard
+- openLink: '${STORYBOOK_URL}?STORYBOOK_STORY_ID=pages-navigation-shell--keyboard-access&mode=canvas'
+- extendedWaitUntil:
+    visible:
+      id: page-title
+      text: Keyboard access
+    timeout: 30000
+- scrollUntilVisible:
+    element:
+      id: page-keyboard-input
+- tapOn:
+    id: page-keyboard-input
+- inputText: First note
+- scrollUntilVisible:
+    element:
+      id: page-keyboard-save
+- tapOn:
+    id: page-keyboard-save
+- scrollUntilVisible:
+    element:
+      id: page-keyboard-result
+- assertVisible:
+    id: page-keyboard-result
+    text: 'Saved 1: First note'
+- hideKeyboard
+- tapOn:
+    id: page-keyboard-input
+- eraseText
+- inputText: Second note
+- scrollUntilVisible:
+    element:
+      id: page-keyboard-save
+- tapOn:
+    id: page-keyboard-save
+- scrollUntilVisible:
+    element:
+      id: page-keyboard-result
+- assertVisible:
+    id: page-keyboard-result
+    text: 'Saved 2: Second note'
+- hideKeyboard

@@ -1,0 +1,47 @@
+appId: com.hyrkul.likan
+name: Shared page headers and native back arrow in both themes
+tags: [smoke, storybook, navigation]
+env:
+  STORYBOOK_URL: myappexpo://storybook
+---
+- runFlow:
+    file: ../helpers/open-story.yaml
+    env:
+      STORY_ID: pages-navigation-shell--default
+      READY_ID: page-title
+- assertNotVisible:
+    id: page-back
+- openLink: '${STORYBOOK_URL}?STORYBOOK_STORY_ID=pages-navigation-shell--header-with-back-arrow&mode=canvas'
+- extendedWaitUntil:
+    visible:
+      id: page-back
+    timeout: 30000
+- tapOn:
+    id: page-back
+- assertVisible:
+    id: page-back-presses
+    text: 'Back presses: 1'
+- tapOn:
+    id: page-back
+- assertVisible:
+    id: page-back-presses
+    text: 'Back presses: 2'
+- openLink: '${STORYBOOK_URL}?STORYBOOK_STORY_ID=pages-navigation-shell--dark-header-with-back-arrow&mode=canvas'
+- extendedWaitUntil:
+    visible:
+      id: page-back-presses
+      text: 'Back presses: 0'
+    timeout: 30000
+- tapOn:
+    id: page-back
+- assertVisible:
+    id: page-back-presses
+    text: 'Back presses: 1'
+- openLink: '${STORYBOOK_URL}?STORYBOOK_STORY_ID=pages-navigation-shell--dark&mode=canvas'
+- extendedWaitUntil:
+    visible:
+      id: page-title
+      text: My recipes
+    timeout: 30000
+- assertNotVisible:
+    id: page-back

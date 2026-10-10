@@ -43,7 +43,7 @@ Selectors only exist in stories that render the relevant elements. For example, 
 
 - Collapsible has no native `testID` prop. Its root ID is applied to its Host. Tap the native header within that host and assert `expo-ui-collapsible-content` after expanding.
 - Picker forwards `testID` on iOS but drops it on Android in the installed version. Use `expo-ui-picker-container` to locate the Android dropdown and select its options by their visible labels.
-- Android ListItem also drops its `testID` prop. `UniversalListItem` supplies the equivalent Compose test-ID modifier so row selectors are retained.
+- Android ListItem also drops its `testID` prop. The shared `ListItem` Android adapter supplies the equivalent Compose test-ID modifier so row selectors are retained. `UniversalListItem` directly aliases that adapter.
 - Spacer is a layout element; assert the positions of its `-start` and `-end` siblings instead of trying to tap it.
 - Native test IDs' visibility to a specific automation driver must be verified on a device. Bundling and typechecking do not inspect the accessibility hierarchy.
 

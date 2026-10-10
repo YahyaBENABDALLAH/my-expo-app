@@ -1,0 +1,11 @@
+# Localization
+
+App translations live in `src/shared/locales/fr.json`, `en.json`, and `ar.json`. They preserve the keys and translations from `reference/shared/locales`, with additional namespaces for this app's screens and controls. Use `useTranslation().t()` in rendered components. Keep route names, form field names, enum values, brands, and test selectors independent of the language.
+
+French is the default. The language picker appears in every page's appearance footer, including authentication pages. It lists Français, English, and العربية and saves the choice under the reference-compatible `appLanguage` storage key. Startup waits for that preference before dismissing the launch overlay. Failed storage reads use French; failed writes leave the selected language usable for the current session.
+
+Arabic selects RTL through the existing layout direction provider. Changes preserve navigation, query caches, and drafts. French and English select LTR. The separate direction switch remains available for layout previews. Arabic authentication headings use the system font for script support. No app reload or new dependency is required.
+
+Custom validation messages store translation keys and translate when displayed. Zod's built-in messages use its current locale. API requests send the selected `Accept-Language`; app-owned failures use the dictionaries. Server responses and user-authored recipe content remain the server's responsibility.
+
+Run `npm run test:localization`, `npm run typecheck`, and `npm run lint`. Localization tests check reference preservation, complete dictionaries, matching interpolation placeholders, literal label coverage, persistence, storage failures, late restoration, RTL, draft preservation, and request language. `Pages/Localization` and `.maestro/storybook/localization.yaml` exercise the production footer and draft on native devices. The flow selects French before switching to English and Arabic, then restores English. Native iOS and Android verification requires a connected device or simulator.

@@ -1,5 +1,1 @@
-import { Redirect } from 'expo-router';
-
-export default function IndexScreen() {
-  return <Redirect href="/skia" />;
-}
+export { default } from '@/features/recipes/home-screen';

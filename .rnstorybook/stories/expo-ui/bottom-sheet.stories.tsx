@@ -1,14 +1,21 @@
-import { Button, Column, Text } from '@expo/ui';
-import type { Meta, StoryObj } from '@storybook/react-native';
-import { useState } from 'react';
-import { View, Text as RNText } from 'react-native';
-import { action } from 'storybook/actions';
-import { NativeStoryFrame, nativeThemeControls } from '../../components/native-story-frame';
+import Colors from '@/constants/colors';
+import {
+  Column,
+  UniversalButtonContent,
+  UniversalText,
+  UniversalTextContent,
+  UniversalButton,
+} from '@components/ui';
 import {
   UniversalBottomSheet,
   type UniversalBottomSheetProps,
-} from '@/components/ui/universal-bottom-sheet';
-import { UniversalButton } from '@/components/ui/universal-button';
+} from '../../components/showcase/universal-bottom-sheet';
+import type { Meta, StoryObj } from '@storybook/react-native';
+import { useState } from 'react';
+import { View } from 'react-native';
+
+import { action } from 'storybook/actions';
+import { NativeStoryFrame, nativeThemeControls } from '../../components/native-story-frame';
 
 type DemoProps = UniversalBottomSheetProps & {
   title: string;
@@ -19,10 +26,11 @@ type DemoProps = UniversalBottomSheetProps & {
 
 function BottomSheetDemo({ title, content, onOpen, onClose, ...args }: DemoProps) {
   const [isPresented, setIsPresented] = useState(args.isPresented);
-  const ink = args.colorScheme === 'light' ? '#173C65' : '#DBEDF4';
+  const ink = args.colorScheme === 'light' ? Colors.light.text : Colors.dark.text;
   return (
     <View style={{ gap: 20 }}>
       <UniversalButton
+        variant="secondary"
         testID={`${args.testID}-open`}
         label="Open bottom sheet"
         colorScheme={args.colorScheme}
@@ -31,13 +39,17 @@ function BottomSheetDemo({ title, content, onOpen, onClose, ...args }: DemoProps
           onOpen();
         }}
       />
-      <RNText testID={`${args.testID}-state`} style={{ color: ink }}>
-        State: {isPresented ? 'Open' : 'Closed'}. Swipe down or tap Close to dismiss.
-      </RNText>
-      <RNText style={{ color: ink }}>
+      <UniversalText
+        testID={`${args.testID}-state`}
+        colorScheme={args.colorScheme}
+        textStyle={{ color: ink }}
+      >
+        {`State: ${isPresented ? 'Open' : 'Closed'}. Swipe down or tap Close to dismiss.`}
+      </UniversalText>
+      <UniversalText colorScheme={args.colorScheme} textStyle={{ color: ink }}>
         Android supports partial and expanded states; custom heights and fractions use the nearest
         native state.
-      </RNText>
+      </UniversalText>
       <UniversalBottomSheet
         {...args}
         isPresented={isPresented}
@@ -47,16 +59,20 @@ function BottomSheetDemo({ title, content, onOpen, onClose, ...args }: DemoProps
         }}
       >
         <Column testID={`${args.testID}-content`} spacing={16} style={{ paddingVertical: 16 }}>
-          <Text
+          <UniversalTextContent
             testID={`${args.testID}-title`}
             textStyle={{ fontSize: 24, fontWeight: '700', color: ink }}
           >
             {title}
-          </Text>
-          <Text testID={`${args.testID}-description`} textStyle={{ fontSize: 16, color: ink }}>
+          </UniversalTextContent>
+          <UniversalTextContent
+            testID={`${args.testID}-description`}
+            textStyle={{ fontSize: 16, color: ink }}
+          >
             {content}
-          </Text>
-          <Button
+          </UniversalTextContent>
+          <UniversalButtonContent
+            variant="secondary"
             testID={`${args.testID}-close`}
             label="Close"
             onPress={() => {
@@ -79,7 +95,6 @@ const meta = {
     title: 'A native bottom sheet',
     content: 'Drag the handle to resize this sheet, or close it and open it again.',
     colorScheme: 'dark',
-    seedColor: '#5AB9E8',
     showDragIndicator: true,
     contentPadding: 24,
     shouldDismissOnBackPress: true,
@@ -136,8 +151,8 @@ export const FixedHeight: Story = { args: { snapPoints: [{ height: 320 }] } };
 export const WithoutDragIndicator: Story = { args: { showDragIndicator: false } };
 export const NoOutsideDismiss: Story = { args: { shouldDismissOnClickOutside: false } };
 export const NoBackDismiss: Story = { args: { shouldDismissOnBackPress: false } };
-export const CustomScrim: Story = { args: { scrimColor: '#081224CC' } };
-export const CustomBackground: Story = { args: { containerColor: '#173C65' } };
+export const CustomScrim: Story = { args: { scrimColor: Colors.dark.overlay } };
+export const CustomBackground: Story = { args: { containerColor: Colors.light.text } };
 export const EdgePadding: Story = {
   args: { contentPadding: { top: 8, bottom: 32, left: 20, right: 20 } },
 };

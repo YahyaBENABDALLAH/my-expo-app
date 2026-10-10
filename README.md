@@ -15,10 +15,15 @@ src/
     launch/            Launch-screen experience
     maps/              Map screens and platform implementations
     skia/              Skia experience and platform loading
-    storybook/         Development-only Storybook screen integration
+    storybook/         Development and preview Storybook screen integration
   hooks/               Shared hooks and platform implementations
+  context/             Auth restoration and native TanStack Query providers
+  guards/              Auth predicates for protected route groups
+  lib/                 Shared QueryClient and pure entity cache keys
+  services/            Typed entity services, TanStack hooks and auth/session services
   constants/           Shared colors and layout values
-  types/               Asset declarations
+  types/               API DTOs and shared declarations
+  shared/locales/      French, English and Arabic app translations
   validation/
     schemas/           Zod validation schemas and inferred form types
     resolvers/         React Hook Form resolver adapters
@@ -36,7 +41,8 @@ docs/                  Selector reference and project notes
 scripts/               Build support scripts
 .maestro/              Shared native Android/iOS UI test flows
 tests/validation/      Zod schema tests
-tests/navigation/      Native route discovery and preload regression tests
+tests/navigation/      Native route discovery and guarded navigation tests
+tests/auth/            Session lifecycle and API interceptor regression tests
 ```
 
 Import app source with `@/`, assets with `@assets/`, and the Storybook entry with `@storybook`. Reusable UI components must not import Storybook helpers or stories. Keep non-route code outside `src/app/`. Platform-specific implementations stay next to their shared component.
@@ -45,18 +51,28 @@ Retain existing dependencies for planned features, even when they are not yet us
 
 ## Development
 
+App labels use the dictionaries adapted from `reference/shared/locales`. Select
+Français, English or العربية in the page footer or profile sheet. The saved choice
+restores on startup; Arabic uses RTL without reloading the app. See
+[localization](docs/localization.md) for conventions and verification.
+
 - `npm start` starts Metro.
 - Use Node 22.18 or newer and `npm ci` to install the locked dependencies.
-- `npm run check` runs TypeScript, lint, formatting, validation, and navigation tests.
+- `npm run check` runs TypeScript, lint, formatting, and all unit/regression tests.
+- `npm run test:services` checks API contracts, pagination, cancellation and mutation cache behavior.
 - `npm run lint` checks app source, Storybook source, and project scripts/configuration with zero warnings allowed.
 - `npm run typecheck` checks app source, platform implementations, and Storybook stories with strict TypeScript.
 - `npm run format` applies the shared formatting rules; `npm run format:check` checks them.
 - `npm run storybook:generate` regenerates story discovery after adding or moving stories.
 
-Open the **Storybook** tab in a development build to browse native stories. See [the test-ID reference](docs/storybook-test-ids.md) for selectors and SDK limitations.
+Open **Browse all pages** and select **Storybook** in a development or preview build to browse native stories. Signed-out testers can use **Browse all pages as guest (dev)** on Login. See [guest browsing and preview builds](docs/development-guest-mode.md) and [the test-ID reference](docs/storybook-test-ids.md) for selectors and SDK limitations.
 
 Run `npm run test:e2e` with Maestro installed and a development build connected to Metro. See [native UI testing](docs/native-ui-tests.md) for device setup, individual flows, and platform requirements.
 
-The **Account** tab opens native login, registration, and password-reset forms. See [auth forms](docs/auth-forms.md) for the validation-only scope, source folders, and test IDs. Run `npm run test:validation` to check the Zod schemas.
+Signed-out users start at **Login**, with registration, email verification, and password recovery in one native auth stack. The **Account** tab shows the signed-in identity and logout. Set `EXPO_PUBLIC_API_URL` in `.env.local` and restart Metro after changing it. See [auth forms](docs/auth-forms.md) for the backend contract and test IDs. Run `npm test` to check schemas, navigation, session races, and API interceptors.
 
 See [the cleanup report](docs/project-cleanup.md) for review findings, dependency decisions, and the remaining upstream dependency advisory.
+
+See [API services and TanStack Query](docs/api-services.md) for the 16 entity services, typed hooks, documented writes, cache invalidation and examples.
+
+Use `$expo-api-services` when adding or updating entity services. The [project skill](.agents/skills/expo-api-services/SKILL.md) describes the contracts, query keys, mutation lifecycle and checks to preserve.

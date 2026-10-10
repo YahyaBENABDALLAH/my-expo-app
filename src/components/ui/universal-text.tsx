@@ -1,8 +1,7 @@
 import { Text } from '@expo/ui';
 import type { TextProps, UniversalFontWeight } from '@expo/ui';
-import Colors from '@/constants/colors';
-import { useColorScheme } from '@/hooks/use-color-scheme';
-import { UniversalHost } from './universal-host';
+import { useThemeColors } from '@/hooks/use-theme';
+import { UniversalHost, useHostColorScheme } from './universal-host';
 
 export type UniversalTextVariant = 'heading' | 'title' | 'body' | 'caption';
 export type UniversalTextColorScheme = 'light' | 'dark';
@@ -26,35 +25,43 @@ const variants: Record<
   caption: { fontSize: 13, fontWeight: '400' },
 };
 
-export function UniversalText({
+export function UniversalText({ colorScheme, ...props }: UniversalTextProps) {
+  return (
+    <UniversalHost
+      testID={props.testID ? `${props.testID}-container` : undefined}
+      colorScheme={colorScheme}
+    >
+      <UniversalTextContent {...props} colorScheme={colorScheme} />
+    </UniversalHost>
+  );
+}
+
+/** Native text for composition inside an existing Host. */
+export function UniversalTextContent({
   variant = 'body',
   fontWeight,
   fontSize,
-  lightColor = Colors.light.text,
-  darkColor = Colors.dark.text,
+  lightColor,
+  darkColor,
   colorScheme,
   textStyle,
   ...textProps
 }: UniversalTextProps) {
-  const activeColorScheme = useColorScheme(colorScheme);
+  const activeColorScheme = useHostColorScheme(colorScheme);
+  const colors = useThemeColors(activeColorScheme);
   const preset = variants[variant];
   const resolvedFontSize = fontSize ?? preset.fontSize;
 
   return (
-    <UniversalHost
-      testID={textProps.testID ? `${textProps.testID}-container` : undefined}
-      colorScheme={activeColorScheme}
-    >
-      <Text
-        {...textProps}
-        textStyle={{
-          fontSize: resolvedFontSize,
-          fontWeight: fontWeight ?? preset.fontWeight,
-          lineHeight: Math.round(resolvedFontSize * 1.25),
-          color: activeColorScheme === 'dark' ? darkColor : lightColor,
-          ...textStyle,
-        }}
-      />
-    </UniversalHost>
+    <Text
+      {...textProps}
+      textStyle={{
+        fontSize: resolvedFontSize,
+        fontWeight: fontWeight ?? preset.fontWeight,
+        lineHeight: Math.round(resolvedFontSize * 1.25),
+        color: (activeColorScheme === 'dark' ? darkColor : lightColor) ?? colors.text,
+        ...textStyle,
+      }}
+    />
   );
 }

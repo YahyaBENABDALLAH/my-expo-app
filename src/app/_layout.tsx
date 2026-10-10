@@ -1,16 +1,36 @@
+import {
+  AuthText,
+  Column,
+  ErrorToastHost,
+  UniversalHost as Host,
+  LaunchScreen,
+  LoadingContent,
+  nativeFillSize,
+  PageFrame,
+  PageMotionOverlay,
+  Spacer,
+  UniversalButtonContent,
+  useAuthTheme,
+} from '@components/ui';
 import { useFonts } from 'expo-font';
-import { DarkTheme, DefaultTheme, Stack, ThemeProvider } from 'expo-router';
+import { Stack, ThemeProvider } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useCallback, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { View } from 'react-native';
 import { useReducedMotion } from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { LaunchScreen } from '@/features/launch/launch-screen';
-import Colors from '@/constants/colors';
+import { navigationTheme } from '@/constants/navigation-theme';
+import { AuthProvider, useAuthContext } from '@/context/auth.context';
+import { LanguageProvider, useLanguage } from '@/context/language.context';
+import { LayoutDirectionProvider, useLayoutDirection } from '@/context/layout-direction.context';
+import { AppQueryProvider } from '@/context/query-provider';
+import { ThemePreferencesProvider } from '@/context/theme.context';
+import { useAuthGuards } from '@/guards/auth-guards';
 import { useColorScheme } from '@/hooks/use-color-scheme';
-
-const BRAND_SCREEN_DURATION_MS = 5000;
+import { useThemeColors } from '@/hooks/use-theme';
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -28,10 +48,7 @@ SplashScreen.preventAutoHideAsync().catch(() => {
 SplashScreen.setOptions({ duration: 300, fade: true });
 
 export default function RootLayout() {
-  const [showBrandScreen, setShowBrandScreen] = useState(true);
-  const [brandScreenExiting, setBrandScreenExiting] = useState(false);
   const [loaded, error] = useFonts({
-    SpaceMono: require('@assets/fonts/SpaceMono-Regular.ttf'),
     'Inter-Black': require('@assets/fonts/Inter-Black.otf'),
   });
 
@@ -44,60 +61,140 @@ export default function RootLayout() {
     if (!loaded) return;
 
     SplashScreen.hide();
-    const timeout = setTimeout(() => {
-      setBrandScreenExiting(true);
-    }, BRAND_SCREEN_DURATION_MS);
-
-    return () => clearTimeout(timeout);
   }, [loaded]);
-
-  const finishBrandScreen = useCallback(() => {
-    setShowBrandScreen(false);
-  }, []);
 
   if (!loaded) {
     return null;
   }
 
   return (
+    <LayoutDirectionProvider>
+      <LanguageProvider>
+        <ThemePreferencesProvider>
+          <AppQueryProvider>
+            <AuthProvider>
+              <RootLayoutContent />
+            </AuthProvider>
+          </AppQueryProvider>
+        </ThemePreferencesProvider>
+      </LanguageProvider>
+    </LayoutDirectionProvider>
+  );
+}
+
+function RootLayoutContent() {
+  const colorScheme = useColorScheme();
+  const colors = useThemeColors(colorScheme);
+  const [showBrandScreen, setShowBrandScreen] = useState(true);
+  const { restoring } = useAuthGuards();
+  const { error } = useAuthContext();
+  const { ready: languageReady } = useLanguage();
+  // Restoration failures must expose their retry UI instead of keeping the launch overlay.
+  const ready = languageReady && (!restoring || Boolean(error));
+  const finishBrandScreen = useCallback(() => setShowBrandScreen(false), []);
+
+  return (
     <View
-      testID="app-ready"
+      testID={ready ? 'app-ready' : undefined}
       collapsable={false}
-      style={{ flex: 1, backgroundColor: Colors.dark.background }}
+      style={{ flex: 1, backgroundColor: colors.background }}
     >
-      <StatusBar style={showBrandScreen ? 'light' : 'auto'} />
+      <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
       <RootLayoutNav />
-      {showBrandScreen && (
-        <LaunchScreen exiting={brandScreenExiting} onExitComplete={finishBrandScreen} />
-      )}
+      <PageMotionOverlay animate={!showBrandScreen} />
+      {showBrandScreen && <LaunchScreen exiting={ready} onExitComplete={finishBrandScreen} />}
+      {!showBrandScreen && <ErrorToastHost />}
     </View>
   );
 }
 
 function RootLayoutNav() {
+  const { t } = useTranslation();
+  const insets = useSafeAreaInsets();
   const colorScheme = useColorScheme();
+  const colors = useThemeColors(colorScheme);
+  const direction = useLayoutDirection();
   const reducedMotion = useReducedMotion();
+  const { requireAuth, requireNoAuth, restoring } = useAuthGuards();
+  const { error, retryRestore } = useAuthContext();
+  const { buttonPalette } = useAuthTheme();
+
+  if (restoring)
+    return (
+      <PageFrame title={t('session.title')}>
+        <View
+          style={{
+            flex: 1,
+            padding: 24,
+            paddingTop: 24,
+            paddingBottom: 24,
+            paddingLeft: insets.left + 24,
+            paddingRight: insets.right + 24,
+            backgroundColor: colors.background,
+          }}
+        >
+          <Host
+            style={{ flex: 1 }}
+            colorScheme={colorScheme}
+            seedColor={colors.tint}
+            buttonPalette={buttonPalette}
+            matchContents={false}
+            ignoreSafeArea="all"
+          >
+            <Column spacing={16} alignment="center" modifiers={nativeFillSize}>
+              <Spacer flexible />
+              {error ? (
+                <AuthText>{error}</AuthText>
+              ) : (
+                <LoadingContent label={t('session.restoring')} />
+              )}
+              {error ? (
+                <UniversalButtonContent
+                  variant="secondary"
+                  label={t('common.tryAgain')}
+                  onPress={retryRestore}
+                />
+              ) : null}
+              <Spacer flexible />
+            </Column>
+          </Host>
+        </View>
+      </PageFrame>
+    );
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+    <ThemeProvider value={navigationTheme(colorScheme, colors)}>
       <Stack
         screenOptions={{
           animation: reducedMotion ? 'fade' : 'default',
           animationMatchesGesture: reducedMotion,
-          contentStyle: { backgroundColor: Colors[colorScheme].background },
+          contentStyle: { backgroundColor: colors.background, direction },
+          headerShown: false,
           headerShadowVisible: false,
         }}
       >
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="(auth)/login" options={{ title: 'Log in', headerTransparent: true }} />
-        <Stack.Screen
-          name="(auth)/register"
-          options={{ title: 'Create account', headerTransparent: true }}
-        />
-        <Stack.Screen
-          name="(auth)/forgot-password"
-          options={{ title: 'Reset password', headerTransparent: true }}
-        />
+        <Stack.Protected guard={requireNoAuth}>
+          <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+        </Stack.Protected>
+        <Stack.Protected guard={requireAuth}>
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen name="recipe/[uuid]" options={{ title: t('common.recipeLabel') }} />
+          <Stack.Screen name="category/[uuid]" options={{ title: t('common.category') }} />
+          <Stack.Screen
+            name="my-recipes/liked-favorites"
+            options={{ title: t('common.savedRecipes') }}
+          />
+          <Stack.Screen name="my-recipes/history" options={{ title: t('common.recipeHistory') }} />
+          <Stack.Screen name="my-recipes/creations" options={{ title: t('common.creations') }} />
+          <Stack.Screen name="ingredients" options={{ title: t('common.ingredients') }} />
+          <Stack.Screen name="become-chef" options={{ title: t('chefProfile.heroTitle') }} />
+          <Stack.Screen name="device-info" options={{ title: t('tools.deviceInfo') }} />
+          <Stack.Screen name="health-check" options={{ title: t('common.healthCheck') }} />
+          <Stack.Screen name="ui" options={{ title: t('tools.showcase') }} />
+          <Stack.Screen name="ui-component/[name]" options={{ title: t('tools.component') }} />
+          <Stack.Screen name="development-pages" options={{ title: t('tools.allPages') }} />
+          <Stack.Screen name="main" options={{ headerShown: false }} />
+        </Stack.Protected>
       </Stack>
     </ThemeProvider>
   );

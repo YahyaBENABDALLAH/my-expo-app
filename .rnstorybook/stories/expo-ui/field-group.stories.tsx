@@ -1,12 +1,13 @@
-import { Checkbox, Column, FieldGroup, Slider, Switch, Text } from '@expo/ui';
+import Colors from '@/constants/colors';
+import { Checkbox, Column, FieldGroup, Slider, Switch, Text } from '@components/ui';
+import {
+  UniversalFieldGroup,
+  type UniversalFieldGroupProps,
+} from '../../components/showcase/universal-field-group';
 import type { Meta, StoryObj } from '@storybook/react-native';
 import { useState } from 'react';
 import { action } from 'storybook/actions';
 import { NativeStoryFrame, nativeThemeControls } from '../../components/native-story-frame';
-import {
-  UniversalFieldGroup,
-  type UniversalFieldGroupProps,
-} from '@/components/ui/universal-field-group';
 
 type DemoProps = UniversalFieldGroupProps & {
   title: string;
@@ -41,7 +42,7 @@ function FieldGroupDemo({
   const [notify, setNotify] = useState(notifications);
   const [checked, setChecked] = useState(accepted);
   const [level, setLevel] = useState(volume);
-  const ink = args.colorScheme === 'light' ? '#173C65' : '#DBEDF4';
+  const ink = args.colorScheme === 'light' ? Colors.light.text : Colors.dark.text;
   return (
     <UniversalFieldGroup {...args}>
       <FieldGroup.Section
@@ -78,6 +79,9 @@ function FieldGroupDemo({
             }}
           />
         ) : null}
+        <Text testID={`${args.testID}-state`} textStyle={{ color: ink }}>
+          {`Notifications: ${notify ? 'On' : 'Off'} · Terms: ${checked ? 'Accepted' : 'Not accepted'}`}
+        </Text>
         {footer ? (
           <FieldGroup.SectionFooter>
             <Text textStyle={{ color: ink, fontSize: 13 }}>{footer}</Text>
@@ -132,7 +136,6 @@ const meta = {
     hidden: false,
     viewportHeight: 440,
     colorScheme: 'dark',
-    seedColor: '#5AB9E8',
     onNotificationsChange: action('notifications changed'),
     onAcceptedChange: action('terms changed'),
     onVolumeChange: action('volume changed'),

@@ -1,0 +1,43 @@
+appId: com.hyrkul.likan
+name: Shared Skia motion passes touches through to native controls
+tags: [storybook, motion]
+env:
+  STORYBOOK_URL: myappexpo://storybook
+---
+- runFlow:
+    file: ../helpers/open-story.yaml
+    env:
+      STORY_ID: pages-shared-skia-motion--light
+      READY_ID: page-motion-action
+- assertVisible: 'Button presses: 0'
+- tapOn:
+    id: page-motion-action
+- assertVisible: 'Button presses: 1'
+- tapOn:
+    id: page-motion-action
+- assertVisible: 'Button presses: 2'
+- tapOn:
+    id: page-motion-toggle
+- assertVisible: Static wave
+- assertVisible: Resume wave
+- tapOn:
+    id: page-motion-toggle
+- assertVisible: Motion requested
+- assertVisible: Pause wave
+- runFlow:
+    file: ../helpers/open-story.yaml
+    env:
+      STORY_ID: pages-shared-skia-motion--dark
+      READY_ID: page-motion-action
+- tapOn:
+    id: page-motion-action
+- assertVisible: 'Button presses: 1'
+- runFlow:
+    file: ../helpers/open-story.yaml
+    env:
+      STORY_ID: pages-shared-skia-motion--static
+      READY_ID: page-motion-action
+- assertVisible: Static wave
+- tapOn:
+    id: page-motion-action
+- assertVisible: 'Button presses: 1'

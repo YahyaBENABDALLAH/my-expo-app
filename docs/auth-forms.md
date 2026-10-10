@@ -1,37 +1,44 @@
-# Authentication screens and validation
+# Native authentication
 
-Open the **Account** tab to reach login. The standalone routes are `/login`, `/register`, and `/forgot-password`, including their native links such as `myappexpo://login`.
+The iOS/Android auth screens adapt `Reference/`'s palette, spacing, decorative heading font, and form layout. Each `AuthScreenFrame` owns one `@expo/ui` Host with the auth scheme and seed color. Native ScrollView and Column layouts contain host-free AuthText, UniversalButtonContent, FormTextInput, and FormSubmit content. React Native keyboard avoidance stays outside the Host. The Likan brand stays in the screen header.
 
-This is a screens-and-validation implementation. Submitting valid details shows validation feedback only. It does not create an account, establish a session, or send a reset email. Credentials are kept in the form's memory; they are not logged or persisted.
+Keep React Native View and RNHostView out of this continuous native tree. UniversalTextContent and UniversalTextInputContent compose inside an existing Host; UniversalText and UniversalTextInput remain explicit adapters for React Native layouts elsewhere. The native input content needs no JavaScript width measurement. Native width modifiers and the screen's capped content width constrain the form. Follow the [SDK 57 Host boundary rules](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/host/#placing-components-inside-react-native-views), also researched through Context7's Expo index. The session-restoration panel owns its own Host rather than adding one to each auth control.
 
-## Source folders
+Storybook's Expo UI/Auth Screen stories exercise the actual frame, fields, password button, submit states, and text with one Host and no backend calls. Run `.maestro/storybook/auth-screen.yaml` on both platforms to check validation, editing, one callback per press, and pending-state suppression. Repeat with the device in light/dark appearance; story registration alone does not verify native layout or interactions.
 
-- `src/app/(auth)/`: thin route files, hosted directly by the root native stack in `src/app/_layout.tsx`.
-- `src/features/auth/screens/`: login, registration, and forgot-password screens.
-- `src/features/auth/components/`: keyboard-aware frame, React Hook Form field adapter, and submit feedback.
-- `src/features/auth/hooks/`: validation-only submission, idle screen prefetching, and return navigation.
-- `src/validation/schemas/auth.ts`: Zod schemas and inferred form types.
-- `src/validation/resolvers/auth.ts`: React Hook Form Zod resolvers.
+Auth buttons use native SwiftUI/Compose controls with colors from `authButtonTokens`. They retain native shapes, padding, typography, disabled states, and press feedback. Full-width sizing happens natively inside the interactive surface; no JavaScript width measurements, custom painted background, or custom press animation is used.
 
-Native text inputs and buttons use the existing universal Expo UI wrappers. `FormTextInput` adapts native observable text state to React Hook Form, forwards blur and focus refs, and keeps external form resets synchronized. Password visibility changes retain the native text state.
+## Configuration
 
-Login prefetches registration and password reset in separate idle callbacks while focused. Both forms can prepare their Expo UI hosts and input measurements off-screen without adding navigation history. Pending callbacks are canceled when Login loses focus. Auth routes share the root native stack, avoiding a nested auth navigator that would group both prefetch targets into one preloaded route. Navigation dismisses the keyboard without adding a timer; the stack uses native transition timing and fades for reduced motion. Its background matches the form theme, and headers remain transparent.
+Set `EXPO_PUBLIC_API_URL` to the HTTPS Identity API origin in `.env.local`, without a trailing `/api`. Restart Metro after changing it. `.env.local` is ignored by Git. The server must be reachable from the device.
 
-Run `npm run test:navigation` to check route discovery on both platforms, independent preloads, route reuse, and preserved Account state. The Maestro navigation flow checks Account → Register → Account → Forgot Password → Account, including retained email input. Judge motion on a physical device with a preview/release build; these Node tests and JavaScript exports do not measure frame rate.
+## Routes and state
 
-Validation starts after a field has received focus and then blurred, or after submit. Untouched fields show no errors on the initial render; the shared input wrapper ignores native initial unfocused notifications. Fields with errors revalidate as they are corrected. Errors appear below their field and the first invalid input receives focus. Email addresses are trimmed and lowercased. Passwords retain their original whitespace. Login requires a nonempty password; registration requires 8–128 characters and a matching confirmation. Names support international characters and require 1–80 characters after trimming.
+- `/login`: email or username and password; `/register`: username, first name, last name, email, password, and local password confirmation.
+- `/verify-email`: transient six-digit challenge, expiry, confirmation, and server-controlled resend cooldown. Opening this route without a challenge returns to login.
+- `/forgot-password`: send recovery instructions and show a generic confirmation after success.
+- `/account`: signed-in identity query, offline saved identity, retry, and logout.
 
-## Checks and UI selectors
+Auth routes share `src/app/(auth)/_layout.tsx` and its transient flow provider. The root uses native protected groups with predicates in `src/guards/`. Session restoration finishes before route selection; storage-read failures show a retry action. Authenticated users cannot return to auth screens through back navigation. Returning from registration or recovery preserves the existing login draft. Leaving a form invalidates its pending flow response.
 
-```sh
-npm run test:validation
-npm run test:e2e:auth
-```
+`src/services/api.ts` adapts the reference Axios client: bearer metadata, typed API errors, one retry after shared token rotation, and checks that prevent old requests from returning data after account changes. `src/services/auth/` owns auth endpoints, installation metadata, SecureStore storage, refresh, restoration, and logout. Tokens are stored together; passwords and verification codes are never persisted. Temporary refresh failures preserve the session; explicit invalid-session codes remove it. Logout attempts server revocation and clears locally even offline. A local storage deletion failure remains retryable.
 
-The schema tests run with Node 22.18+ (native TypeScript stripping). UI flows require Maestro and an installed development build connected to Metro; see [native-ui-tests.md](native-ui-tests.md).
+TanStack Query mutations handle submissions with retries disabled. They fail promptly offline rather than queueing credentials. The shared QueryClient clears when accounts change. AppState and Expo Network drive native focus/reconnect behavior. `auth.queries.ts` contains the current-identity query, keyed by user ID.
 
-Registration and password reset retain a `returnTo` route parameter when opened from the Account tab. Their login links return to that tab; direct form links return to `/login`. Only `account` is accepted as an alternate destination.
+## API contract
 
-IDs use `auth-login`, `auth-register`, or `auth-forgot-password` as the prefix. Inputs append `-email`, `-password`, `-name`, or `-confirm-password`; field errors append `-error`, password visibility buttons append `-visibility`, and submit feedback uses `-submit-status`. Navigation buttons use `auth-login-register`, `auth-login-forgot-password`, `auth-register-login`, and `auth-forgot-password-login`. The Account tab uses `tab-account`.
+DTOs in `src/types/auth.types.ts` mirror the reference Identity snapshot. Login accepts `login`, not `email`; login and confirmation include a persisted device installation ID. Registration excludes the local confirmation field. Login and registration may return either an OTP challenge or a validated token response.
 
-Schema tests cover normalization, required fields, malformed email, password length, international names, and confirmation errors. Maestro flows cover invalid submissions, corrections, and navigation. Native accessibility, keyboard layout, and visibility need device verification.
+Recovery currently returns only `{ message }`, while resetting a password requires a `challengeId`. The reference does not specify how that ID is delivered. The recovery request and confirmation are implemented; a reset-completion screen awaits that delivery contract. Google sign-in is outside this phase.
+
+Validation follows the reference DTO limits: identifier 3–256 characters, password 8–128, username 3–50, names up to 100, email up to 256, and exactly six code digits. Registration/recovery emails are trimmed and lowercased; login identifiers are trimmed without changing case; password whitespace stays significant. Native field errors appear after blur or submission.
+
+API failures use the app's shared Expo UI toast flow, including login, registration, verification/resend, recovery/reset, account reads, logout, and background token refresh. Auth forms retain entered values for retry; only client-side validation stays inline. See [error notifications](api-services.md#error-notifications) for cache callbacks, retry timing, platform behavior, and regression coverage.
+
+## Verification
+
+Run `npm run typecheck`, `npm run lint`, and `npm test`. Session and interceptor tests execute production modules with fake native storage and network transport, including concurrent refresh, late 401s, failed persistence, and account-change races.
+
+Run `npm run test:e2e:auth` with Maestro and a signed-out development build connected to Metro. These flows check invalid submissions, password visibility, corrections, and navigation without sending valid forms to the backend. Live login, registration/OTP, recovery email delivery, keyboard layout, custom font rendering, and accessibility identifiers still need device verification.
+
+Selectors retain `auth-login-email` for the email-or-username field. Registration uses `auth-register-username`, `auth-register-first-name`, `auth-register-last-name`, `auth-register-email`, `auth-register-password`, and `auth-register-confirm-password`. Field errors append `-error`. Login and registration have person/mail/lock left icons; password and confirmation use an inline eye action (`-right-icon`) with Show password / Hide password accessibility labels. Each field keeps independent visibility state, starts masked, and disables its action while pending. `FormTextInput.passwordToggle="icon"` selects this composition; other forms retain the existing text button (`-visibility`). Native auth Storybook includes PasswordIcons and PendingPasswordIcons. Maestro login/register flows check revealed values and masking; device execution remains pending. Verification uses `auth-verify-code`, `auth-verify-submit`, and `auth-verify-resend`. API notifications use the root `error-toast` overlay; iOS text and dismissal selectors are `error-toast-message` and `error-toast-dismiss`, while Android uses native Snackbar accessibility. Account uses `auth-account` and `auth-logout`.
