@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next';
 import { Column, useNativeState } from '@expo/ui';
 import { nativeFillWidth, nativeFillWidthEnd } from '../native/native-fill-width';
 import { useEffect, useRef, useState } from 'react';
-import { useWindowDimensions } from 'react-native';
 import { useController, type Control, type FieldPath, type FieldValues } from 'react-hook-form';
 
 import { UniversalButtonContent } from '../button/universal-button-content';
@@ -43,7 +42,6 @@ export function FormTextInput<T extends FieldValues>({
   const nativeValue = useNativeState(value);
   const [showPassword, setShowPassword] = useState(false);
   const { colors } = useAuthTheme();
-  const { fontScale } = useWindowDimensions();
   const invalid = Boolean(fieldState.error);
   const wasInvalid = useRef(false);
   const message = translateValidationMessage(fieldState.error?.message) ?? helperText;
@@ -88,14 +86,15 @@ export function FormTextInput<T extends FieldValues>({
         }}
         status={invalid ? 'error' : 'default'}
       />
-      <AuthText
-        testID={invalid ? `${testID}-error` : undefined}
-        numberOfLines={2}
-        style={{ height: 40 * fontScale, opacity: message ? 1 : 0 }}
-        textStyle={{ color: invalid ? colors.error : colors.muted, fontSize: 14, lineHeight: 20 }}
-      >
-        {message || ' '}
-      </AuthText>
+      {message ? (
+        <AuthText
+          testID={testID ? `${testID}-${invalid ? 'error' : 'helper'}` : undefined}
+          modifiers={nativeFillWidth}
+          textStyle={{ color: invalid ? colors.error : colors.muted, fontSize: 14, lineHeight: 20 }}
+        >
+          {message}
+        </AuthText>
+      ) : null}
       {password && passwordToggle === 'button' ? (
         <Column alignment="end" modifiers={nativeFillWidthEnd}>
           <UniversalButtonContent

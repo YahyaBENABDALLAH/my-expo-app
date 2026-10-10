@@ -19,10 +19,12 @@ import type { LoginFormValues } from '@/validation/schemas/auth';
 function NativeFormDemo({
   pending = false,
   icons = false,
+  loginHelperText,
   colorScheme = 'dark',
 }: {
   pending?: boolean;
   icons?: boolean;
+  loginHelperText?: string;
   colorScheme?: 'light' | 'dark';
 }) {
   const [submissions, setSubmissions] = useState(0);
@@ -37,13 +39,14 @@ function NativeFormDemo({
       testID="native-form"
       colorScheme={colorScheme}
       title="One native Host"
-      description="Validation keeps message space stable and provides error haptics. Fields, universal buttons and password visibility share one native Host."
+      description="Fields reserve no empty message space. Errors and hints wrap below their input when present; validation provides error haptics."
     >
       <Column spacing={20} modifiers={nativeFillWidth}>
         <FormTextInput
           control={form.control}
           name="login"
           label="Email or username"
+          helperText={loginHelperText}
           leftIcon={icons ? authInputIcons.person : undefined}
           testID="native-form-login"
           disabled={pending}
@@ -82,6 +85,7 @@ const meta = {
   argTypes: {
     pending: { control: 'boolean' },
     icons: { control: 'boolean' },
+    loginHelperText: { control: 'text' },
     colorScheme: { control: 'select', options: ['light', 'dark'] },
   },
   parameters: { layout: 'fullscreen' },
@@ -108,3 +112,9 @@ export const DarkTheme: Story = { args: { colorScheme: 'dark' } };
 export const Pending: Story = { args: { pending: true } };
 export const PasswordIcons: Story = { args: { icons: true } };
 export const PendingPasswordIcons: Story = { args: { icons: true, pending: true } };
+export const LongHelperText: Story = {
+  args: {
+    loginHelperText:
+      'Enter the email address or username you used to create your account. This hint should wrap naturally on narrow screens and with larger text. Submit the empty form to replace it with an error, then enter a username to restore the hint.',
+  },
+};

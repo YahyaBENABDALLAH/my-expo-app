@@ -9,11 +9,17 @@ env:
     env:
       STORY_ID: expo-ui-auth-screen--shared-host
       READY_ID: native-form-submit
+- assertNotVisible:
+    id: native-form-login-error
+- assertNotVisible:
+    id: native-form-password-error
 - tapOn:
     id: native-form-submit
 - assertVisible:
     id: native-form-login-error
     text: Email or username is required.
+- assertVisible:
+    id: native-form-password-error
 - tapOn:
     id: native-form-login
 - inputText: alex@example.com
@@ -33,6 +39,27 @@ env:
 - assertVisible:
     id: native-form-submit-status
     text: 'Submissions: 1'
+- runFlow:
+    file: ../helpers/open-story.yaml
+    env:
+      STORY_ID: expo-ui-auth-screen--long-helper-text
+      READY_ID: native-form-submit
+- assertVisible:
+    id: native-form-login-helper
+- tapOn:
+    id: native-form-submit
+- assertVisible:
+    id: native-form-login-error
+- assertNotVisible:
+    id: native-form-login-helper
+- tapOn:
+    id: native-form-login
+- inputText: alex@example.com
+- hideKeyboard
+- assertNotVisible:
+    id: native-form-login-error
+- assertVisible:
+    id: native-form-login-helper
 - runFlow:
     file: ../helpers/open-story.yaml
     env:
