@@ -25,7 +25,7 @@ import { UniversalTextContent } from '../text/universal-text';
 import { nativeFillSize } from '../native/native-fill-width';
 
 const WAVE_HEIGHT = 144;
-const EXIT_DURATION_MS = 300;
+const EXIT_DURATION_MS = 2000;
 // LottieView accepts Metro's numeric asset ID on native, though its source type omits it.
 const bluePepeSource = bluePepe as unknown as string;
 
@@ -65,7 +65,7 @@ export function LaunchScreen({
     offsetY.set(
       withTiming(
         -(height + WAVE_HEIGHT),
-        { duration: EXIT_DURATION_MS, easing: Easing.bezier(0.23, 1, 0.32, 1) },
+        { duration: EXIT_DURATION_MS, easing: Easing.bezier(0.77, 0, 0.175, 1) },
         (finished) => {
           if (finished) scheduleOnRN(onExitComplete);
         },

@@ -82,7 +82,7 @@ flow is `aurora-background.yaml`; native execution remains pending.
 
 `LaunchScreen` now reports native layout with optional `onReady`. The root hides the
 native splash at that point and retains the animated screen for the user-requested
-three seconds, then exits once startup is also ready. Its existing 300-ms transition
+three seconds, then exits once startup is also ready. Its two-second upward transition
 completes immediately under reduced motion. `launch-screen.stories.tsx` provides a
 replayable ThreeSeconds preview. Root JS fixtures exercise fast/slow restoration and
 the timing boundary. These statements supersede the readiness-only startup behavior
