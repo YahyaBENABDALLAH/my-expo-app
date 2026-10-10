@@ -21,7 +21,7 @@ export function ScreenError({ error, retry }: ErrorBoundaryProps) {
         testID="screen-error"
         matchContents={false}
         ignoreSafeArea="all"
-        style={{ flex: 1, backgroundColor: colors.background }}
+        style={{ flex: 1 }}
       >
         <ScrollView>
           <Column

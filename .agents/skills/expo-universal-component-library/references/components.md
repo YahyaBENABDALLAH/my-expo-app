@@ -70,6 +70,27 @@ content. These checks establish JS behavior; native rendering still requires dev
 
 ### Shared page motion
 
+The current default is the full-screen `AuroraBackground`, mounted behind root
+navigation. Stack/tab scenes, page frames, headers, auth forms, loading and recovery
+boundaries reveal the theme-aware shader through transparent containers. It supports
+`animate`, `colorScheme`, optional shared `hue` and RN boundary `style`; native layout
+sets resolution. Its UI-thread clock stops during static mode, inactive app state and
+live Reduce Motion changes. Decoration ignores touches and accessibility.
+`aurora-background.stories.tsx` covers Light, Dark, Static and NarrowPhone with page
+content, native buttons, press counts and pause/resume. The corresponding Maestro
+flow is `aurora-background.yaml`; native execution remains pending.
+
+`LaunchScreen` now reports native layout with optional `onReady`. The root hides the
+native splash at that point and retains the animated screen for the user-requested
+three seconds, then exits once startup is also ready. Its existing 300-ms transition
+completes immediately under reduced motion. `launch-screen.stories.tsx` provides a
+replayable ThreeSeconds preview. Root JS fixtures exercise fast/slow restoration and
+the timing boundary. These statements supersede the readiness-only startup behavior
+recorded later in this catalog; actual native rendering and timing remain unverified.
+
+The following top-edge wave is retained as optional artwork and a composition story;
+it is no longer the root default:
+
 `PageMotionOverlay` (`src/components/ui/page/page-motion-overlay.tsx`) provides a single 144-point-tall Skia canvas above the root navigation tree. It covers all routed pages, including authentication, details, and utility screens, without modifying their native control trees. `animate` defaults to true; optional `colorScheme` supplies deterministic light/dark previews. It consumes existing `tint` and `tabIconSelected` colors. Two oversized paths drift gently in opposite directions on a shared 12-second UI-thread loop. Width follows the wrapper's `onLayout` event, with no per-frame measurement or React updates. `useMotionEnabled` cancels/resets motion during background/inactive states, live Reduce Motion changes, and explicit static mode. The root keeps it static beneath the launch screen.
 
 Both wrapper and canvas ignore touches, and the decorative wrapper is hidden from accessibility. `.rnstorybook/stories/pages/page-motion.stories.tsx` covers Light, Dark, Static, and NarrowPhone with native buttons underneath the artwork, a visible action count, and pause/resume. `.maestro/storybook/page-motion.yaml` checks single tap delivery and those control states. These fixtures do not prove animation timing, actual native stacking, screen-reader behavior, rotation, or device performance; see [shared motion verification](../../../../docs/shared-skia-motion.md).

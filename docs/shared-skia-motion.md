@@ -1,28 +1,29 @@
 # Shared Skia page motion
 
-The root layout mounts `PageMotionOverlay` once above the navigation tree and below the launch screen. Every routed page receives the same gentle top-edge wave, including authentication, tabs, recipe/category details, collections, tools, maps, and not-found screens. Existing page content and native navigation own their usual layouts and safe areas.
+The root layout mounts `AuroraBackground` once behind navigation as the default full-screen background. Authentication, tabs, recipe/category details, collections, tools and not-found pages share the same theme-aware shader. Navigation themes, stack content, tab scenes, page frames, headers, auth forms, loading and recovery boundaries are transparent. Cards, fields and native controls keep their semantic surfaces. Maps and intentional Storybook fixture surfaces cover the artwork where their own content fills the screen.
 
-The 144-point canvas draws two fixed, oversized paths using existing light/dark `tint` and `tabIconSelected` tokens. Reanimated translates the paths in opposite directions over a seamless 12-second cycle. The canvas sizes from the wrapper's layout event; the frame loop performs no view measurement, path construction, network work, or React state updates. No dependencies were added.
+The existing aurora shader uses the selected theme's `background`, `surfaceRaised`, `primary` and `secondary` tokens. Its native wrapper's layout event updates resolution, including narrow previews. One Reanimated frame callback advances shader time on the UI thread; frames do not measure views, construct paths or update React state. No dependencies were added.
 
-The overlay is decorative and ignores touches. It is hidden from the accessibility tree. Existing `useMotionEnabled` observes app lifecycle and live Reduce Motion changes; disabled motion cancels the loop and returns to a static wave. The root requests static mode while the launch screen covers the app. A single root scene avoids hidden tab/stack screens owning extra animation loops.
+Both wrapper and canvas ignore touches and the decorative wrapper is hidden from accessibility. `useMotionEnabled` observes app lifecycle and live Reduce Motion changes. Explicit static mode, reduced motion and inactive app state stop the frame callback, preserving the current frame. Resuming does not advance through the time spent paused. The root keeps its canvas static while the launch screen covers it; the launch screen's own aurora supplies the visible startup artwork. Ordinary pages do not mount additional background loops. The dedicated Skia demo retains its interactive palette canvas.
 
-Native Storybook provides `Pages/Shared Skia motion` stories for Light, Dark, Static, and NarrowPhone. The composition includes an action button underneath the wave, an action counter, and pause/resume controls. The status label describes the story's requested animation mode; the OS accessibility setting and app lifecycle can still suppress motion.
+The requested splash minimum is three seconds, starting after the animated launch screen receives native layout and the root hides the native splash. Fonts are already ready; language and session restoration continue during the display. Once both the minimum and startup readiness are satisfied, the existing 300-ms wave exit reveals the app. Reduce Motion keeps the startup artwork static and completes exit immediately after the minimum. Session restoration errors still expose recovery after branding. `app-ready` appears only after the launch overlay completes.
 
-`.maestro/storybook/page-motion.yaml` checks touch-through, one action per tap, pause/resume controls, dark mode, and static-mode interaction. It does not assert rendered wave frames or system Reduce Motion behavior.
+`Pages/Skia background` stories cover Light, Dark, Static and NarrowPhone with page content, native action buttons, an action counter and pause/resume controls. `.maestro/storybook/aurora-background.yaml` checks one action per tap and those control states across light/dark/static compositions. `Pages/Animated splash/ThreeSeconds` previews the production launch artwork and supports replay. The old `PageMotionOverlay` and its stories remain available as optional top-edge artwork; they are no longer mounted by the root.
 
 ## Verification
 
 Completed checks:
 
 - `npm run typecheck` and `npm run lint` pass.
-- `npm run test:layout` and `npm run test:navigation` pass (28 existing checks).
-- `npm run storybook:generate` completes; its generated recursive story matcher includes the new story file.
-- Prettier checks pass for the new source, root integration, story, native flow, and this document.
+- `npm run test:layout` passes, including root fixture checks for fast and slow restoration, the three-second boundary, readiness after exit and retaining one shared background through direction changes.
+- `npm run test:navigation` passes (28 route checks).
+- `npm run storybook:generate` completes; its recursive story matcher includes both new story files.
+- Existing page, auth and loading stories use a static aurora matching their explicit light/dark scheme, independently of the app's appearance.
 
-Native rendering and performance are unverified: the Android SDK reports no connected devices, and this Windows workspace has no local iOS simulator. On iOS and Android, inspect light/dark auth, tab, detail, map, and tool pages; confirm headers and inputs remain readable and interactive. Enable Reduce Motion while open, background/resume the app, switch pages, and resize/rotate on supported devices. Judge smoothness in a release build on the slowest supported device.
+Native rendering and performance remain unverified: `adb devices` reports no connected devices, and this Windows workspace has no local iOS simulator. On iOS and Android, cold-launch the app and inspect the three-second Lottie/Skia presentation and transition. Inspect light/dark auth, tab, detail, map and tool pages; confirm native headers, buttons and inputs remain readable and interactive. Enable Reduce Motion while open, background/resume the app, switch pages and resize/rotate on supported devices. Check the native splash handoff and smoothness in a release build on the slowest supported device.
 
 Run the focused native interaction flow with a connected development build:
 
 ```sh
-maestro test .maestro/storybook/page-motion.yaml
+maestro test .maestro/storybook/aurora-background.yaml
 ```

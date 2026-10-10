@@ -15,7 +15,7 @@ export function MapExperience() {
   const insets = useSafeAreaInsets();
   const colors = useThemeColors();
   return (
-    <View style={{ flex: 1, backgroundColor: colors.background }}>
+    <View style={{ flex: 1 }}>
       <MapView
         style={{ flex: 1 }}
         initialRegion={{ ...CASABLANCA, latitudeDelta: 0.08, longitudeDelta: 0.08 }}

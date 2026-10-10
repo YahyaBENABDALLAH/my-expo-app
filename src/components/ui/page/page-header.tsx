@@ -22,7 +22,7 @@ export function PageHeader({
       <Column
         spacing={8}
         modifiers={nativeFillWidth}
-        style={{ paddingHorizontal: 16, paddingVertical: 8, backgroundColor: colors.surface }}
+        style={{ paddingHorizontal: 16, paddingVertical: 8 }}
       >
         {title ? (
           <Row alignment="center" spacing={8} modifiers={nativeFillWidth}>

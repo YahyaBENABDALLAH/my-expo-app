@@ -9,7 +9,6 @@ import { nativeFillWidth } from '../native/native-fill-width';
 import { PageFrame } from './page-frame';
 import { PageAppearanceControls } from '../appearance/page-appearance-controls';
 import { UniversalTextContent } from '../text/universal-text';
-import { useThemeColors } from '@/hooks/use-theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import type { ReactNode } from 'react';
 import { screenInsets } from '@/lib/screen-insets';
@@ -71,12 +70,10 @@ function PageContent({
   colorScheme: 'light' | 'dark';
 }) {
   const insets = useSafeAreaInsets();
-  const colors = useThemeColors(scheme);
   return (
     <View
       style={{
         flex: 1,
-        backgroundColor: colors.background,
         ...screenInsets(insets, { tabBarShown: tab }),
       }}
     >

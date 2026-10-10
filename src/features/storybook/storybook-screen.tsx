@@ -9,7 +9,7 @@ import { screenInsets } from '@/lib/screen-insets';
 
 export default function StorybookScreen() {
   const focused = useIsFocused();
-  const { scheme, colors } = useAppTheme();
+  const { scheme } = useAppTheme();
   const insets = useSafeAreaInsets();
   const params = useLocalSearchParams<{ mode?: string }>();
 
@@ -19,7 +19,6 @@ export default function StorybookScreen() {
       style={{
         flex: 1,
         ...screenInsets(insets, { tabBarShown: true }),
-        backgroundColor: colors.background,
       }}
     >
       {focused ? <StatusBar style={scheme === 'dark' ? 'light' : 'dark'} /> : null}

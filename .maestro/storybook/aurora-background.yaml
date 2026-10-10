@@ -1,0 +1,41 @@
+appId: com.hyrkul.likan
+name: Fullscreen Skia background preserves native button interaction
+tags: [storybook, motion]
+env:
+  STORYBOOK_URL: myappexpo://storybook
+---
+- runFlow:
+    file: ../helpers/open-story.yaml
+    env:
+      STORY_ID: pages-skia-background--light
+      READY_ID: aurora-action
+- assertVisible: 'Button presses: 0'
+- tapOn:
+    id: aurora-action
+- assertVisible: 'Button presses: 1'
+- tapOn:
+    id: aurora-toggle
+- assertVisible: Static background
+- tapOn:
+    id: aurora-action
+- assertVisible: 'Button presses: 2'
+- tapOn:
+    id: aurora-toggle
+- assertVisible: Motion requested
+- runFlow:
+    file: ../helpers/open-story.yaml
+    env:
+      STORY_ID: pages-skia-background--dark
+      READY_ID: aurora-action
+- tapOn:
+    id: aurora-action
+- assertVisible: 'Button presses: 1'
+- runFlow:
+    file: ../helpers/open-story.yaml
+    env:
+      STORY_ID: pages-skia-background--static
+      READY_ID: aurora-action
+- assertVisible: Static background
+- tapOn:
+    id: aurora-action
+- assertVisible: 'Button presses: 1'

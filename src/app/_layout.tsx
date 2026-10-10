@@ -1,5 +1,6 @@
 import {
   AuthText,
+  AuroraBackground,
   Column,
   ErrorToastHost,
   UniversalHost as Host,
@@ -7,7 +8,6 @@ import {
   LoadingContent,
   nativeFillSize,
   PageFrame,
-  PageMotionOverlay,
   Spacer,
   UniversalButtonContent,
   useAuthTheme,
@@ -45,7 +45,9 @@ export const unstable_settings = {
 SplashScreen.preventAutoHideAsync().catch(() => {
   // The splash may already be hidden during a development reload.
 });
-SplashScreen.setOptions({ duration: 300, fade: true });
+SplashScreen.setOptions({ duration: 0, fade: false });
+
+const BRAND_DURATION_MS = 3000;
 
 export default function RootLayout() {
   const [loaded, error] = useFonts({
@@ -56,12 +58,6 @@ export default function RootLayout() {
   useEffect(() => {
     if (error) throw error;
   }, [error]);
-
-  useEffect(() => {
-    if (!loaded) return;
-
-    SplashScreen.hide();
-  }, [loaded]);
 
   if (!loaded) {
     return null;
@@ -86,23 +82,46 @@ function RootLayoutContent() {
   const colorScheme = useColorScheme();
   const colors = useThemeColors(colorScheme);
   const [showBrandScreen, setShowBrandScreen] = useState(true);
+  const [brandScreenVisible, setBrandScreenVisible] = useState(false);
+  const [brandDurationElapsed, setBrandDurationElapsed] = useState(false);
   const { restoring } = useAuthGuards();
   const { error } = useAuthContext();
   const { ready: languageReady } = useLanguage();
   // Restoration failures must expose their retry UI instead of keeping the launch overlay.
   const ready = languageReady && (!restoring || Boolean(error));
   const finishBrandScreen = useCallback(() => setShowBrandScreen(false), []);
+  const revealBrandScreen = useCallback(() => {
+    // Begin the three seconds only once the animated screen has native layout.
+    SplashScreen.hide();
+    setBrandScreenVisible(true);
+  }, []);
+
+  useEffect(() => {
+    if (!brandScreenVisible) return;
+    const timeout = setTimeout(() => setBrandDurationElapsed(true), BRAND_DURATION_MS);
+    return () => clearTimeout(timeout);
+  }, [brandScreenVisible]);
 
   return (
     <View
-      testID={ready ? 'app-ready' : undefined}
+      testID={ready && !showBrandScreen ? 'app-ready' : undefined}
       collapsable={false}
       style={{ flex: 1, backgroundColor: colors.background }}
     >
       <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
+      <AuroraBackground
+        animate={!showBrandScreen}
+        colorScheme={colorScheme}
+        style={{ position: 'absolute', top: 0, right: 0, bottom: 0, left: 0 }}
+      />
       {ready || !showBrandScreen ? <RootLayoutNav /> : null}
-      <PageMotionOverlay animate={!showBrandScreen} />
-      {showBrandScreen && <LaunchScreen exiting={ready} onExitComplete={finishBrandScreen} />}
+      {showBrandScreen && (
+        <LaunchScreen
+          exiting={ready && brandDurationElapsed}
+          onReady={revealBrandScreen}
+          onExitComplete={finishBrandScreen}
+        />
+      )}
       {!showBrandScreen && <ErrorToastHost />}
     </View>
   );
@@ -130,7 +149,6 @@ function RootLayoutNav() {
             paddingBottom: 24,
             paddingLeft: insets.left + 24,
             paddingRight: insets.right + 24,
-            backgroundColor: colors.background,
           }}
         >
           <Host
@@ -168,7 +186,7 @@ function RootLayoutNav() {
         screenOptions={{
           animation: reducedMotion ? 'fade' : 'default',
           animationMatchesGesture: reducedMotion,
-          contentStyle: { backgroundColor: colors.background, direction },
+          contentStyle: { backgroundColor: 'transparent', direction },
           headerShown: false,
           headerShadowVisible: false,
         }}

@@ -5,7 +5,10 @@ Exports: `PageScreen`, `PageFrame`, `PageHeader` and `PageMotionOverlay`.
 `page-screen.tsx` composes scrolling content, actions and an appearance footer.
 `page-frame.tsx` handles title/content/footer safe-area boundaries.
 `page-header.tsx` uses the private `page-back-button.*` adapters.
-`page-motion-overlay.tsx` contains shared passive Skia artwork.
+`page-motion-overlay.tsx` contains the optional top-edge wave artwork.
+The root now uses `AuroraBackground` behind navigation as the default background.
+Frames, headers and page content are transparent so they reveal that shared
+canvas; native cards and controls keep their usual semantic surfaces.
 
 Ordinary pages place appearance controls after scroll content. Specialized
 map/canvas pages use the frame's hosted footer. Keep system insets outside

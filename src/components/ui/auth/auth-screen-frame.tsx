@@ -50,7 +50,6 @@ function AuthScreenContent({
         flex: 1,
         alignItems: 'center',
         paddingHorizontal: horizontalPadding,
-        backgroundColor: colors.background,
       }}
     >
       <UniversalHost

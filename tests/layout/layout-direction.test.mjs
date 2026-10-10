@@ -359,7 +359,8 @@ test('compact switches keep distinct prefixes for global, story and sheet contro
 });
 
 for (const authenticated of [false, true]) {
-  test(`${authenticated ? 'signed-in' : 'signed-out'} root waits for restoration and retains navigation/providers when direction flips`, () => {
+  test(`${authenticated ? 'signed-in' : 'signed-out'} root shows three seconds of branding, waits for restoration and retains navigation/providers when direction flips`, (t) => {
+    t.mock.timers.enable({ apis: ['setTimeout'] });
     const s = setup();
     let directionSettings;
     let finishRestore;
@@ -386,7 +387,7 @@ for (const authenticated of [false, true]) {
       UniversalHost: s.UniversalHost,
       useAuthTheme: () => ({ buttonPalette: {} }),
       LaunchScreen: s.native('LaunchScreen'),
-      PageMotionOverlay: s.native('PageMotionOverlay'),
+      AuroraBackground: s.native('AuroraBackground'),
       ErrorToastHost: s.native('ErrorToastHost'),
       PageFrame: s.native('RestorationPanel'),
       Column: s.native('Column'),
@@ -435,6 +436,22 @@ for (const authenticated of [false, true]) {
     const view = renderFixture(createElement(RootLayout));
     const queryProvider = view.findAll('AppQueryProvider')[0];
     const authProvider = view.findAll('AuthProvider')[0];
+    const background = view.findAll('AuroraBackground')[0];
+    const launch = view.findAll('LaunchScreen')[0];
+    assert.equal(background.props.animate, false);
+    assert.equal(launch.props.exiting, false);
+    // Asset loading before native layout must not consume the visible branding time.
+    view.flush(() => t.mock.timers.tick(5_000));
+    assert.equal(launch.props.exiting, false);
+    view.flush(() => launch.props.onReady());
+    if (authenticated) {
+      view.flush(() => t.mock.timers.tick(3_000));
+      assert.equal(
+        launch.props.exiting,
+        false,
+        'Elapsed branding must still wait for restoration.',
+      );
+    }
     assert.equal(view.findAll('Stack').length, 0);
     assert.equal(view.findAll('RestorationPanel').length, 0);
     view.flush(finishLanguage);
@@ -442,6 +459,26 @@ for (const authenticated of [false, true]) {
     assert.equal(view.findAll('RestorationPanel').length, 0);
     view.flush(finishRestore);
     const stack = view.findAll('Stack')[0];
+    if (!authenticated) {
+      assert.equal(launch.props.exiting, false, 'Fast restoration must still show the animation.');
+      view.flush(() => t.mock.timers.tick(2_999));
+      assert.equal(launch.props.exiting, false);
+      view.flush(() => t.mock.timers.tick(1));
+    }
+    assert.equal(launch.props.exiting, true);
+    assert.equal(
+      view.findAll('View').some((node) => node.props.testID === 'app-ready'),
+      false,
+    );
+    view.flush(() => launch.props.onExitComplete());
+    assert.equal(view.findAll('LaunchScreen').length, 0);
+    assert.equal(view.findAll('AuroraBackground')[0], background);
+    assert.equal(background.props.animate, true);
+    assert.equal(
+      view.findAll('View').some((node) => node.props.testID === 'app-ready'),
+      true,
+    );
+    assert.equal(stack.props.screenOptions.contentStyle.backgroundColor, 'transparent');
     assert.equal(view.findAll('AuthProvider')[0], authProvider);
     assert.equal(view.findAll('AppQueryProvider')[0], queryProvider);
     assert.equal(view.findAll('Switch').length, 0);

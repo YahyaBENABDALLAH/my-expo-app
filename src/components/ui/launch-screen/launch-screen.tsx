@@ -31,9 +31,11 @@ const bluePepeSource = bluePepe as unknown as string;
 
 export function LaunchScreen({
   exiting,
+  onReady,
   onExitComplete,
 }: {
   exiting: boolean;
+  onReady?: () => void;
   onExitComplete: () => void;
 }) {
   const { t } = useTranslation();
@@ -79,6 +81,7 @@ export function LaunchScreen({
   return (
     <Animated.View
       testID="app-brand-screen"
+      onLayout={onReady}
       accessible
       accessibilityLabel={t('launch.loading')}
       pointerEvents={exiting ? 'none' : 'auto'}

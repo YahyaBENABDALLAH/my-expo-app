@@ -1,4 +1,5 @@
 import {
+  AuroraBackground,
   Column,
   nativeFillWidth,
   AuthScreenFrame,
@@ -9,6 +10,7 @@ import {
 import type { Meta, StoryObj } from '@storybook/react-native';
 
 import { useState } from 'react';
+import { View } from 'react-native';
 import { useForm } from 'react-hook-form';
 
 import { loginResolver } from '@/validation/resolvers/auth';
@@ -83,6 +85,18 @@ const meta = {
     colorScheme: { control: 'select', options: ['light', 'dark'] },
   },
   parameters: { layout: 'fullscreen' },
+  decorators: [
+    (Story, { args }) => (
+      <View style={{ flex: 1 }}>
+        <AuroraBackground
+          colorScheme={args.colorScheme}
+          animate={false}
+          style={{ position: 'absolute', top: 0, right: 0, bottom: 0, left: 0 }}
+        />
+        <Story />
+      </View>
+    ),
+  ],
 } satisfies Meta<typeof NativeFormDemo>;
 
 export default meta;

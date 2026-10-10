@@ -1,4 +1,5 @@
 import {
+  AuroraBackground,
   NativeField,
   PageScreen,
   UniversalButtonContent,
@@ -8,6 +9,7 @@ import type { Meta, StoryObj } from '@storybook/react-native';
 import { SafeAreaInsetsContext } from 'react-native-safe-area-context';
 
 import { useEffect, useRef, useState } from 'react';
+import { View } from 'react-native';
 
 const meta = {
   title: 'Pages/Navigation shell',
@@ -20,6 +22,18 @@ const meta = {
     colorScheme: 'light',
   },
   parameters: { layout: 'fullscreen' },
+  decorators: [
+    (Story, { args }) => (
+      <View style={{ flex: 1 }}>
+        <AuroraBackground
+          colorScheme={args.colorScheme}
+          animate={false}
+          style={{ position: 'absolute', top: 0, right: 0, bottom: 0, left: 0 }}
+        />
+        <Story />
+      </View>
+    ),
+  ],
   argTypes: { colorScheme: { control: 'select', options: ['light', 'dark'] } },
 } satisfies Meta<typeof PageScreen>;
 export default meta;

@@ -39,7 +39,7 @@ export function LoadingScreen({
       colorScheme={scheme}
       matchContents={false}
       ignoreSafeArea="all"
-      style={{ flex: 1, backgroundColor: useThemeColors(scheme).background }}
+      style={{ flex: 1 }}
     >
       <Column
         alignment="center"

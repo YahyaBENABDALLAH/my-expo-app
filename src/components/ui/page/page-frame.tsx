@@ -1,7 +1,6 @@
 import type { PropsWithChildren } from 'react';
 import { View } from 'react-native';
 import { SafeAreaInsetsContext, useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useThemeColors } from '@/hooks/use-theme';
 import { PageHeader } from './page-header';
 import { PageAppearanceFooter } from '../appearance/page-appearance-controls';
 
@@ -21,16 +20,14 @@ export function PageFrame({
   tab?: boolean;
 }>) {
   const insets = useSafeAreaInsets();
-  const colors = useThemeColors(colorScheme);
   return (
-    <View style={{ flex: 1, backgroundColor: colors.background }}>
+    <View style={{ flex: 1 }}>
       <View
         testID="page-header-safe-area"
         style={{
           paddingTop: insets.top,
           paddingLeft: insets.left,
           paddingRight: insets.right,
-          backgroundColor: colors.surface,
         }}
       >
         {title ? <PageHeader title={title} onBack={onBack} colorScheme={colorScheme} /> : null}
@@ -46,7 +43,6 @@ export function PageFrame({
             paddingLeft: insets.left,
             paddingRight: insets.right,
             paddingBottom: tab ? 0 : insets.bottom,
-            backgroundColor: colors.surface,
           }}
         >
           <PageAppearanceFooter colorScheme={colorScheme} />

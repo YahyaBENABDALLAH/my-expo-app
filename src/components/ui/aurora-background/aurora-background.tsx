@@ -1,13 +1,15 @@
-import { Canvas, Fill, Shader, Skia, useClock } from '@shopify/react-native-skia';
-import { StyleProp, ViewStyle, useWindowDimensions } from 'react-native';
+import { Canvas, Fill, Shader, Skia } from '@shopify/react-native-skia';
+import { useEffect } from 'react';
+import { View, type StyleProp, type ViewStyle, useWindowDimensions } from 'react-native';
 import {
-  SharedValue,
+  type SharedValue,
   useDerivedValue,
-  useReducedMotion,
+  useFrameCallback,
   useSharedValue,
 } from 'react-native-reanimated';
 import { themes, themeIds } from '@/constants/themes/index';
 import { useAppTheme } from '@/hooks/use-theme';
+import { useMotionEnabled } from '@/hooks/use-motion-enabled';
 import { useHostColorScheme } from '../host/universal-host';
 
 // Resolve color uniforms once; animated frames only update time and hue.
@@ -64,32 +66,56 @@ export function AuroraBackground({
   hue,
   colorScheme,
   style,
+  animate = true,
 }: {
   hue?: SharedValue<number>;
   colorScheme?: 'light' | 'dark';
   style: StyleProp<ViewStyle>;
+  animate?: boolean;
 }) {
   const scheme = useHostColorScheme(colorScheme);
   const { themeId } = useAppTheme(scheme);
   const palette = shaderPalettes[`${themeId}-${scheme}`];
   const { width, height } = useWindowDimensions();
-  const clock = useClock();
-  const reduceMotion = useReducedMotion();
+  const resolution = useSharedValue([width, height]);
+  const clock = useSharedValue(0);
+  const enabled = useMotionEnabled(animate);
+  const { setActive } = useFrameCallback(({ timeSincePreviousFrame }) => {
+    clock.set((time) => time + Math.min(timeSincePreviousFrame ?? 0, 64) / 1000);
+  }, false);
+  useEffect(() => {
+    setActive(enabled);
+    return () => setActive(false);
+  }, [enabled, setActive]);
   const defaultHue = useSharedValue(0);
   const activeHue = hue ?? defaultHue;
 
   const uniforms = useDerivedValue(() => ({
     ...palette,
-    resolution: [width, height],
-    time: reduceMotion ? 0 : clock.get() / 1000,
+    resolution: resolution.get(),
+    time: clock.get(),
     hue: activeHue.get(),
   }));
 
   return (
-    <Canvas style={style}>
-      <Fill>
-        <Shader source={shader} uniforms={uniforms} />
-      </Fill>
-    </Canvas>
+    <View
+      testID="aurora-background"
+      pointerEvents="none"
+      accessible={false}
+      accessibilityElementsHidden
+      importantForAccessibility="no-hide-descendants"
+      collapsable={false}
+      onLayout={({ nativeEvent }) => {
+        const { width, height } = nativeEvent.layout;
+        resolution.set([Math.max(1, width), Math.max(1, height)]);
+      }}
+      style={style}
+    >
+      <Canvas pointerEvents="none" style={{ flex: 1 }}>
+        <Fill>
+          <Shader source={shader} uniforms={uniforms} />
+        </Fill>
+      </Canvas>
+    </View>
   );
 }

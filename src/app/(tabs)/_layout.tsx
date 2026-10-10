@@ -12,7 +12,11 @@ export default function TabLayout() {
     <TabActionsProvider>
       <Tabs
         tabBar={(props) => <ReferenceTabBar {...props} />}
-        screenOptions={{ headerShown: false, animation: 'none' }}
+        screenOptions={{
+          headerShown: false,
+          animation: 'none',
+          sceneStyle: { backgroundColor: 'transparent' },
+        }}
       >
         <Tabs.Screen name="index" options={{ title: t('common.home') }} />
         <Tabs.Screen name="search" options={{ title: t('common.search') }} />
