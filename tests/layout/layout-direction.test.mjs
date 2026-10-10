@@ -355,9 +355,14 @@ test('compact switches keep distinct prefixes for global, story and sheet contro
 });
 
 for (const authenticated of [false, true]) {
-  test(`${authenticated ? 'signed-in' : 'signed-out'} root leaves headers to pages and retains navigation/providers when direction flips`, () => {
+  test(`${authenticated ? 'signed-in' : 'signed-out'} root waits for restoration and retains navigation/providers when direction flips`, () => {
     const s = setup();
     let directionSettings;
+    let finishRestore;
+    let finishLanguage;
+    const RestorationContext = createContext(true);
+    const LanguageContext = createContext({ ready: false });
+    const NativeAuthProvider = s.native('AuthProvider');
     const NativeStack = s.native('Stack');
     function Stack(props) {
       directionSettings = s.useLayoutDirectionSettings();
@@ -379,6 +384,10 @@ for (const authenticated of [false, true]) {
       LaunchScreen: s.native('LaunchScreen'),
       PageMotionOverlay: s.native('PageMotionOverlay'),
       ErrorToastHost: s.native('ErrorToastHost'),
+      PageFrame: s.native('RestorationPanel'),
+      Column: s.native('Column'),
+      LoadingContent: s.native('LoadingContent'),
+      Spacer: s.native('Spacer'),
     };
     s.mocks['expo-font'] = { useFonts: () => [true, null] };
     s.mocks['expo-splash-screen'] = {
@@ -392,21 +401,45 @@ for (const authenticated of [false, true]) {
     s.mocks['@assets/fonts/UnifrakturCook-Bold.ttf'] = 2;
     s.mocks['@/context/query-provider'] = { AppQueryProvider: s.native('AppQueryProvider') };
     s.mocks['@/context/auth.context'] = {
-      AuthProvider: s.native('AuthProvider'),
+      AuthProvider({ children }) {
+        const [restoring, setRestoring] = useState(true);
+        finishRestore = () => setRestoring(false);
+        return createElement(
+          RestorationContext.Provider,
+          { value: restoring },
+          createElement(NativeAuthProvider, null, children),
+        );
+      },
       useAuthContext: () => ({ error: null }),
+    };
+    s.mocks['@/context/language.context'] = {
+      LanguageProvider({ children }) {
+        const [ready, setReady] = useState(false);
+        finishLanguage = () => setReady(true);
+        return createElement(LanguageContext.Provider, { value: { ready } }, children);
+      },
+      useLanguage: () => useContext(LanguageContext),
     };
     s.mocks['@/guards/auth-guards'] = {
       useAuthGuards: () => ({
         requireNoAuth: !authenticated,
         requireAuth: authenticated,
-        restoring: false,
+        restoring: useContext(RestorationContext),
       }),
     };
     const { default: RootLayout } = s.load('app/_layout.tsx');
     const view = renderFixture(createElement(RootLayout));
-    const stack = view.findAll('Stack')[0];
     const queryProvider = view.findAll('AppQueryProvider')[0];
     const authProvider = view.findAll('AuthProvider')[0];
+    assert.equal(view.findAll('Stack').length, 0);
+    assert.equal(view.findAll('RestorationPanel').length, 0);
+    view.flush(finishLanguage);
+    assert.equal(view.findAll('Stack').length, 0);
+    assert.equal(view.findAll('RestorationPanel').length, 0);
+    view.flush(finishRestore);
+    const stack = view.findAll('Stack')[0];
+    assert.equal(view.findAll('AuthProvider')[0], authProvider);
+    assert.equal(view.findAll('AppQueryProvider')[0], queryProvider);
     assert.equal(view.findAll('Switch').length, 0);
     assert.equal(view.findAll('Screen')[0].props.name, authenticated ? '(tabs)' : '(auth)');
     for (const direction of ['rtl', 'ltr']) {

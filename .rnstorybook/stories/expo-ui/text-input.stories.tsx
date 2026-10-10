@@ -2,8 +2,6 @@ import {
   Column,
   UniversalHost as Host,
   Icon,
-  RNHostView,
-  ScrollView,
   Text,
   useNativeState,
   type TextInputRef,
@@ -136,23 +134,19 @@ const meta = {
       // These stories are for the on-device iOS/Android Storybook only.
       if (Platform.OS !== 'ios' && Platform.OS !== 'android') return <></>;
       return (
-        <Host colorScheme={context.args.colorScheme} style={{ flex: 1 }}>
-          <ScrollView testID={`${context.args.testID}-canvas`}>
-            <RNHostView matchContents>
-              <View
-                style={{
-                  padding: 24,
-                  backgroundColor:
-                    context.args.colorScheme === 'light'
-                      ? Colors.light.background
-                      : Colors.dark.background,
-                }}
-              >
-                <Story />
-              </View>
-            </RNHostView>
-          </ScrollView>
-        </Host>
+        <View
+          testID={`${context.args.testID}-canvas`}
+          style={{
+            flex: 1,
+            padding: 24,
+            backgroundColor:
+              context.args.colorScheme === 'light'
+                ? Colors.light.background
+                : Colors.dark.background,
+          }}
+        >
+          <Story />
+        </View>
       );
     },
   ],

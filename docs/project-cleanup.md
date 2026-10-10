@@ -22,9 +22,14 @@ Retained all existing dependencies for planned features, including `@stepperize/
 Configured Firebase, Image, Secure Store, Sharing, Updates, and framework infrastructure remain available. Storybook controls require the community slider, date picker, bottom sheet, and SVG peers even though app screens use Expo UI.
 
 The selected redundancy cleanup on 2026-10-05 removed the web-only CanvasKit copy
-script, generated WASM and unused favicon. Postinstall retains the Expo UI
-native-state lifecycle patch. Dependency declarations and lockfile resolution
-remain unchanged.
+script, generated WASM and unused favicon. The 2026-10-10 cleanup removes the
+Expo UI postinstall patch and its workaround-specific tests and notes. Expo SDK
+57 packages now use the compatible patch releases selected by `expo install
+--fix`, including Expo `57.0.27`. Expo UI stays pinned to the unmodified `57.0.21`
+release because native testing found a numeric-width crash in `57.0.22`; see
+[the version decision](build-verification.md#expo-ui-version). Navigation now waits
+for session/language restoration before allocating native screen state. The lockfile
+is synchronized; application controls use the supported Expo UI observable API.
 
 The package lock is synchronized. The original dependency set remains available alongside the project cleanup and security fixes.
 
@@ -41,15 +46,26 @@ The audit initially reported 26 findings, including six high-severity findings. 
 
 Review these overrides during dependency updates and remove them once upstream packages resolve patched versions themselves.
 
-Three moderate findings remain in the chain `expo-router → query-string → decode-uri-component`. The patched decoder changes from CommonJS to ESM, while the installed query parser expects a callable CommonJS export. Forcing the replacement would break query parsing. Do not use `npm audit fix --force`, which also proposes incompatible Expo downgrades; resolve this with a compatible upstream Router/query-parser update. Track [the decoder advisory](https://github.com/advisories/GHSA-vcc3-ghjq-m6fr).
+The 2026-10-10 audit reports 27 findings (24 high and three moderate), including
+dependency chains through `braces`, `node-forge` and `decode-uri-component`.
+The registry has no patched `braces` or `node-forge` release at this review date.
+The patched decoder changes from CommonJS to ESM, while the installed query
+parser expects a callable CommonJS export. Forcing the replacement would break
+query parsing. Do not use `npm audit fix --force`, which also proposes incompatible
+Expo downgrades; these findings require compatible upstream updates. Track
+[the decoder advisory](https://github.com/advisories/GHSA-vcc3-ghjq-m6fr),
+[the braces advisory](https://github.com/advisories/GHSA-vfj7-8cjw-p6xm) and
+[the node-forge advisory](https://github.com/advisories/GHSA-86w9-cpqp-85rv).
 
 ## Verification
 
-- `npm run check`: strict TypeScript, zero-warning lint, formatting, and nine validation tests.
+- `npm run check`: strict TypeScript, zero-warning lint, formatting, and 290 tests.
 - `npx expo-doctor`: all 21 checks pass.
 - Android and iOS production JavaScript exports pass; source-map inspection confirms Storybook is excluded.
 - Android and iOS development JavaScript exports also pass, including the Storybook stories and controls.
 - Development Storybook discovery generation passes.
-- Native Maestro flows remain available but were not run, per the request to skip them. JavaScript exports do not establish device interaction correctness or native binary build success.
+- The 2026-10-10 cleanup includes successful Android and iOS simulator EAS builds
+  and Android emulator checks. See [the build verification report](build-verification.md)
+  for artifacts, interaction results and the remaining iOS/Firebase limits.
 
 Run `npm run check` before committing. Use the documented Maestro flows when device automation is resumed.

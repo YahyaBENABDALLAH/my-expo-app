@@ -41,7 +41,7 @@ Scope: audit items 3, 4, 8, 9, 10 and 11. Keep every package manifest, lockfile 
 
 - iOS device interaction, native accessibility/font scaling, map/Skia appearance, keyboard behavior and detailed startup timing remain unverified. Successful Hermes exports establish bundling, not native runtime behavior.
 - Maestro emits repeated Windows file-lock heartbeat errors; both Android button/loading flows nevertheless completed successfully. These tool warnings did not fail their app assertions.
-- The original fix retained CanvasKit copying under its frozen-manifest scope. The selected redundancy cleanup on 2026-10-05 removed the web copy script and WASM asset together with that postinstall step. Postinstall still applies the Expo UI native-state lifecycle patch.
+- The original fix retained CanvasKit copying under its frozen-manifest scope. The selected redundancy cleanup on 2026-10-05 removed the web copy script and WASM asset together with that postinstall step. The 2026-10-10 cleanup removes the remaining Expo UI postinstall patch and uses unmodified SDK 57 packages.
 - Malformed successful write responses may follow a completed server write. Automatic write retries remain off; failure context directs users to check the result before repeating uncertain server writes.
 - The original audit remains a historical baseline. Unrelated recovery-challenge, server-write/local-persistence partial success and collection/catalog pagination findings are outside this requested fix scope. Creations still explicitly shows the first-100-public-recipes limitation.
 

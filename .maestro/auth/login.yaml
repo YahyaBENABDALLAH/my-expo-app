@@ -14,10 +14,10 @@ tags: [smoke, auth]
 - hideKeyboard
 - assertVisible:
     id: auth-login-email-error
-    text: Enter your email or username.
+    text: Email or username is required.
 - assertVisible:
     id: auth-login-password-error
-    text: Use at least 8 characters.
+    text: Password must contain at least 8 characters.
 - tapOn:
     id: auth-login-email
 - inputText: alex@example.com

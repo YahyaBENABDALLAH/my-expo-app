@@ -4,11 +4,13 @@ Screens import reusable presentation from `@components/ui`. This alias points to
 [`index.ts`](index.ts). Implementations in this folder import siblings directly.
 Feature screens retain queries, mutations, form state and workflow hooks.
 
-Native input `value` remains an Expo UI observable, including form resets and
-password toggles. SDK 57's native-state hook has a project postinstall workaround
-to prevent effect cleanup from releasing retained values. See the
-[lifecycle patch and verification limits](../../../docs/expo-ui-native-state.md)
-before updating `@expo/ui`.
+Native input `value` uses Expo UI's supported observable API, including form
+resets and password toggles. Dependencies are installed without project patches.
+Check the SDK 57 documentation and installed types before updating `@expo/ui`.
+Expo UI is pinned to unmodified `57.0.21`, with compatible Router `57.0.24`; see the
+[native version decision](../../../docs/build-verification.md#expo-ui-version)
+before changing that pin. Auth layout constrains the native Host through the
+existing keyboard/safe-area boundary, with full-width native content.
 
 | Need                     | Components / source                                                                             |
 | ------------------------ | ----------------------------------------------------------------------------------------------- |

@@ -1,6 +1,6 @@
 # Universal component catalog
 
-Inventory checked 2026-10-03 against Expo `~57.0.26`, installed `@expo/ui` `57.0.21`, and [SDK 57 universal documentation](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/). The manifest range is `~57.0.14`; resolve actual installed versions before future edits.
+SDK/package versions refreshed 2026-10-10: Expo `~57.0.27` and installed `@expo/ui` `57.0.21` (exact manifest pin). Expo UI `57.0.22` crashes on Android numeric widths; the pin and scoped dependency-validation exclusion are documented in `docs/build-verification.md`. The component inventory uses [SDK 57 universal documentation](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/); resolve actual installed versions before future edits. Packages are installed without project patches.
 
 Authoritative local export inventory: `node_modules/@expo/ui/src/universal/index.ts`. Read component `types.ts` and native implementations alongside the linked API page. This catalog records availability and proposed verification, not proof that all behavior has passed.
 
@@ -273,7 +273,7 @@ UniversalHost provides its resolved scheme to content through useHostColorScheme
 
 LoadingIndicator is a host-free platform adapter using SwiftUI ProgressView or Compose CircularProgressIndicator. LoadingContent composes a native row with an indicator and text; LoadingScreen owns a full-screen Host for route/Suspense boundaries. loading-state.stories.tsx exercises fetching, disabled, offline, persistent error, successful empty, cached refresh and refresh failure, plus full-screen and light/dark compositions. .maestro/storybook/loading-state.yaml checks observable state transitions. JS render tests establish query state selection; native layout/interaction verification is recorded in docs/production-fixes-plan.md.
 
-Screen recovery, launch text, maps/Skia captions and controls now use Expo UI. RN boundaries remain for native maps, canvas/Lottie artwork, keyboard/safe areas, navigation and absolute overlays. Launch waits for actual font/session readiness, with a 300-ms exit and immediate completion under reduced motion. Native-only no-op loaders and unused web branches were removed. The selected redundancy cleanup on 2026-10-05 also removed the web CanvasKit copy script, WASM asset and favicon; postinstall retains the Expo UI native-state lifecycle patch.
+Screen recovery, launch text, maps/Skia captions and controls now use Expo UI. RN boundaries remain for native maps, canvas/Lottie artwork, keyboard/safe areas, navigation and absolute overlays. Launch waits for actual font/session readiness, with a 300-ms exit and immediate completion under reduced motion. Native-only no-op loaders and unused web branches were removed. The selected redundancy cleanup on 2026-10-05 also removed the web CanvasKit copy script, WASM asset and favicon; the 2026-10-10 cleanup removes the remaining Expo UI postinstall patch.
 
 ### Floating-action native verification follow-up
 

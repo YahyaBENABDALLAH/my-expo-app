@@ -12,7 +12,7 @@ appId: com.hyrkul.likan
 - extendedWaitUntil:
     visible:
       id: expo-ui-button
-    timeout: 60000
+    timeout: 120000
 - openLink: '${STORYBOOK_URL}?STORYBOOK_STORY_ID=${STORY_ID}&mode=canvas'
 - extendedWaitUntil:
     visible:

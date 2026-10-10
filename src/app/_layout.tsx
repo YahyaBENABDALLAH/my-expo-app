@@ -100,7 +100,7 @@ function RootLayoutContent() {
       style={{ flex: 1, backgroundColor: colors.background }}
     >
       <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
-      <RootLayoutNav />
+      {ready || !showBrandScreen ? <RootLayoutNav /> : null}
       <PageMotionOverlay animate={!showBrandScreen} />
       {showBrandScreen && <LaunchScreen exiting={ready} onExitComplete={finishBrandScreen} />}
       {!showBrandScreen && <ErrorToastHost />}

@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { Column } from '@expo/ui';
 import type { PropsWithChildren } from 'react';
-import { KeyboardAvoidingView, Platform, useWindowDimensions } from 'react-native';
+import { KeyboardAvoidingView, Platform } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuthTheme } from './auth-theme';
 import { nativeFillWidth, nativeFillWidthCenter } from './native-fill-width';
@@ -41,17 +41,20 @@ function AuthScreenContent({
   const { language } = useLanguage();
   const { t } = useTranslation();
   const { colors, scheme, buttonPalette } = useAuthTheme(colorScheme);
-  const { width } = useWindowDimensions();
   const horizontalPadding = Math.max(24, insets.left + 16, insets.right + 16);
-  const contentWidth = Math.max(0, Math.min(480, width - horizontalPadding * 2));
   return (
     <KeyboardAvoidingView
       testID={testID}
       behavior="padding"
-      style={{ flex: 1, backgroundColor: colors.background }}
+      style={{
+        flex: 1,
+        alignItems: 'center',
+        paddingHorizontal: horizontalPadding,
+        backgroundColor: colors.background,
+      }}
     >
       <UniversalHost
-        style={{ flex: 1 }}
+        style={{ flex: 1, width: '100%', maxWidth: 480 }}
         colorScheme={scheme}
         seedColor={colors.tint}
         buttonPalette={buttonPalette}
@@ -71,7 +74,7 @@ function AuthScreenContent({
               paddingBottom: (tab ? 0 : insets.bottom) + 32,
             }}
           >
-            <Column spacing={32} style={{ width: contentWidth }}>
+            <Column spacing={32} modifiers={nativeFillWidth}>
               <Column spacing={12} modifiers={nativeFillWidth}>
                 <AuthText variant="caption" fontWeight="700" textStyle={{ color: colors.tint }}>
                   {t('brand.wordmark')}

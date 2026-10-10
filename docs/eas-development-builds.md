@@ -17,10 +17,24 @@ Replacement submitted with existing remote signing credentials. Verified final E
 - App ID: `com.hyrkul.likan`
 - [Build status and installation artifact](https://expo.dev/accounts/ybenabdallah/projects/likan/builds/bb2fb613-9756-47c7-9533-a934b1f9e61c)
 
-## iOS blocker
+## iOS configuration
 
-Not submitted: the installed React Native Firebase config plugin requires `expo.ios.googleServicesFile`, which is absent. No matching plist was found in the app. Reference's `GoogleService-Info.plist` identifies `com.hyrkul.foodiya`, while this app uses `com.hyrkul.likan`; it cannot be reused by changing only the bundle ID. The EAS development environment does not expose a matching iOS Firebase file variable.
+The iOS simulator development build submitted on 2026-10-10 failed during prebuild because the installed React Native Firebase config plugin requires `expo.ios.googleServicesFile`. Build ID: `64f44088-ab45-4e15-92c1-f79118d58c37`.
 
-Supply the Firebase iOS configuration for `com.hyrkul.likan` as a local file path or an EAS file environment variable. Then configure its path, validate the app configuration, and start the development build. Apple signing/device provisioning has not been verified yet.
+`app.json` now points `expo.ios.googleServicesFile` to `./GoogleService-Info.plist`.
+The file exists, but its Firebase identifiers and API key are placeholders.
+Native compilation can succeed with this file; Firebase initialization and
+messaging cannot be considered configured or verified. In the existing Firebase
+project, register or select the iOS app with bundle ID `com.hyrkul.likan`, download
+its `GoogleService-Info.plist`, and replace the placeholder. Reference's plist
+identifies `com.hyrkul.foodiya` and cannot be reused by changing only the bundle ID.
 
-The remote development environment has no `EXPO_PUBLIC_API_URL`; the dev client's Metro server loads the project's local development environment when serving JavaScript. Android native build completion is verified; actual device behavior remains unverified.
+The development profile builds for the iOS simulator. Apple device signing and
+provisioning have not been verified. The Firebase plugin uses CocoaPods with
+`disableSPM: true`, static frameworks and static linking for `RNFBApp` and
+`RNFBMessaging`.
+
+The remote development environment now provides `EXPO_PUBLIC_API_URL`. The dev
+client's Metro server also loads the project's local development environment
+when serving JavaScript. See [the 2026-10-10 cleanup verification](build-verification.md)
+for fresh builds of the unpatched dependency set and runtime verification limits.

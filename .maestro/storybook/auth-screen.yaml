@@ -13,7 +13,7 @@ env:
     id: native-form-submit
 - assertVisible:
     id: native-form-login-error
-    text: Enter your email or username.
+    text: Email or username is required.
 - tapOn:
     id: native-form-login
 - inputText: alex@example.com
