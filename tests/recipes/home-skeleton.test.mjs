@@ -42,7 +42,7 @@ function setup() {
         return animate;
       },
     },
-    '@/components/ui/universal-host': {
+    '@/components/ui/host/universal-host': {
       UniversalHost: native('Host'),
       useHostColorScheme: ui.useHostColorScheme,
     },

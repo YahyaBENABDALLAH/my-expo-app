@@ -32,11 +32,13 @@ function setup(isRTL = false) {
       Text: native('Text'),
     },
     '@/hooks/use-color-scheme': { useColorScheme: (scheme) => scheme ?? 'light' },
-    '@/components/ui/switch': { Switch: native('Switch') },
-    '@/components/ui/native-fill-width': { nativeFillWidth: [], nativeRowWeight: [] },
-    '@/components/ui/floating-action': { FloatingAction: native('FloatingAction') },
-    '@/components/ui/navigation-glass-surface': { NavigationGlassSurface: native('GlassSurface') },
-    '@/components/ui/navigation-tab': { NavigationTab: native('NavigationTab') },
+    '@/components/ui/switch/switch': { Switch: native('Switch') },
+    '@/components/ui/native/native-fill-width': { nativeFillWidth: [], nativeRowWeight: [] },
+    '@/components/ui/floating-action/floating-action': { FloatingAction: native('FloatingAction') },
+    '@/components/ui/navigation/navigation-glass-surface': {
+      NavigationGlassSurface: native('GlassSurface'),
+    },
+    '@/components/ui/navigation/navigation-tab': { NavigationTab: native('NavigationTab') },
     '@expo/ui/jetpack-compose': { Icon: native('Icon'), IconButton: native('IconButton') },
     '@expo/ui/jetpack-compose/modifiers': {
       semantics: (props) => ({ semantics: props }),
@@ -48,8 +50,8 @@ function setup(isRTL = false) {
   };
   const load = createSourceLoader(mocks);
   const direction = load('context/layout-direction.context.tsx');
-  const host = load('components/ui/universal-host.tsx');
-  const control = load('components/ui/layout-direction-control.tsx');
+  const host = load('components/ui/host/universal-host.tsx');
+  const control = load('components/ui/appearance/layout-direction-control.tsx');
   mocks['@components/ui'] = {
     Column: mocks['@expo/ui'].Column,
     ...host,
@@ -64,7 +66,7 @@ function setup(isRTL = false) {
     useSafeAreaInsets,
     ...direction,
     ...host,
-    ...load('components/ui/bottom-sheet.tsx'),
+    ...load('components/ui/bottom-sheet/bottom-sheet.tsx'),
     ...control,
     ...load('../.rnstorybook/components/layout-direction-frame.tsx'),
     colors: load('constants/colors.ts').default,
@@ -220,7 +222,7 @@ test('sheet bridge preserves explicit chrome colors and dismissal callback', () 
 
 test('Android page back arrow flips live and retains the same press target', () => {
   const s = setup();
-  const { PageBackButton } = s.load('components/ui/page-back-button.android.tsx');
+  const { PageBackButton } = s.load('components/ui/page/page-back-button.android.tsx');
   let settings;
   let presses = 0;
   function Screen() {
@@ -247,7 +249,9 @@ test('Android page back arrow flips live and retains the same press target', () 
 
 test('tab bar follows live direction, keeps the action centered and preserves physical insets', () => {
   const s = setup();
-  const { ReferenceNavigationBar } = s.load('components/ui/reference-navigation-bar.tsx');
+  const { ReferenceNavigationBar } = s.load(
+    'components/ui/navigation/reference-navigation-bar.tsx',
+  );
   let settings;
   function Screen() {
     settings = s.useLayoutDirectionSettings();

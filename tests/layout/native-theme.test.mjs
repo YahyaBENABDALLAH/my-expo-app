@@ -38,9 +38,12 @@ function setup(platform) {
     '@/hooks/use-color-scheme': { useColorScheme: (scheme) => scheme ?? 'light' },
     '@/context/layout-direction.context': { useLayoutDirection: () => 'ltr' },
     'react-native': { View: native() },
-    '@/components/ui/native-fill-width': { nativeFillWidth: [] },
-    '@/components/ui/text-input-modifiers': { inputRowFlex: [] },
-    '@/components/ui/text-input-icon-button': { TextInputIconButton: native() },
+    '@/components/ui/native/native-fill-width': { nativeFillWidth: [] },
+    '@/components/ui/text-input/text-input-modifiers': {
+      inputRowFlex: [],
+      inputFieldAppearance: (style) => ({ style }),
+    },
+    '@/components/ui/text-input/text-input-icon-button': { TextInputIconButton: native() },
     '@expo/ui/jetpack-compose': {
       PullToRefreshBox: native(captured.refresh),
       Switch: native(captured.switches),
@@ -58,11 +61,13 @@ function setup(platform) {
       foregroundStyle: modifier('foregroundStyle'),
     },
   });
-  const { UniversalHost } = load('components/ui/universal-host.tsx');
-  const { UniversalTextInputContent } = load('components/ui/universal-text-input.tsx');
-  const { RefreshableScrollView } = load(`components/ui/refreshable-scroll-view.${platform}.tsx`);
+  const { UniversalHost } = load('components/ui/host/universal-host.tsx');
+  const { UniversalTextInputContent } = load('components/ui/text-input/universal-text-input.tsx');
+  const { RefreshableScrollView } = load(
+    `components/ui/refreshable-scroll-view/refreshable-scroll-view.${platform}.tsx`,
+  );
   const colors = load('constants/colors.ts').default;
-  const { Switch } = load(`components/ui/switch.${platform}.tsx`);
+  const { Switch } = load(`components/ui/switch/switch.${platform}.tsx`);
   const render = (component, props, host = {}) =>
     renderToStaticMarkup(createElement(UniversalHost, host, createElement(component, props)));
   return { captured, colors, render, UniversalTextInputContent, RefreshableScrollView, Switch };

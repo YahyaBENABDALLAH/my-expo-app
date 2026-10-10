@@ -6,7 +6,7 @@ The layout follows `Reference/components/popular-recipe-card.tsx` and `Reference
 
 ## Public component
 
-`src/components/ui/home-recipe-card.tsx` exports `HomeRecipeCard` through `@components/ui`.
+`src/components/ui/home-recipe-card/home-recipe-card.tsx` exports `HomeRecipeCard` through `@components/ui`.
 
 - `recipe`: `HomeRecipeCardData` with image source, title, description, formatted duration, category, chef, likes, and secondary metadata.
 - `variant`: `popular` or `editorial`.

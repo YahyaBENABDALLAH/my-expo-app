@@ -288,6 +288,19 @@ export const Warning: Story = {
 export const LightTheme: Story = { args: { colorScheme: 'light' } };
 export const DarkTheme: Story = { args: { colorScheme: 'dark' } };
 
+export const RoundedBorder: Story = {
+  args: {
+    label: 'Rounded border',
+    style: { borderWidth: 3, borderRadius: 24 },
+    status: 'error',
+    helperText: 'Check that the colored border follows all four corners without gaps.',
+  },
+};
+export const RoundedBorderLight: Story = {
+  ...RoundedBorder,
+  args: { ...RoundedBorder.args, colorScheme: 'light' },
+};
+
 function InheritedHostInputDemo(args: UniversalTextInputProps) {
   return (
     <Host colorScheme={args.colorScheme}>

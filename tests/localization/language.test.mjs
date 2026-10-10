@@ -131,7 +131,7 @@ function setup(storage) {
     },
     'react-native': { View: native('View'), I18nManager: { isRTL: false } },
     'expo-router': { LocaleProvider: native('LocaleProvider') },
-    '@/components/ui/picker': { Picker },
+    '@/components/ui/picker/picker': { Picker },
   });
   const {
     default: i18n,
@@ -144,7 +144,7 @@ function setup(storage) {
   const { LayoutDirectionProvider, useLayoutDirection } = load(
     'context/layout-direction.context.tsx',
   );
-  const { LanguagePicker } = load('components/ui/language-picker.tsx');
+  const { LanguagePicker } = load('components/ui/appearance/language-picker.tsx');
   let settings;
   function Content() {
     settings = useLanguage();

@@ -8,17 +8,17 @@ import { createSourceLoader } from '../helpers/load-source.mjs';
 // at their boundary; these assertions do not establish native layout or colors.
 const load = createSourceLoader({
   '@expo/ui': { Column: ({ children }) => createElement('section', null, children) },
-  '@/components/ui/universal-text': {
+  '@/components/ui/text/universal-text': {
     UniversalTextContent: ({ children }) => createElement('p', null, children),
   },
-  '@/components/ui/loading-state': {
+  '@/components/ui/loading/loading-state': {
     LoadingContent: ({ label }) => createElement('p', null, label),
   },
-  '@/components/ui/universal-button-content': {
+  '@/components/ui/button/universal-button-content': {
     UniversalButtonContent: ({ label, disabled }) => createElement('button', { disabled }, label),
   },
 });
-const { QueryContent } = load('components/ui/query-content.tsx');
+const { QueryContent } = load('components/ui/loading/query-content.tsx');
 function render(overrides = {}, props = {}) {
   const query = {
     data: undefined,

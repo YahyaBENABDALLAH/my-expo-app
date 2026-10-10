@@ -28,6 +28,8 @@ export function useRecipeCreation() {
   const [draft, setDraft] = useState<RecipeDraft>(emptyRecipeDraft);
   const [step, setStep] = useState(0);
   const [error, setError] = useState('');
+  const isFinalStep = step === recipeStepSchemas.length - 1;
+  const isCurrentValid = recipeStepSchemas[step].safeParse(draft).success;
   const nextId = useRef(0);
   const submitting = useRef(false);
   const [ingredientSearch, setIngredientSearch] = useState('');
@@ -59,33 +61,43 @@ export function useRecipeCreation() {
     },
   });
   const { mutate } = mutation;
+  const continueDisabled = mutation.isPending || (isFinalStep && !chefUuid);
   const advance = useCallback(() => {
     if (submitting.current) return;
-    const result = (step === 3 ? recipeDraftSchema : recipeStepSchemas[step]).safeParse(draft);
+    const result = (isFinalStep ? recipeDraftSchema : recipeStepSchemas[step]).safeParse(draft);
     if (!result.success) {
       setError(result.error.issues.map((issue) => issue.message).join('\n'));
       return;
     }
     setError('');
-    if (step < 3) setStep(step + 1);
-    else {
-      submitting.current = true;
-      mutate(recipeBody(draft));
+    if (!isFinalStep) {
+      setStep(step + 1);
+      return;
     }
-  }, [draft, step, mutate]);
+    submitting.current = true;
+    mutate(recipeBody(draft));
+  }, [draft, step, isFinalStep, mutate]);
   useEffect(() => {
     setAction('create-recipe', {
-      kind: step === 3 ? 'submit' : 'continue',
+      kind: isFinalStep ? 'submit' : 'continue',
       label: mutation.isPending
         ? t('recipeForm.publishing')
-        : step === 3
+        : isFinalStep
           ? t('recipeForm.submit')
           : t('recipeForm.continue'),
       onPress: advance,
-      disabled: mutation.isPending || (step === 3 && !chefUuid),
+      disabled: continueDisabled,
     });
     return () => setAction('create-recipe', undefined);
-  }, [advance, mutation.isPending, setAction, step, chefUuid, t]);
+  }, [advance, mutation.isPending, setAction, isFinalStep, continueDisabled, t]);
+  const previousStep = () => {
+    setStep(step - 1);
+    setError('');
+  };
+  const searchIngredients = (value: string) => {
+    setIngredientSearch(value);
+    setLookupPage(1);
+  };
   const setField = (key: Exclude<keyof RecipeDraft, 'ingredients' | 'steps'>, value: string) =>
     setDraft((current) => ({ ...current, [key]: value }));
   const addIngredient = () => {
@@ -98,10 +110,33 @@ export function useRecipeCreation() {
       ],
     }));
   };
+  const updateIngredient = (
+    id: number,
+    changes: Partial<Omit<RecipeDraft['ingredients'][number], 'id'>>,
+  ) =>
+    setDraft((current) => ({
+      ...current,
+      ingredients: current.ingredients.map((row) => (row.id === id ? { ...row, ...changes } : row)),
+    }));
+  const removeIngredient = (id: number) =>
+    setDraft((current) => ({
+      ...current,
+      ingredients: current.ingredients.filter((row) => row.id !== id),
+    }));
   const addStep = () => {
     const id = nextId.current++;
     setDraft((current) => ({ ...current, steps: [...current.steps, { id, instruction: '' }] }));
   };
+  const updateStep = (id: number, instruction: string) =>
+    setDraft((current) => ({
+      ...current,
+      steps: current.steps.map((row) => (row.id === id ? { ...row, instruction } : row)),
+    }));
+  const removeStep = (id: number) =>
+    setDraft((current) => ({
+      ...current,
+      steps: current.steps.filter((row) => row.id !== id),
+    }));
   return {
     focused,
     onRefresh: focused && (needsChef || step === 1 || step === 2) ? refresh : undefined,
@@ -110,15 +145,20 @@ export function useRecipeCreation() {
     canCreateChef: Boolean(user?.uuid),
     chefUuid,
     draft,
-    setDraft,
     step,
-    setStep,
+    isFinalStep,
+    isCurrentValid,
+    continueDisabled,
+    previousStep,
     error,
-    setError,
     addIngredient,
+    updateIngredient,
+    removeIngredient,
     addStep,
+    updateStep,
+    removeStep,
     ingredientSearch,
-    setIngredientSearch,
+    searchIngredients,
     lookupPage,
     setLookupPage,
     difficulties,

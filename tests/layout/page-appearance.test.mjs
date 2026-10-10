@@ -35,25 +35,27 @@ function setup(deviceScheme = 'light') {
       Row: native('Row'),
       Text: native('Text'),
     },
-    '@/components/ui/native-fill-width': {
+    '@/components/ui/native/native-fill-width': {
       nativeFillWidth: [],
       nativeRowWeight: [],
       nativeFillWidthCenter: [],
     },
-    '@/components/ui/refreshable-scroll-view': { RefreshableScrollView: native('ScrollView') },
-    '@/components/ui/universal-button-content': { UniversalButtonContent: native('Button') },
-    '@/components/ui/switch': { Switch: native('Switch') },
-    '@/components/ui/picker': { Picker },
-    '@/components/ui/page-back-button': { PageBackButton: native('BackButton') },
+    '@/components/ui/refreshable-scroll-view/refreshable-scroll-view': {
+      RefreshableScrollView: native('ScrollView'),
+    },
+    '@/components/ui/button/universal-button-content': { UniversalButtonContent: native('Button') },
+    '@/components/ui/switch/switch': { Switch: native('Switch') },
+    '@/components/ui/picker/picker': { Picker },
+    '@/components/ui/page/page-back-button': { PageBackButton: native('BackButton') },
   });
   return {
     ...load('context/theme.context.tsx'),
     ...load('context/layout-direction.context.tsx'),
     ...load('hooks/use-theme.ts'),
     ...load('hooks/use-color-scheme.ts'),
-    ...load('components/ui/page-frame.tsx'),
-    ...load('components/ui/page-screen.tsx'),
-    ...load('components/ui/auth-screen-frame.tsx'),
+    ...load('components/ui/page/page-frame.tsx'),
+    ...load('components/ui/page/page-screen.tsx'),
+    ...load('components/ui/auth/auth-screen-frame.tsx'),
     themes: load('constants/themes/index.ts').themes,
     SafeAreaInsetsContext,
   };

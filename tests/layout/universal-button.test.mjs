@@ -53,11 +53,13 @@ function setup(platform) {
     '@expo/ui/jetpack-compose/modifiers': modifiers,
   };
   const load = createSourceLoader(mocks);
-  const { UniversalHost } = load('components/ui/universal-host.tsx');
-  const { UniversalButtonContent } = load(`components/ui/universal-button-content.${platform}.tsx`);
-  const { authButtonPalettes } = load('components/ui/auth-theme.ts');
-  mocks['@/components/ui/universal-button-content'] = { UniversalButtonContent };
-  const { UniversalButton } = load('components/ui/universal-button.tsx');
+  const { UniversalHost } = load('components/ui/host/universal-host.tsx');
+  const { UniversalButtonContent } = load(
+    `components/ui/button/universal-button-content.${platform}.tsx`,
+  );
+  const { authButtonPalettes } = load('components/ui/auth/auth-theme.ts');
+  mocks['@/components/ui/button/universal-button-content'] = { UniversalButtonContent };
+  const { UniversalButton } = load('components/ui/button/universal-button.tsx');
   const colors = load('constants/colors.ts').default;
   return {
     buttons,

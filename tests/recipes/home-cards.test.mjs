@@ -40,13 +40,13 @@ function setup() {
         error: '#b3261e',
       }),
     },
-    '@/components/ui/universal-host': { useHostColorScheme: () => 'light' },
-    '@/components/ui/native-fill-width': { nativeFillWidth: [], nativeRowWeight: [] },
-    '@/components/ui/universal-button-content': {
+    '@/components/ui/host/universal-host': { useHostColorScheme: () => 'light' },
+    '@/components/ui/native/native-fill-width': { nativeFillWidth: [], nativeRowWeight: [] },
+    '@/components/ui/button/universal-button-content': {
       UniversalButtonContent: ui.UniversalButtonContent,
     },
-    '@/components/ui/universal-text': { UniversalTextContent: ui.UniversalTextContent },
-    '@/components/ui/home-recipe-card-image': {
+    '@/components/ui/text/universal-text': { UniversalTextContent: ui.UniversalTextContent },
+    '@/components/ui/home-recipe-card/home-recipe-card-image': {
       HomeRecipeCardImage: ({ top, bottom, ...props }) => h('CardImage', props, top, bottom),
     },
     '@assets/images/recipe-examples/breakfast.jpg': 1,
@@ -60,7 +60,7 @@ function setup() {
       router: { push: () => assert.fail('Samples must not navigate to fake API recipes.') },
     },
   });
-  ui.HomeRecipeCard = load('components/ui/home-recipe-card.tsx').HomeRecipeCard;
+  ui.HomeRecipeCard = load('components/ui/home-recipe-card/home-recipe-card.tsx').HomeRecipeCard;
   return {
     ...load('features/recipes/home-card-examples.tsx'),
     i18n: load('lib/i18n.ts').default,

@@ -67,7 +67,7 @@ devices/emulators. Both final builds of the pinned version are `FINISHED`, with 
 build error and uploaded artifacts:
 
 - [Android 89f1e965-9c05-4e37-830c-0f1cef7aeb9a](https://expo.dev/accounts/ybenabdallah/projects/likan/builds/89f1e965-9c05-4e37-830c-0f1cef7aeb9a): Gradle `BUILD SUCCESSFUL`; [APK](https://expo.dev/artifacts/eas/Lj8dUIkODTcZ_Rq4qRk1oOGuQ-2aMVnk9LRcmnnYimk.apk).
-- [iOS simulator 450d2fa7-8829-4a27-8e3b-c5dac180eb66](https://expo.dev/accounts/ybenabdallah/projects/likan/builds/450d2fa7-8829-4a27-8e3b-c5dac180eb66): Xcode compilation and packaging succeeded; [application archive](https://expo.dev/artifacts/eas/W75RDXBs4djA2xpWMlonw6P_91AOBBqxX0snR08CX7s.tar.gz).
+- [iOS simulator 450d2fa7-8829-4a27-8e3b-c5dac180eb66](https://expo.dev/accounts/ybenabdallah/projects/likan/builds/450d2fa7-8829-4a27-8e3b-c5dac180eb66): Xcode compilation and packaging succeeded, but the user subsequently reported a crash before the splash screen. This artifact contains the invalid Firebase bootstrap; use its replacement below.
 
 The diagnostic `57.0.22` builds both compiled and uploaded artifacts:
 
@@ -94,6 +94,41 @@ Neither successful flow produced an AndroidRuntime or ReactNativeJS error. The
 recovery and auth-story wording fixes were checked against the dictionary but
 their complete flows were not executed.
 
+## iOS startup repair
+
+The installed Firebase plugin injects `FirebaseApp.configure()` before
+`factory.startReactNative()`. The referenced plist's `GOOGLE_APP_ID` is
+`REPLACE_WITH_FIREBASE_IOS_APP_ID`. [Firebase iOS SDK 12.18.0 validation](https://github.com/firebase/firebase-ios-sdk/blob/12.18.0/FirebaseCore/Sources/FIRApp.m)
+rejects that value and raises a native exception. This is a concrete startup bug
+consistent with the user's report; no simulator crash log was supplied to establish
+whether other startup failures also occur.
+
+The repair removes the Firebase config plugins, iOS plist reference and
+Firebase-specific framework settings. Platform-specific autolinking exclusions
+remove both unused Firebase modules from iOS, while retaining their npm packages
+and Android integration. Native config introspection is unchanged for Android;
+real autolinking output confirms Firebase remains linked on Android and is absent
+on iOS. Expo Doctor still passes all 21 checks, and lint/typecheck pass.
+
+[Replacement iOS simulator build 1f0c2bdb-b8c6-4b5f-83db-527d05a4baba](https://expo.dev/accounts/ybenabdallah/projects/likan/builds/1f0c2bdb-b8c6-4b5f-83db-527d05a4baba)
+was submitted with `--platform ios --profile development --clear-cache` and
+finished at 20:05 UTC. Xcode reports `Build Succeeded`; packaging and artifact
+upload completed. [Replacement simulator archive](https://expo.dev/artifacts/eas/H-kPam29-3hFRILDdwXnUYNH-zkEyTV8TGtwSQYSM9c.tar.gz).
+The EAS prebuild and CocoaPods installation passed, and native build logs have no
+FirebaseCore, RNFBApp or RNFBMessaging references. This is a native change: install
+the replacement binary, then connect its development client to Metro. The new
+Metro tunnel serves the iOS development manifest and Hermes bundle with HTTP 200.
+
+Inspection of the uploaded archive confirms bundle ID `com.hyrkul.likan`,
+`iPhoneSimulator` as the supported platform and iOS `16.4` as the minimum version.
+The archive contains no `GoogleService-Info.plist`; the app executables contain no
+FIRApp, RNFBAppModule or RNFBMessagingModule symbol references checked by the
+inspection. Its registered `exp+likan` URL scheme matches the active Metro tunnel.
+
+Local iOS prebuild is unsupported on this Windows host, and EAS Simulator
+availability returns `available: false` for the account. Native launch verification
+must be performed on the user's simulator after installing the replacement.
+
 ## Limits
 
 Expo UI `57.0.21` still uses effect-based shared-object release. The passing Android
@@ -102,10 +137,10 @@ they do not establish that effect replay, retained/hidden state, external form
 resets or every navigation/reload path is safe. Those cases and all iOS runtime
 behavior remain unverified.
 
-The iOS Firebase plist contains placeholder values. A valid Firebase-generated
-configuration for `com.hyrkul.likan` is required for Firebase functionality. No
-application source currently imports the Firebase packages. They remain installed
-for planned features pending the user's preference.
+The placeholder iOS Firebase plist is no longer referenced or bundled. Firebase
+is disabled in the iOS binary until a valid configuration for `com.hyrkul.likan`
+is supplied and native integration is restored. No application source currently
+imports the retained Firebase packages.
 
 The dependency audit still reports 27 findings (24 high, three moderate). The
 remaining chains need compatible upstream fixes; see

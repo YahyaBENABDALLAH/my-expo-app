@@ -14,7 +14,6 @@ import { router } from 'expo-router';
 
 import { lookupLabel } from './queries';
 
-import { recipeStepSchemas } from './recipe-draft';
 import { useRecipeCreation } from './use-recipe-creation';
 
 export default function CreateScreen() {
@@ -27,15 +26,20 @@ export default function CreateScreen() {
     canCreateChef,
     chefUuid,
     draft,
-    setDraft,
     step,
-    setStep,
+    isFinalStep,
+    isCurrentValid,
+    continueDisabled,
+    previousStep,
     error,
-    setError,
     addIngredient,
+    updateIngredient,
+    removeIngredient,
     addStep,
+    updateStep,
+    removeStep,
     ingredientSearch,
-    setIngredientSearch,
+    searchIngredients,
     lookupPage,
     setLookupPage,
     difficulties,
@@ -53,11 +57,7 @@ export default function CreateScreen() {
       tab
       onRefresh={onRefresh}
     >
-      <RecipeStepper
-        current={step}
-        isCurrentValid={recipeStepSchemas[step].safeParse(draft).success}
-        animate={focused}
-      />
+      <RecipeStepper current={step} isCurrentValid={isCurrentValid} animate={focused} />
       {!chefUuid ? (
         needsChef ? (
           <QueryContent query={chef} disabledMessage={t('recipeForm.loadChef')}>
@@ -125,16 +125,16 @@ export default function CreateScreen() {
               </QueryContent>
             </Column>
           ))}
-          {(['prepTimeMinutes', 'cookTimeMinutes', 'servings'] as const).map((key) => (
+          {(
+            [
+              ['prepTimeMinutes', 'recipeForm.preparation'],
+              ['cookTimeMinutes', 'recipeForm.cooking'],
+              ['servings', 'recipeForm.servings'],
+            ] as const
+          ).map(([key, label]) => (
             <NativeField
               key={key}
-              label={
-                key === 'servings'
-                  ? t('recipeForm.servings')
-                  : key === 'prepTimeMinutes'
-                    ? t('recipeForm.preparation')
-                    : t('recipeForm.cooking')
-              }
+              label={t(label)}
               testID={`recipe-${key}`}
               value={draft[key]}
               numeric
@@ -149,10 +149,7 @@ export default function CreateScreen() {
             label={t('recipeForm.findIngredients')}
             testID="ingredient-search"
             value={ingredientSearch}
-            onChange={(value) => {
-              setIngredientSearch(value);
-              setLookupPage(1);
-            }}
+            onChange={searchIngredients}
           />
           <QueryContent query={ingredients}>
             <Text>
@@ -180,12 +177,7 @@ export default function CreateScreen() {
               <Picker
                 selectedValue={item.ingredientUuid}
                 onValueChange={(value) =>
-                  setDraft((current) => ({
-                    ...current,
-                    ingredients: current.ingredients.map((row) =>
-                      row.id === item.id ? { ...row, ingredientUuid: String(value) } : row,
-                    ),
-                  }))
+                  updateIngredient(item.id, { ingredientUuid: String(value) })
                 }
               >
                 <Picker.Item value="" label={t('recipeForm.selectIngredient')} />
@@ -205,26 +197,12 @@ export default function CreateScreen() {
                 numeric
                 testID={`ingredient-${item.id}-quantity`}
                 value={item.quantity}
-                onChange={(value) =>
-                  setDraft((current) => ({
-                    ...current,
-                    ingredients: current.ingredients.map((row) =>
-                      row.id === item.id ? { ...row, quantity: value } : row,
-                    ),
-                  }))
-                }
+                onChange={(value) => updateIngredient(item.id, { quantity: value })}
               />
               <QueryContent query={units}>
                 <Picker
                   selectedValue={item.unitUuid}
-                  onValueChange={(value) =>
-                    setDraft((current) => ({
-                      ...current,
-                      ingredients: current.ingredients.map((row) =>
-                        row.id === item.id ? { ...row, unitUuid: String(value) } : row,
-                      ),
-                    }))
-                  }
+                  onValueChange={(value) => updateIngredient(item.id, { unitUuid: String(value) })}
                 >
                   <Picker.Item value="" label={t('recipeForm.noUnit')} />
                   {units.data?.data.map((option) => (
@@ -239,12 +217,7 @@ export default function CreateScreen() {
               <UniversalButtonContent
                 variant="destructive"
                 label={t('recipeForm.removeIngredient')}
-                onPress={() =>
-                  setDraft((current) => ({
-                    ...current,
-                    ingredients: current.ingredients.filter((row) => row.id !== item.id),
-                  }))
-                }
+                onPress={() => removeIngredient(item.id)}
               />
             </Column>
           ))}
@@ -265,24 +238,12 @@ export default function CreateScreen() {
                 multiline
                 testID={`recipe-instruction-${item.id}`}
                 value={item.instruction}
-                onChange={(value) =>
-                  setDraft((current) => ({
-                    ...current,
-                    steps: current.steps.map((row) =>
-                      row.id === item.id ? { ...row, instruction: value } : row,
-                    ),
-                  }))
-                }
+                onChange={(value) => updateStep(item.id, value)}
               />
               <UniversalButtonContent
                 variant="destructive"
                 label={t('recipeForm.removeStep')}
-                onPress={() =>
-                  setDraft((current) => ({
-                    ...current,
-                    steps: current.steps.filter((row) => row.id !== item.id),
-                  }))
-                }
+                onPress={() => removeStep(item.id)}
               />
             </Column>
           ))}
@@ -298,23 +259,20 @@ export default function CreateScreen() {
         variant="secondary"
         label={t('recipeForm.previousStep')}
         disabled={step === 0 || mutation.isPending}
-        onPress={() => {
-          setStep(step - 1);
-          setError('');
-        }}
+        onPress={previousStep}
       />
       <UniversalButtonContent
-        variant={step === 3 ? 'success' : 'primary'}
+        variant={isFinalStep ? 'success' : 'primary'}
         label={
           mutation.isPending
             ? t('recipeForm.publishing')
-            : step === 3
+            : isFinalStep
               ? t('recipeForm.publish')
               : t('auth.continue')
         }
         testID="recipe-continue"
         onPress={advance}
-        disabled={mutation.isPending || (step === 3 && !chefUuid)}
+        disabled={continueDisabled}
       />
       {mutation.error ? (
         <Text testID="recipe-publish-error">{t('recipeForm.publishFailed')}</Text>

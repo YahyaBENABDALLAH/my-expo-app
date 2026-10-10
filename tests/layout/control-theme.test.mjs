@@ -105,11 +105,11 @@ function setup(platform) {
       'field-group',
       'collapsible',
       'segmented-control',
-    ].map((name) => load(`components/ui/${name}.${platform}.tsx`)),
+    ].map((name) => load(`components/ui/${name}/${name}.${platform}.tsx`)),
   );
   return {
     ...controls,
-    UniversalHost: load('components/ui/universal-host.tsx').UniversalHost,
+    UniversalHost: load('components/ui/host/universal-host.tsx').UniversalHost,
     colors: load('constants/colors.ts').default,
   };
 }

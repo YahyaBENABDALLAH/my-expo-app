@@ -19,7 +19,12 @@ Reviewed Expo SDK 57 configuration, native routes, shared UI wrappers, feature s
 
 Retained all existing dependencies for planned features, including `@stepperize/react`, `@tanstack/react-query`, `axios`, `i18next`, `react-i18next`, `expo-blur`, `expo-camera`, `expo-device`, `expo-haptics`, `expo-image-picker`, `expo-linear-gradient`, `expo-location`, `expo-network`, `expo-notifications`, `expo-observe`, and `expo-web-browser`. These 16 packages were restored after the initial cleanup at the user's request. Do not remove dependencies solely because they are not yet imported by app source.
 
-Configured Firebase, Image, Secure Store, Sharing, Updates, and framework infrastructure remain available. Storybook controls require the community slider, date picker, bottom sheet, and SVG peers even though app screens use Expo UI.
+Image, Secure Store, Sharing, Updates, and framework infrastructure remain available.
+Firebase packages remain installed; Android retains its configured native modules,
+while iOS excludes them until a valid Firebase plist is supplied. The placeholder
+iOS bootstrap was removed after a startup crash was reported. Storybook controls
+require the community slider, date picker, bottom sheet, and SVG peers even though
+app screens use Expo UI.
 
 The selected redundancy cleanup on 2026-10-05 removed the web-only CanvasKit copy
 script, generated WASM and unused favicon. The 2026-10-10 cleanup removes the

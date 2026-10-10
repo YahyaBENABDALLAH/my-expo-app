@@ -3,9 +3,9 @@
 ## Existing sources
 
 - `src/constants/colors.ts`: shared light/dark app palette and `buttonSeedColors` semantic seeds.
-- `src/components/ui/auth-theme.ts`: auth light/dark palette and button container/content pairs.
-- `src/components/ui/types.ts`: shared `colorScheme`, `seedColor`, and `testID` props.
-- `src/components/ui/universal-host.tsx`: native Host wrapper, scheme selection, and sizing defaults.
+- `src/components/ui/auth/auth-theme.ts`: auth light/dark palette and button container/content pairs.
+- `src/components/ui/host/types.ts`: shared `colorScheme`, `seedColor`, and `testID` props.
+- `src/components/ui/host/universal-host.tsx`: native Host wrapper, scheme selection, and sizing defaults.
 
 These palettes currently differ. Reuse the palette appropriate to the component's existing scope. When asked to unify the theme, consolidate into one shared semantic source and migrate existing consumers deliberately; do not create a third parallel theme or change brand values as part of an unrelated component task.
 

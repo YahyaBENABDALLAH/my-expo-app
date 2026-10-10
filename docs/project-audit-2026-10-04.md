@@ -65,7 +65,7 @@ Prefer a documented owner-specific backend read for creations. The supplied `Rec
 
 ### 3. P2 — Product buttons bypass the semantic button contract
 
-Evidence: [universal-button.tsx](C:/Users/pc/Desktop/EXPO/my-app-expo/src/components/ui/universal-button.tsx), lines 12–17 and 35–38; [auth-button.d.ts](C:/Users/pc/Desktop/EXPO/my-app-expo/src/features/auth/components/auth-button.d.ts), line 8; [create-screen.tsx](C:/Users/pc/Desktop/EXPO/my-app-expo/src/features/recipes/create-screen.tsx), lines 202 and 234; [collection-screens.tsx](C:/Users/pc/Desktop/EXPO/my-app-expo/src/features/recipes/collection-screens.tsx), line 115.
+Evidence: [universal-button.tsx](C:/Users/pc/Desktop/EXPO/my-app-expo/src/components/ui/button/universal-button.tsx), lines 12–17 and 35–38; [auth-button.d.ts](C:/Users/pc/Desktop/EXPO/my-app-expo/src/features/auth/components/auth-button.d.ts), line 8; [create-screen.tsx](C:/Users/pc/Desktop/EXPO/my-app-expo/src/features/recipes/create-screen.tsx), lines 202 and 234; [collection-screens.tsx](C:/Users/pc/Desktop/EXPO/my-app-expo/src/features/recipes/collection-screens.tsx), line 115.
 
 Across recipe/page feature source there are **36 direct universal Expo UI Button JSX sites; 29 omit `variant`**. This static count includes the development guest exit site and reusable query/page compositions; it is not the number of rendered buttons. Of 15 `AuthButton` JSX sites, four omit its variant. The semantic `UniversalButton` is used in Storybook rather than product screens. Its own variant and semantic variant remain optional with primary defaults.
 

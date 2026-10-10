@@ -43,16 +43,19 @@ function SearchContent({
   const focused = useIsFocused();
   const [text, setText] = useState(single(params.q));
   const [search, setSearch] = useState(text);
-  const filterKey = [params.categoryUuid, params.cuisineUuid, params.difficultyUuid]
-    .map(single)
-    .join('\u0000');
+  const filters = {
+    categoryUuid: single(params.categoryUuid),
+    cuisineUuid: single(params.cuisineUuid),
+    difficultyUuid: single(params.difficultyUuid),
+  };
+  const filterValues = Object.values(filters);
+  const activeFilters = filterValues.filter(Boolean);
+  const filterKey = filterValues.join('\u0000');
   const [pagination, setPagination] = useState({ filterKey, page: 1 });
   const page = pagination.filterKey === filterKey ? pagination.page : 1;
   const setPage = useCallback((page: number) => setPagination({ filterKey, page }), [filterKey]);
   const [sheet, setSheet] = useState(false);
-  const filtersActive = Boolean(
-    single(params.categoryUuid) || single(params.cuisineUuid) || single(params.difficultyUuid),
-  );
+  const filtersActive = activeFilters.length > 0;
   const { setAction } = useTabActions();
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -79,9 +82,7 @@ function SearchContent({
     page,
     pageSize: 12,
     search,
-    categoryUuid: single(params.categoryUuid),
-    cuisineUuid: single(params.cuisineUuid),
-    difficultyUuid: single(params.difficultyUuid),
+    ...filters,
   });
   const query = useQuery({ ...options, enabled: focused });
   const onRefresh = useScreenRefresh([
@@ -89,18 +90,13 @@ function SearchContent({
     categoryOptions.queryKey,
     ...(sheet ? [cuisineOptions.queryKey, difficultyOptions.queryKey] : []),
   ]);
-  const filters = [
-    single(params.categoryUuid),
-    single(params.cuisineUuid),
-    single(params.difficultyUuid),
-  ].filter(Boolean);
   return (
     <PageScreen
       title={t('common.search')}
       onRefresh={onRefresh}
       description={
-        filters.length
-          ? t('search.filtered', { filters: filters.join(', ') })
+        filtersActive
+          ? t('search.filtered', { filters: activeFilters.join(', ') })
           : t('search.description')
       }
       tab
@@ -151,7 +147,7 @@ function SearchContent({
               <Text>{label}</Text>
               <QueryContent query={lookup}>
                 <Picker
-                  selectedValue={single(params[key])}
+                  selectedValue={filters[key]}
                   onValueChange={(value) => {
                     router.setParams({ [key]: String(value) });
                     setPage(1);

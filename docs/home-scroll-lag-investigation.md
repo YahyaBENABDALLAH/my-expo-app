@@ -16,14 +16,14 @@ Four lifecycle regressions in `tests/recipes/home-skeleton.test.mjs` pass: timed
 
 ### 1. Four vertical scroll owners can consume the same swipe
 
-`src/components/ui/page-screen.tsx:91` wraps the home content in `RefreshableScrollView`. The installed Android universal `ScrollView` renders a Compose `Column` with `verticalScroll(rememberScrollState())`.
+`src/components/ui/page/page-screen.tsx:91` wraps the home content in `RefreshableScrollView`. The installed Android universal `ScrollView` renders a Compose `Column` with `verticalScroll(rememberScrollState())`.
 
 Three more vertical scroll containers live inside it:
 
 | Home content                                         | Source                                     | Android implementation                                                                                    |
 | ---------------------------------------------------- | ------------------------------------------ | --------------------------------------------------------------------------------------------------------- |
-| Preferences form, 240 points high                    | `src/features/recipes/home-screen.tsx:205` | The project `FieldGroup` adapter embeds a `LazyColumn` at `src/components/ui/field-group.android.tsx:68`. |
-| Three sample meal rows, inside a 240-point container | `src/features/recipes/home-screen.tsx:231` | The project `List` adapter embeds a `LazyColumn` at `src/components/ui/list.android.tsx:24`.              |
+| Preferences form, 240 points high                    | `src/features/recipes/home-screen.tsx:205` | The project `FieldGroup` adapter embeds a `LazyColumn` at `src/components/ui/field-group/field-group.android.tsx:68`. |
+| Three sample meal rows, inside a 240-point container | `src/features/recipes/home-screen.tsx:231` | The project `List` adapter embeds a `LazyColumn` at `src/components/ui/list/list.android.tsx:24`.              |
 | Six tips, 224 points high                            | `src/features/recipes/home-screen.tsx:283` | Another universal vertical `ScrollView`.                                                                  |
 
 These containers are bounded, so this is not an unbounded nested-list diagnosis. They still own separate scrolling gestures. If the page feels sticky specifically when a swipe begins over the form, meal list, or tips, gesture consumption and fling handoff are the first things to inspect. Frame drops are a separate symptom and must be measured separately.
@@ -50,7 +50,7 @@ This demonstrates recurring React work and native animation requests. It does no
 
 Those derived values execute on the UI runtime and drive Skia directly. They do not cause React renders per frame, but path allocation, tessellation, and drawing still compete with native scrolling. There is no viewport guard, so the flame also keeps updating when scrolled out of view.
 
-The root wave (`src/app/_layout.tsx`, `PageMotionOverlay`) and the tab action (`src/components/ui/floating-action.tsx`) add continuous drawing work. They are shared across screens, so they are secondary suspects when lag occurs only on Home. The floating action already builds its wave path once and animates transforms; it does not have the flame's per-update path construction.
+The root wave (`src/app/_layout.tsx`, `PageMotionOverlay`) and the tab action (`src/components/ui/floating-action/floating-action.tsx`) add continuous drawing work. They are shared across screens, so they are secondary suspects when lag occurs only on Home. The floating action already builds its wave path once and animates transforms; it does not have the flame's per-update path construction.
 
 ### 4. Home content is eagerly laid out
 

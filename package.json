@@ -115,6 +115,14 @@
   },
   "private": true,
   "expo": {
+    "autolinking": {
+      "ios": {
+        "exclude": [
+          "@react-native-firebase/app",
+          "@react-native-firebase/messaging"
+        ]
+      }
+    },
     "install": {
       "exclude": [
         "@expo/ui",

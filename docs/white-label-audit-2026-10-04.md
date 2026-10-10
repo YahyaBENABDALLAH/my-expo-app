@@ -51,9 +51,9 @@ The installed package already supplies DateTimePicker at `@expo/ui/community/dat
 
 ### 1. P1 — One brand change does not propagate across the app
 
-[App colors](../src/constants/colors.ts), [auth colors](../src/components/ui/auth-theme.ts:4), [navigation artwork palettes](../src/constants/navigation-action-theme.ts:15) and launch artwork are independent sources. The Host fix themes ordinary controls, but does not consolidate these palettes. Navigation uses Expo Router's default navigation themes in [the root layout](../src/app/_layout.tsx:146), rather than mapping all navigation colors to the app palette. Some default story text/backgrounds still repeat palette hex values.
+[App colors](../src/constants/colors.ts), [auth colors](../src/components/ui/auth/auth-theme.ts:4), [navigation artwork palettes](../src/constants/navigation-action-theme.ts:15) and launch artwork are independent sources. The Host fix themes ordinary controls, but does not consolidate these palettes. Navigation uses Expo Router's default navigation themes in [the root layout](../src/app/_layout.tsx:146), rather than mapping all navigation colors to the app palette. Some default story text/backgrounds still repeat palette hex values.
 
-Brand identity is also scattered: `app.json` contains the app name, scheme and package IDs; [LaunchScreen](../src/components/ui/launch-screen.tsx:77) and the account screen contain “Likan”. Launch forces dark appearance and literal artwork colors, while map/Skia route fallbacks also contain literals. These choices prevent complete light/dark and brand substitution.
+Brand identity is also scattered: `app.json` contains the app name, scheme and package IDs; [LaunchScreen](../src/components/ui/launch-screen/launch-screen.tsx:77) and the account screen contain “Likan”. Launch forces dark appearance and literal artwork colors, while map/Skia route fallbacks also contain literals. These choices prevent complete light/dark and brand substitution.
 
 **KISS change:** one typed build-time brand configuration for identity/assets and one semantic light/dark token source. Have auth, navigation, launch, stories and native controls consume it. Add only repeated, useful spacing/typography/radius tokens. Use named foreground tokens for semantic filled surfaces; do not introduce a general theme engine or a large wrapper hierarchy.
 
@@ -111,7 +111,7 @@ The current auth light success foreground/background pair (`#FFFFFF` on `#12A150
 
 ### 10. P2 — Responsive and reusable component contracts remain incomplete
 
-[RecipeCard](../src/components/ui/recipe-card.tsx:27) fixes image width at 260 while page/card horizontal padding consumes another 72 points; this exceeds the available image width on a 320-point viewport. [SegmentedControlProps](../src/components/ui/segmented-control.types.ts:1) has no disabled state. Infrastructure stories do not yet exercise the full theme/sizing contract.
+[RecipeCard](../src/components/ui/recipe-card/recipe-card.tsx:27) fixes image width at 260 while page/card horizontal padding consumes another 72 points; this exceeds the available image width on a 320-point viewport. [SegmentedControlProps](../src/components/ui/segmented-control/segmented-control.types.ts:1) has no disabled state. Infrastructure stories do not yet exercise the full theme/sizing contract.
 
 **KISS change:** constrain media to available content width, add disabled semantics where the control needs them, and exercise the shared primitives at narrow widths, large text sizes, RTL and both schemes. Keep specialized RN boundaries for images/maps/Skia; use Row/Column/Spacer for ordinary composition.
 

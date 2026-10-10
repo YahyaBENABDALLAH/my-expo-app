@@ -1,7 +1,7 @@
 import { useThemeColors } from '@/hooks/use-theme';
 import { Column } from '@expo/ui';
 import { skeletonModifiers } from './skeleton-modifiers';
-import { UniversalHost, useHostColorScheme } from '../universal-host';
+import { UniversalHost, useHostColorScheme } from '../host/universal-host';
 import {
   SKELETON_DIMMED_OPACITY,
   SKELETON_PULSE_DURATION_MS,

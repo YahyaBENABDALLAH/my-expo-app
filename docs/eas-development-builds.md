@@ -21,18 +21,35 @@ Replacement submitted with existing remote signing credentials. Verified final E
 
 The iOS simulator development build submitted on 2026-10-10 failed during prebuild because the installed React Native Firebase config plugin requires `expo.ios.googleServicesFile`. Build ID: `64f44088-ab45-4e15-92c1-f79118d58c37`.
 
-`app.json` now points `expo.ios.googleServicesFile` to `./GoogleService-Info.plist`.
-The file exists, but its Firebase identifiers and API key are placeholders.
-Native compilation can succeed with this file; Firebase initialization and
-messaging cannot be considered configured or verified. In the existing Firebase
-project, register or select the iOS app with bundle ID `com.hyrkul.likan`, download
-its `GoogleService-Info.plist`, and replace the placeholder. Reference's plist
-identifies `com.hyrkul.foodiya` and cannot be reused by changing only the bundle ID.
+The subsequent simulator build compiled with a placeholder plist, but the user
+reported that it closes before the splash screen. The Firebase config plugin
+calls `FirebaseApp.configure()` before React Native starts. Firebase iOS SDK
+`12.18.0` rejects the placeholder `GOOGLE_APP_ID` with a native exception.
 
-The development profile builds for the iOS simulator. Apple device signing and
-provisioning have not been verified. The Firebase plugin uses CocoaPods with
-`disableSPM: true`, static frameworks and static linking for `RNFBApp` and
-`RNFBMessaging`.
+Firebase has no current application consumers, so the startup repair removes
+its bootstrap plugins and iOS Google-services reference. `expo.autolinking.ios.exclude`
+keeps `@react-native-firebase/app` and `@react-native-firebase/messaging` out of the
+iOS binary. Their npm packages remain installed for future features. The obsolete
+Firebase framework/linking overrides are also removed. The placeholder file remains
+in the repository but is not bundled or used by the new iOS build.
+
+Android keeps its valid `google-services.json` and both Firebase native modules.
+Expo's default plugins copy the JSON and configure the Google Services Gradle
+plugin from `android.googleServicesFile`; the removed Firebase plugins were
+redundant for this project's Android settings. Android native config introspection
+is unchanged after this repair.
+
+Replacement [iOS simulator build 1f0c2bdb-b8c6-4b5f-83db-527d05a4baba](https://expo.dev/accounts/ybenabdallah/projects/likan/builds/1f0c2bdb-b8c6-4b5f-83db-527d05a4baba)
+finished successfully with the existing `development` profile and cleared cache.
+[Download the replacement simulator app](https://expo.dev/artifacts/eas/H-kPam29-3hFRILDdwXnUYNH-zkEyTV8TGtwSQYSM9c.tar.gz).
+Install this replacement; the previous iOS artifact contains the
+invalid bootstrap and cannot be corrected by a Metro reload.
+
+To enable Firebase on iOS later, obtain the Firebase-generated plist for
+`com.hyrkul.likan`, restore its native plugins and framework configuration, remove
+the iOS autolinking exclusions and create a new native build. Reference's plist
+identifies `com.hyrkul.foodiya` and cannot be reused by changing only the bundle ID.
+Apple device signing and provisioning remain unverified.
 
 The remote development environment now provides `EXPO_PUBLIC_API_URL`. The dev
 client's Metro server also loads the project's local development environment
