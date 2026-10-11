@@ -1,13 +1,13 @@
-import { useTranslation } from 'react-i18next';
 import { useThemeColors } from '@/hooks/use-theme';
-import { FloatingAction } from '../floating-action/floating-action';
 import { Column, Row, Spacer } from '@expo/ui';
-import { nativeFillWidth, nativeRowWeight } from '../native/native-fill-width';
+import { useTranslation } from 'react-i18next';
+import { FloatingAction } from '../floating-action/floating-action';
 import type { FloatingActionButtonProps } from '../floating-action/floating-action-button.types';
+import { UniversalHost, useHostLayoutDirection } from '../host/universal-host';
+import { nativeFillWidth, nativeRowWeight } from '../native/native-fill-width';
 import { NavigationGlassSurface } from './navigation-glass-surface';
 import { NavigationTab } from './navigation-tab';
 import type { NavigationTabName } from './navigation-tab.types';
-import { UniversalHost, useHostLayoutDirection } from '../host/universal-host';
 
 import { View } from 'react-native';
 
@@ -79,8 +79,6 @@ export function ReferenceNavigationBar({
           left: 0,
           right: 0,
           bottom: 0,
-          borderTopLeftRadius: 20,
-          borderTopRightRadius: 20,
           backgroundColor: colors.tabBarGlassTint,
           shadowColor: colors.tabBarShadow,
           shadowOpacity: scheme === 'dark' ? 0.3 : 0,
@@ -91,16 +89,7 @@ export function ReferenceNavigationBar({
           elevation: scheme === 'dark' ? 8 : 0,
         }}
       >
-        <View
-          style={{
-            flex: 1,
-            borderTopLeftRadius: 20,
-            borderTopRightRadius: 20,
-            overflow: 'hidden',
-          }}
-        >
-          <NavigationGlassSurface colorScheme={scheme} />
-        </View>
+        <NavigationGlassSurface colorScheme={scheme} />
       </View>
       {/* Side cutouts protect controls without insetting the bar surface.
             The raised action remains a sibling of the clipped tab row. */}
@@ -112,8 +101,6 @@ export function ReferenceNavigationBar({
           left: leftInset,
           right: rightInset,
           height: 56,
-          borderTopLeftRadius: 20,
-          borderTopRightRadius: 20,
           overflow: 'hidden',
           zIndex: 1,
           elevation: scheme === 'dark' ? 9 : 0,
