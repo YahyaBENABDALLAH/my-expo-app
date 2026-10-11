@@ -29,14 +29,14 @@ test('showcase preview and height changes reuse cards; changed card width and la
     '@assets/images/recipe-examples/pasta.jpg': 3,
   };
   const load = createSourceLoader(mocks);
-  const data = load('features/ui-showcase/home-card-examples.data.ts');
-  mocks['@/features/ui-showcase/home-card-examples.data'] = {
+  const data = load('features/recipes/home-card-examples.data.ts');
+  mocks['@/features/recipes/home-card-examples.data'] = {
     homeRecipeExamples: (t) => {
       calls.fixtures++;
       return data.homeRecipeExamples(t);
     },
   };
-  const { HomeCardExamples } = load('features/ui-showcase/home-card-examples.tsx');
+  const { HomeCardExamples } = load('features/recipes/home-card-examples.tsx');
   const i18n = load('lib/i18n.ts').default;
   const content = h(HomeCardExamples);
   let resize;

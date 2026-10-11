@@ -353,6 +353,16 @@ static/timed follow-up passes four lifecycle regressions in
 `tests/recipes/home-skeleton.test.mjs`; native timed disappearance, layout shift
 and release smoothness have not been checked on a device.
 
+Home follow-up (2026-10-11): the shared food samples now live in
+`src/features/recipes/home-card-examples.tsx` and render on Home as a horizontal
+popular row plus editorial cards in the page's existing vertical scroll. Showcase
+compositions retain their optional bounded viewport. Home also renders two cards
+of `SkeletonContent` during a focused uncached recipe fetch; idle/offline states
+and cached refreshes do not animate placeholders. The existing native query
+feedback and retry controls remain. `HomeSections`/`HomeSectionsDark` stories and
+recipe fixtures cover the composition, sample preview taps and skeleton lifecycle;
+native scroll handoff and artwork still require device checks.
+
 - Auth screens use one Host per AuthScreenFrame, including account, and native ScrollView/Column children. AuthText and UniversalButtonContent are host-free; FormTextInput uses UniversalTextInputContent. Do not insert RN View/RNHostView between these native controls and their Host. The session-restoration panel owns a separate Host.
 - UniversalTextContent and UniversalTextInputContent are native composition exports alongside the existing RN-layout adapters. They preserve text palette roles and field text/muted/tint/surface/border/status roles; field refs, observable value, focus/blur, editable/read-only, and password props remain available. Input content does not expose the adapter's RN touch observer (`onPress`) or measure layout in JS. Use numeric widths or the platform native-fill-width modifiers, not percentage universal widths.
 - TextInput supports `leftIcon` and `rightIcon` (Expo UI `Icon` names; prefer `Icon.select`), `onRightIconPress`, and `rightIconAccessibilityLabel`. SDK 57 has no universal input icon slots, so native Row/Icon/Button surround the same TextInput inside one field surface. Android weights the input; iOS expands it with a frame. Icons use muted/tint roles; the right action keeps native Button feedback and padding. Omit the callback for a decorative right icon. `disabled` blocks the action; readOnly/editable affect editing only. Style applies to the whole field with icons; textStyle and modifiers still target the input. The existing adapter onPress touch observer also observes icon touches. `text-input.stories.tsx` includes left/right, clickable light/dark, and disabled examples with a visible action count. `.maestro/storybook/text-input-icons.yaml` checks clear, typing, one callback per tap, and disabled suppression; native execution, narrow widths, multiline, font scaling, and accessibility remain unverified until run on devices.

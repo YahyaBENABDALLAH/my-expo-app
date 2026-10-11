@@ -3,7 +3,7 @@ import type { TFunction } from 'i18next';
 
 export type HomeRecipeExample = HomeRecipeCardData & { id: string };
 
-/** Four local samples share three photos and never require a network request. */
+/** Four local food samples share three bundled photos and never require a network request. */
 export function homeRecipeExamples(t: TFunction): HomeRecipeExample[] {
   const samples: HomeRecipeExample[] = [
     {

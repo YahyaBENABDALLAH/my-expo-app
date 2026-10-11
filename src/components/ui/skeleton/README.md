@@ -38,5 +38,9 @@ Existing composition story: [skeleton.stories.tsx](../../../../.rnstorybook/stor
 width; `AnimationControls` exercises native content. Device rendering and timing
 must be checked on iOS and Android.
 
+Home uses `SkeletonContent` inside its page Host for two cards during the initial
+uncached recipe fetch. Shapes unmount when Home blurs or data arrives; cached
+refreshes, idle queries and offline pauses retain the existing query presentation.
+
 Import public components from `@components/ui`; UI implementations import
 concrete files directly. [Back to the UI guide](../README.md).

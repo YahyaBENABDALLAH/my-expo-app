@@ -12,8 +12,9 @@ description and metadata. Cards set native button padding/rounding to zero;
 their surface/image corners are independent.
 
 See [Home card examples](../../../../docs/home-recipe-card-examples.md). The
-editorial collection uses a fixed 300-point scroll viewport; the existing
-light/dark collection stories cover both variants and long lists.
+editorial collection shares Home's page scroll. The showcase optionally uses a
+fixed 300-point viewport. The light/dark `HomeSections` stories cover Home's
+horizontal food cards, inline vertical cards and initial-loading skeletons.
 
 Existing composition story: [home-recipe-card.stories.tsx](../../../../.rnstorybook/stories/pages/home-recipe-card.stories.tsx).
 

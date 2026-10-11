@@ -6,7 +6,7 @@ import { renderFixture } from '../helpers/render-fixture.mjs';
 
 // Real screen, placeholder and pulse hooks; native views and API transport are boundaries.
 // These fixtures verify lifecycle and React work, not Android drawing or FPS.
-function setup() {
+function setup(recipeQuery) {
   const native = (name) => (props) => h(name, props, props.children);
   const FieldGroup = native('FieldGroup');
   FieldGroup.Section = native('FieldSection');
@@ -17,6 +17,7 @@ function setup() {
   let motionReads = 0;
   let shapeRenders = 0;
   let setMotion;
+  let setRecipes;
   const destinations = [];
   const ui = {
     Column: (props) => {
@@ -72,14 +73,22 @@ function setup() {
     '@tanstack/react-query': {
       useQuery: ({ queryKey }) => {
         queryReads++;
-        return {
-          data: { data: queryKey[0] === 'recipes' ? [{ uuid: 'recipe-1' }] : [] },
-          isFetching: false,
-        };
+        const recipe = queryKey[0] === 'recipes';
+        const [result, update] = useState(
+          recipe && recipeQuery
+            ? recipeQuery
+            : {
+                data: { data: recipe ? [{ uuid: 'recipe-1' }] : [] },
+                isFetching: false,
+                fetchStatus: 'idle',
+              },
+        );
+        if (recipe) setRecipes = update;
+        return result;
       },
     },
     '@/hooks/use-screen-refresh': { useScreenRefresh: () => async () => {} },
-    '@/features/ui-showcase/home-card-examples': { HomeCardExamples: () => null },
+    '@/features/recipes/home-card-examples': { HomeCardExamples: native('FoodExamples') },
     '@/features/recipes/queries': {
       lookupLabel: (item) => item.name,
       lookupOptions: () => ({ queryKey: ['categories'] }),
@@ -96,6 +105,7 @@ function setup() {
     motionReads: () => motionReads,
     shapeRenders: () => shapeRenders,
     motion: (enabled) => setMotion(enabled),
+    recipes: (result) => setRecipes(result),
     destinations,
     placeholders: (view) =>
       view.findAll('Column').filter((node) => node.props.modifiers?.[0]?.skeleton),
@@ -213,13 +223,15 @@ test('leaving the showcase cancels its pending preview timeout', (t) => {
   assert.equal(s.placeholders(view).length, 0);
 });
 
-test('home presents live recipes without sample controls, timed skeletons or duplicate cards', async (t) => {
+test('home combines food sections with live recipes without duplicate API cards or preview timers', async (t) => {
   t.mock.timers.enable({ apis: ['setTimeout', 'setInterval'] });
   const timeouts = t.mock.method(globalThis, 'setTimeout');
   const s = setup();
   const view = renderFixture(h(s.HomeScreen));
   try {
     assert.equal(view.findAll('RecipeCard').length, 1);
+    assert.equal(view.findAll('FoodExamples').length, 1);
+    assert.equal(view.findAll('FoodExamples')[0].props.editorialScroll, false);
     const openRecipe = view.findAll('RecipeCard')[0].props.onPress;
     view.flush(() => openRecipe('recipe-1'));
     assert.deepEqual(s.destinations, [
@@ -243,6 +255,57 @@ test('home presents live recipes without sample controls, timed skeletons or dup
     view.unmount();
   }
 });
+
+test('home skeletons pulse only for an initial fetch and release the clock on blur or cached refresh', (t) => {
+  t.mock.timers.enable({ apis: ['setTimeout', 'setInterval'] });
+  const intervals = t.mock.method(globalThis, 'setInterval');
+  const clear = t.mock.method(globalThis, 'clearInterval');
+  const s = setup({ data: undefined, fetchStatus: 'fetching', isFetching: true });
+  const view = renderFixture(h(s.HomeScreen));
+  try {
+    assert.equal(s.placeholders(view).length, 8);
+    assert.equal(view.findAll('FoodExamples').length, 1);
+    assert.equal(intervals.mock.calls.length, 1);
+    const queryReads = s.queryReads();
+    view.flush(() => t.mock.timers.tick(900));
+    assert.ok(s.placeholders(view).every((node) => node.props.modifiers[0].opacity < 0.72));
+    assert.equal(s.queryReads(), queryReads);
+    view.flush(() => s.focus(false));
+    assert.equal(s.placeholders(view).length, 0);
+    assert.equal(clear.mock.calls.length, 1);
+    view.flush(() => s.focus(true));
+    assert.equal(s.placeholders(view).length, 8);
+    assert.equal(intervals.mock.calls.length, 2);
+    view.flush(() =>
+      s.recipes({
+        data: { data: [{ uuid: 'recipe-1' }] },
+        fetchStatus: 'fetching',
+        isFetching: true,
+      }),
+    );
+    assert.equal(s.placeholders(view).length, 0);
+    assert.equal(view.findAll('RecipeCard').length, 1);
+    assert.equal(clear.mock.calls.length, 2);
+  } finally {
+    view.unmount();
+  }
+});
+
+for (const fetchStatus of ['idle', 'paused']) {
+  test(`home does not animate loading skeletons while the query is ${fetchStatus}`, (t) => {
+    t.mock.timers.enable({ apis: ['setInterval'] });
+    const intervals = t.mock.method(globalThis, 'setInterval');
+    const s = setup({ data: undefined, fetchStatus, isFetching: false });
+    const view = renderFixture(h(s.HomeScreen));
+    try {
+      assert.equal(s.placeholders(view).length, 0);
+      assert.equal(view.findAll('FoodExamples').length, 1);
+      assert.equal(intervals.mock.calls.length, 0);
+    } finally {
+      view.unmount();
+    }
+  });
+}
 
 test('animated skeletons retain one shared pulse clock and pausing releases it', (t) => {
   t.mock.timers.enable({ apis: ['setTimeout', 'setInterval'] });

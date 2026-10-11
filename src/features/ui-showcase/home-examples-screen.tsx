@@ -16,7 +16,7 @@ import {
   useHostColorScheme,
 } from '@components/ui';
 import { useEffect, useState } from 'react';
-import { HomeCardExamples } from './home-card-examples';
+import { HomeCardExamples } from '@/features/recipes/home-card-examples';
 
 export default function HomeExamplesScreen() {
   const { t } = useTranslation();

@@ -14,7 +14,8 @@ import {
 } from '@components/ui';
 import { homeRecipeExamples } from './home-card-examples.data';
 
-export function HomeCardExamples() {
+/** Inline editorial cards share the page's vertical scroll; showcases can bound their viewport. */
+export function HomeCardExamples({ editorialScroll = true }: { editorialScroll?: boolean }) {
   const { t } = useTranslation();
   const { width, height } = useWindowDimensions();
   const insets = useSafeAreaInsets();
@@ -63,15 +64,21 @@ export function HomeCardExamples() {
         <Row spacing={12}>{popularCards}</Row>
       </ScrollView>
       <Text fontWeight="600">{t('home.editorsChoice')}</Text>
-      <ScrollView
-        direction="vertical"
-        style={{ height: 300 }}
-        testID="home-editorial-card-examples"
-      >
-        <Column spacing={16} modifiers={nativeFillWidth}>
+      {editorialScroll ? (
+        <ScrollView
+          direction="vertical"
+          style={{ height: 300 }}
+          testID="home-editorial-card-examples"
+        >
+          <Column spacing={16} modifiers={nativeFillWidth}>
+            {editorialCards}
+          </Column>
+        </ScrollView>
+      ) : (
+        <Column spacing={16} modifiers={nativeFillWidth} testID="home-editorial-card-examples">
           {editorialCards}
         </Column>
-      </ScrollView>
+      )}
       {selected ? (
         <BottomSheet
           isPresented

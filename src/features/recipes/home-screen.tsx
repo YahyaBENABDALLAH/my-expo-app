@@ -16,6 +16,8 @@ import { router, useIsFocused } from 'expo-router';
 import { useScreenRefresh } from '@/hooks/use-screen-refresh';
 import { lookupLabel, lookupOptions, recipeListOptions } from './queries';
 import { openRecipe } from './recipe-navigation';
+import { HomeCardExamples } from './home-card-examples';
+import { HomeRecipeSkeletons } from './home-recipe-skeletons';
 
 export default function HomeScreen() {
   const { t } = useTranslation();
@@ -39,6 +41,7 @@ export default function HomeScreen() {
         fullWidth
         onPress={() => router.navigate('/search')}
       />
+      <HomeCardExamples editorialScroll={false} />
       <Text variant="title">{t('home.categories')}</Text>
       <QueryContent query={categories} empty={categories.data?.data.length === 0}>
         <ScrollView direction="horizontal">
@@ -66,6 +69,9 @@ export default function HomeScreen() {
           onPress={() => router.navigate('/search')}
         />
       </Row>
+      {focused && recipes.data === undefined && recipes.fetchStatus === 'fetching' ? (
+        <HomeRecipeSkeletons animate={focused} />
+      ) : null}
       <QueryContent
         query={recipes}
         empty={recipes.data?.data.length === 0}

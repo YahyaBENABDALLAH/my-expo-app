@@ -62,7 +62,7 @@ function setup() {
   });
   ui.HomeRecipeCard = load('components/ui/home-recipe-card/home-recipe-card.tsx').HomeRecipeCard;
   return {
-    ...load('features/ui-showcase/home-card-examples.tsx'),
+    ...load('features/recipes/home-card-examples.tsx'),
     i18n: load('lib/i18n.ts').default,
     resize: (dimensions) => resize(dimensions),
     byId: (view, type, testID) => view.findAll(type).find((node) => node.props.testID === testID),
@@ -157,6 +157,25 @@ test('an open sample preview follows live French and Arabic translations without
       assert.equal(s.byId(view, 'Text', 'home-example-recipe-title').props.children, title);
       assert.equal(view.findAll('BottomSheet').length, 1);
     }
+  } finally {
+    view.unmount();
+  }
+});
+
+test('home food sections use one horizontal scroller and let the page own vertical scrolling', () => {
+  const s = setup();
+  const view = renderFixture(h(s.HomeCardExamples, { editorialScroll: false }));
+  try {
+    assert.equal(view.findAll('ScrollView').length, 1);
+    assert.equal(view.findAll('ScrollView')[0].props.direction, 'horizontal');
+    assert.equal(view.findAll('CardImage').length, 8);
+    assert.ok(s.byId(view, 'Column', 'home-editorial-card-examples'));
+    view.flush(() => s.byId(view, 'Button', 'home-editorial-example-salad').props.onPress());
+    assert.equal(
+      s.byId(view, 'Text', 'home-example-recipe-title').props.children,
+      'Chickpea salad',
+    );
+    assert.equal(view.findAll('BottomSheet').length, 1);
   } finally {
     view.unmount();
   }

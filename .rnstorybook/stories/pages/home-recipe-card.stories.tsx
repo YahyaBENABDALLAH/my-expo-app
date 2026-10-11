@@ -9,8 +9,9 @@ import {
   UniversalHost,
   UniversalTextContent as Text,
 } from '@components/ui';
-import { homeRecipeExamples } from '@/features/ui-showcase/home-card-examples.data';
-import { HomeCardExamples } from '@/features/ui-showcase/home-card-examples';
+import { homeRecipeExamples } from '@/features/recipes/home-card-examples.data';
+import { HomeCardExamples } from '@/features/recipes/home-card-examples';
+import { HomeRecipeSkeletons } from '@/features/recipes/home-recipe-skeletons';
 
 function CardStory({
   variant,
@@ -78,3 +79,19 @@ export const HorizontalAndVerticalDark: Story = {
   ...HorizontalAndVertical,
   args: { colorScheme: 'dark' },
 };
+
+export const HomeSections: Story = {
+  parameters: { controls: { include: ['colorScheme'] } },
+  render: ({ colorScheme }) => (
+    <UniversalHost colorScheme={colorScheme} matchContents={false} style={{ flex: 1 }}>
+      <ScrollView>
+        <Column spacing={20} style={{ padding: 24 }}>
+          <HomeCardExamples editorialScroll={false} />
+          <HomeRecipeSkeletons animate />
+        </Column>
+      </ScrollView>
+    </UniversalHost>
+  ),
+};
+
+export const HomeSectionsDark: Story = { ...HomeSections, args: { colorScheme: 'dark' } };
