@@ -89,9 +89,12 @@ function StepCircle({
     cancelAnimation(active);
     cancelAnimation(completed);
     cancelAnimation(valid);
-    active.set(enabled ? withSpring(index === current ? 1 : 0, settle) : index === current ? 1 : 0);
-    completed.set(enabled ? withSpring(index < current ? 1 : 0, settle) : index < current ? 1 : 0);
-    valid.set(enabled ? withSpring(isCurrentValid ? 1 : 0, settle) : isCurrentValid ? 1 : 0);
+    const activeValue = index === current ? 1 : 0;
+    const completedValue = index < current ? 1 : 0;
+    const validValue = isCurrentValid ? 1 : 0;
+    active.set(enabled ? withSpring(activeValue, settle) : activeValue);
+    completed.set(enabled ? withSpring(completedValue, settle) : completedValue);
+    valid.set(enabled ? withSpring(validValue, settle) : validValue);
     return () => {
       cancelAnimation(active);
       cancelAnimation(completed);
@@ -197,7 +200,7 @@ export const RecipeStepper = memo(function RecipeStepper({
     <Column spacing={8} modifiers={nativeFillWidth}>
       <RecipeStepperLayout
         indicatorHeight={indicatorHeight}
-        artwork={(canvasWidth) => (
+        renderArtwork={(canvasWidth) => (
           <View
             collapsable={false}
             style={{
@@ -243,19 +246,13 @@ export const RecipeStepper = memo(function RecipeStepper({
           const label = t(key);
           const active = index === currentIndex;
           const completed = index < currentIndex;
+          const pendingNumberColor = active ? colors.tabBarActive : colors.muted;
           const numberColor =
-            completed || (active && isCurrentValid)
-              ? colors.surface
-              : active
-                ? colors.tabBarActive
-                : colors.muted;
-          const state = t(
-            completed
-              ? 'recipeForm.completed'
-              : active
-                ? 'recipeForm.current'
-                : 'recipeForm.upcoming',
-          );
+            completed || (active && isCurrentValid) ? colors.surface : pendingNumberColor;
+          const pendingState = active ? 'recipeForm.current' : 'recipeForm.upcoming';
+          const state = t(completed ? 'recipeForm.completed' : pendingState);
+          const inactiveLabelColor = completed ? colors.text : colors.muted;
+          const labelColor = active ? colors.tabBarActive : inactiveLabelColor;
           return {
             id: `recipe-step-${index}`,
             accessibilityLabel: t('recipeForm.stepAccessibility', {
@@ -280,7 +277,7 @@ export const RecipeStepper = memo(function RecipeStepper({
                 fontSize={12}
                 fontWeight={active ? '600' : '500'}
                 textStyle={{
-                  color: active ? colors.tabBarActive : completed ? colors.text : colors.muted,
+                  color: labelColor,
                   textAlign: 'center',
                 }}
               >

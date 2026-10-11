@@ -1,5 +1,26 @@
 # Universal component catalog
 
+2026-10-11 duplication cleanup: Facebook, Instagram and TikTok color data lives
+in `src/constants/themes/brand-palettes.json`. The existing theme exports use
+the typed `createBrandTheme` factory to combine feedback defaults and derived
+roles once. All 544 resolved token values across the four themes and eight
+appearances matched the pre-refactor baseline. No component props, semantic
+roles or native theme mappings change. Theme and App Settings stories remain
+applicable, with selection/appearance regression checks in
+`tests/layout/page-appearance.test.mjs`; native rendering remains a device check.
+
+2026-10-11 MEDIUM-impact SonarQube maintenance: native button types/styles, form
+message selectors, Host sizing, auth font fallback and page wave opacity use
+separate decisions with the same public props and theme roles. The stepper's
+private `renderArtwork(width)` contract explicitly identifies its render callback;
+native geometry, motion guards and accessible labels remain covered by the existing
+RecipeStepper stories and geometry/render tests. Existing Button, AuthScreen,
+PageScreen and Theme compositions remain applicable. LoadingState and TextInput
+use `ErrorState` exports, and TextInput uses `Numeric`; display names are unchanged,
+story IDs follow the new exports, and the loading Maestro selector is updated.
+Storybook safe-area values retain identity until their content edges change.
+Native geometry, focus, keyboard and accessibility still require device checks.
+
 2026-10-11 geometry follow-up: the input RN bridge, iOS bottom sheet and both
 stepper layout adapters share a guarded width hook. Duplicate/invalid reports
 skip React setters; real widths still update. Aurora resolution uses only actual
@@ -300,6 +321,8 @@ and release smoothness have not been checked on a device.
 - Native icon button resolution: shared declarations live in `text-input-icon-button.d.ts`, never a declaration-only `.ts` beside `.ios.tsx`/`.android.tsx`. Metro checks source extensions in order, so a plain `.ts` can shadow native `.tsx` implementations and produce an undefined component. `tests/layout/native-input-resolution.test.mjs` checks both platforms with the installed Metro resolver and Expo extension ordering; native interaction still requires devices.
 - TextInput maintenance review: Context7 examples were cross-checked with SDK 57 docs and installed source because search results included newer versions. All icon fields now apply resolved vertical padding to the text once; explicit shorthand/directional padding is respected without padding the native action twice. The private icon button uses a narrow shared props interface, avoiding unsupported Button props on Android. FormTextInput shares its visibility callback/label and preserves an explicitly supplied secureTextEntry for non-password-mode callers. CustomPaddingIcons and ReadOnlyIcons stories cover the changed contract; the icon Maestro flow also covers a read-only field's separate action. Observable values, caller refs, native Host ownership, and isolated platform modifiers remain the intended design. React Hook Form validation still runs on JS; no per-keystroke wrapper state was added. Native focus/cursor across iOS secure/nonsecure swaps, screen-reader labels, font scaling, and geometry require devices.
 - TextInput icon sizing: every leading/trailing icon uses a fixed 20 × 20 frame, including both password eye symbols. The action target is 48 × 48 on iOS and Android. Field height uses native layout without font-scale calculations. `PasswordVisibility` and `PasswordVisibilityLargeText` stories exercise reveal/hide; `.maestro/storybook/text-input-icons.yaml` includes password visibility checks. Native geometry, font scaling and focus across secure-field swaps remain unverified without devices.
+
+- HIGH-impact SonarQube maintenance: button palette roles use a fixed intent table; FormTextInput isolates password overrides; TextInput isolates appearance and trailing-icon selection; QueryContent isolates resolved/empty content selection. Public props, theme roles, native hierarchy and selectors remain the same. Existing Button, TextInput, AuthScreen and LoadingState stories cover these contracts; the full Node regression suite checks adapter actions, password masking/reset, query states and render stability. Native touch geometry and accessibility remain device checks.
 
 - Root imports select SwiftUI on iOS and Compose on Android. Ordinary native trees need Host. BottomSheet in this installed version creates its own internal native Host; follow its implementation and existing wrapper rather than blindly nesting another host.
 - BottomSheet uses `isPresented` and `onDismiss`. Android Material sheet states do not guarantee exact parity with iOS fractional/height detents; document and verify each supported platform behavior.

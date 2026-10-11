@@ -18,6 +18,16 @@ import { collectionMutationOptions, likeRecipeOptions } from './mutations';
 import { collectionOptions } from './collections';
 import { recipeDetailOptions } from './queries';
 
+function favoriteActionLabel(pending: boolean, favorite: boolean) {
+  if (pending) return 'recipes.saving';
+  return favorite ? 'recipes.removeFavorite' : 'recipes.saveFavorite';
+}
+
+function likeActionLabel(pending: boolean, liked: boolean) {
+  if (pending) return 'recipes.liking';
+  return liked ? 'common.likedOnly' : 'recipes.like';
+}
+
 export default function DetailScreen() {
   const { t } = useTranslation();
   const { uuid } = useLocalSearchParams<{ uuid?: string | string[] }>();
@@ -39,66 +49,58 @@ export default function DetailScreen() {
     if (recipe.data && userUuid) recordView({ recipe: recipe.data });
   }, [recipe.data, userUuid, recordView]);
   const like = useMutation(likeRecipeOptions(client, userUuid, valid ? uuid : ''));
+  if (!valid) {
+    return (
+      <PageScreen
+        title={t('recipes.invalidLink')}
+        description={t('recipes.invalidLinkDescription')}
+      />
+    );
+  }
   return (
     <PageScreen
-      title={valid ? t('common.recipeLabel') : t('recipes.invalidLink')}
-      onRefresh={valid ? onRefresh : undefined}
-      description={
-        valid ? (recipe.data?.summary ?? t('recipes.details')) : t('recipes.invalidLinkDescription')
-      }
+      title={t('common.recipeLabel')}
+      onRefresh={onRefresh}
+      description={recipe.data?.summary ?? t('recipes.details')}
     >
-      {valid ? (
-        <QueryContent query={recipe}>
-          <Text variant="title">{recipe.data?.title ?? ''}</Text>
-          <Text>
-            {t('recipes.facts', {
-              minutes: recipe.data?.totalTimeMinutes ?? 0,
-              servings: recipe.data?.servings ?? 0,
-            })}
-          </Text>
-          {!userUuid ? <Text>{t('recipes.loginLike')}</Text> : null}
-          <UniversalButtonContent
-            variant={favorite ? 'destructive' : 'secondary'}
-            label={
-              save.isPending
-                ? t('recipes.saving')
-                : favorite
-                  ? t('recipes.removeFavorite')
-                  : t('recipes.saveFavorite')
-            }
-            testID="recipe-favorite"
-            disabled={!userUuid || !favorites.data || save.isPending}
-            onPress={() => save.mutate({ recipe: recipe.data, remove: favorite })}
-          />
-          {save.error ? <Text>{t('recipes.favoriteFailed')}</Text> : null}
-          <UniversalButtonContent
-            variant="secondary"
-            label={
-              like.isPending
-                ? t('recipes.liking')
-                : like.isSuccess
-                  ? t('common.likedOnly')
-                  : t('recipes.like')
-            }
-            disabled={like.isPending || like.isSuccess || !userUuid}
-            onPress={() => like.mutate()}
-          />
-          {like.error ? <Text>{t('recipes.likeFailed')}</Text> : null}
-          <Text variant="title">{t('common.ingredients')}</Text>
-          {recipe.data?.ingredients?.map((item, index) => (
-            <Text
-              key={index}
-            >{`${item.quantity ?? ''} ${item.unitLabel ?? ''} ${item.ingredientName}${item.isOptional ? t('recipes.optional') : ''}`}</Text>
-          ))}
-          <Text variant="title">{t('recipes.instructions')}</Text>
-          {recipe.data?.steps?.map((item) => (
-            <Column key={item.stepNumber} spacing={8}>
-              <Text fontWeight="600">{`${item.stepNumber}. ${item.title}`}</Text>
-              <Text>{item.instruction}</Text>
-            </Column>
-          ))}
-        </QueryContent>
-      ) : null}
+      <QueryContent query={recipe}>
+        <Text variant="title">{recipe.data?.title ?? ''}</Text>
+        <Text>
+          {t('recipes.facts', {
+            minutes: recipe.data?.totalTimeMinutes ?? 0,
+            servings: recipe.data?.servings ?? 0,
+          })}
+        </Text>
+        {!userUuid ? <Text>{t('recipes.loginLike')}</Text> : null}
+        <UniversalButtonContent
+          variant={favorite ? 'destructive' : 'secondary'}
+          label={t(favoriteActionLabel(save.isPending, favorite))}
+          testID="recipe-favorite"
+          disabled={!userUuid || !favorites.data || save.isPending}
+          onPress={() => save.mutate({ recipe: recipe.data, remove: favorite })}
+        />
+        {save.error ? <Text>{t('recipes.favoriteFailed')}</Text> : null}
+        <UniversalButtonContent
+          variant="secondary"
+          label={t(likeActionLabel(like.isPending, like.isSuccess))}
+          disabled={like.isPending || like.isSuccess || !userUuid}
+          onPress={() => like.mutate()}
+        />
+        {like.error ? <Text>{t('recipes.likeFailed')}</Text> : null}
+        <Text variant="title">{t('common.ingredients')}</Text>
+        {recipe.data?.ingredients?.map((item) => (
+          <Text
+            key={`${item.sortOrder}:${item.ingredientName}:${item.unitLabel ?? ''}`}
+          >{`${item.quantity ?? ''} ${item.unitLabel ?? ''} ${item.ingredientName}${item.isOptional ? t('recipes.optional') : ''}`}</Text>
+        ))}
+        <Text variant="title">{t('recipes.instructions')}</Text>
+        {recipe.data?.steps?.map((item) => (
+          <Column key={item.stepNumber} spacing={8}>
+            <Text fontWeight="600">{`${item.stepNumber}. ${item.title}`}</Text>
+            <Text>{item.instruction}</Text>
+          </Column>
+        ))}
+      </QueryContent>
     </PageScreen>
   );
 }

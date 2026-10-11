@@ -113,3 +113,13 @@ export const feedbackColors = {
     onInfo: '#111318',
   },
 };
+
+type BrandColors = Omit<SemanticColors, keyof typeof feedbackColors.light>;
+
+/** Brand configuration shares feedback defaults and the derived token mapping. */
+export function createBrandTheme(colors: Record<AppColorScheme, BrandColors>): ThemePalette {
+  return {
+    light: createColorTokens({ ...feedbackColors.light, ...colors.light }),
+    dark: createColorTokens({ ...feedbackColors.dark, ...colors.dark }),
+  };
+}

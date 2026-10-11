@@ -15,6 +15,7 @@ or React state update per frame.
 Its default `overlay` variant decorates headers; `variant="splash"` places the
 same moving paths in normal flow with opaque fills for the launch screen's bottom
 edge. Both use the exported `PAGE_WAVE_HEIGHT` and the same motion guards.
+The back wave resolves theme opacity first; the splash keeps full opacity.
 The root mounts it above navigation, alongside `AuroraBackground` behind navigation
 as the default background.
 Frames, headers and page content are transparent so they reveal that shared

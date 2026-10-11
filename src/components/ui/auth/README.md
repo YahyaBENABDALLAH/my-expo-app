@@ -13,6 +13,10 @@ still require an explicit `variant`.
 
 Keep session operations, validation and form state in the auth feature.
 
+Heading font selection preserves the native Android/iOS font names and leaves
+Arabic to its existing font fallback. Keyboard and safe-area layout stay in the
+same frame.
+
 Login supplies `LoginPreferences` in the top bar: a globe icon on the physical
 left and a sun/moon button on the physical right. The top-bar Host explicitly
 uses LTR to preserve these positions in Arabic. The language sheet is outside

@@ -2,14 +2,15 @@ import { isAxiosError } from 'axios';
 import { ApiError } from '@/services/api.error';
 
 export function getAuthFailure(error: unknown) {
-  const status =
-    error instanceof ApiError
-      ? error.status
-      : isAxiosError(error)
-        ? (error.response?.status ?? 0)
-        : 0;
-  const data: unknown =
-    error instanceof ApiError ? error.data : isAxiosError(error) ? error.response?.data : undefined;
+  let status = 0;
+  let data: unknown;
+  if (error instanceof ApiError) {
+    status = error.status;
+    data = error.data;
+  } else if (isAxiosError(error)) {
+    status = error.response?.status ?? 0;
+    data = error.response?.data;
+  }
   const code =
     data && typeof data === 'object' && 'code' in data && typeof data.code === 'string'
       ? data.code

@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient, type QueryKey } from '@tanstack/react-query';
 import { router, useIsFocused } from 'expo-router';
 import { useCallback, useRef, useState } from 'react';
 import { useAuthContext } from '@/context/auth.context';
@@ -14,6 +14,40 @@ import {
   recipeStepSchemas,
   type RecipeDraft,
 } from './recipe-draft';
+
+function useRecipeLookups(focused: boolean, step: number, needsChef: boolean, chefKey: QueryKey) {
+  const [ingredientSearch, setIngredientSearch] = useState('');
+  const [lookupPage, setLookupPage] = useState(1);
+  const difficultyOptions = lookupOptions('Difficulty');
+  const cuisineOptions = lookupOptions('Cuisine');
+  const ingredientOptions = lookupOptions('Ingredient', lookupPage, ingredientSearch);
+  const unitOptions = lookupOptions('Unit');
+  const difficulties = useQuery({ ...difficultyOptions, enabled: focused && step === 1 });
+  const cuisines = useQuery({ ...cuisineOptions, enabled: focused && step === 1 });
+  const ingredients = useQuery({ ...ingredientOptions, enabled: focused && step === 2 });
+  const units = useQuery({ ...unitOptions, enabled: focused && step === 2 });
+  const refresh = useScreenRefresh([
+    ...(needsChef ? [chefKey] : []),
+    ...(step === 1 ? [difficultyOptions.queryKey, cuisineOptions.queryKey] : []),
+    ...(step === 2 ? [ingredientOptions.queryKey, unitOptions.queryKey] : []),
+  ]);
+  const hasRefreshQueries = needsChef || step === 1 || step === 2;
+  const searchIngredients = (value: string) => {
+    setIngredientSearch(value);
+    setLookupPage(1);
+  };
+  return {
+    onRefresh: focused && hasRefreshQueries ? refresh : undefined,
+    ingredientSearch,
+    searchIngredients,
+    lookupPage,
+    setLookupPage,
+    difficulties,
+    cuisines,
+    ingredients,
+    units,
+  };
+}
 
 export function useRecipeCreation() {
   const { t } = useTranslation();
@@ -31,21 +65,17 @@ export function useRecipeCreation() {
   const isCurrentValid = recipeStepSchemas[step].safeParse(draft).success;
   const nextId = useRef(0);
   const submitting = useRef(false);
-  const [ingredientSearch, setIngredientSearch] = useState('');
-  const [lookupPage, setLookupPage] = useState(1);
-  const difficultyOptions = lookupOptions('Difficulty');
-  const cuisineOptions = lookupOptions('Cuisine');
-  const ingredientOptions = lookupOptions('Ingredient', lookupPage, ingredientSearch);
-  const unitOptions = lookupOptions('Unit');
-  const difficulties = useQuery({ ...difficultyOptions, enabled: focused && step === 1 });
-  const cuisines = useQuery({ ...cuisineOptions, enabled: focused && step === 1 });
-  const ingredients = useQuery({ ...ingredientOptions, enabled: focused && step === 2 });
-  const units = useQuery({ ...unitOptions, enabled: focused && step === 2 });
-  const refresh = useScreenRefresh([
-    ...(needsChef ? [chefOptions.queryKey] : []),
-    ...(step === 1 ? [difficultyOptions.queryKey, cuisineOptions.queryKey] : []),
-    ...(step === 2 ? [ingredientOptions.queryKey, unitOptions.queryKey] : []),
-  ]);
+  const {
+    onRefresh,
+    ingredientSearch,
+    searchIngredients,
+    lookupPage,
+    setLookupPage,
+    difficulties,
+    cuisines,
+    ingredients,
+    units,
+  } = useRecipeLookups(focused, step, needsChef, chefOptions.queryKey);
   const publishOptions = createRecipeOptions(client, chefUuid ?? '');
   const mutation = useMutation({
     ...publishOptions,
@@ -76,23 +106,16 @@ export function useRecipeCreation() {
     submitting.current = true;
     mutate(recipeBody(draft));
   }, [draft, step, isFinalStep, mutate]);
+  const continueLabel = isFinalStep ? t('recipeForm.submit') : t('recipeForm.continue');
   useRegisterTabAction('create-recipe', {
     kind: isFinalStep ? 'submit' : 'continue',
-    label: mutation.isPending
-      ? t('recipeForm.publishing')
-      : isFinalStep
-        ? t('recipeForm.submit')
-        : t('recipeForm.continue'),
+    label: mutation.isPending ? t('recipeForm.publishing') : continueLabel,
     onPress: advance,
     disabled: continueDisabled,
   });
   const previousStep = () => {
     setStep(step - 1);
     setError('');
-  };
-  const searchIngredients = (value: string) => {
-    setIngredientSearch(value);
-    setLookupPage(1);
   };
   const setField = (key: Exclude<keyof RecipeDraft, 'ingredients' | 'steps'>, value: string) =>
     setDraft((current) => ({ ...current, [key]: value }));
@@ -135,7 +158,7 @@ export function useRecipeCreation() {
     }));
   return {
     focused,
-    onRefresh: focused && (needsChef || step === 1 || step === 2) ? refresh : undefined,
+    onRefresh,
     chef,
     needsChef,
     canCreateChef: Boolean(user?.uuid),

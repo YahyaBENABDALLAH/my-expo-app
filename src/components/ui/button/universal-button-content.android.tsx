@@ -22,8 +22,8 @@ export function UniversalButtonContent({
     scheme,
     useHostButtonPalette(palette, scheme),
   );
-  const NativeButton =
-    variant === 'secondary' ? OutlinedButton : variant === 'link' ? TextButton : Button;
+  const defaultButton = variant === 'link' ? TextButton : Button;
+  const NativeButton = variant === 'secondary' ? OutlinedButton : defaultButton;
   return (
     <NativeButton
       onClick={disabled ? undefined : onPress}

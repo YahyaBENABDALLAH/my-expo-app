@@ -48,11 +48,11 @@ function setup() {
     '@/components/ui/button/universal-button-content': { UniversalButtonContent: native('Button') },
     '@/components/ui/text/universal-text': { UniversalTextContent: native('Text') },
     '@/components/ui/recipe-stepper/recipe-stepper-layout': {
-      RecipeStepperLayout: ({ artwork, steps }) =>
+      RecipeStepperLayout: ({ renderArtwork, steps }) =>
         h(
           'StepperLayout',
           null,
-          artwork(320),
+          renderArtwork(320),
           ...steps.map((step) => h('Step', { key: step.id }, step.number, step.label)),
         ),
     },

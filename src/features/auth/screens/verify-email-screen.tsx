@@ -72,6 +72,7 @@ export function VerifyEmailScreen() {
   const seconds = resendSeconds(resendAt, now);
   const expired = codeExpired(expiresAt, now);
   const busy = pending || resend.isPending;
+  const resendLabel = seconds > 0 ? t('auth.resendCountdown', { seconds }) : t('auth.resendCode');
   return (
     <AuthScreenFrame
       testID="auth-verify-email"
@@ -109,13 +110,7 @@ export function VerifyEmailScreen() {
           fullWidth
           variant="secondary"
           testID="auth-verify-resend"
-          label={
-            resend.isPending
-              ? t('auth.sending')
-              : seconds > 0
-                ? t('auth.resendCountdown', { seconds })
-                : t('auth.resendCode')
-          }
+          label={resend.isPending ? t('auth.sending') : resendLabel}
           disabled={busy || seconds > 0 || !canResendRegistration}
           onPress={() => resend.mutate()}
         />

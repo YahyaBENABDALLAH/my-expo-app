@@ -267,7 +267,8 @@ export const ReadOnly: Story = {
   },
 };
 export const NotEditable: Story = { args: { defaultValue: 'Locked value', editable: false } };
-export const Error: Story = {
+export const ErrorState: Story = {
+  name: 'Error',
   args: {
     defaultValue: 'alex@',
     label: 'Email',
@@ -411,7 +412,8 @@ export const Phone: Story = {
     autoComplete: 'tel',
   },
 };
-export const Number: Story = {
+export const Numeric: Story = {
+  name: 'Number',
   args: {
     label: 'Quantity',
     placeholder: '0',

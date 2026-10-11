@@ -47,17 +47,14 @@ function ResetPasswordForm({ challengeId }: { challengeId: string | null }) {
       if (mounted.current) setSaved(true);
     },
   );
+  const recoveryDescription = valid
+    ? t('auth.resetDescription')
+    : t('auth.missingRecoveryDescription');
   return (
     <AuthScreenFrame
       testID="auth-reset-password"
       title={saved ? t('auth.passwordResetTitle') : t('auth.resetPasswordTitle')}
-      description={
-        saved
-          ? t('auth.resetComplete')
-          : valid
-            ? t('auth.resetDescription')
-            : t('auth.missingRecoveryDescription')
-      }
+      description={saved ? t('auth.resetComplete') : recoveryDescription}
     >
       {valid && !saved && (
         <Column spacing={20} modifiers={nativeFillWidth}>

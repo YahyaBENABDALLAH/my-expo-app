@@ -44,6 +44,12 @@ type Props = ComponentProps<typeof Host> & {
   buttonPalette?: UniversalButtonPalette;
 };
 
+function defaultMatchContents(viewportHeight: number | undefined, inline: boolean) {
+  if (viewportHeight !== undefined) return false;
+  if (inline) return true;
+  return { vertical: true };
+}
+
 /** Common theme, native selector, and sizing defaults for hosted UI controls. */
 export function UniversalHost({
   colorScheme,
@@ -52,7 +58,7 @@ export function UniversalHost({
   inline = false,
   viewportHeight,
   buttonPalette,
-  matchContents = viewportHeight !== undefined ? false : inline ? true : { vertical: true },
+  matchContents = defaultMatchContents(viewportHeight, inline),
   style,
   ...props
 }: Props) {

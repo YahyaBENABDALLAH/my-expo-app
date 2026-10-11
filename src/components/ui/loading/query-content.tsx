@@ -11,6 +11,17 @@ export type ContentQuery<T> = Pick<
   'data' | 'error' | 'fetchStatus' | 'isFetching' | 'isEnabled'
 > & { refetch: () => unknown };
 
+function resolvedQueryContent(
+  data: unknown,
+  empty: boolean | undefined,
+  emptyLabel: string,
+  children: ReactNode,
+) {
+  if (data === undefined) return null;
+  if (empty) return <Text>{emptyLabel}</Text>;
+  return children;
+}
+
 export function QueryContent<T>({
   query,
   empty,
@@ -57,13 +68,7 @@ export function QueryContent<T>({
           {query.isEnabled ? t('query.waiting') : (disabledMessage ?? t('query.disabled'))}
         </Text>
       ) : null}
-      {query.data !== undefined ? (
-        empty ? (
-          <Text>{emptyMessage ?? t('query.empty')}</Text>
-        ) : (
-          children
-        )
-      ) : null}
+      {resolvedQueryContent(query.data, empty, emptyMessage ?? t('query.empty'), children)}
     </Column>
   );
 }

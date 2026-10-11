@@ -116,7 +116,9 @@ function getBaseUrl(override?: string) {
     throw new ApiConfigurationError();
   }
 
-  return baseUrl.replace(/\/+$/, '');
+  let end = baseUrl.length;
+  while (end > 0 && baseUrl[end - 1] === '/') end--;
+  return baseUrl.slice(0, end);
 }
 
 function getDisplayMessage(status: number, data: unknown) {
@@ -162,6 +164,19 @@ function axiosErrorKind(error: AxiosError): ApiErrorKind {
   return 'unexpected';
 }
 
+function axiosDisplayMessage(kind: ApiErrorKind, status: number, data: unknown) {
+  switch (kind) {
+    case 'http':
+      return getDisplayMessage(status, data);
+    case 'network':
+      return i18n.t('api.network');
+    case 'timeout':
+      return i18n.t('api.timeout');
+    default:
+      return i18n.t('auth.requestFailed');
+  }
+}
+
 function toApiError(error: unknown) {
   if (
     isCancel(error) ||
@@ -182,14 +197,7 @@ function toApiError(error: unknown) {
       kind === 'timeout'
         ? `API request timed out after ${timeout}ms`
         : error.message || `API request failed with status ${status}`;
-    const displayMessage =
-      kind === 'http'
-        ? getDisplayMessage(status, data)
-        : kind === 'network'
-          ? i18n.t('api.network')
-          : kind === 'timeout'
-            ? i18n.t('api.timeout')
-            : i18n.t('auth.requestFailed');
+    const displayMessage = axiosDisplayMessage(kind, status, data);
     return new ApiError(message, status, data, displayMessage, kind);
   }
 
@@ -288,11 +296,11 @@ export function createAxiosInstance(
             return instance(originalConfig);
           }
         } catch (refreshError) {
-          return Promise.reject(toApiError(refreshError));
+          throw toApiError(refreshError);
         }
       }
 
-      return Promise.reject(toApiError(error));
+      throw toApiError(error);
     },
   );
 

@@ -5,7 +5,7 @@ import {
   UniversalHost,
   useHostColorScheme,
 } from '@components/ui';
-import type { PropsWithChildren } from 'react';
+import { useMemo, type PropsWithChildren } from 'react';
 import { View } from 'react-native';
 import { SafeAreaInsetsContext, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useThemeColors } from '@/hooks/use-theme';
@@ -20,6 +20,8 @@ export function LayoutDirectionFrame({
   testIDPrefix?: string;
 }>) {
   const insets = useSafeAreaInsets();
+  const { bottom, left, right } = insets;
+  const contentInsets = useMemo(() => ({ top: 0, bottom, left, right }), [bottom, left, right]);
   const scheme = useHostColorScheme(colorScheme);
   const colors = useThemeColors(scheme);
   return (
@@ -41,7 +43,7 @@ export function LayoutDirectionFrame({
           </Column>
         </UniversalHost>
       </View>
-      <SafeAreaInsetsContext.Provider value={{ ...insets, top: 0 }}>
+      <SafeAreaInsetsContext.Provider value={contentInsets}>
         <View style={{ flex: 1 }}>{children}</View>
       </SafeAreaInsetsContext.Provider>
     </View>

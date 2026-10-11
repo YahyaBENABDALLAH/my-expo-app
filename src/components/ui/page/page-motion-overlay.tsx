@@ -39,6 +39,7 @@ export function PageMotionOverlay({
   const colors = useThemeColors(scheme);
   const enabled = useMotionEnabled(animate);
   const splash = variant === 'splash';
+  const overlayBackOpacity = scheme === 'dark' ? 0.12 : 0.08;
   const phase = useSharedValue(0);
   const width = useSharedValue(0);
 
@@ -92,7 +93,7 @@ export function PageMotionOverlay({
       <Canvas pointerEvents="none" style={{ flex: 1 }}>
         <Group transform={fit}>
           <Group transform={backDrift}>
-            <Path path={backWave} opacity={splash ? 1 : scheme === 'dark' ? 0.12 : 0.08}>
+            <Path path={backWave} opacity={splash ? 1 : overlayBackOpacity}>
               <LinearGradient
                 start={vec(0, 0)}
                 end={vec(0, PAGE_WAVE_HEIGHT)}

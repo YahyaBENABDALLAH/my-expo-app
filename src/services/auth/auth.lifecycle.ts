@@ -29,10 +29,12 @@ export function signOut(): Promise<void> {
 export async function restoreSession() {
   const version = getSessionVersion();
   const session = await getAuthSession();
-  if (version !== getSessionVersion()) return session;
-  if (session && !(Date.parse(session.expiresAtUtc ?? '') > Date.now())) {
-    // Keep the cached identity during temporary network failures.
-    void requestNewToken(version).catch(reportErrorToast);
+  if (version === getSessionVersion() && session) {
+    const accessTokenValid = Date.parse(session.expiresAtUtc ?? '') > Date.now();
+    if (!accessTokenValid) {
+      // Keep the cached identity during temporary network failures.
+      void requestNewToken(version).catch(reportErrorToast);
+    }
   }
   return session;
 }

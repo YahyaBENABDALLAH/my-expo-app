@@ -72,7 +72,10 @@ export async function getAuthSession(): Promise<AuthSession | null> {
   const raw = await SecureStore.getItemAsync(STORAGE_KEY);
   assertSessionVersion(version);
   if (currentSession !== undefined) return currentSession;
-  if (!raw) return (currentSession = null);
+  if (!raw) {
+    currentSession = null;
+    return currentSession;
+  }
   try {
     currentSession = normalizeSession(JSON.parse(raw));
     return currentSession;

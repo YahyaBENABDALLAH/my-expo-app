@@ -9,11 +9,15 @@ import {
 import { useMeasuredWidth } from '@/hooks/use-measured-width';
 import type { RecipeStepperLayoutProps } from './recipe-stepper-layout.types';
 
-export function RecipeStepperLayout({ artwork, steps, indicatorHeight }: RecipeStepperLayoutProps) {
+export function RecipeStepperLayout({
+  renderArtwork,
+  steps,
+  indicatorHeight,
+}: RecipeStepperLayoutProps) {
   const [width, setWidth] = useMeasuredWidth();
   return (
     <ZStack alignment="top" modifiers={[frame({ minWidth: 0, maxWidth: Infinity })]}>
-      {width > 0 && <RNHostView matchContents>{artwork(width)}</RNHostView>}
+      {width > 0 && <RNHostView matchContents>{renderArtwork(width)}</RNHostView>}
       <HStack
         alignment="top"
         spacing={0}

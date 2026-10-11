@@ -26,6 +26,24 @@ type Props<T extends FieldValues> = Omit<
   onEdited?: () => void;
 };
 
+function passwordInputOverrides(
+  password: boolean,
+  shown: boolean,
+  toggle: 'button' | 'icon',
+  onToggle: () => void,
+  actionLabel: string,
+): Partial<UniversalTextInputProps> {
+  if (!password) return {};
+  const secureTextEntry = !shown;
+  if (toggle === 'button') return { secureTextEntry };
+  return {
+    secureTextEntry,
+    rightIcon: shown ? authInputIcons.hidePassword : authInputIcons.showPassword,
+    onRightIconPress: onToggle,
+    rightIconAccessibilityLabel: actionLabel,
+  };
+}
+
 export function FormTextInput<T extends FieldValues>({
   control,
   name,
@@ -45,7 +63,7 @@ export function FormTextInput<T extends FieldValues>({
   const invalid = Boolean(fieldState.error);
   const wasInvalid = useRef(false);
   const message = translateValidationMessage(fieldState.error?.message) ?? helperText;
-  const inlinePasswordToggle = password && passwordToggle === 'icon';
+  const messageSuffix = invalid ? 'error' : 'helper';
   const passwordActionLabel = showPassword ? t('auth.hidePassword') : t('auth.showPassword');
   const togglePassword = () => setShowPassword((shown) => !shown);
 
@@ -63,22 +81,17 @@ export function FormTextInput<T extends FieldValues>({
     <Column spacing={8} modifiers={nativeFillWidth}>
       <UniversalTextInputContent
         {...props}
+        {...passwordInputOverrides(
+          password,
+          showPassword,
+          passwordToggle,
+          togglePassword,
+          passwordActionLabel,
+        )}
         testID={testID}
         ref={(input) => field.ref(input)}
         value={nativeValue}
         palette={colors}
-        secureTextEntry={password ? !showPassword : props.secureTextEntry}
-        rightIcon={
-          inlinePasswordToggle
-            ? showPassword
-              ? authInputIcons.hidePassword
-              : authInputIcons.showPassword
-            : props.rightIcon
-        }
-        onRightIconPress={inlinePasswordToggle ? togglePassword : props.onRightIconPress}
-        rightIconAccessibilityLabel={
-          inlinePasswordToggle ? passwordActionLabel : props.rightIconAccessibilityLabel
-        }
         onBlur={() => field.onBlur()}
         onChangeText={(text) => {
           field.onChange(text);
@@ -88,7 +101,7 @@ export function FormTextInput<T extends FieldValues>({
       />
       {message ? (
         <AuthText
-          testID={testID ? `${testID}-${invalid ? 'error' : 'helper'}` : undefined}
+          testID={testID ? `${testID}-${messageSuffix}` : undefined}
           modifiers={nativeFillWidth}
           textStyle={{ color: invalid ? colors.error : colors.muted, fontSize: 14, lineHeight: 20 }}
         >

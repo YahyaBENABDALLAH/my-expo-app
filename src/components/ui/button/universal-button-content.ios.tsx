@@ -30,14 +30,14 @@ export function UniversalButtonContent({
     scheme,
     useHostButtonPalette(palette, scheme),
   );
+  const filledStyle = variant === 'secondary' ? 'bordered' : 'borderedProminent';
+  const nativeStyle = variant === 'link' ? 'plain' : filledStyle;
   return (
     <Button
       testID={testID}
       onPress={disabled ? undefined : onPress}
       modifiers={[
-        buttonStyle(
-          variant === 'link' ? 'plain' : variant === 'secondary' ? 'bordered' : 'borderedProminent',
-        ),
+        buttonStyle(nativeStyle),
         tint(accent),
         nativeDisabled(Boolean(disabled)),
         ...(borderRadius === undefined ? [] : [clipShape('roundedRectangle', borderRadius)]),

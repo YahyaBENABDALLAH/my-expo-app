@@ -20,6 +20,7 @@ export default function MoreScreen() {
   const { user, signOut, developmentGuest } = useAuthContext();
   const [profile, setProfile] = useState(false);
   const logout = useMutation({ mutationFn: signOut, networkMode: 'always', retry: 0 });
+  const signOutLabel = developmentGuest ? t('tools.exitGuest') : t('common.signOut');
   const fullName =
     [user?.firstName, user?.lastName].filter(Boolean).join(' ') ||
     user?.userName ||
@@ -78,13 +79,7 @@ export default function MoreScreen() {
       />
       <UniversalButtonContent
         variant="destructive"
-        label={
-          logout.isPending
-            ? t('account.signingOut')
-            : developmentGuest
-              ? t('tools.exitGuest')
-              : t('common.signOut')
-        }
+        label={logout.isPending ? t('account.signingOut') : signOutLabel}
         testID="more-sign-out"
         disabled={logout.isPending}
         onPress={() => logout.mutate()}

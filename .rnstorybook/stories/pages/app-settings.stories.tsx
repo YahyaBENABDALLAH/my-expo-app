@@ -5,6 +5,8 @@ import { LayoutDirectionProvider, type LayoutDirection } from '@/context/layout-
 import { themes, type ThemeId } from '@/constants/themes/index';
 import SettingsScreen from '@/features/settings/settings-screen';
 
+const zeroInsets = { top: 0, bottom: 0, left: 0, right: 0 };
+
 function SettingsDemo({
   colorScheme,
   themeId,
@@ -15,7 +17,7 @@ function SettingsDemo({
   direction: LayoutDirection;
 }) {
   return (
-    <SafeAreaInsetsContext.Provider value={{ top: 0, bottom: 0, left: 0, right: 0 }}>
+    <SafeAreaInsetsContext.Provider value={zeroInsets}>
       <LayoutDirectionProvider key={direction} initialDirection={direction}>
         <ThemePreferencesProvider
           key={`${themeId}-${colorScheme}`}

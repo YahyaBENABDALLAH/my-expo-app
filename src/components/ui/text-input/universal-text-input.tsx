@@ -38,6 +38,75 @@ export interface UniversalTextInputProps extends TextInputProps {
   onPress?: () => void;
 }
 
+type InputColors = NonNullable<UniversalTextInputProps['palette']>;
+
+function inputAppearance(
+  style: TextInputProps['style'],
+  colors: Pick<InputColors, 'surface' | 'tint' | 'border'>,
+  focused: boolean,
+  semanticColor: string | undefined,
+  hasIconAction: boolean,
+) {
+  const fieldStyle = {
+    paddingHorizontal: style?.paddingHorizontal ?? style?.padding ?? 14,
+    paddingVertical: style?.paddingVertical ?? style?.padding ?? 14,
+    // Expo UI maps paddingRight to native trailing/end, including in RTL.
+    ...(hasIconAction
+      ? { paddingRight: style?.paddingRight ?? style?.paddingHorizontal ?? style?.padding ?? 2 }
+      : {}),
+    backgroundColor: colors.surface,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: semanticColor ?? (focused ? colors.tint : colors.border),
+    ...style,
+  };
+  // Vertical spacing belongs on the text, outside the native icon tap target.
+  const inputPadding = {
+    paddingTop: fieldStyle.paddingTop ?? fieldStyle.paddingVertical,
+    paddingBottom: fieldStyle.paddingBottom ?? fieldStyle.paddingVertical,
+  };
+  const fieldAppearance = inputFieldAppearance({
+    ...fieldStyle,
+    paddingVertical: 0,
+    paddingTop: 0,
+    paddingBottom: 0,
+  });
+  return { fieldAppearance, inputPadding };
+}
+
+function trailingInputIcon({
+  rightIcon,
+  onRightIconPress,
+  rightIconAccessibilityLabel,
+  disabled,
+  testID,
+  colors,
+  iconStyle,
+}: Readonly<
+  Pick<
+    UniversalTextInputProps,
+    'rightIcon' | 'onRightIconPress' | 'rightIconAccessibilityLabel' | 'disabled' | 'testID'
+  > & { colors: Pick<InputColors, 'tint' | 'muted'>; iconStyle: IconProps['style'] }
+>) {
+  if (rightIcon == null) return null;
+  const iconTestID = testID ? `${testID}-right-icon` : undefined;
+  if (!onRightIconPress) {
+    return (
+      <Icon name={rightIcon} size={20} color={colors.muted} style={iconStyle} testID={iconTestID} />
+    );
+  }
+  return (
+    <TextInputIconButton
+      disabled={disabled}
+      onPress={disabled ? undefined : onRightIconPress}
+      accessibilityLabel={rightIconAccessibilityLabel}
+      testID={iconTestID}
+    >
+      <Icon name={rightIcon} size={20} color={colors.tint} style={iconStyle} />
+    </TextInputIconButton>
+  );
+}
+
 /** Adapter for an input embedded in a React Native layout. */
 export function UniversalTextInput({
   colorScheme,
@@ -97,31 +166,13 @@ export function UniversalTextInputContent({
   const hasIconAction = rightIcon != null && !!onRightIconPress;
   const contentStyle = { opacity: disabled ? 0.5 : 1 };
   const iconStyle = { width: 20, height: 20, ...contentStyle };
-  const fieldStyle = {
-    paddingHorizontal: style?.paddingHorizontal ?? style?.padding ?? 14,
-    paddingVertical: style?.paddingVertical ?? style?.padding ?? 14,
-    // Expo UI maps paddingRight to native trailing/end, including in RTL.
-    ...(hasIconAction
-      ? { paddingRight: style?.paddingRight ?? style?.paddingHorizontal ?? style?.padding ?? 2 }
-      : {}),
-    backgroundColor: colors.surface,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: semanticColor ?? (focused ? colors.tint : colors.border),
-    ...style,
-  };
-  // Keep vertical spacing on the text, not around the icon's native tap target.
-  // Resolve overrides once so custom padding cannot be applied to both layers.
-  const inputPadding = {
-    paddingTop: fieldStyle.paddingTop ?? fieldStyle.paddingVertical,
-    paddingBottom: fieldStyle.paddingBottom ?? fieldStyle.paddingVertical,
-  };
-  const fieldAppearance = inputFieldAppearance({
-    ...fieldStyle,
-    paddingVertical: 0,
-    paddingTop: 0,
-    paddingBottom: 0,
-  });
+  const { fieldAppearance, inputPadding } = inputAppearance(
+    style,
+    colors,
+    focused,
+    semanticColor,
+    hasIconAction,
+  );
   const input = (
     <TextInput
       {...inputProps}
@@ -184,26 +235,15 @@ export function UniversalTextInputContent({
           />
         ) : null}
         {input}
-        {rightIcon != null ? (
-          onRightIconPress ? (
-            <TextInputIconButton
-              disabled={disabled}
-              onPress={disabled ? undefined : onRightIconPress}
-              accessibilityLabel={rightIconAccessibilityLabel}
-              testID={inputProps.testID ? `${inputProps.testID}-right-icon` : undefined}
-            >
-              <Icon name={rightIcon} size={20} color={colors.tint} style={iconStyle} />
-            </TextInputIconButton>
-          ) : (
-            <Icon
-              name={rightIcon}
-              size={20}
-              color={colors.muted}
-              style={iconStyle}
-              testID={inputProps.testID ? `${inputProps.testID}-right-icon` : undefined}
-            />
-          )
-        ) : null}
+        {trailingInputIcon({
+          rightIcon,
+          onRightIconPress,
+          rightIconAccessibilityLabel,
+          disabled,
+          testID: inputProps.testID,
+          colors,
+          iconStyle,
+        })}
       </Row>
       {helperText ? (
         <Text

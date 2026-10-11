@@ -102,6 +102,32 @@ function setup(handler) {
   };
 }
 
+for (const [name, baseUrl, expected] of [
+  [
+    'surrounding whitespace and trailing slashes',
+    ' https://identity.test/api/// ',
+    'https://identity.test/api',
+  ],
+  [
+    'long trailing slash run',
+    `https://identity.test/${'/'.repeat(100000)}`,
+    'https://identity.test',
+  ],
+  [
+    'long internal slash run',
+    `https://identity.test/${'/'.repeat(100000)}users`,
+    `https://identity.test/${'/'.repeat(100000)}users`,
+  ],
+]) {
+  test(`API base URL preserves its path when normalizing ${name}`, async () => {
+    const auth = setup((config) => response(config, { ok: true }));
+    await auth.createApiClient({ baseUrl, includeAuth: false }).get('/api/Recipe');
+    assert.equal(auth.requests.length, 1);
+    assert.equal(auth.requests[0].baseURL, expected);
+    assert.equal(auth.requests[0].url, '/api/Recipe');
+  });
+}
+
 test('missing API configuration reports an actionable error without making a request', async () => {
   const previous = process.env.EXPO_PUBLIC_API_URL;
   delete process.env.EXPO_PUBLIC_API_URL;

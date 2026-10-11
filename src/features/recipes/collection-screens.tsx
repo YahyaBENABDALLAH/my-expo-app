@@ -184,6 +184,29 @@ export function CreationsScreen() {
     ...(user?.isChef && !user.chefProfileUuid ? [chefOptions.queryKey] : []),
     ...(chefUuid ? [options.queryKey] : []),
   ]);
+  let content = (
+    <Text>{user?.uuid ? t('recipes.createChefToPublish') : t('recipes.loginCreations')}</Text>
+  );
+  if (chefUuid) {
+    content = (
+      <QueryContent query={query} empty={recipes.length === 0}>
+        <Column spacing={12}>
+          {recipes.map((recipe) => (
+            <RecipeCard key={recipe.uuid} recipe={recipe} />
+          ))}
+        </Column>
+        <Text variant="caption">{t('recipes.creationsLimit')}</Text>
+      </QueryContent>
+    );
+  } else if (user?.isChef) {
+    content = (
+      <QueryContent query={chef}>
+        {!chef.error && !chef.isFetching && chef.fetchStatus !== 'paused' ? (
+          <Text>{t('recipes.createChefToPublish')}</Text>
+        ) : null}
+      </QueryContent>
+    );
+  }
   return (
     <PageScreen
       title={t('common.creations')}
@@ -197,24 +220,7 @@ export function CreationsScreen() {
         },
       ]}
     >
-      {chefUuid ? (
-        <QueryContent query={query} empty={recipes.length === 0}>
-          <Column spacing={12}>
-            {recipes.map((recipe) => (
-              <RecipeCard key={recipe.uuid} recipe={recipe} />
-            ))}
-          </Column>
-          <Text variant="caption">{t('recipes.creationsLimit')}</Text>
-        </QueryContent>
-      ) : user?.isChef ? (
-        <QueryContent query={chef}>
-          {!chef.error && !chef.isFetching && chef.fetchStatus !== 'paused' ? (
-            <Text>{t('recipes.createChefToPublish')}</Text>
-          ) : null}
-        </QueryContent>
-      ) : (
-        <Text>{user?.uuid ? t('recipes.createChefToPublish') : t('recipes.loginCreations')}</Text>
-      )}
+      {content}
     </PageScreen>
   );
 }

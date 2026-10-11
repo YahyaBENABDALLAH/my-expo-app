@@ -16,6 +16,45 @@ import { lookupLabel } from './queries';
 
 import { useRecipeCreation } from './use-recipe-creation';
 
+function ChefRequirement({
+  chef,
+  chefUuid,
+  needsChef,
+  canCreateChef,
+}: Readonly<
+  Pick<ReturnType<typeof useRecipeCreation>, 'chef' | 'chefUuid' | 'needsChef' | 'canCreateChef'>
+>) {
+  const { t } = useTranslation();
+  if (chefUuid) return null;
+  if (!needsChef) {
+    return (
+      <>
+        <Text>{canCreateChef ? t('recipeForm.chefRequired') : t('recipeForm.loginChef')}</Text>
+        <UniversalButtonContent
+          variant="primary"
+          disabled={!canCreateChef}
+          label={t('chefProfile.heroTitle')}
+          onPress={() => router.push('/become-chef')}
+        />
+      </>
+    );
+  }
+  return (
+    <QueryContent query={chef} disabledMessage={t('recipeForm.loadChef')}>
+      {!chef.error && !chef.isFetching && chef.fetchStatus !== 'paused' ? (
+        <>
+          <Text>{t('recipeForm.chefRequired')}</Text>
+          <UniversalButtonContent
+            variant="primary"
+            label={t('chefProfile.heroTitle')}
+            onPress={() => router.push('/become-chef')}
+          />
+        </>
+      ) : null}
+    </QueryContent>
+  );
+}
+
 export default function CreateScreen() {
   const { t } = useTranslation();
   const {
@@ -50,6 +89,7 @@ export default function CreateScreen() {
     advance,
     setField,
   } = useRecipeCreation();
+  const continueLabel = isFinalStep ? t('recipeForm.publish') : t('auth.continue');
   return (
     <PageScreen
       title={t('common.createRecipe')}
@@ -58,32 +98,12 @@ export default function CreateScreen() {
       onRefresh={onRefresh}
     >
       <RecipeStepper current={step} isCurrentValid={isCurrentValid} animate={focused} />
-      {!chefUuid ? (
-        needsChef ? (
-          <QueryContent query={chef} disabledMessage={t('recipeForm.loadChef')}>
-            {!chef.error && !chef.isFetching && chef.fetchStatus !== 'paused' ? (
-              <>
-                <Text>{t('recipeForm.chefRequired')}</Text>
-                <UniversalButtonContent
-                  variant="primary"
-                  label={t('chefProfile.heroTitle')}
-                  onPress={() => router.push('/become-chef')}
-                />
-              </>
-            ) : null}
-          </QueryContent>
-        ) : (
-          <>
-            <Text>{canCreateChef ? t('recipeForm.chefRequired') : t('recipeForm.loginChef')}</Text>
-            <UniversalButtonContent
-              variant="primary"
-              disabled={!canCreateChef}
-              label={t('chefProfile.heroTitle')}
-              onPress={() => router.push('/become-chef')}
-            />
-          </>
-        )
-      ) : null}
+      <ChefRequirement
+        chef={chef}
+        chefUuid={chefUuid}
+        needsChef={needsChef}
+        canCreateChef={canCreateChef}
+      />
       {error ? <Text testID="recipe-form-error">{translateValidationMessage(error)}</Text> : null}
       {step === 0 ? (
         <>
@@ -263,13 +283,7 @@ export default function CreateScreen() {
       />
       <UniversalButtonContent
         variant={isFinalStep ? 'success' : 'primary'}
-        label={
-          mutation.isPending
-            ? t('recipeForm.publishing')
-            : isFinalStep
-              ? t('recipeForm.publish')
-              : t('auth.continue')
-        }
+        label={mutation.isPending ? t('recipeForm.publishing') : continueLabel}
         testID="recipe-continue"
         onPress={advance}
         disabled={continueDisabled}

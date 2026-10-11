@@ -156,7 +156,7 @@ for (const platform of ['ios', 'android']) {
       h(RecipeStepperLayout, {
         indicatorHeight: 80,
         steps: [],
-        artwork: (width) => h('Artwork', { width }),
+        renderArtwork: (width) => h('Artwork', { width }),
       }),
     );
     const report = (width) =>

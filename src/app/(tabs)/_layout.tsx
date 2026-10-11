@@ -6,12 +6,16 @@ import { TabActionsProvider } from '@/features/pages/tab-actions';
 
 export const unstable_settings = { initialRouteName: 'index' };
 
+function renderTabBar(props: Parameters<typeof ReferenceTabBar>[0]) {
+  return <ReferenceTabBar {...props} />;
+}
+
 export default function TabLayout() {
   const { t } = useTranslation();
   return (
     <TabActionsProvider>
       <Tabs
-        tabBar={(props) => <ReferenceTabBar {...props} />}
+        tabBar={renderTabBar}
         screenOptions={{
           headerShown: false,
           animation: 'none',

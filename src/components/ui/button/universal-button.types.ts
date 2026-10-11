@@ -34,6 +34,15 @@ export type UniversalButtonProps = {
   palette?: UniversalButtonPalette;
 };
 
+const buttonColorRoles = {
+  primary: ['primary', 'onPrimary'],
+  secondary: ['secondary', 'onPrimary'],
+  link: ['tint', 'onPrimary'],
+  success: ['success', 'onSuccess'],
+  warning: ['warning', 'onWarning'],
+  destructive: ['error', 'onError'],
+} as const;
+
 export function buttonAppearance(
   variant: UniversalButtonVariant,
   scheme: 'light' | 'dark',
@@ -41,26 +50,9 @@ export function buttonAppearance(
 ) {
   const colors = palette ?? Colors[scheme];
   const filled = variant !== 'secondary' && variant !== 'link';
-  const accent =
-    variant === 'success'
-      ? colors.success
-      : variant === 'warning'
-        ? colors.warning
-        : variant === 'destructive'
-          ? colors.error
-          : variant === 'secondary'
-            ? (colors.secondary ?? colors.tint)
-            : variant === 'link'
-              ? colors.tint
-              : (colors.primary ?? colors.tint);
-  const foreground =
-    variant === 'success'
-      ? colors.onSuccess
-      : variant === 'warning'
-        ? colors.onWarning
-        : variant === 'destructive'
-          ? colors.onError
-          : colors.onPrimary;
+  const [accentRole, foregroundRole] = buttonColorRoles[variant];
+  const accent = colors[accentRole] ?? colors.tint;
+  const foreground = colors[foregroundRole];
   return {
     filled,
     accent,

@@ -54,11 +54,13 @@ function setup(stored) {
   const replace = mock.fn();
   const clearQueries = mock.fn();
   const clearNavigation = mock.fn();
+  const randomUUID = mock.fn(() => '01234567-89ab-4cde-8f01-23456789abcd');
   const dependencies = {
     '@/lib/i18n': createSourceLoader()('lib/i18n.ts'),
     zod,
     'expo-secure-store': secureStore,
     'expo-device': {},
+    'expo-crypto': { randomUUID },
     'expo-constants': { default: {} },
     'react-native': { Platform: { OS: 'android' } },
     axios: { ...axios, create: () => ({ post }) },
@@ -106,6 +108,7 @@ function setup(stored) {
     replace,
     clearQueries,
     clearNavigation,
+    randomUUID,
     events,
     ...session,
     ...load('services/auth/auth.refresh.ts'),
@@ -130,7 +133,29 @@ test('installation ID shares concurrent work and retries failed reads and writes
   assert.match(id, /^[0-9a-f-]{36}$/);
   assert.equal(await auth.getDeviceInstallationId(), id);
   assert.equal(auth.secureStore.getItemAsync.mock.callCount(), 3);
+  assert.equal(auth.randomUUID.mock.callCount(), 2);
   assert.equal(auth.storage.get('auth.deviceInstallationId'), id);
+});
+
+test('installation ID retains a valid stored UUID without generating or writing another', async () => {
+  const auth = setup();
+  const storedId = 'fedcba98-7654-4321-8abc-def012345678';
+  auth.storage.set('auth.deviceInstallationId', storedId);
+  assert.equal(await auth.getDeviceInstallationId(), storedId);
+  assert.equal(auth.randomUUID.mock.callCount(), 0);
+  assert.equal(auth.secureStore.setItemAsync.mock.callCount(), 0);
+});
+
+test('installation ID retries a failed native UUID call without persisting a fallback', async () => {
+  const auth = setup();
+  auth.randomUUID.mock.mockImplementationOnce(() => {
+    throw new Error('native random unavailable');
+  });
+  await assert.rejects(auth.getDeviceInstallationId(), /native random unavailable/);
+  assert.equal(auth.secureStore.setItemAsync.mock.callCount(), 0);
+  const id = await auth.getDeviceInstallationId();
+  assert.equal(auth.storage.get('auth.deviceInstallationId'), id);
+  assert.equal(auth.randomUUID.mock.callCount(), 2);
 });
 
 test('valid stored session restores without a network call', async () => {
@@ -153,6 +178,30 @@ test('expired stored session stays available while refresh is pending', async ()
   await refresh;
   assert.equal(auth.post.mock.callCount(), 1);
   assert.equal(await auth.getAccessToken(), 'access-2');
+});
+
+test('restoration returns its snapshot without scheduling a refresh after the session generation changes', async () => {
+  let version = 1;
+  const read = deferred();
+  const requestNewToken = mock.fn(async () => {});
+  const reportErrorToast = mock.fn();
+  const load = createSourceLoader({
+    'services/auth/auth.session.ts': {
+      getSessionVersion: () => version,
+      getAuthSession: () => read.promise,
+    },
+    'services/auth/auth.refresh.ts': { requestNewToken },
+    'services/auth/auth.api.ts': { logout: async () => {} },
+    '@/lib/error-toasts': { reportErrorToast },
+  });
+  const { restoreSession } = load('services/auth/auth.lifecycle.ts');
+  const restoration = restoreSession();
+  version++;
+  const snapshot = { ...token(), expiresAtUtc: '2000-01-01T00:00:00Z' };
+  read.resolve(snapshot);
+  assert.strictEqual(await restoration, snapshot);
+  assert.equal(requestNewToken.mock.callCount(), 0);
+  assert.equal(reportErrorToast.mock.callCount(), 0);
 });
 
 test('corrupt storage is removed; transient read failure can be retried', async () => {

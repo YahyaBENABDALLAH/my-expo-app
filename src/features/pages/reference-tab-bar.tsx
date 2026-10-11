@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { ReferenceNavigationBar } from '@components/ui';
+import { ReferenceNavigationBar, type FloatingActionKind } from '@components/ui';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { router, useIsFocused, type Tabs } from 'expo-router';
 import { useEffect, useRef, useState, type ComponentProps } from 'react';
@@ -7,6 +7,13 @@ import { Keyboard } from 'react-native';
 import { useTabActions } from './tab-actions';
 
 type BottomTabBarProps = Parameters<NonNullable<ComponentProps<typeof Tabs>['tabBar']>>[0];
+
+const routeActionKinds: Partial<Record<string, FloatingActionKind>> = {
+  search: 'filters',
+  more: 'profile',
+  recipes: 'liked',
+  'create-recipe': 'continue',
+};
 
 export function ReferenceTabBar({ state, navigation, insets }: BottomTabBarProps) {
   const { t } = useTranslation();
@@ -25,17 +32,7 @@ export function ReferenceTabBar({ state, navigation, insets }: BottomTabBarProps
       hide.remove();
     };
   }, []);
-  const kind =
-    action?.kind ??
-    (activeRoute.name === 'search'
-      ? 'filters'
-      : activeRoute.name === 'more'
-        ? 'profile'
-        : activeRoute.name === 'recipes'
-          ? 'liked'
-          : activeRoute.name === 'create-recipe'
-            ? 'continue'
-            : 'create');
+  const kind = action?.kind ?? routeActionKinds[activeRoute.name] ?? 'create';
 
   if (keyboardVisible) return null;
 

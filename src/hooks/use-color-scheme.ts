@@ -5,9 +5,6 @@ export function useColorScheme(preferredScheme?: ColorSchemeName): 'light' | 'da
   const coreScheme = useColorSchemeCore();
   const preferences = useThemePreferences();
   const resolved = preferredScheme ?? preferences?.colorScheme;
-  return resolved === 'light' || resolved === 'dark'
-    ? resolved
-    : coreScheme === 'dark'
-      ? 'dark'
-      : 'light';
+  if (resolved === 'light' || resolved === 'dark') return resolved;
+  return coreScheme === 'dark' ? 'dark' : 'light';
 }

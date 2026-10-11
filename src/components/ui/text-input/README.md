@@ -17,8 +17,15 @@ It filters equal/invalid widths before updating React, so position-only or
 equivalent rounded reports do not rerun input composition. Actual resize keeps
 the same native field instance; hosted content needs no measurement state.
 
+Field appearance and trailing-icon composition use private pure helpers in the
+same file. The native TextInput stays in its existing position, with unchanged
+focus guards, padding overrides, icon selectors, and disabled-action handling.
+
 Read the installed APIs before changing platform appearance, focus, keyboard
 or icon behavior.
+
+Story exports `ErrorState` and `Numeric` keep the display names Error and Number.
+Their story IDs end in `--error-state` and `--numeric`.
 
 All input icons have a fixed 20 × 20 frame. Right icon buttons use a fixed
 48 × 48 tap target on both platforms, including password reveal/hide.

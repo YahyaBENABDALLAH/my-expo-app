@@ -11,13 +11,17 @@ import {
 import { useMeasuredWidth } from '@/hooks/use-measured-width';
 import type { RecipeStepperLayoutProps } from './recipe-stepper-layout.types';
 
-export function RecipeStepperLayout({ artwork, steps, indicatorHeight }: RecipeStepperLayoutProps) {
+export function RecipeStepperLayout({
+  renderArtwork,
+  steps,
+  indicatorHeight,
+}: RecipeStepperLayoutProps) {
   const [width, setWidth] = useMeasuredWidth();
   return (
     <Box contentAlignment="topStart" modifiers={[fillMaxWidth()]}>
       {width > 0 && (
         <RNHostView matchContents modifiers={[height(indicatorHeight)]}>
-          {artwork(width)}
+          {renderArtwork(width)}
         </RNHostView>
       )}
       <Row

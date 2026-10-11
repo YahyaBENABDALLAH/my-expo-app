@@ -7,7 +7,7 @@ env:
 - runFlow:
     file: ../helpers/open-story.yaml
     env:
-      STORY_ID: expo-ui-loading-state--error
+      STORY_ID: expo-ui-loading-state--error-state
       READY_ID: query-error
 - assertVisible: 'Content couldn’t load. Please try again.'
 - tapOn: Retry

@@ -14,11 +14,11 @@ application, entity hooks, API definitions, dependencies and root Firebase
 placeholder. Application imports and tests use `src/`; the removed directory is
 not required at runtime or by the current test suite.
 
-| Check               | Result                             |
-| ------------------- | ---------------------------------- |
-| `npm run lint`      | Pending verification after cleanup |
-| `npm run typecheck` | Pending verification after cleanup |
-| `npm test`          | Pending verification after cleanup |
+| Check               | Result                                   |
+| ------------------- | ---------------------------------------- |
+| `npm run lint`      | PASS: zero warnings or errors            |
+| `npm run typecheck` | PASS                                     |
+| `npm test`          | PASS: 417 tests across eight test groups |
 
 ## Recorded build and device results
 

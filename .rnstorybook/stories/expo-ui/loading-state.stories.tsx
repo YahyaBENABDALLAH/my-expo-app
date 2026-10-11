@@ -22,11 +22,13 @@ function LoadingDemo({ state: initial, colorScheme }: Props) {
   const [state, setState] = useState(initial);
   const cached = ['empty', 'ready', 'refreshing', 'refresh-error'].includes(state);
   const fetching = state === 'loading' || state === 'refreshing';
+  const cachedData = state === 'empty' ? [] : ['Saved recipe'];
+  const settledFetchStatus = state === 'offline' ? 'paused' : 'idle';
   const query: ContentQuery<string[]> = {
-    data: cached ? (state === 'empty' ? [] : ['Saved recipe']) : undefined,
+    data: cached ? cachedData : undefined,
     error:
       state === 'error' || state === 'refresh-error' ? new globalThis.Error('Fixture error') : null,
-    fetchStatus: fetching ? 'fetching' : state === 'offline' ? 'paused' : 'idle',
+    fetchStatus: fetching ? 'fetching' : settledFetchStatus,
     isFetching: fetching,
     isEnabled: state !== 'disabled',
     refetch: () => setState('ready'),
@@ -107,7 +109,7 @@ type Story = StoryObj<typeof meta>;
 export const Loading: Story = {};
 export const Offline: Story = { args: { state: 'offline' } };
 export const Disabled: Story = { args: { state: 'disabled' } };
-export const Error: Story = { args: { state: 'error' } };
+export const ErrorState: Story = { name: 'Error', args: { state: 'error' } };
 export const Empty: Story = { args: { state: 'empty' } };
 export const Refreshing: Story = { args: { state: 'refreshing' } };
 export const RefreshError: Story = { args: { state: 'refresh-error' } };

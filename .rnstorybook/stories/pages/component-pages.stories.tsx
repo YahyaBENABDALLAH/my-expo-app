@@ -5,9 +5,11 @@ import { componentPages } from '@/features/ui-showcase/catalog';
 import { ThemePreferencesProvider } from '@/context/theme.context';
 import { LayoutDirectionProvider } from '@/context/layout-direction.context';
 
+const zeroInsets = { top: 0, bottom: 0, left: 0, right: 0 };
+
 function Gallery({ name }: { name: string }) {
   return (
-    <SafeAreaInsetsContext.Provider value={{ top: 0, bottom: 0, left: 0, right: 0 }}>
+    <SafeAreaInsetsContext.Provider value={zeroInsets}>
       <LayoutDirectionProvider initialDirection="ltr">
         <ThemePreferencesProvider initialColorScheme="light">
           <ComponentScreen name={name} />

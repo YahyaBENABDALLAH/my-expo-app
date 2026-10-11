@@ -1,4 +1,5 @@
 import * as Device from 'expo-device';
+import { randomUUID } from 'expo-crypto';
 import * as SecureStore from 'expo-secure-store';
 import Constants from 'expo-constants';
 import { Platform } from 'react-native';
@@ -9,14 +10,6 @@ const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0
 
 let installationIdPromise: Promise<string> | undefined;
 
-function createLocalInstallationId() {
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (token) => {
-    const random = Math.floor(Math.random() * 16);
-    const value = token === 'x' ? random : (random & 0x3) | 0x8;
-    return value.toString(16);
-  });
-}
-
 async function loadOrCreateLocalInstallationId() {
   const storedId = await SecureStore.getItemAsync(DEVICE_INSTALLATION_ID_KEY);
 
@@ -24,7 +17,7 @@ async function loadOrCreateLocalInstallationId() {
     return storedId;
   }
 
-  const installationId = createLocalInstallationId();
+  const installationId = randomUUID();
   await SecureStore.setItemAsync(DEVICE_INSTALLATION_ID_KEY, installationId);
   return installationId;
 }

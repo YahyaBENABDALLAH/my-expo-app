@@ -6,6 +6,10 @@ Exports: `RecipeStepper` and `RecipeStepperProps`.
 an existing Host. `recipe-stepper-layout.*` aligns native labels with the RN/Skia
 canvas; its types stay here.
 
+The private adapters call `renderArtwork(width)` as a render callback after
+measurement; they do not mount it as a component type. Animation target values
+and label colors are selected separately before applying springs or rendering.
+
 `current` is clamped to 0-3. `isCurrentValid` controls current-step fill.
 `animate` and `colorScheme` support deterministic previews. Indicators describe
 state; they do not bypass validation or navigate.

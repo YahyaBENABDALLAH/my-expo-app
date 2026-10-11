@@ -19,6 +19,7 @@ export function AccountScreen() {
   const identity = useQuery(options);
   const onRefresh = useScreenRefresh([options.queryKey]);
   const logout = useMutation({ mutationFn: signOut, networkMode: 'always', retry: 0 });
+  const signOutLabel = developmentGuest ? t('tools.exitGuest') : t('common.signOut');
   const name = identity.data
     ? `${identity.data.firstName} ${identity.data.lastName}`.trim()
     : `${user?.firstName ?? ''} ${user?.lastName ?? ''}`.trim();
@@ -49,13 +50,7 @@ export function AccountScreen() {
           variant="secondary"
           fullWidth
           testID="auth-logout"
-          label={
-            logout.isPending
-              ? t('account.signingOut')
-              : developmentGuest
-                ? t('tools.exitGuest')
-                : t('common.signOut')
-          }
+          label={logout.isPending ? t('account.signingOut') : signOutLabel}
           disabled={logout.isPending}
           onPress={() => logout.mutate()}
         />

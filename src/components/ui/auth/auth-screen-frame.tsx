@@ -45,6 +45,8 @@ function AuthScreenContent({
   const { t } = useTranslation();
   const { colors, scheme, buttonPalette } = useAuthTheme(colorScheme);
   const horizontalPadding = Math.max(24, insets.left + 16, insets.right + 16);
+  const platformHeadingFont = Platform.OS === 'android' ? 'Inter-Black' : 'InterBlack';
+  const headingFont = language === 'ar' ? undefined : platformHeadingFont;
   return (
     <KeyboardAvoidingView
       testID={testID}
@@ -84,12 +86,7 @@ function AuthScreenContent({
                 <AuthText
                   variant="heading"
                   textStyle={{
-                    fontFamily:
-                      language === 'ar'
-                        ? undefined
-                        : Platform.OS === 'android'
-                          ? 'Inter-Black'
-                          : 'InterBlack',
+                    fontFamily: headingFont,
                     fontSize: 32,
                     lineHeight: 38,
                   }}
