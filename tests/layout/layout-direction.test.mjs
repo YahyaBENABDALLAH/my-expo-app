@@ -445,15 +445,23 @@ test('compact switches keep distinct prefixes for global, story and sheet contro
   view.unmount();
 });
 
-for (const authenticated of [false, true]) {
-  test(`${authenticated ? 'signed-in' : 'signed-out'} root exits when resources are ready and retains navigation/providers when direction flips`, (t) => {
+for (const [authenticated, introductionRequired] of [
+  [false, false],
+  [false, true],
+  [true, false],
+  [true, true],
+]) {
+  test(`${authenticated ? 'signed-in' : 'signed-out'} root, onboarding ${introductionRequired ? 'required' : 'completed'}, exits when resources are ready and retains navigation/providers when direction flips`, (t) => {
     t.mock.timers.enable({ apis: ['setTimeout'] });
     const s = setup();
     let directionSettings;
     let finishRestore;
     let finishLanguage;
+    let finishOnboarding;
+    let completeIntroduction;
     const RestorationContext = createContext(true);
     const LanguageContext = createContext({ ready: false });
+    const OnboardingContext = createContext({ ready: false, completed: !introductionRequired });
     const NativeAuthProvider = s.native('AuthProvider');
     const NativeStack = s.native('Stack');
     function Stack(props) {
@@ -520,6 +528,16 @@ for (const authenticated of [false, true]) {
         restoring: useContext(RestorationContext),
       }),
     };
+    s.mocks['@/context/onboarding.context'] = {
+      OnboardingProvider({ children }) {
+        const [ready, setReady] = useState(false);
+        const [completed, setCompleted] = useState(!introductionRequired);
+        finishOnboarding = () => setReady(true);
+        completeIntroduction = () => setCompleted(true);
+        return createElement(OnboardingContext.Provider, { value: { ready, completed } }, children);
+      },
+      useOnboarding: () => useContext(OnboardingContext),
+    };
     const { default: RootLayout } = s.load('app/_layout.tsx');
     const view = renderFixture(createElement(RootLayout));
     const queryProvider = view.findAll('AppQueryProvider')[0];
@@ -540,6 +558,13 @@ for (const authenticated of [false, true]) {
     assert.equal(view.findAll('Stack').length, 0);
     assert.equal(view.findAll('RestorationPanel').length, 0);
     view.flush(finishRestore);
+    assert.equal(view.findAll('Stack').length, 0);
+    assert.equal(
+      launch.props.exiting,
+      false,
+      'Startup must wait for the saved onboarding preference.',
+    );
+    view.flush(finishOnboarding);
     const stack = view.findAll('Stack')[0];
     assert.equal(
       launch.props.exiting,
@@ -565,7 +590,23 @@ for (const authenticated of [false, true]) {
     assert.equal(view.findAll('AuthProvider')[0], authProvider);
     assert.equal(view.findAll('AppQueryProvider')[0], queryProvider);
     assert.equal(view.findAll('Switch').length, 0);
-    assert.equal(view.findAll('Screen')[0].props.name, authenticated ? '(tabs)' : '(auth)');
+    assert.equal(
+      view.findAll('Screen')[0].props.name,
+      introductionRequired ? '(onboarding)' : authenticated ? '(tabs)' : '(auth)',
+    );
+    if (introductionRequired) {
+      assert.deepEqual(
+        view.findAll('Screen').map((screen) => screen.props.name),
+        ['(onboarding)'],
+      );
+      view.flush(completeIntroduction);
+      assert.equal(view.findAll('Screen')[0].props.name, authenticated ? '(tabs)' : '(auth)');
+      assert.equal(
+        view.findAll('Screen').some((screen) => screen.props.name === '(onboarding)'),
+        false,
+      );
+      assert.equal(view.findAll('AuthProvider')[0], authProvider);
+    }
     for (const direction of ['rtl', 'ltr']) {
       view.flush(() => directionSettings.setDirection(direction));
       assert.equal(view.findAll('Switch').length, 0);

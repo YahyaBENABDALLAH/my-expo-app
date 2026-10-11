@@ -12,3 +12,14 @@ env:
     notVisible:
       id: app-brand-screen
     timeout: 30000
+- runFlow:
+    when:
+      visible:
+        id: onboarding-skip
+    commands:
+      - tapOn:
+          id: onboarding-skip
+      - extendedWaitUntil:
+          notVisible:
+            id: onboarding-skip
+          timeout: 10000

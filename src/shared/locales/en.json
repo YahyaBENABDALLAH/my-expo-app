@@ -250,6 +250,8 @@
       "detail": "Your kitchen. Your inspiration."
     },
     "start": "Let’s get started",
+    "next": "Next",
+    "saveFailed": "We couldn’t save your progress. Please try again.",
     "skip": "Skip to sign in",
     "back": "Previous",
     "progress": "Introduction progress"
@@ -572,6 +574,29 @@
     "server": "Internal server error. Please try again later.",
     "unexpected": "Unexpected error ({{status}}).",
     "invalidResponse": "The server returned invalid data. Please try again."
+  },
+  "otp": {
+    "eyebrow": "VERIFICATION",
+    "title": "Check your inbox",
+    "description": "Enter the 6-digit code sent to",
+    "codeLabel": "6-digit verification code",
+    "inputHint": "You can also paste your entire code.",
+    "verify": "Verify code",
+    "verifying": "Verifying…",
+    "invalid": "That code isn't correct. Check it and try again.",
+    "verifyFailed": "We couldn't verify your code. Please try again.",
+    "successTitle": "You're verified!",
+    "successDescription": "Your code is confirmed. You're ready to continue.",
+    "done": "Done",
+    "noCode": "Didn't receive a code?",
+    "resend": "Send a new code",
+    "resendIn": "Resend in {{seconds}}s",
+    "resending": "Sending a new code…",
+    "resent": "A new code is on its way. Check your inbox.",
+    "resendFailed": "We couldn't send a new code. Please try again.",
+    "security": "A small step to keep your account safe",
+    "openDemo": "Open OTP bottom sheet",
+    "demoHint": "UI preview · Enter 123456 to try the success animation."
   },
   "brand": {
     "name": "Likan",

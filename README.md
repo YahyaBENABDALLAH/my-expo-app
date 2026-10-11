@@ -12,6 +12,7 @@ src/
     visuals/           Shared visual components
   features/
     auth/              Native authentication screens and form adapters
+    onboarding/        Three native introduction pages shown on first launch
     launch/            Launch-screen experience
     maps/              Map screens and platform implementations
     skia/              Skia experience and platform loading
@@ -55,6 +56,12 @@ Français, English or العربية in the page footer or profile sheet. The sa
 restores on startup; Arabic uses RTL without reloading the app. See
 [localization](docs/localization.md) for conventions and verification.
 
+The first launch shows Discover, Cook, and Save introduction pages before sign-in.
+Next and Previous navigate between them; Skip or Let’s get started saves
+`onboardingCompleted` in AsyncStorage. Later launches and sign-outs keep that
+preference. Startup waits for the preference before choosing a route, and a failed
+save offers a retry without marking the introduction complete.
+
 - `npm start` starts Metro.
 - Use Node 22.18 or newer and `npm ci` to install the locked dependencies.
 - `npm run check` runs TypeScript, lint, formatting, and all unit/regression tests.
@@ -62,6 +69,8 @@ restores on startup; Arabic uses RTL without reloading the app. See
 - `npm run lint` checks app source, Storybook source, and project scripts/configuration with zero warnings allowed.
 - `npm run typecheck` checks app source, platform implementations, and Storybook stories with strict TypeScript.
 - `npm run test:architecture` checks import boundaries with real ESLint probes.
+- `npm run test:onboarding` checks first-launch persistence, navigation and save recovery.
+- `npm run test:e2e:onboarding` runs the native first-launch and skip flows on a connected test device; these flows clear the app’s data.
 - `npm run format` applies the shared formatting rules; `npm run format:check` checks them.
 - `npm run storybook:generate` regenerates story discovery after adding or moving stories.
 

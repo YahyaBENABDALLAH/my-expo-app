@@ -7,6 +7,8 @@ Each folder owns one component or a small family. Keep its implementation,
 iOS/Android adapters, types and private helpers together. Every folder has a
 README with its purpose, usage constraints and available story coverage.
 
+For six-digit verification forms, see [OTP bottom sheet](otp-bottom-sheet/README.md).
+
 | Need                    | Folder guides                                                                                                                                                              |
 | ----------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Buttons and actions     | [button](button/README.md), [floating-action](floating-action/README.md)                                                                                                   |

@@ -250,6 +250,8 @@
       "detail": "Votre cuisine. Votre inspiration."
     },
     "start": "C’est parti",
+    "next": "Suivant",
+    "saveFailed": "Impossible d’enregistrer votre progression. Veuillez réessayer.",
     "skip": "Passer à la connexion",
     "back": "Précédent",
     "progress": "Progression de la présentation"
@@ -572,6 +574,29 @@
     "server": "Erreur interne du serveur. Réessayez plus tard.",
     "unexpected": "Erreur inattendue ({{status}}).",
     "invalidResponse": "Le serveur a renvoyé des données invalides. Réessayez."
+  },
+  "otp": {
+    "eyebrow": "VÉRIFICATION",
+    "title": "Consultez vos messages",
+    "description": "Saisissez le code à 6 chiffres envoyé à",
+    "codeLabel": "Code de vérification à 6 chiffres",
+    "inputHint": "Vous pouvez aussi coller le code complet.",
+    "verify": "Vérifier le code",
+    "verifying": "Vérification…",
+    "invalid": "Ce code est incorrect. Vérifiez-le et réessayez.",
+    "verifyFailed": "Impossible de vérifier le code. Veuillez réessayer.",
+    "successTitle": "Vérification réussie !",
+    "successDescription": "Votre code est confirmé. Vous pouvez continuer.",
+    "done": "Terminer",
+    "noCode": "Vous n'avez pas reçu de code ?",
+    "resend": "Envoyer un nouveau code",
+    "resendIn": "Renvoyer dans {{seconds}} s",
+    "resending": "Envoi d'un nouveau code…",
+    "resent": "Un nouveau code a été envoyé. Consultez vos messages.",
+    "resendFailed": "Impossible d'envoyer un nouveau code. Veuillez réessayer.",
+    "security": "Un petit geste pour protéger votre compte",
+    "openDemo": "Ouvrir la feuille de code OTP",
+    "demoHint": "Aperçu de l'interface · Saisissez 123456 pour voir l'animation de réussite."
   },
   "brand": {
     "name": "Likan",

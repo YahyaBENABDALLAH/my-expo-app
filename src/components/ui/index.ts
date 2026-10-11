@@ -53,6 +53,7 @@ export * from './loading/screen-error';
 export * from './native/native-fill-width';
 export * from './navigation/navigation-tab.types';
 export * from './navigation/reference-navigation-bar';
+export * from './otp-bottom-sheet/otp-bottom-sheet';
 export * from './page/page-frame';
 export * from './page/page-header';
 export * from './page/page-motion-overlay';

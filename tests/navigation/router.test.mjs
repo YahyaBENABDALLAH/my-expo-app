@@ -40,6 +40,9 @@ function discoverRoutes(platform) {
   const context = (key) => ({
     default: () => null,
     ...(key === './(auth)/_layout.tsx' ? { unstable_settings: { initialRouteName: 'login' } } : {}),
+    ...(key === './(onboarding)/_layout.tsx'
+      ? { unstable_settings: { initialRouteName: 'discover' } }
+      : {}),
   });
   context.keys = () => files;
   return getRoutes(context, { platform, skipGenerated: true });
@@ -54,6 +57,18 @@ for (const platform of ['android', 'ios']) {
     for (const name of ['login', 'register', 'forgot-password', 'reset-password', 'verify-email'])
       assert.equal(auth.children.find(({ route }) => route === name)?.type, 'route');
     assert.equal(root.children.find(({ route }) => route === '(tabs)')?.type, 'layout');
+  });
+  test(`${platform}: the first-launch introduction has three routes and starts at discovery`, () => {
+    const introduction = discoverRoutes(platform).children.find(
+      ({ route }) => route === '(onboarding)',
+    );
+    assert.equal(introduction.type, 'layout');
+    assert.equal(introduction.initialRouteName, 'discover');
+    assert.deepEqual(introduction.children.map(({ route }) => route).sort(), [
+      'cook',
+      'discover',
+      'save',
+    ]);
   });
 }
 
@@ -111,6 +126,9 @@ for (const platform of ['android', 'ios']) {
   const config = getReactNavigationConfig(discoverRoutes(platform));
   for (const [path, name, params] of [
     ['/', 'index', {}],
+    ['/discover', 'discover', {}],
+    ['/cook', 'cook', {}],
+    ['/save', 'save', {}],
     [
       '/recipe/00000000-0000-4000-8000-000000000001',
       'recipe/[uuid]',
@@ -165,3 +183,30 @@ test('changing guarded route availability removes the previous group from histor
     ['(auth)'],
   );
 });
+
+for (const destination of ['(auth)', '(tabs)']) {
+  test(`finishing onboarding removes its history before entering ${destination}`, () => {
+    const router = StackRouter({ initialRouteName: '(tabs)' });
+    const options = (routeNames) => ({
+      routeNames,
+      routeParamList: {},
+      routeGetIdList: {},
+      routeKeyChanges: [],
+    });
+    const firstLaunch = router.getInitialState(options(['(onboarding)']));
+    assert.equal(firstLaunch.routes[0].name, '(onboarding)');
+    const completed = router.getStateForRouteNamesChange(firstLaunch, options([destination]));
+    assert.deepEqual(
+      completed.routes.map(({ name }) => name),
+      [destination],
+    );
+    assert.equal(
+      router.getStateForAction(
+        completed,
+        { type: 'POP', payload: { count: 1 } },
+        options([destination]),
+      ),
+      null,
+    );
+  });
+}

@@ -27,6 +27,7 @@ import { navigationTheme } from '@/constants/navigation-theme';
 import { AuthProvider, useAuthContext } from '@/context/auth.context';
 import { LanguageProvider, useLanguage } from '@/context/language.context';
 import { LayoutDirectionProvider, useLayoutDirection } from '@/context/layout-direction.context';
+import { OnboardingProvider, useOnboarding } from '@/context/onboarding.context';
 import { AppQueryProvider } from '@/context/query-provider';
 import { ThemePreferencesProvider } from '@/context/theme.context';
 import { useAuthGuards } from '@/guards/auth-guards';
@@ -67,9 +68,11 @@ export default function RootLayout() {
       <LanguageProvider>
         <ThemePreferencesProvider>
           <AppQueryProvider>
-            <AuthProvider>
-              <RootLayoutContent />
-            </AuthProvider>
+            <OnboardingProvider>
+              <AuthProvider>
+                <RootLayoutContent />
+              </AuthProvider>
+            </OnboardingProvider>
           </AppQueryProvider>
         </ThemePreferencesProvider>
       </LanguageProvider>
@@ -84,8 +87,9 @@ function RootLayoutContent() {
   const { restoring } = useAuthGuards();
   const { error } = useAuthContext();
   const { ready: languageReady } = useLanguage();
+  const { ready: onboardingReady } = useOnboarding();
   // Restoration failures must expose their retry UI instead of keeping the launch overlay.
-  const ready = languageReady && (!restoring || Boolean(error));
+  const ready = languageReady && onboardingReady && (!restoring || Boolean(error));
   const finishBrandScreen = useCallback(() => setShowBrandScreen(false), []);
   const revealBrandScreen = useCallback(() => {
     SplashScreen.hide();
@@ -127,6 +131,7 @@ function RootLayoutNav() {
   const { requireAuth, requireNoAuth, restoring } = useAuthGuards();
   const { error, retryRestore } = useAuthContext();
   const { buttonPalette } = useAuthTheme();
+  const { completed } = useOnboarding();
 
   if (restoring)
     return (
@@ -181,10 +186,13 @@ function RootLayoutNav() {
           headerShadowVisible: false,
         }}
       >
-        <Stack.Protected guard={requireNoAuth}>
+        <Stack.Protected guard={!completed}>
+          <Stack.Screen name="(onboarding)" options={{ headerShown: false }} />
+        </Stack.Protected>
+        <Stack.Protected guard={completed && requireNoAuth}>
           <Stack.Screen name="(auth)" options={{ headerShown: false }} />
         </Stack.Protected>
-        <Stack.Protected guard={requireAuth}>
+        <Stack.Protected guard={completed && requireAuth}>
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
           <Stack.Screen name="recipe/[uuid]" options={{ title: t('common.recipeLabel') }} />
           <Stack.Screen name="category/[uuid]" options={{ title: t('common.category') }} />
@@ -203,6 +211,10 @@ function RootLayoutNav() {
           <Stack.Screen name="ui-component/[name]" options={{ title: t('tools.component') }} />
           <Stack.Screen name="development-pages" options={{ title: t('tools.allPages') }} />
           <Stack.Screen name="main" options={{ headerShown: false }} />
+        </Stack.Protected>
+        <Stack.Protected guard={completed}>
+          <Stack.Screen name="sign-up" options={{ headerShown: false }} />
+          <Stack.Screen name="+not-found" />
         </Stack.Protected>
       </Stack>
     </ThemeProvider>

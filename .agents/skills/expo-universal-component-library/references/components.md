@@ -103,6 +103,8 @@ the application adapters below with direct Expo UI layout/icon exports.
 Story names refer to `.rnstorybook/stories/expo-ui/`.
 Existing stories are recorded without implying full behavioral coverage.
 
+`OtpBottomSheet` composes the native [BottomSheet](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/bottomsheet/) and [TextInput](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/textinput/) with six visible digit slots. Its public props control presentation, recipient, verification/resend callbacks, cooldown, helper copy, theme and selector prefix. Platform overlay stacks keep a single transparent native input above the slots; an explicit-width direction bridge keeps digits LTR in Arabic. Shared text/surface/tint/selection/border and success/error roles style the form. A fixed-size Reanimated boundary animates only the native shield and respects reduced motion. `otp-bottom-sheet.stories.tsx` covers both themes, cooldown and request failures using an isolated English fixture; `.maestro/storybook/otp-bottom-sheet.yaml` covers rejection, backspace, success, incomplete input, resend and reopening. Digit normalization tests cover paste and numeric scripts. Native keyboard/autofill, accessibility, hit areas, large fonts and constrained geometry remain unverified without devices. See [component guide](../../../../src/components/ui/otp-bottom-sheet/README.md).
+
 Each component family has a folder and README. Keep its implementation,
 platform adapters, types and private helpers together. The root public barrel
 retains existing imports; implementations import concrete files directly.

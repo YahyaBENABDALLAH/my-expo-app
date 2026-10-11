@@ -1,0 +1,60 @@
+appId: com.hyrkul.likan
+name: First-launch introduction completes once
+tags: [onboarding, navigation, smoke]
+env:
+  DEV_CLIENT_URL: myappexpo://expo-development-client/?url=http%3A%2F%2F127.0.0.1%3A8081
+---
+- launchApp:
+    clearState: true
+- openLink: '${DEV_CLIENT_URL}'
+- extendedWaitUntil:
+    visible:
+      id: app-ready
+    timeout: 60000
+- assertVisible:
+    id: onboarding-discover
+- assertNotVisible:
+    id: auth-login-submit
+- scrollUntilVisible:
+    element:
+      id: onboarding-next
+- tapOn:
+    id: onboarding-next
+- assertVisible:
+    id: onboarding-cook
+- scrollUntilVisible:
+    element:
+      id: onboarding-back
+- tapOn:
+    id: onboarding-back
+- assertVisible:
+    id: onboarding-discover
+- scrollUntilVisible:
+    element:
+      id: onboarding-next
+- tapOn:
+    id: onboarding-next
+- scrollUntilVisible:
+    element:
+      id: onboarding-next
+- tapOn:
+    id: onboarding-next
+- assertVisible:
+    id: onboarding-save
+- scrollUntilVisible:
+    element:
+      id: onboarding-start
+- tapOn:
+    id: onboarding-start
+- extendedWaitUntil:
+    visible:
+      id: auth-login-submit
+    timeout: 10000
+- runFlow: ../helpers/bootstrap-app.yaml
+- assertVisible:
+    id: auth-login-submit
+- assertNotVisible:
+    id: onboarding-discover
+- back
+- assertNotVisible:
+    id: onboarding-save
