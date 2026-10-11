@@ -10,6 +10,7 @@ import {
   RecipeCard,
   nativeFillWidth,
   nativeRowWeight,
+  SearchField,
 } from '@components/ui';
 import { useQuery } from '@tanstack/react-query';
 import { router, useIsFocused } from 'expo-router';
@@ -31,14 +32,18 @@ export default function HomeScreen() {
       description={t('home.description')}
       tab
       onRefresh={onRefresh}
+      headerAccessory={
+        <SearchField
+          mode="navigate"
+          placeholder={t('search.recipes')}
+          testID="home-search"
+          active={focused}
+          onPress={() =>
+            router.navigate({ pathname: '/search', params: { focus: String(Date.now()) } })
+          }
+        />
+      }
     >
-      <UniversalButtonContent
-        label={t('home.search')}
-        variant="primary"
-        testID="home-search"
-        fullWidth
-        onPress={() => router.navigate('/search')}
-      />
       <Text variant="title">{t('home.categories')}</Text>
       <QueryContent query={categories} empty={categories.data?.data.length === 0}>
         <ScrollView direction="horizontal">

@@ -28,10 +28,16 @@ function setup(initial = {}) {
       UniversalButtonContent: native('Button'),
       PageScreen: (props) => {
         calls.pages++;
-        return h('Page', props, props.children);
+        return h(
+          'Page',
+          props,
+          props.headerAccessory,
+          props.children,
+          props.headerAction ? h('Button', props.headerAction) : null,
+        );
       },
       UniversalTextContent: native('Text'),
-      NativeField: native('Input'),
+      SearchField: native('Input'),
       RecipeCard: native('Card'),
       QueryContent: native('Content'),
       nativeFillWidth: [],
@@ -48,9 +54,13 @@ function setup(initial = {}) {
           updates.push(values);
           changeParams((params) => ({ ...params, ...values }));
         },
+        navigate: (path) => updates.push({ navigate: path }),
       },
     },
-    'react-native': { useWindowDimensions: () => useContext(dimensions) },
+    'react-native': {
+      useWindowDimensions: () => useContext(dimensions),
+      Keyboard: { dismiss() {} },
+    },
     '@/features/pages/tab-actions': { useRegisterTabAction: setAction },
     '@/hooks/use-screen-refresh': { useScreenRefresh: () => async () => {} },
     '@/features/recipes/queries': {
@@ -91,6 +101,7 @@ function setup(initial = {}) {
     calls,
     resize: (next) => resizeWindow(next),
     updates,
+    changeParams: (values) => changeParams((params) => ({ ...params, ...values })),
     reads,
     action: () => action,
     result: () => reads.filter((options) => options.queryKey[0] === 'recipes').at(-1).queryKey[1],
@@ -199,6 +210,54 @@ test('a successful empty search offers reset and clears route criteria and the i
     assert.equal(s.result().cuisineUuid, '');
     assert.equal(s.result().page, 1);
     assert.equal(s.byId(view, 'search-reset'), undefined);
+  } finally {
+    view.unmount();
+  }
+});
+
+test('a Home focus intent preserves the mounted field, draft, filters and pagination', (t) => {
+  t.mock.timers.enable({ apis: ['setTimeout'] });
+  const s = setup({ categoryUuid: 'salads' });
+  const view = renderFixture(h(s.Screen));
+  try {
+    const input = s.byId(view, 'recipe-search-input');
+    assert.equal(input.props.focusRequest, '');
+    view.flush(() => input.props.onChange('tagine'));
+    view.flush(() => t.mock.timers.tick(300));
+    view.flush(() => s.byId(view, 'search-next-page').props.onPress());
+    view.flush(() => s.changeParams({ focus: 'home-1' }));
+    assert.equal(s.byId(view, 'recipe-search-input'), input);
+    assert.equal(input.props.focusRequest, 'home-1');
+    assert.equal(input.props.value, 'tagine');
+    assert.equal(s.result().categoryUuid, 'salads');
+    assert.equal(s.result().page, 2);
+    view.flush(() => s.byId(view, 'search-cancel').props.onPress());
+    assert.deepEqual(s.updates.at(-1), { navigate: '/' });
+    view.flush(() => s.changeParams({ focus: 'home-2' }));
+    assert.equal(input.props.value, 'tagine');
+    assert.equal(input.props.focusRequest, 'home-2');
+  } finally {
+    view.unmount();
+  }
+});
+
+test('keyboard submit commits immediately and direct query changes keep the field mounted', (t) => {
+  t.mock.timers.enable({ apis: ['setTimeout'] });
+  const s = setup();
+  const view = renderFixture(h(s.Screen));
+  try {
+    const input = s.byId(view, 'recipe-search-input');
+    view.flush(() => s.byId(view, 'search-next-page').props.onPress());
+    view.flush(() => input.props.onChange('  couscous  '));
+    view.flush(() => input.props.onSubmit('  couscous  '));
+    assert.equal(s.result().search, 'couscous');
+    assert.equal(s.result().page, 1);
+    view.flush(() => t.mock.timers.tick(300));
+    assert.equal(s.result().search, 'couscous');
+    view.flush(() => s.changeParams({ q: 'soup' }));
+    assert.equal(s.byId(view, 'recipe-search-input'), input);
+    assert.equal(input.props.value, 'soup');
+    assert.equal(s.result().search, 'soup');
   } finally {
     view.unmount();
   }

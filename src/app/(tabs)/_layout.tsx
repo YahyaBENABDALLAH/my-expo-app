@@ -15,6 +15,7 @@ export default function TabLayout() {
   return (
     <TabActionsProvider>
       <Tabs
+        backBehavior="history"
         tabBar={renderTabBar}
         screenOptions={{
           headerShown: false,

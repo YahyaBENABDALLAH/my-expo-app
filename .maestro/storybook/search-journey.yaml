@@ -1,0 +1,45 @@
+appId: com.hyrkul.likan
+name: Search field continuity and draft retention
+tags: [smoke, storybook, input, navigation]
+---
+- runFlow:
+    file: ../helpers/open-story.yaml
+    env:
+      STORY_ID: pages-search-journey--light
+      READY_ID: home-search
+- tapOn:
+    id: home-search
+- assertVisible:
+    id: recipe-search-input
+    focused: true
+- inputText: couscous
+- assertVisible:
+    id: search-journey-draft
+    text: 'Draft: couscous'
+- tapOn:
+    id: recipe-search-input-right-icon
+- assertVisible:
+    id: search-journey-draft
+    text: 'Draft: empty'
+- inputText: tagine
+- tapOn:
+    id: search-cancel
+- assertVisible:
+    id: home-search
+- tapOn:
+    id: home-search
+- assertVisible:
+    id: recipe-search-input
+    text: tagine
+    focused: true
+- hideKeyboard
+- scrollUntilVisible:
+    element:
+      id: search-journey-row-23
+    direction: DOWN
+- assertVisible:
+    id: recipe-search-input
+- tapOn:
+    id: search-cancel
+- assertVisible:
+    id: home-search

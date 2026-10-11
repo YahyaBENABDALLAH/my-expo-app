@@ -1,5 +1,26 @@
 # Universal component catalog
 
+2026-10-11 search journey: `search-field/search-field.tsx` adds the standalone
+`SearchField` with `navigate` and `edit` modes. Native SwiftUI/Compose trigger
+adapters match the input's surface, inset, font, icon and trailing action space.
+It accepts `placeholder`, `testID`, `colorScheme`, `active` and `animate`; edit
+mode takes `value`, `onChange`, `onSubmit`, `clearLabel` and a one-shot
+`focusRequest`. Semantic roles are surface/border/muted/text/tint/selection.
+Native ref focus/blur and a guarded 300-ms UI-thread transform spring implement
+Home entry without animating tab scenes or measuring native layout. Search
+keeps its mounted field and draft across focus requests and direct query changes.
+`PageScreen.headerAccessory` is a standalone hosted slot pinned above scrolling
+content and inside keyboard protection. `headerAction` supplies a labelled native
+link action to `PageHeader`; every header keeps a 48-point minimum row and the
+same 24-point content inset. Descriptions use muted 14-point text. Tab back
+navigation uses visit history; stacks retain native gestures and keyboard handling.
+`search-field.stories.tsx` covers the complete journey in light/dark/static/narrow
+fixtures and also exercises these page-shell slots. Node checks cover intent
+consumption, cancellation, native value updates, draft preservation, submit and
+query changes. New native flows are `storybook/search-journey.yaml` and
+`pages/home-search.yaml`. Native geometry, accessibility, keyboard delivery and
+animation feel remain unverified without connected iOS/Android devices.
+
 2026-10-11 duplication cleanup: Facebook, Instagram and TikTok color data lives
 in `src/constants/themes/brand-palettes.json`. The existing theme exports use
 the typed `createBrandTheme` factory to combine feedback defaults and derived

@@ -33,6 +33,7 @@ function setup(deviceScheme = 'light') {
       Host: native('Host'),
       Column: native('Column'),
       Row: native('Row'),
+      Spacer: native('Spacer'),
       Text: native('Text'),
       ScrollView: native('ScrollView'),
     },

@@ -179,6 +179,8 @@ function RootLayoutNav() {
           contentStyle: { backgroundColor: 'transparent', direction },
           headerShown: false,
           headerShadowVisible: false,
+          gestureEnabled: true,
+          keyboardHandlingEnabled: true,
         }}
       >
         <Stack.Protected guard={requireNoAuth}>
