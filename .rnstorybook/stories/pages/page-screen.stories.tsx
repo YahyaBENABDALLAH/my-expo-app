@@ -1,6 +1,7 @@
 import {
   AuroraBackground,
   NativeField,
+  PageFrame,
   PageScreen,
   UniversalButtonContent,
   UniversalTextContent as Text,
@@ -56,6 +57,15 @@ const notchedInsets: Story['decorators'] = [
   ),
 ];
 export const NotchedPhone: Story = { decorators: notchedInsets };
+export const TransparentHeader: Story = {
+  decorators: notchedInsets,
+  args: { title: 'Cartes' },
+  render: ({ title, colorScheme }) => (
+    <PageFrame title={title} colorScheme={colorScheme} headerOverlay>
+      <AuroraBackground colorScheme={colorScheme} animate={false} style={{ flex: 1 }} />
+    </PageFrame>
+  ),
+};
 export const LandscapeCutout: Story = {
   decorators: [
     (Story) => (

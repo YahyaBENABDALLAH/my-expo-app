@@ -3,17 +3,12 @@
 Exports: `PageScreen`, `PageFrame`, `PageHeader` and `PageMotionOverlay`.
 
 `page-screen.tsx` composes scrolling content and actions.
-`headerAccessory` accepts standalone hosted UI above the scroll view and inside
-keyboard protection. Home and Search pin their matching SearchField there, so
-scrolling and descriptions cannot move the search entry between screens.
-`headerAction` is a labelled native link control beside the title, used for Search's
-Cancel action. Headers use the same 24-point side inset as content and a 48-point
-minimum row without fixing the maximum text height. Descriptions use subdued
-14-point text to keep the main content prominent. `search-field.stories.tsx`
-exercises both slots and the Home/Search transition.
 `page-frame.tsx` handles the header's safe area and leaves other edges to content.
-Its adjusted safe-area context keeps a stable identity until bottom/left/right
-insets change, so unrelated parent updates do not notify every inset consumer.
+Its optional `headerOverlay` floats the transparent header above full-height content,
+as used by Cartes. Overlay content retains the top device inset for native map controls;
+a title-only overlay ignores touches so map gestures work beneath the header.
+Its adjusted safe-area context keeps a stable identity until content insets change,
+so unrelated parent updates do not notify every inset consumer.
 `tests/layout/render-stability.test.mjs` checks this and real inset propagation.
 `page-header.tsx` uses the private `page-back-button.*` adapters.
 `page-motion-overlay.tsx` contains the shared animated top-edge wave artwork.
@@ -37,7 +32,8 @@ Page actions accept stable `testID` values independent of translated labels.
 Motion follows focus/activity/reduced-motion guards and ignores touches.
 See [shared motion](../../../../docs/shared-skia-motion.md).
 
-Existing composition story: [page-screen.stories.tsx](../../../../.rnstorybook/stories/pages/page-screen.stories.tsx).
+Existing composition story: [page-screen.stories.tsx](../../../../.rnstorybook/stories/pages/page-screen.stories.tsx),
+including `TransparentHeader` for the overlay with a simulated notch.
 
 Import public components from `@components/ui`; UI implementations import
 concrete files directly. [Back to the UI guide](../README.md).

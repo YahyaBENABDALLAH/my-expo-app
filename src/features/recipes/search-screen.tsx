@@ -8,16 +8,15 @@ import {
   UniversalButtonContent,
   PageScreen,
   UniversalTextContent as Text,
-  SearchField,
+  NativeField,
   QueryContent,
   RecipeCard,
   nativeFillWidth,
-  nativeRowWeight,
 } from '@components/ui';
 import { useQuery } from '@tanstack/react-query';
 import { router, useIsFocused, useLocalSearchParams } from 'expo-router';
 import { useCallback, useEffect, useState, type PropsWithChildren } from 'react';
-import { Keyboard, useWindowDimensions } from 'react-native';
+import { useWindowDimensions } from 'react-native';
 import { useScreenRefresh } from '@/hooks/use-screen-refresh';
 import { useRegisterTabAction } from '@/features/pages/tab-actions';
 import { lookupLabel, lookupOptions, recipeListOptions } from './queries';
@@ -25,7 +24,6 @@ import { openRecipe } from './recipe-navigation';
 
 type SearchParams = {
   q?: string | string[];
-  focus?: string | string[];
   categoryUuid?: string | string[];
   cuisineUuid?: string | string[];
   difficultyUuid?: string | string[];
@@ -49,7 +47,7 @@ function SearchFilterViewport({ children }: PropsWithChildren) {
 
 export default function SearchScreen() {
   const params = useLocalSearchParams<SearchParams>();
-  return <SearchContent params={params} />;
+  return <SearchContent key={single(params.q)} params={params} />;
 }
 
 function SearchContent({ params }: { params: SearchParams }) {
@@ -57,14 +55,6 @@ function SearchContent({ params }: { params: SearchParams }) {
   const focused = useIsFocused();
   const [text, setText] = useState(single(params.q));
   const [search, setSearch] = useState(text);
-  const [previousRouteSearch, setPreviousRouteSearch] = useState(text);
-  const routeSearch = single(params.q);
-  // Sync an external deep link before rendering children, preserving the native field.
-  if (previousRouteSearch !== routeSearch) {
-    setPreviousRouteSearch(routeSearch);
-    setText(routeSearch);
-    setSearch(routeSearch);
-  }
   const categoryUuid = single(params.categoryUuid);
   const cuisineUuid = single(params.cuisineUuid);
   const difficultyUuid = single(params.difficultyUuid);
@@ -77,7 +67,6 @@ function SearchContent({ params }: { params: SearchParams }) {
   const [sheet, setSheet] = useState(false);
   const [draftFilters, setDraftFilters] = useState<SearchFilters>(filters);
   const openFilters = useCallback(() => {
-    Keyboard.dismiss();
     setDraftFilters({ categoryUuid, cuisineUuid, difficultyUuid });
     setSheet(true);
   }, [categoryUuid, cuisineUuid, difficultyUuid]);
@@ -117,53 +106,26 @@ function SearchContent({ params }: { params: SearchParams }) {
       onRefresh={onRefresh}
       description={t('search.description')}
       tab
-      headerAction={
-        single(params.focus)
-          ? {
-              label: t('auth.cancel'),
-              testID: 'search-cancel',
-              onPress: () => {
-                Keyboard.dismiss();
-                router.navigate('/');
-              },
-            }
-          : undefined
-      }
-      headerAccessory={
-        <SearchField
-          mode="edit"
-          placeholder={t('search.recipes')}
-          testID="recipe-search-input"
-          value={text}
-          onChange={setText}
-          clearLabel={t('common.clear')}
-          active={focused}
-          focusRequest={single(params.focus)}
-          onSubmit={(value) => {
-            setSearch(value.trim());
-            setPage(1);
-            Keyboard.dismiss();
-          }}
-        />
-      }
     >
-      <Row spacing={12} alignment="center" modifiers={nativeFillWidth}>
-        <Column modifiers={nativeRowWeight}>
-          {query.isSuccess ? (
-            <Text variant="caption" testID="search-result-count">
-              {t('search.resultCount', { count: query.data.meta.itemCount })}
-            </Text>
-          ) : null}
-        </Column>
-        <UniversalButtonContent
-          variant="secondary"
-          label={
-            filterCount ? t('search.activeFilters', { count: filterCount }) : t('search.filters')
-          }
-          testID="search-filters"
-          onPress={openFilters}
-        />
-      </Row>
+      <NativeField
+        label={t('search.recipes')}
+        testID="recipe-search-input"
+        value={text}
+        onChange={setText}
+      />
+      <UniversalButtonContent
+        variant="secondary"
+        label={
+          filterCount ? t('search.activeFilters', { count: filterCount }) : t('search.filters')
+        }
+        testID="search-filters"
+        onPress={openFilters}
+      />
+      {query.isSuccess ? (
+        <Text variant="caption" testID="search-result-count">
+          {t('search.resultCount', { count: query.data.meta.itemCount })}
+        </Text>
+      ) : null}
       <QueryContent query={query} empty={empty} emptyMessage={t('search.noResults')}>
         {query.data?.data.map((recipe) => (
           <RecipeCard key={recipe.uuid} recipe={recipe} onPress={openRecipe} />

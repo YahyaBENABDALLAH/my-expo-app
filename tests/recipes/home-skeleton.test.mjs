@@ -28,7 +28,6 @@ function setup() {
     UniversalTextContent: native('Text'),
     QueryContent: native('QueryContent'),
     RecipeCard: native('RecipeCard'),
-    SearchField: native('SearchField'),
     Switch: native('Switch'),
     nativeFillWidth: [],
     nativeRowWeight: [],

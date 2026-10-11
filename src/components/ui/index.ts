@@ -60,7 +60,6 @@ export * from './page/page-screen';
 export * from './picker/picker';
 export * from './recipe-card/recipe-card';
 export * from './recipe-stepper/recipe-stepper';
-export * from './search-field/search-field';
 export * from './refreshable-scroll-view/refreshable-scroll-view';
 export * from './refreshable-scroll-view/refreshable-scroll-view.types';
 export * from './segmented-control/segmented-control';
