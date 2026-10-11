@@ -186,32 +186,34 @@ for (const platform of ['ios', 'android']) {
   });
 }
 
-test('iOS sheet ignores duplicate width and position-only geometry events while retaining real resize', () => {
-  const s = setup();
-  const { BottomSheet } = s.load('components/ui/bottom-sheet/bottom-sheet.tsx');
-  const view = renderFixture(h(BottomSheet, { isPresented: true, onDismiss() {} }, h('Content')));
-  const report = (width, y = 0) =>
-    view.flush(() =>
-      view
-        .findAll('Column')[0]
-        .props.modifiers.find((value) => value.geometry)
-        .geometry({ width, y, height: 250 }),
-    );
-  try {
-    report(342);
-    const before = s.calls.geometryFactories;
-    report(342, 150);
-    report(342, 200);
-    assert.equal(s.calls.geometryFactories, before);
-    report(492);
-    assert.equal(view.findAll('Host')[0].props.style.width, 492);
-    const resized = s.calls.geometryFactories;
-    for (const invalid of [0, -1, NaN, Infinity]) report(invalid);
-    assert.equal(s.calls.geometryFactories, resized);
-  } finally {
-    view.unmount();
-  }
-});
+for (const platform of ['ios', 'android']) {
+  test(`${platform} sheet ignores duplicate width and size/position-only geometry events while retaining real resize`, () => {
+    const s = setup(platform);
+    const { BottomSheet } = s.load('components/ui/bottom-sheet/bottom-sheet.tsx');
+    const view = renderFixture(h(BottomSheet, { isPresented: true, onDismiss() {} }, h('Content')));
+    const report = (width, height = 250, y = 0) =>
+      view.flush(() =>
+        view
+          .findAll('Column')[0]
+          .props.modifiers.find((value) => value.geometry)
+          .geometry({ width, y, height }),
+      );
+    try {
+      report(342);
+      const before = s.calls.geometryFactories;
+      report(342, 150);
+      report(342, 150, 200);
+      assert.equal(s.calls.geometryFactories, before);
+      report(492);
+      assert.equal(view.findAll('Host')[0].props.style.width, 492);
+      const resized = s.calls.geometryFactories;
+      for (const invalid of [0, -1, NaN, Infinity]) report(invalid);
+      assert.equal(s.calls.geometryFactories, resized);
+    } finally {
+      view.unmount();
+    }
+  });
+}
 
 test('RN input bridge skips duplicate rounded width updates and preserves the native field across resize', () => {
   const s = setup();

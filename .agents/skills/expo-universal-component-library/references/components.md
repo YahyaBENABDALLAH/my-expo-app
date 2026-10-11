@@ -40,7 +40,7 @@ story IDs follow the new exports, and the loading Maestro selector is updated.
 Storybook safe-area values retain identity until their content edges change.
 Native geometry, focus, keyboard and accessibility still require device checks.
 
-2026-10-11 geometry follow-up: the input RN bridge, iOS bottom sheet and both
+2026-10-11 geometry follow-up: the input RN bridge, both bottom sheets and both
 stepper layout adapters share a guarded width hook. Duplicate/invalid reports
 skip React setters; real widths still update. Aurora resolution uses only actual
 layout through a shared value and no window subscription. The page/splash wave
@@ -349,7 +349,7 @@ and release smoothness have not been checked on a device.
 
 - Root imports select SwiftUI on iOS and Compose on Android. Ordinary native trees need Host. BottomSheet in this installed version creates its own internal native Host; follow its implementation and existing wrapper rather than blindly nesting another host.
 - BottomSheet uses `isPresented` and `onDismiss`. Android Material sheet states do not guarantee exact parity with iOS fractional/height detents; document and verify each supported platform behavior.
-- The shared BottomSheet owns 24-point edge padding (`contentPadding` overrides it), surface/text theme roles and a full-width leading Column. Both platforms use one universal render tree; a guarded iOS sizing modifier measures the presented width for the nested Host, preserves intrinsic height when auto-sized and anchors explicit detents at the top. The bottom-sheet story includes long wrapping text and full-width actions; width/state JS checks do not prove native geometry.
+- The shared BottomSheet owns 24-point edge padding (`contentPadding` overrides it), surface/text theme roles and a full-width leading Column. Both platforms use one universal render tree; `onGeometryChange` on iOS and `onSizeChanged` on Android measure the padded native Column and give the nested Host a numeric width. Percentage width can collapse content in the self-sizing Android RN bridge. Auto-sized sheets retain intrinsic height; explicit iOS detents anchor content at the top. The bottom-sheet story covers wrapping text/full-width actions, and `Pages/Login preferences` plus its Maestro flow cover visibility of all three language choices, selection, reopening and draft retention. JS checks cover resizing, duplicate/invalid reports and state retention on both platforms; native geometry still requires a device.
 - Picker wheel appearance is iOS-specific; Android uses its dropdown behavior.
 - List is for short native groups, not a virtualization solution for unbounded feeds. Do not silently replace it with a disallowed UI control or render huge data trees. Raise the requirement and resolve an approved approach if needed.
 - Existing wrappers and stories can contain styling or RN content that predates the mobile-only skill. Their presence is not an exception for new work. Correct only the touched scope and document remaining drift.

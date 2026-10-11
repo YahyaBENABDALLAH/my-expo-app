@@ -11,6 +11,17 @@ env:
       READY_ID: auth-login-language
 - tapOn:
     id: auth-login-language
+- assertVisible:
+    id: auth-login-language-fr
+    text: Français
+- assertVisible:
+    id: auth-login-language-en
+    text: English
+- assertVisible:
+    id: auth-login-language-ar
+    text: العربية
+- assertVisible:
+    id: auth-login-language-close
 - tapOn:
     id: auth-login-language-en
 - assertVisible:
@@ -45,6 +56,12 @@ env:
     text: ar · light · rtl
 - tapOn:
     id: auth-login-language
+- assertVisible:
+    id: auth-login-language-fr
+- assertVisible:
+    id: auth-login-language-en
+- assertVisible:
+    id: auth-login-language-ar
 - tapOn:
     id: auth-login-language-close
 - assertNotVisible:

@@ -55,6 +55,7 @@ for (const platform of ['ios', 'android']) {
         },
         '@expo/ui/jetpack-compose': { IconButton: native('IconButton') },
         '@expo/ui/jetpack-compose/modifiers': {
+          onSizeChanged: (handler) => ({ onSizeChanged: handler }),
           semantics: (semantics) => ({ semantics }),
           size: (width, height) => ({ width, height }),
           testID: (testID) => ({ testID }),
@@ -181,7 +182,11 @@ for (const platform of ['ios', 'android']) {
           press(languageButton);
           const sheet = view.findAll('Sheet')[0];
           assert.equal(sheet.props.isPresented, true);
+          const eventName = platform === 'ios' ? 'onGeometryChange' : 'onSizeChanged';
+          const sizing = sheet.children[0].props.modifiers.find((modifier) => modifier[eventName]);
+          view.flush(() => sizing[eventName]({ width: 342, height: 280 }));
           const sheetHost = view.findAll('RNHostView')[0].children[0];
+          assert.equal(sheetHost.props.style.at(-1).width, 342);
           assert.equal(
             sheetHost.props.layoutDirection,
             draft.props.language === 'ar' ? 'rightToLeft' : 'leftToRight',

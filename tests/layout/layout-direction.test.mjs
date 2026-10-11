@@ -46,6 +46,7 @@ function setup(isRTL = false, platform = 'android') {
       onGeometryChange: (handler) => ({ onGeometryChange: handler }),
     },
     '@expo/ui/jetpack-compose/modifiers': {
+      onSizeChanged: (handler) => ({ onSizeChanged: handler }),
       semantics: (props) => ({ semantics: props }),
       size: (width, height) => ({ width, height }),
       testID: (id) => ({ id }),
@@ -232,46 +233,56 @@ test('sheet bridge preserves explicit chrome colors and dismissal callback', () 
   view.unmount();
 });
 
-test('iOS sheet resizes its content to the presented width without losing local state', () => {
-  const s = setup(false, 'ios');
-  let changeDraft;
-  function Draft() {
-    const [draft, setDraft] = useState('');
-    changeDraft = setDraft;
-    return createElement('SheetDraft', { draft });
-  }
-  const view = renderFixture(
-    createElement(
-      s.UniversalHost,
-      { colorScheme: 'dark', layoutDirection: 'rightToLeft' },
-      createElement(s.BottomSheet, { isPresented: true, onDismiss() {} }, createElement(Draft)),
-    ),
-  );
-  try {
-    const sheet = view.findAll('BottomSheet')[0];
-    const host = view.findAll('Host')[1];
-    const draft = view.findAll('SheetDraft')[0];
-    const geometry = view.findAll('Column')[0].props.modifiers.find((mod) => mod.onGeometryChange);
-    view.flush(() => changeDraft('مسودة Draft 123'));
-    for (const width of [342, 492, 300]) {
-      view.flush(() => geometry.onGeometryChange({ x: 0, y: 0, width, height: 280 }));
-      assert.equal(view.findAll('Host')[1], host);
-      assert.equal(host.props.style.at(-1).width, width);
-      assert.deepEqual(host.props.matchContents, { vertical: true });
-      assert.equal(host.props.layoutDirection, 'rightToLeft');
-      assert.equal(host.props.colorScheme, 'dark');
-      assert.equal(view.findAll('BottomSheet')[0], sheet);
-      assert.equal(view.findAll('SheetDraft')[0], draft);
-      assert.equal(draft.props.draft, 'مسودة Draft 123');
+for (const platform of ['ios', 'android']) {
+  test(`${platform} sheet resizes its content to the presented width without losing local state`, () => {
+    const s = setup(false, platform);
+    let changeDraft;
+    function Draft() {
+      const [draft, setDraft] = useState('');
+      changeDraft = setDraft;
+      return createElement('SheetDraft', { draft });
     }
-    for (const width of [0, -1, NaN, Infinity]) {
-      view.flush(() => geometry.onGeometryChange({ x: 0, y: 0, width, height: 280 }));
-      assert.equal(host.props.style.at(-1).width, 300);
+    const view = renderFixture(
+      createElement(
+        s.UniversalHost,
+        { colorScheme: 'dark', layoutDirection: 'rightToLeft' },
+        createElement(s.BottomSheet, { isPresented: true, onDismiss() {} }, createElement(Draft)),
+      ),
+    );
+    try {
+      const sheet = view.findAll('BottomSheet')[0];
+      const host = view.findAll('Host')[1];
+      const draft = view.findAll('SheetDraft')[0];
+      const eventName = platform === 'ios' ? 'onGeometryChange' : 'onSizeChanged';
+      const reportSize = view.findAll('Column')[0].props.modifiers.find((mod) => mod[eventName])?.[
+        eventName
+      ];
+      assert.equal(
+        typeof reportSize,
+        'function',
+        'The native sheet must measure the bridge width.',
+      );
+      view.flush(() => changeDraft('مسودة Draft 123'));
+      for (const width of [342, 492, 300]) {
+        view.flush(() => reportSize({ x: 0, y: 0, width, height: 280 }));
+        assert.equal(view.findAll('Host')[1], host);
+        assert.equal(host.props.style.at(-1).width, width);
+        assert.deepEqual(host.props.matchContents, { vertical: true });
+        assert.equal(host.props.layoutDirection, 'rightToLeft');
+        assert.equal(host.props.colorScheme, 'dark');
+        assert.equal(view.findAll('BottomSheet')[0], sheet);
+        assert.equal(view.findAll('SheetDraft')[0], draft);
+        assert.equal(draft.props.draft, 'مسودة Draft 123');
+      }
+      for (const width of [0, -1, NaN, Infinity]) {
+        view.flush(() => reportSize({ x: 0, y: 0, width, height: 280 }));
+        assert.equal(host.props.style.at(-1).width, 300);
+      }
+    } finally {
+      view.unmount();
     }
-  } finally {
-    view.unmount();
-  }
-});
+  });
+}
 
 for (const snapPoints of [undefined, [], ['half', 'full']]) {
   test(`iOS sheet ${snapPoints?.length ? 'anchors explicit detents to the top' : 'keeps auto-sized height'}`, () => {

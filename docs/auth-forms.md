@@ -2,6 +2,8 @@
 
 The iOS/Android auth screens adapt `Reference/`'s palette, spacing, decorative heading font, and form layout. Each `AuthScreenFrame` owns one `@expo/ui` Host with the auth scheme and seed color. Native ScrollView and Column layouts contain host-free AuthText, UniversalButtonContent, FormTextInput, and FormSubmit content. React Native keyboard avoidance stays outside the Host. The Likan brand stays in the screen header.
 
+Registration owns one `UniversalHost` with a full-height Expo UI `FieldGroup` as its scroll container. Profile, account/security, preferences, and getting-started sections contain the existing form fields, a preferred-language `Picker`, and two informational `ListItem` rows. The picker defaults to the current app language and submits `preferredLanguage` with the registration request; its choices use language autonyms. First and last names remain optional. All fields, the picker, and auth actions disable during submission. Keep this native form out of an enclosing ScrollView or List to avoid nested scroll containers. Its stable selectors include `auth-register-scroll`, `auth-register-language`, and `auth-register-account-list`.
+
 Keep React Native View and RNHostView out of this continuous native tree. UniversalTextContent and UniversalTextInputContent compose inside an existing Host; UniversalText and UniversalTextInput remain explicit adapters for React Native layouts elsewhere. The native input content needs no JavaScript width measurement. Native width modifiers and the screen's capped content width constrain the form. Follow the [SDK 57 Host boundary rules](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/host/#placing-components-inside-react-native-views), also researched through Context7's Expo index. The session-restoration panel owns its own Host rather than adding one to each auth control.
 
 Storybook's Expo UI/Auth Screen stories exercise the actual frame, fields, password button, submit states, and text with one Host and no backend calls. Run `.maestro/storybook/auth-screen.yaml` on both platforms to check validation, editing, one callback per press, and pending-state suppression. Repeat with the device in light/dark appearance; story registration alone does not verify native layout or interactions.
@@ -14,7 +16,7 @@ Set `EXPO_PUBLIC_API_URL` to the HTTPS Identity API origin in `.env.local`, with
 
 ## Routes and state
 
-- `/login`: email or username and password; `/register`: username, first name, last name, email, password, and local password confirmation.
+- `/login`: email or username and password; `/register`: username, optional first/last names, email, password, local password confirmation, and preferred language.
 - `/verify-email`: transient six-digit challenge, expiry, confirmation, and server-controlled resend cooldown. Opening this route without a challenge returns to login.
 - `/forgot-password`: send recovery instructions and show a generic confirmation after success.
 - `/account`: signed-in identity query, offline saved identity, retry, and logout.

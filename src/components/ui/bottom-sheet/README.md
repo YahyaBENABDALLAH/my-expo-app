@@ -10,12 +10,14 @@ Let the sheet own edge padding; avoid adding a second inset to its content.
 Other native sheet props pass through.
 
 The Host/RNHostView bridge is necessary for presented content. Keep it here.
-Both platforms use one universal content tree in `bottom-sheet.tsx`. A guarded
-iOS sizing modifier reads the native sheet's available width with
-`onGeometryChange`, then gives the nested Host that numeric width while matching
-only its height to content. This avoids percentage-width sizing through a
-self-sizing RN bridge and follows iPad sheet/window resizing. Explicit detents
-anchor content to the top; auto-sized sheets retain their intrinsic height.
+Both platforms use one universal content tree in `bottom-sheet.tsx`. Native
+sizing modifiers read the sheet's available content width: `onGeometryChange`
+on iOS and `onSizeChanged` on Android. The nested Host receives that numeric
+width while matching only its height to content. Percentage-width sizing
+through this self-sizing RN bridge can collapse Android preference controls to
+zero width. Measuring the padded native Column also follows sheet/window
+resizing without guessing the screen width. Explicit iOS detents anchor content
+to the top; auto-sized sheets retain their intrinsic height.
 Duplicate/position-only geometry reports are filtered before calling React's
 state setter. Actual width changes still resize the bridge; zero/invalid reports
 retain the last presented width.
@@ -27,6 +29,8 @@ Existing composition story: [bottom-sheet.stories.tsx](../../../../.rnstorybook/
 It covers long wrapping text, themes, detents, padding and a full-width close
 action. JS tests check width updates, state preservation and prop forwarding;
 native geometry and gestures still require iOS/Android verification.
+`Pages/Login preferences` and `.maestro/storybook/login-preferences.yaml` also
+exercise all three language choices, selection, reopening and draft retention.
 
 Import public components from `@components/ui`; UI implementations import
 concrete files directly. [Back to the UI guide](../README.md).
