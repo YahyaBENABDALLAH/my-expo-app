@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { createElement as h, useState } from 'react';
+import { createContext, createElement as h, useContext, useState } from 'react';
 import { createSourceLoader } from '../helpers/load-source.mjs';
 import { renderFixture } from '../helpers/render-fixture.mjs';
 
@@ -9,6 +9,9 @@ function setup(initial = {}) {
   const Picker = Object.assign(native('Picker'), { Item: native('Item') });
   const updates = [];
   const reads = [];
+  const calls = { pages: 0 };
+  const dimensions = createContext({ height: 844, width: 390, fontScale: 1 });
+  let resizeWindow;
   let changeParams;
   let action;
   let hasResults = true;
@@ -23,7 +26,10 @@ function setup(initial = {}) {
       ScrollView: native('ScrollView'),
       Picker,
       UniversalButtonContent: native('Button'),
-      PageScreen: native('Page'),
+      PageScreen: (props) => {
+        calls.pages++;
+        return h('Page', props, props.children);
+      },
       UniversalTextContent: native('Text'),
       NativeField: native('Input'),
       RecipeCard: native('Card'),
@@ -44,8 +50,8 @@ function setup(initial = {}) {
         },
       },
     },
-    'react-native': { useWindowDimensions: () => ({ height: 844, width: 390, fontScale: 1 }) },
-    '@/features/pages/tab-actions': { useTabActions: () => ({ setAction }) },
+    'react-native': { useWindowDimensions: () => useContext(dimensions) },
+    '@/features/pages/tab-actions': { useRegisterTabAction: setAction },
     '@/hooks/use-screen-refresh': { useScreenRefresh: () => async () => {} },
     '@/features/recipes/queries': {
       lookupLabel: (item) => item.name,
@@ -74,8 +80,16 @@ function setup(initial = {}) {
       },
     },
   });
+  function Window({ children }) {
+    const [size, update] = useState({ height: 844, width: 390, fontScale: 1 });
+    resizeWindow = update;
+    return h(dimensions.Provider, { value: size }, children);
+  }
   return {
     Screen: load('features/recipes/search-screen.tsx').default,
+    Window,
+    calls,
+    resize: (next) => resizeWindow(next),
     updates,
     reads,
     action: () => action,
@@ -119,6 +133,26 @@ test('filters apply atomically; cancel and native dismissal discard a draft', (t
     assert.equal(s.result().page, 1);
     assert.equal(view.findAll('Sheet')[0].props.isPresented, false);
     assert.equal(view.findAll('Page')[0].props.description.includes('applied-category'), false);
+  } finally {
+    view.unmount();
+  }
+});
+
+test('filter viewport resizes without rebuilding results or losing the filter draft', () => {
+  const s = setup();
+  const view = renderFixture(h(s.Window, null, h(s.Screen)));
+  try {
+    view.flush(() => s.action().onPress());
+    view.flush(() => view.findAll('Picker')[0].props.onValueChange('draft-category'));
+    const before = { pages: s.calls.pages, reads: s.reads.length };
+    view.flush(() => s.resize({ width: 844, height: 500, fontScale: 1 }));
+    assert.equal(view.findAll('ScrollView')[0].props.style.height, 350);
+    assert.equal(s.calls.pages, before.pages);
+    assert.equal(s.reads.length, before.reads);
+    assert.equal(view.findAll('Picker')[0].props.selectedValue, 'draft-category');
+    view.flush(() => s.resize({ width: 844, height: 500, fontScale: 1.5 }));
+    assert.equal(s.calls.pages, before.pages);
+    assert.equal(s.reads.length, before.reads);
   } finally {
     view.unmount();
   }

@@ -81,6 +81,32 @@ test('missing detail identifiers disable automatic and manual fetch functions', 
   s.client.clear();
 });
 
+for (const [name, metadata] of [
+  ['a future page that skips requested pages', { page: 3, pageCount: 4, hasNextPage: true }],
+  ['a final page with an incorrect next-page flag', { page: 1, pageCount: 1, hasNextPage: true }],
+  ['a nonempty page with zero total pages', { page: 1, pageCount: 0, hasNextPage: true }],
+]) {
+  test(`infinite reads stop on ${name}`, async () => {
+    const result = page();
+    Object.assign(result.meta, metadata);
+    const s = createApiHarness(() => result);
+    const options = s.load('services/recipe/recipe.queries.ts').recipeInfiniteOptions();
+    const observer = new InfiniteQueryObserver(s.client, { ...options, enabled: false });
+    const unsubscribe = observer.subscribe(() => {});
+    try {
+      const first = await observer.refetch();
+      assert.equal(first.hasNextPage, false);
+      await observer.fetchNextPage();
+      assert.equal(s.requests.length, 1);
+      assert.deepEqual(s.requests[0].params.page, 1);
+      assert.deepEqual(observer.getCurrentResult().data.pageParams, [1]);
+    } finally {
+      unsubscribe();
+      s.client.clear();
+    }
+  });
+}
+
 test('query cancellation aborts Axios and a late response never enters the cache', async () => {
   const started = deferred();
   const response = deferred();

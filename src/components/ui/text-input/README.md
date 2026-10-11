@@ -12,17 +12,18 @@ The native `value` uses Expo UI's supported observable API, including external
 resets and password toggles. Use `FormTextInput` or `NativeField` to bridge
 caller form/string state. Keep validation and submission in the feature.
 
+The RN boundary measures and rounds its container width only on layout events.
+It filters equal/invalid widths before updating React, so position-only or
+equivalent rounded reports do not rerun input composition. Actual resize keeps
+the same native field instance; hosted content needs no measurement state.
+
 Read the installed APIs before changing platform appearance, focus, keyboard
 or icon behavior.
 
-Single-line fields reserve a stable height from the font scale, text line height,
-resolved vertical padding and border. Right actions retain room for their native
-tap target. Password reveal/hide, focus, editing and clearing use the same field
-height; `style.height` overrides it. Multiline fields still grow naturally.
-
-`PasswordVisibility` and `PasswordVisibilityLargeText` stories expose a recorded
-height baseline and the largest subsequent change. The password visibility
-Maestro flow checks that this stays zero while toggling and editing.
+All input icons have a fixed 20 × 20 frame. Right icon buttons use a fixed
+48 × 48 tap target on both platforms, including password reveal/hide.
+`PasswordVisibility` and `PasswordVisibilityLargeText` stories exercise the toggle;
+the icon Maestro flow checks revealing and hiding the password.
 
 Existing composition story: [text-input.stories.tsx](../../../../.rnstorybook/stories/expo-ui/text-input.stories.tsx).
 

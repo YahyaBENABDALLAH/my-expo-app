@@ -10,6 +10,12 @@ ordinary scrolling. An async `onRefresh` owns work and error feedback; the
 wrapper waits for settlement, releases the indicator on failure and coalesces
 pending gestures.
 
+`use-pending-refresh.ts` shares only promise coordination and error completion.
+Android supplies its existing spinner state setter; iOS adds no JS spinner state.
+Both retain their native indicator colors and the disabled/hidden interaction
+guard. Tests cover callback changes during a pending request, duplicate gestures,
+success, rejection, recovery and retained content.
+
 See [API refresh guidance](../../../../docs/api-services.md). Native gestures,
 indicator placement and short-content behavior require device verification.
 

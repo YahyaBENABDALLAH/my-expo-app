@@ -14,6 +14,18 @@ import { getSessionVersion, subscribeAuthSession } from '@/services/auth/auth.se
 import type { AuthUser } from '@/types/auth-session.types';
 
 type AuthState = { status: AuthStatus; user: AuthUser | null; error: string | null };
+type AuthSnapshot = AuthState & { version: number };
+
+/** Display fields are scalar; newly allocated but equal users do not change the UI. */
+function sameUser(previous: AuthUser | null, next: AuthUser | null) {
+  if (previous === next) return true;
+  if (!previous || !next) return false;
+  const keys = Object.keys(previous) as (keyof AuthUser)[];
+  return (
+    keys.length === Object.keys(next).length &&
+    keys.every((key) => Object.is(previous[key], next[key]))
+  );
+}
 const AuthContext = createContext<
   | (AuthState & {
       signOut: typeof signOut;
@@ -29,20 +41,26 @@ export function AuthProvider({ children }: PropsWithChildren) {
   const { t } = useTranslation();
   const [attempt, setAttempt] = useState(0);
   const [guestEnabled, setGuestEnabled] = useState(false);
-  const [state, setState] = useState<AuthState>({
+  const [state, setState] = useState<AuthSnapshot>({
     status: AUTH_STATUS.UNKNOWN,
     user: null,
     error: null,
+    version: getSessionVersion(),
   });
   useEffect(() => {
     let active = true;
     const apply = (user: AuthUser | null, authenticated: boolean) => {
-      if (active)
-        setState({
-          user,
-          status: authenticated ? AUTH_STATUS.AUTHENTICATED : AUTH_STATUS.UNAUTHENTICATED,
-          error: null,
-        });
+      if (!active) return;
+      const status = authenticated ? AUTH_STATUS.AUTHENTICATED : AUTH_STATUS.UNAUTHENTICATED;
+      const version = getSessionVersion();
+      setState((current) =>
+        current.version === version &&
+        current.status === status &&
+        current.error === null &&
+        sameUser(current.user, user)
+          ? current
+          : { user, status, error: null, version },
+      );
     };
     const unsubscribe = subscribeAuthSession(({ session }) =>
       apply(session?.user ?? null, Boolean(session)),
@@ -58,6 +76,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
             status: AUTH_STATUS.UNKNOWN,
             user: null,
             error: 'session.restoreFailed',
+            version,
           });
       });
     return () => {
@@ -67,7 +86,8 @@ export function AuthProvider({ children }: PropsWithChildren) {
   }, [attempt]);
   const value = useMemo(
     () => ({
-      ...state,
+      status: state.status,
+      user: state.user,
       error: state.error ? t(state.error) : null,
       developmentGuest:
         appDevEnabled && guestEnabled && state.status === AUTH_STATUS.UNAUTHENTICATED,
@@ -80,7 +100,12 @@ export function AuthProvider({ children }: PropsWithChildren) {
         await signOut();
       },
       retryRestore: () => {
-        setState({ status: AUTH_STATUS.UNKNOWN, user: null, error: null });
+        setState({
+          status: AUTH_STATUS.UNKNOWN,
+          user: null,
+          error: null,
+          version: getSessionVersion(),
+        });
         setAttempt((value) => value + 1);
       },
     }),

@@ -45,7 +45,7 @@ function DirectionPreview({ colorScheme }: { colorScheme: 'light' | 'dark' }) {
       style={{ flex: 1, backgroundColor: Colors[colorScheme].background }}
     >
       <ScrollView>
-        <Column spacing={16} modifiers={nativeFillWidth} style={{ padding: 24 }}>
+        <Column spacing={16} modifiers={nativeFillWidth}>
           <Text variant="title">Live layout direction</Text>
           <Text testID="layout-direction-status">{`Direction: ${direction.toUpperCase()}`}</Text>
           <Row modifiers={nativeFillWidth}>

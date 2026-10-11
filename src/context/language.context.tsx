@@ -1,5 +1,13 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { createContext, useContext, useEffect, useState, type PropsWithChildren } from 'react';
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+  type PropsWithChildren,
+} from 'react';
 import { I18nextProvider, useTranslation } from 'react-i18next';
 import { z } from 'zod';
 
@@ -48,19 +56,23 @@ export function LanguageProvider({ children }: PropsWithChildren) {
     };
   }, [setDirection]);
 
-  function setLanguage(language: Language) {
-    if (!ready || !normalizeLanguage(language)) return;
-    void i18n.changeLanguage(language);
-    persistence = persistence
-      .then(() => AsyncStorage.setItem(STORAGE_KEY, language))
-      .catch(() => {
-        // The current session can still use the selected language.
-      });
-  }
+  const setLanguage = useCallback(
+    (language: Language) => {
+      if (!ready || !normalizeLanguage(language)) return;
+      void i18n.changeLanguage(language);
+      persistence = persistence
+        .then(() => AsyncStorage.setItem(STORAGE_KEY, language))
+        .catch(() => {
+          // The current session can still use the selected language.
+        });
+    },
+    [ready],
+  );
+  const value = useMemo(() => ({ ready, setLanguage }), [ready, setLanguage]);
 
   return (
     <I18nextProvider i18n={i18n}>
-      <LanguageContext.Provider value={{ ready, setLanguage }}>{children}</LanguageContext.Provider>
+      <LanguageContext.Provider value={value}>{children}</LanguageContext.Provider>
     </I18nextProvider>
   );
 }

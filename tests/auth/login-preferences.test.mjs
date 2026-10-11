@@ -50,6 +50,7 @@ for (const platform of ['ios', 'android']) {
           contentShape: (shape) => ({ shape }),
           disabled: (disabled) => ({ disabled }),
           frame: (frame) => ({ frame }),
+          onGeometryChange: (handler) => ({ onGeometryChange: handler }),
           shapes: { rectangle: () => 'rectangle' },
         },
         '@expo/ui/jetpack-compose': { IconButton: native('IconButton') },

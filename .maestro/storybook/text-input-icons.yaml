@@ -57,3 +57,18 @@ env:
 - assertNotVisible:
     id: expo-ui-text-input
     text: Soup
+- runFlow:
+    file: ../helpers/open-story.yaml
+    env:
+      STORY_ID: expo-ui-universal-text-input--password-visibility
+      READY_ID: expo-ui-text-input-right-icon
+- tapOn:
+    id: expo-ui-text-input-right-icon
+- assertVisible:
+    id: expo-ui-text-input
+    text: Example123!
+- tapOn:
+    id: expo-ui-text-input-right-icon
+- assertNotVisible:
+    id: expo-ui-text-input
+    text: Example123!

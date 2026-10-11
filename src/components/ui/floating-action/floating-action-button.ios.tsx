@@ -1,4 +1,5 @@
-import { Button, HStack, Image } from '@expo/ui/swift-ui';
+import { Icon } from '@expo/ui';
+import { Button, HStack } from '@expo/ui/swift-ui';
 import {
   accessibilityLabel,
   buttonStyle,
@@ -10,16 +11,7 @@ import {
 import { useThemeColors } from '@/hooks/use-theme';
 import { useHostColorScheme } from '../host/universal-host';
 import type { FloatingActionButtonProps } from './floating-action-button.types';
-
-const symbols = {
-  create: 'fork.knife',
-  continue: 'plus',
-  filters: 'slider.horizontal.3',
-  'active-filters': 'slider.horizontal.3',
-  liked: 'heart.fill',
-  profile: 'fork.knife',
-  submit: 'checkmark',
-} as const;
+import { floatingActionIcons, FLOATING_ACTION_ICON_SIZE } from './floating-action-icons';
 export function FloatingActionButton({
   kind,
   label,
@@ -38,7 +30,11 @@ export function FloatingActionButton({
       ]}
     >
       <HStack modifiers={[frame({ width: 76, height: 76 }), contentShape(shapes.circle())]}>
-        <Image systemName={symbols[kind]} size={28} color={colors.onPrimary} />
+        <Icon
+          name={floatingActionIcons[kind]}
+          size={FLOATING_ACTION_ICON_SIZE}
+          color={colors.onPrimary}
+        />
       </HStack>
     </Button>
   );

@@ -3,7 +3,8 @@ import { readFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { mock, test } from 'node:test';
-import { isAxiosError } from 'axios';
+import * as axios from 'axios';
+import * as query from '@tanstack/react-query';
 import ts from 'typescript';
 import * as zod from 'zod';
 import { createSourceLoader } from '../helpers/load-source.mjs';
@@ -60,7 +61,8 @@ function setup(stored) {
     'expo-device': {},
     'expo-constants': { default: {} },
     'react-native': { Platform: { OS: 'android' } },
-    axios: { __esModule: true, isAxiosError, create: () => ({ post }) },
+    axios: { ...axios, create: () => ({ post }) },
+    '@tanstack/react-query': query,
     './auth.api': { logout },
     'expo-router': { router: { replace } },
     '@/lib/react-query': { queryClient: { clear: clearQueries } },

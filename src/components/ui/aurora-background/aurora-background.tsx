@@ -1,6 +1,6 @@
 import { Canvas, Fill, Shader, Skia } from '@shopify/react-native-skia';
-import { useEffect } from 'react';
-import { View, type StyleProp, type ViewStyle, useWindowDimensions } from 'react-native';
+import { useCallback, useEffect, useRef } from 'react';
+import { View, type LayoutChangeEvent, type StyleProp, type ViewStyle } from 'react-native';
 import {
   type SharedValue,
   useDerivedValue,
@@ -76,8 +76,20 @@ export function AuroraBackground({
   const scheme = useHostColorScheme(colorScheme);
   const { themeId } = useAppTheme(scheme);
   const palette = shaderPalettes[`${themeId}-${scheme}`];
-  const { width, height } = useWindowDimensions();
-  const resolution = useSharedValue([width, height]);
+  // Actual container geometry owns resolution; window subscriptions duplicate it.
+  const measured = useRef({ width: 1, height: 1 });
+  const resolution = useSharedValue([1, 1]);
+  const onLayout = useCallback(
+    ({ nativeEvent: { layout } }: LayoutChangeEvent) => {
+      if (!Number.isFinite(layout.width) || !Number.isFinite(layout.height)) return;
+      const width = Math.max(1, layout.width);
+      const height = Math.max(1, layout.height);
+      if (measured.current.width === width && measured.current.height === height) return;
+      measured.current = { width, height };
+      resolution.set([width, height]);
+    },
+    [resolution],
+  );
   const clock = useSharedValue(0);
   const enabled = useMotionEnabled(animate);
   const { setActive } = useFrameCallback(({ timeSincePreviousFrame }) => {
@@ -105,10 +117,7 @@ export function AuroraBackground({
       accessibilityElementsHidden
       importantForAccessibility="no-hide-descendants"
       collapsable={false}
-      onLayout={({ nativeEvent }) => {
-        const { width, height } = nativeEvent.layout;
-        resolution.set([Math.max(1, width), Math.max(1, height)]);
-      }}
+      onLayout={onLayout}
       style={style}
     >
       <Canvas pointerEvents="none" style={{ flex: 1 }}>

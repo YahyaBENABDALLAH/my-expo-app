@@ -548,7 +548,8 @@
     "tidal": "Tidal"
   },
   "api": {
-    "network": "Unable to reach the server. Check your connection and API configuration.",
+    "network": "Unable to reach the server. Check your connection and try again.",
+    "timeout": "The request took too long. Please try again.",
     "invalidRequest": "Invalid request. Check the submitted fields.",
     "forbidden": "You do not have permission to perform this action.",
     "notFound": "The requested resource could not be found.",

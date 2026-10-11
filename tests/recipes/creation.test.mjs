@@ -15,6 +15,7 @@ function setup(write = () => recipeFixture()) {
   Picker.Item = native('PickerItem');
   const navigations = [];
   let action;
+  const renders = { page: 0, action: 0 };
   const s = createApiHarness(write, {
     '@components/ui': {
       Column: native('Column'),
@@ -22,7 +23,10 @@ function setup(write = () => recipeFixture()) {
       UniversalButtonContent: native('Button'),
       UniversalTextContent: native('Text'),
       RecipeStepper: native('Stepper'),
-      PageScreen: native('Page'),
+      PageScreen: (props) => {
+        renders.page++;
+        return h('Page', props, props.children);
+      },
       NativeField: native('Field'),
       QueryContent: native('QueryContent'),
     },
@@ -45,6 +49,7 @@ function setup(write = () => recipeFixture()) {
   const { TabActionsProvider, useTabActions } = s.load('features/pages/tab-actions.tsx');
   const Screen = s.load('features/recipes/create-screen.tsx').default;
   function Actions() {
+    renders.action++;
     action = useTabActions().actions['create-recipe'];
     return null;
   }
@@ -70,6 +75,7 @@ function setup(write = () => recipeFixture()) {
   return {
     ...s,
     view,
+    renders,
     navigations,
     button,
     field,
@@ -105,6 +111,27 @@ function fillRecipe(s) {
   s.press('recipe-add-step');
   s.change('recipe-instruction-1', '  Simmer.  ');
 }
+
+test('typing renders the recipe page once and keeps tab actions stable with the latest draft', async () => {
+  const s = setup();
+  try {
+    await s.until(() => Boolean(s.action()));
+    const before = { ...s.renders };
+    s.change('recipe-title', 'Tagine');
+    assert.equal(s.renders.page, before.page + 1);
+    assert.equal(s.renders.action, before.action);
+    s.change('recipe-summary', 'Family dinner');
+    assert.equal(s.renders.page, before.page + 2);
+    assert.equal(s.renders.action, before.action);
+    s.view.flush(() => s.action().onPress());
+    assert.notEqual(s.field('recipe-servings'), undefined);
+    s.previous();
+    assert.equal(s.field('recipe-title').props.value, 'Tagine');
+    assert.equal(s.field('recipe-summary').props.value, 'Family dinner');
+  } finally {
+    s.close();
+  }
+});
 
 test('row edits and removals preserve other rows and drafts across recipe steps', async () => {
   const s = setup();

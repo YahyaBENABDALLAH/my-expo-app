@@ -1,10 +1,10 @@
 import { useTranslation } from 'react-i18next';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { router, useIsFocused } from 'expo-router';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { useAuthContext } from '@/context/auth.context';
 import { useScreenRefresh } from '@/hooks/use-screen-refresh';
-import { useTabActions } from '@/features/pages/tab-actions';
+import { useRegisterTabAction } from '@/features/pages/tab-actions';
 import { chefProfileOptions, lookupOptions } from './queries';
 import { createRecipeOptions } from './mutations';
 import {
@@ -19,7 +19,6 @@ export function useRecipeCreation() {
   const { t } = useTranslation();
   const { user } = useAuthContext();
   const focused = useIsFocused();
-  const { setAction } = useTabActions();
   const client = useQueryClient();
   const chefOptions = chefProfileOptions(user?.uuid ?? '');
   const needsChef = Boolean(user?.isChef && !user.chefProfileUuid);
@@ -77,19 +76,16 @@ export function useRecipeCreation() {
     submitting.current = true;
     mutate(recipeBody(draft));
   }, [draft, step, isFinalStep, mutate]);
-  useEffect(() => {
-    setAction('create-recipe', {
-      kind: isFinalStep ? 'submit' : 'continue',
-      label: mutation.isPending
-        ? t('recipeForm.publishing')
-        : isFinalStep
-          ? t('recipeForm.submit')
-          : t('recipeForm.continue'),
-      onPress: advance,
-      disabled: continueDisabled,
-    });
-    return () => setAction('create-recipe', undefined);
-  }, [advance, mutation.isPending, setAction, isFinalStep, continueDisabled, t]);
+  useRegisterTabAction('create-recipe', {
+    kind: isFinalStep ? 'submit' : 'continue',
+    label: mutation.isPending
+      ? t('recipeForm.publishing')
+      : isFinalStep
+        ? t('recipeForm.submit')
+        : t('recipeForm.continue'),
+    onPress: advance,
+    disabled: continueDisabled,
+  });
   const previousStep = () => {
     setStep(step - 1);
     setError('');

@@ -1,4 +1,5 @@
-import { Column, Icon, Text } from '@expo/ui/jetpack-compose';
+import { Icon } from '@expo/ui';
+import { Column, Text } from '@expo/ui/jetpack-compose';
 import {
   background,
   clip,
@@ -11,13 +12,7 @@ import {
   testID as nativeTestID,
 } from '@expo/ui/jetpack-compose/modifiers';
 import type { NavigationTabProps } from './navigation-tab.types';
-
-const symbols = {
-  index: require('@expo/material-symbols/home.xml'),
-  search: require('@expo/material-symbols/search.xml'),
-  recipes: require('@expo/material-symbols/menu_book.xml'),
-  more: require('@expo/material-symbols/menu.xml'),
-};
+import { navigationTabIcon, navigationTabIconSize } from './navigation-tab-icons';
 
 export function NavigationTab({
   name,
@@ -52,7 +47,11 @@ export function NavigationTab({
             background(selected ? selectedBackgroundColor : 'transparent'),
           ]}
         >
-          <Icon source={symbols[name]} size={name === 'index' ? 22 : 21} tint={color} />
+          <Icon
+            name={navigationTabIcon(name, selected)}
+            size={navigationTabIconSize(name)}
+            color={color}
+          />
         </Column>
         <Text color={color} style={{ fontSize: 12, fontWeight: '600' }}>
           {label}

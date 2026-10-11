@@ -1,5 +1,33 @@
 # Universal component catalog
 
+2026-10-11 geometry follow-up: the input RN bridge, iOS bottom sheet and both
+stepper layout adapters share a guarded width hook. Duplicate/invalid reports
+skip React setters; real widths still update. Aurora resolution uses only actual
+layout through a shared value and no window subscription. The page/splash wave
+reuses two immutable parsed paths. Existing input/sheet/stepper/page-motion/Aurora
+composition stories remain applicable; JS geometry tests cover duplicate reports,
+real resizing, shader writes and path reuse. Native first paint, live geometry and
+frame timing remain unverified. Home card composition caches translated examples
+and collections by actual width; its existing horizontal/vertical stories cover
+preview, resizing and locale changes. See the layout follow-up in the
+[render audit](../../../../docs/render-performance-audit.md#layout-calculation-follow-up).
+
+2026-10-11 render review: the compact `RecipeCard` now has default React memoization
+and `.rnstorybook/stories/pages/recipe-card.stories.tsx` covering light/dark,
+embedded/missing images, long titles, unrelated parent updates and changed likes.
+Its `recipe` prop accepts `RecipeCardData`; it inherits Host/theme/language and
+opens its UUID route. The visual fixture route has no live API record. It shares
+existing surface/text tokens and adds no theme roles.
+`RecipeStepper` uses default memo comparison for current/validity/animation/theme
+props while retaining its native geometry and shared-value motion. Its existing
+step/validity/static/light/dark composition stories remain applicable.
+`PageFrame` preserves adjusted safe-area context identity until content edges
+change, and auth button palettes remain stable until semantic colors change.
+`tests/layout/render-stability.test.mjs` checks skipped unchanged render work and
+real data/theme/locale/inset updates; native layout, press handling and frame
+timing remain unverified in this pass. See
+[render audit](../../../../docs/render-performance-audit.md).
+
 2026-10-10 product cleanup: local recipe card fixtures and control examples are
 colocated under `src/features/ui-showcase/` and reachable through Recipe UI examples.
 LaunchScreen's Ready/Waiting stories follow resource readiness and a 300-ms exit,
@@ -52,13 +80,43 @@ See the [folder guide](../../../../src/components/ui/README.md).
 | [FieldGroup](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/fieldgroup/)   | `field-group/field-group.<platform>.tsx`                                                | `field-group.stories.tsx`                           | Labels/supporting text, grouped fields, empty/error composition, keyboard                                           |
 | [Icon](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/icon/)               | Direct Expo UI export; Storybook showcase                                               | `icon.stories.tsx`                                  | Valid symbols on both platforms, size/tint, meaning conveyed by adjacent text                                       |
 | [List](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/list/)               | `list/list.<platform>.tsx`                                                              | `list.stories.tsx`                                  | Empty/short groups, row selection, refresh if exposed, scroll behavior                                              |
-| [ListItem](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/list/)           | `list-item/list-item.<platform>.tsx`; direct `UniversalListItem` alias                  | Within `list.stories.tsx`; focused coverage pending | Leading/supporting/trailing slots, press/disabled, long text, accessory alignment                                   |
+| [ListItem](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/list/)           | `list-item/list-item.tsx`; direct `UniversalListItem` alias                             | Within `list.stories.tsx`; focused coverage pending | Leading/supporting/trailing slots, press/disabled, long text, accessory alignment                                   |
 | [Picker](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/picker/)           | `picker/picker.<platform>.tsx`                                                          | `picker.stories.tsx`                                | Menu/wheel differences, selected value, disabled, value callback, long option labels                                |
 | [RNHostView](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/rnhostview/)   | Direct Expo UI export                                                                   | Dedicated coverage pending                          | Necessary RN infrastructure inside native trees, intrinsic sizing and interaction; no substitute RN controls        |
 | [Spacer](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/spacer/)           | Direct Expo UI export                                                                   | `spacer.stories.tsx`                                | Horizontal/vertical expansion in constrained layouts                                                                |
 | [TextInput](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/textinput/)     | `text-input/universal-text-input.tsx`                                                   | `text-input.stories.tsx`                            | Empty/type/clear/reset, controlled updates, password, editable/read-only, focus/blur, keyboard, multiline           |
 
 ## Compound exports and helpers
+
+### Shared UI cleanup (2026-10-11)
+
+`list-item/list-item.tsx` now owns the common root ListItem composition, Host theme
+lookup, compound slot exports and public type. Private
+`list-item-appearance.<platform>.tsx` helpers retain the existing native row colors,
+iOS slot foregrounds/background/separators and Android selector/color overrides.
+No palette or touch behavior is replaced with native defaults. The obsolete
+public declaration and component adapters are removed; Metro resolution checks
+cover the shared runtime and native appearance helpers on both platforms.
+
+`navigation-tab-icons.ts` and `floating-action-icons.ts` centralize the current
+symbols through root `Icon.select`. Existing native controls, dimensions, selected
+traits/tab roles, transparency, zero action padding and labels are retained.
+The selected Home symbol still changes only on iOS; profile glyphs retain their
+existing platform difference. Native action tests exercise installed universal
+Icon dispatch with mocked native views.
+
+`refreshable-scroll-view/use-pending-refresh.ts` shares promise deduplication and
+completion after rejection. Android supplies its existing spinner setter; iOS
+gains no JS spinner state. Native indicators, colors and disabled/hidden guards
+remain in the adapters. Render fixtures verify pending callback changes,
+success/failure/retry and content identity.
+
+`Expo UI/Universal List` adds CompoundSlots and CompoundSlotsLight for nested
+slot precedence, numeric zero and observable row activation. Its Maestro flow
+also checks a row without an action. Existing Reference navigation and Navigation
+shell stories cover icon controls and refresh. No Android device was connected
+for this cleanup; native visual/gesture/accessibility verification remains pending.
+See the [audit follow-up](../../../../docs/universal-components-audit.md#implemented-follow-up).
 
 `AuthScreenFrame` has an optional `topBar` ReactNode slot outside its scrolling
 form. Login uses `LoginPreferences` there: native 48-point icon controls for
@@ -165,16 +223,16 @@ Popular titles truncate after two lines; editorial prose wraps.
 passive hosted expo-image content. Static local images use fixed sizes and no
 transition, extra Host, blur, shadow, or continuous animation.
 
-Home renders 21 popular samples horizontally and the same 21 editorial samples
-vertically outside API query content. The editorial section uses a native
-ScrollView with a fixed 300-point/dp height. All 21 cards scroll inside it, with
-no viewport measurements. The finite lists render eagerly and reuse three local
+Recipe UI examples render four popular samples horizontally and the same four
+editorial samples vertically outside API query content. The editorial section
+uses a native ScrollView with a fixed 300-point/dp height. The finite lists render
+eagerly and reuse three local
 images. Taps open a local native preview sheet; fake identifiers never reach
 recipe routes. English/French/Arabic copy and three bundled 800-pixel JPEGs
 require no runtime fetch. `pages/home-recipe-card.stories.tsx` covers both variants
-in light/dark themes, long titles, a visible press counter, and complete 21-card lists.
+in light/dark themes, long titles, a visible press counter, and complete sample lists.
 `tests/recipes/home-cards.test.mjs` checks sample selection, both dismissal paths,
-matching 21-item lists and last-card selection, compact widths, no fetching/interval
+matching sample lists and last-card selection, compact widths, no fetching/interval
 clocks, and live preview translation.
 Metro resolution checks cover both image adapters. Native stacking/touch
 coverage, RTL, large type and release smoothness require device verification.
@@ -238,13 +296,14 @@ and release smoothness have not been checked on a device.
 - `auth-screen.stories.tsx` covers the actual frame, text, fields, and native buttons in one Host, with local validation and pending state. `.maestro/storybook/auth-screen.yaml` checks editing, validation, visibility, submit count, and pending suppression. Native iOS/Android rendering, keyboard/scroll behavior, light/dark appearance, and selectors require a connected device; static checks and story registration do not prove them.
 - FormTextInput renders error/helper text only when a message exists, with natural height, native full-width wrapping and no line limit. Empty fields reserve no message space; validation expands the form while visible and overrides helper text until resolved. Message selectors use the field's testID with `-error`/`-helper` suffixes. Auth Screen's SharedHost and LongHelperText stories exercise empty, error and wrapping states; the auth-screen Maestro flow checks error appearance/clearing and hint restoration. Error feedback uses Android Reject / iOS Error haptics on the valid-to-invalid transition; a 250 ms shared gate coalesces simultaneous field errors. Color feedback remains immediate. Native layout, font scaling and physical haptics still require device verification.
 - FormTextInput supports `passwordToggle="icon"` to toggle password masking through the universal input's right eye icon; the default remains the text button. Login/register fields use shared person/mail/lock icons, including an independent eye toggle for registration confirmation. Colors follow the auth palette, with muted leading glyphs and tint for the action; pending disables it. Auth Screen stories PasswordIcons/PendingPasswordIcons cover composition; auth login/register Maestro flows assert reveal and masking. Native layout, keyboard/focus across SecureField/TextField swaps, and screen-reader behavior remain device checks.
-- Right-icon spacing refinement: `text-input-icon-button.android.tsx` uses Expo UI's native Compose IconButton instead of a text Button with Material text-button padding. iOS keeps a plain 44-point button; Android uses a 48-dp icon target. The field places vertical padding on the editable text only and reduces right inset to 2, avoiding button height plus two outer padding layers. Existing ClickableRightIcon/light/disabled and PasswordIcons stories exercise this shared composition; existing icon/auth Maestro flows retain their selectors. Device geometry remains unverified.
+- Right-icon spacing refinement: `text-input-icon-button.android.tsx` uses Expo UI's native Compose IconButton instead of a text Button with Material text-button padding. Both platforms use a fixed 48-point/dp action target; iOS uses a plain button. The field places vertical padding on the editable text only and reduces right inset to 2, avoiding button height plus two outer padding layers. Existing ClickableRightIcon/light/disabled and PasswordIcons stories exercise this shared composition; existing icon/auth Maestro flows retain their selectors. Device geometry remains unverified.
 - Native icon button resolution: shared declarations live in `text-input-icon-button.d.ts`, never a declaration-only `.ts` beside `.ios.tsx`/`.android.tsx`. Metro checks source extensions in order, so a plain `.ts` can shadow native `.tsx` implementations and produce an undefined component. `tests/layout/native-input-resolution.test.mjs` checks both platforms with the installed Metro resolver and Expo extension ordering; native interaction still requires devices.
 - TextInput maintenance review: Context7 examples were cross-checked with SDK 57 docs and installed source because search results included newer versions. All icon fields now apply resolved vertical padding to the text once; explicit shorthand/directional padding is respected without padding the native action twice. The private icon button uses a narrow shared props interface, avoiding unsupported Button props on Android. FormTextInput shares its visibility callback/label and preserves an explicitly supplied secureTextEntry for non-password-mode callers. CustomPaddingIcons and ReadOnlyIcons stories cover the changed contract; the icon Maestro flow also covers a read-only field's separate action. Observable values, caller refs, native Host ownership, and isolated platform modifiers remain the intended design. React Hook Form validation still runs on JS; no per-keystroke wrapper state was added. Native focus/cursor across iOS secure/nonsecure swaps, screen-reader labels, font scaling, and geometry require devices.
-- Password height stability: single-line TextInput fields reserve a height from the font scale, line height (or 1.5 times font size), resolved vertical padding and border, with at least 48 points/dp for a right action. The height does not depend on masking, focus or text content. Explicit `style.height` takes precedence; multiline fields keep native growth. `PasswordVisibility` and `PasswordVisibilityLargeText` stories record actual RN container geometry and retain the largest height change after a manual baseline. `.maestro/storybook/text-input-password-height.yaml` asserts zero change through reveal/hide, clearing, editing and larger text. This flow has not run on a device; iOS/Android geometry, larger system font scales and focus across secure-field swaps remain unverified.
+- TextInput icon sizing: every leading/trailing icon uses a fixed 20 × 20 frame, including both password eye symbols. The action target is 48 × 48 on iOS and Android. Field height uses native layout without font-scale calculations. `PasswordVisibility` and `PasswordVisibilityLargeText` stories exercise reveal/hide; `.maestro/storybook/text-input-icons.yaml` includes password visibility checks. Native geometry, font scaling and focus across secure-field swaps remain unverified without devices.
 
 - Root imports select SwiftUI on iOS and Compose on Android. Ordinary native trees need Host. BottomSheet in this installed version creates its own internal native Host; follow its implementation and existing wrapper rather than blindly nesting another host.
 - BottomSheet uses `isPresented` and `onDismiss`. Android Material sheet states do not guarantee exact parity with iOS fractional/height detents; document and verify each supported platform behavior.
+- The shared BottomSheet owns 24-point edge padding (`contentPadding` overrides it), surface/text theme roles and a full-width leading Column. Both platforms use one universal render tree; a guarded iOS sizing modifier measures the presented width for the nested Host, preserves intrinsic height when auto-sized and anchors explicit detents at the top. The bottom-sheet story includes long wrapping text and full-width actions; width/state JS checks do not prove native geometry.
 - Picker wheel appearance is iOS-specific; Android uses its dropdown behavior.
 - List is for short native groups, not a virtualization solution for unbounded feeds. Do not silently replace it with a disallowed UI control or render huge data trees. Raise the requirement and resolve an approved approach if needed.
 - Existing wrappers and stories can contain styling or RN content that predates the mobile-only skill. Their presence is not an exception for new work. Correct only the touched scope and document remaining drift.

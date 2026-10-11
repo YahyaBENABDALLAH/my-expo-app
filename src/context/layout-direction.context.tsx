@@ -1,5 +1,5 @@
 import { LocaleProvider } from 'expo-router';
-import { createContext, useContext, useState, type PropsWithChildren } from 'react';
+import { createContext, useContext, useMemo, useState, type PropsWithChildren } from 'react';
 import { I18nManager, View } from 'react-native';
 
 export type LayoutDirection = 'ltr' | 'rtl';
@@ -18,9 +18,10 @@ export function LayoutDirectionProvider({
   initialDirection = deviceDirection,
 }: PropsWithChildren<{ initialDirection?: LayoutDirection }>) {
   const [direction, setDirection] = useState(initialDirection);
+  const value = useMemo(() => ({ direction, setDirection }), [direction]);
 
   return (
-    <LayoutDirectionContext.Provider value={{ direction, setDirection }}>
+    <LayoutDirectionContext.Provider value={value}>
       <LocaleProvider direction={direction}>
         <View style={{ flex: 1, direction }}>{children}</View>
       </LocaleProvider>

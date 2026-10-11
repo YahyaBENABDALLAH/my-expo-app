@@ -1,4 +1,5 @@
-import { isAxiosError } from 'axios';
+import { isCancelledError } from '@tanstack/react-query';
+import { isAxiosError, isCancel } from 'axios';
 import { SessionChangedError } from '@/services/auth/auth.errors';
 import { getAuthErrorMessage } from '@/services/auth/auth.service';
 import i18n from '@/lib/i18n';
@@ -27,6 +28,8 @@ export function subscribeErrorToasts(listener: () => void) {
 export function reportErrorToast(error: unknown) {
   if (
     error instanceof SessionChangedError ||
+    isCancelledError(error) ||
+    isCancel(error) ||
     (isAxiosError(error) && error.code === 'ERR_CANCELED') ||
     (error instanceof Error && error.name === 'AbortError')
   ) {

@@ -7,7 +7,7 @@ export function TextInputIconButton({ accessibilityLabel, ...props }: TextInputI
     <Button
       {...props}
       variant="text"
-      style={{ width: 44, height: 44 }}
+      style={{ width: 48, height: 48 }}
       modifiers={accessibilityLabel ? rightIconLabel(accessibilityLabel) : undefined}
     />
   );

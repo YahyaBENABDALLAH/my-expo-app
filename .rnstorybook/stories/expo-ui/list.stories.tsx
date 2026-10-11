@@ -157,3 +157,46 @@ export const PullToRefresh: Story = { args: { refreshable: true } };
 export const CompactViewport: Story = { args: { viewportHeight: 240 } };
 export const LightTheme: Story = { args: { colorScheme: 'light' } };
 export const DarkTheme: Story = { args: { colorScheme: 'dark' } };
+
+function CompoundSlotsDemo(args: DemoProps) {
+  const [presses, setPresses] = useState(0);
+  return (
+    <View style={{ gap: 16 }}>
+      <RNText
+        colorScheme={args.colorScheme}
+        testID="list-compound-status"
+      >{`Row presses: ${presses}`}</RNText>
+      <UniversalList {...args}>
+        <ListItem
+          testID="list-compound-row"
+          leading="Shorthand leading"
+          supportingText="Shorthand supporting"
+          trailing="Shorthand trailing"
+          onPress={() => setPresses((count) => count + 1)}
+        >
+          <>
+            {'A shared row with nested compound slots'}
+            <>
+              <ListItem.Leading>Badge</ListItem.Leading>
+              <ListItem.Supporting>{0}</ListItem.Supporting>
+              <ListItem.Trailing>Open</ListItem.Trailing>
+            </>
+          </>
+        </ListItem>
+        <ListItem testID="list-compound-passive-row">Row without an action</ListItem>
+      </UniversalList>
+    </View>
+  );
+}
+
+export const CompoundSlots: Story = {
+  render: (args) => (
+    <NativeStoryFrame {...args}>
+      <CompoundSlotsDemo {...args} />
+    </NativeStoryFrame>
+  ),
+};
+export const CompoundSlotsLight: Story = {
+  ...CompoundSlots,
+  args: { colorScheme: 'light' },
+};

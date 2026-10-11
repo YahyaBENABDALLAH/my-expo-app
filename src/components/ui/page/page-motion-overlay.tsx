@@ -1,5 +1,5 @@
 import { useThemeColors } from '@/hooks/use-theme';
-import { Canvas, Group, LinearGradient, Path, vec } from '@shopify/react-native-skia';
+import { Canvas, Group, LinearGradient, Path, Skia, vec } from '@shopify/react-native-skia';
 import { useEffect } from 'react';
 import { View } from 'react-native';
 import {
@@ -16,11 +16,14 @@ import { useMotionEnabled } from '@/hooks/use-motion-enabled';
 
 export const PAGE_WAVE_HEIGHT = 144;
 const WAVE_WIDTH = 1000;
+// Parse fixed geometry once; animation only changes its transform.
 // Oversized paths keep the sides covered throughout the horizontal drift.
-const frontWave =
-  'M -500 -16 H 1500 V 62 C 1250 8 1120 112 820 72 S 330 16 80 58 S -240 118 -500 62 Z';
-const backWave =
-  'M -500 -16 H 1500 V 46 C 1280 98 1060 20 780 56 S 300 112 20 74 S -260 12 -500 48 Z';
+const frontWave = Skia.Path.MakeFromSVGString(
+  'M -500 -16 H 1500 V 62 C 1250 8 1120 112 820 72 S 330 16 80 58 S -240 118 -500 62 Z',
+)!;
+const backWave = Skia.Path.MakeFromSVGString(
+  'M -500 -16 H 1500 V 46 C 1280 98 1060 20 780 56 S 300 112 20 74 S -260 12 -500 48 Z',
+)!;
 
 /** Shared wave artwork for the page header and the splash's moving bottom edge. */
 export function PageMotionOverlay({

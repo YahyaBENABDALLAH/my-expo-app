@@ -14,6 +14,16 @@ Keep native geometry measurements on layout changes and retain the motion
 lifecycle guards. Form validation and step transitions belong in the recipe
 creation workflow.
 
+Both native layout adapters filter duplicate and invalid widths before updating
+React. A genuine resize still supplies concrete bounds for the hosted canvas.
+`tests/layout/geometry-stability.test.mjs` checks repeated reports and resize on
+both platform adapters.
+
+React's default memo comparison skips unchanged step/validity props during form
+typing. Real prop, theme and translation changes still render; shared-value
+animation continues independently of React. `tests/layout/render-stability.test.mjs`
+checks that unchanged props skip the canvas tree and validity changes update it.
+
 Existing composition story: [recipe-stepper.stories.tsx](../../../../.rnstorybook/stories/pages/recipe-stepper.stories.tsx).
 
 Import public components from `@components/ui`; UI implementations import

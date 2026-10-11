@@ -47,7 +47,13 @@ for (const status of [0, 408, 500, 502, 503, 504]) {
           retryDelay: 0,
           queryFn: () => {
             requests++;
-            throw new ApiError('Temporary failure', status, null, 'Unavailable');
+            throw new ApiError(
+              'Temporary failure',
+              status,
+              null,
+              'Unavailable',
+              status === 0 ? 'network' : 'http',
+            );
           },
         }),
       );
@@ -63,7 +69,7 @@ test('cancellation, obsolete sessions, invalid responses and programming errors 
   const load = createSourceLoader();
   const { queryClient: client } = load('lib/react-query.ts');
   const { SessionChangedError } = load('services/auth/auth.errors.ts');
-  const { ApiResponseValidationError } = load('services/api.error.ts');
+  const { ApiError, ApiResponseValidationError } = load('services/api.error.ts');
   try {
     for (const error of [
       new CanceledError(),
@@ -71,6 +77,7 @@ test('cancellation, obsolete sessions, invalid responses and programming errors 
       new SessionChangedError(),
       new ApiResponseValidationError(200),
       new TypeError('Invalid state'),
+      new ApiError('Unclassified failure', 0, null, 'Unable to continue'),
     ]) {
       let requests = 0;
       await assert.rejects(

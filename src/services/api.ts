@@ -8,6 +8,7 @@ import { isSessionInvalid, SessionChangedError } from '@/services/auth/auth.erro
 import { ApiConfigurationError, ApiError, ApiResponseValidationError } from '@/services/api.error';
 import { requestNewToken } from '@/services/auth/auth.refresh';
 import i18n, { getCurrentLanguage } from '@/lib/i18n';
+import type { ApiErrorKind } from '@/types/api.types';
 import type { z } from 'zod';
 import {
   create,
@@ -62,6 +63,10 @@ const STATUS_FALLBACKS: Record<number, string> = {
 
 const DEFAULT_API_TIMEOUT_MS = 10000;
 
+function stringMessages(values: unknown[]) {
+  return values.map((value) => (typeof value === 'string' ? value.trim() : '')).filter(Boolean);
+}
+
 export function extractApiMessage(data: unknown): string | string[] | null {
   if (!data || typeof data !== 'object') {
     return null;
@@ -71,7 +76,8 @@ export function extractApiMessage(data: unknown): string | string[] | null {
   const message = record.message;
 
   if (Array.isArray(message) && message.length > 0) {
-    return message.map(String);
+    const messages = stringMessages(message);
+    if (messages.length > 0) return messages;
   }
 
   if (typeof message === 'string' && message.trim().length > 0) {
@@ -81,10 +87,11 @@ export function extractApiMessage(data: unknown): string | string[] | null {
   const validationErrors = record.errors;
 
   if (validationErrors && typeof validationErrors === 'object') {
-    const messages = Object.values(validationErrors as Record<string, unknown>)
-      .flatMap((value) => (Array.isArray(value) ? value : [value]))
-      .map((value) => String(value).trim())
-      .filter(Boolean);
+    const messages = stringMessages(
+      Object.values(validationErrors as Record<string, unknown>).flatMap((value) =>
+        Array.isArray(value) ? value : [value],
+      ),
+    );
 
     if (messages.length > 0) {
       return messages;
@@ -121,8 +128,47 @@ function getDisplayMessage(status: number, data: unknown) {
   );
 }
 
+function axiosErrorKind(error: AxiosError): ApiErrorKind {
+  if (error.response) return 'http';
+  if (
+    error.code === 'ETIMEDOUT' ||
+    (error.code === 'ECONNABORTED' && /timeout|timed out/i.test(error.message))
+  )
+    return 'timeout';
+  if (
+    [
+      'ERR_BAD_OPTION_VALUE',
+      'ERR_BAD_OPTION',
+      'ERR_INVALID_URL',
+      'ERR_DEPRECATED',
+      'ERR_NOT_SUPPORT',
+    ].includes(error.code ?? '')
+  )
+    return 'configuration';
+  if (
+    [
+      'ERR_NETWORK',
+      'ECONNRESET',
+      'ECONNREFUSED',
+      'ENOTFOUND',
+      'EAI_AGAIN',
+      'ENETUNREACH',
+      'EHOSTUNREACH',
+      'EPIPE',
+    ].includes(error.code ?? '') ||
+    (!error.code && error.request)
+  )
+    return 'network';
+  return 'unexpected';
+}
+
 function toApiError(error: unknown) {
-  if (isCancel(error) || error instanceof SessionChangedError) return error;
+  if (
+    isCancel(error) ||
+    error instanceof SessionChangedError ||
+    (error instanceof Error && error.name === 'AbortError')
+  )
+    return error;
   if (error instanceof ApiError) {
     return error;
   }
@@ -130,23 +176,29 @@ function toApiError(error: unknown) {
   if (isAxiosError(error)) {
     const status = error.response?.status ?? 0;
     const data = error.response?.data ?? null;
+    const kind = axiosErrorKind(error);
+    const timeout = error.config?.timeout ?? DEFAULT_API_TIMEOUT_MS;
     const message =
-      error.code === 'ECONNABORTED'
-        ? `API request timed out after ${DEFAULT_API_TIMEOUT_MS}ms`
+      kind === 'timeout'
+        ? `API request timed out after ${timeout}ms`
         : error.message || `API request failed with status ${status}`;
-
-    return new ApiError(message, status, data, getDisplayMessage(status, data));
-  }
-
-  if (error instanceof Error) {
-    return new ApiError(error.message, 0, null, error.message);
+    const displayMessage =
+      kind === 'http'
+        ? getDisplayMessage(status, data)
+        : kind === 'network'
+          ? i18n.t('api.network')
+          : kind === 'timeout'
+            ? i18n.t('api.timeout')
+            : i18n.t('auth.requestFailed');
+    return new ApiError(message, status, data, displayMessage, kind);
   }
 
   return new ApiError(
-    'API request failed before receiving a response',
+    error instanceof Error ? error.message : 'API request failed before receiving a response',
     0,
     null,
-    i18n.t(STATUS_FALLBACKS[0]),
+    i18n.t('auth.requestFailed'),
+    'unexpected',
   );
 }
 
@@ -195,6 +247,7 @@ export function createAxiosInstance(
 ): AxiosInstance {
   const instance = create({
     timeout: DEFAULT_API_TIMEOUT_MS,
+    transitional: { clarifyTimeoutError: true },
   });
 
   instance.interceptors.request.use(async (config) => {
@@ -210,9 +263,10 @@ export function createAxiosInstance(
       }
       return response;
     },
-    async (error: AxiosError) => {
-      const originalConfig = error.config as RetryableAxiosRequestConfig | undefined;
-      const isUnauthorized = error.response?.status === 401;
+    async (error: unknown) => {
+      const axiosFailure = isAxiosError(error) ? error : undefined;
+      const originalConfig = axiosFailure?.config as RetryableAxiosRequestConfig | undefined;
+      const isUnauthorized = axiosFailure?.response?.status === 401;
 
       if (!skipInterceptor && includeAuth && isUnauthorized && originalConfig) {
         try {

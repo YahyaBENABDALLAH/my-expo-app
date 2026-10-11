@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next';
+import { memo } from 'react';
 import { useThemeColors } from '@/hooks/use-theme';
 import { Column, RNHostView } from '@expo/ui';
 import { UniversalButtonContent } from '../button/universal-button-content';
@@ -8,7 +9,7 @@ import { UniversalTextContent as Text } from '../text/universal-text';
 import { useHostColorScheme } from '../host/universal-host';
 import type { RecipeCardData } from '@/types/recipe.types';
 
-export function RecipeCard({ recipe }: { recipe: RecipeCardData }) {
+export const RecipeCard = memo(function RecipeCard({ recipe }: { recipe: RecipeCardData }) {
   const { t } = useTranslation();
   const colors = useThemeColors(useHostColorScheme());
   return (
@@ -43,4 +44,4 @@ export function RecipeCard({ recipe }: { recipe: RecipeCardData }) {
       </Column>
     </UniversalButtonContent>
   );
-}
+});

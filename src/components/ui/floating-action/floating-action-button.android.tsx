@@ -1,18 +1,10 @@
-import { Button, Icon, Shape } from '@expo/ui/jetpack-compose';
+import { Icon } from '@expo/ui';
+import { Button, Shape } from '@expo/ui/jetpack-compose';
 import { semantics, size, testID } from '@expo/ui/jetpack-compose/modifiers';
 import { useThemeColors } from '@/hooks/use-theme';
 import { useHostColorScheme } from '../host/universal-host';
 import type { FloatingActionButtonProps } from './floating-action-button.types';
-
-const symbols = {
-  create: require('@expo/material-symbols/fork_spoon.xml'),
-  continue: require('@expo/material-symbols/add.xml'),
-  filters: require('@expo/material-symbols/tune.xml'),
-  'active-filters': require('@expo/material-symbols/tune.xml'),
-  liked: require('@expo/material-symbols/favorite.xml'),
-  profile: require('@expo/material-symbols/chef_hat.xml'),
-  submit: require('@expo/material-symbols/check.xml'),
-};
+import { floatingActionIcons, FLOATING_ACTION_ICON_SIZE } from './floating-action-icons';
 export function FloatingActionButton({
   kind,
   label,
@@ -37,7 +29,11 @@ export function FloatingActionButton({
         semantics({ contentDescription: label }),
       ]}
     >
-      <Icon source={symbols[kind]} size={28} tint={colors.onPrimary} />
+      <Icon
+        name={floatingActionIcons[kind]}
+        size={FLOATING_ACTION_ICON_SIZE}
+        color={colors.onPrimary}
+      />
     </Button>
   );
 }

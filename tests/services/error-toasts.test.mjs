@@ -44,6 +44,7 @@ test('credential errors get friendly text; aborts and old sessions never show to
   const { toasts, ApiError, SessionChangedError } = setup();
   for (const error of [
     new CanceledError(),
+    new CancelledError(),
     new DOMException('Aborted', 'AbortError'),
     new SessionChangedError(),
   ]) {

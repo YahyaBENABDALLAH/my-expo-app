@@ -15,10 +15,10 @@ import {
 } from '@components/ui';
 import { useQuery } from '@tanstack/react-query';
 import { router, useIsFocused, useLocalSearchParams } from 'expo-router';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, type PropsWithChildren } from 'react';
 import { useWindowDimensions } from 'react-native';
 import { useScreenRefresh } from '@/hooks/use-screen-refresh';
-import { useTabActions } from '@/features/pages/tab-actions';
+import { useRegisterTabAction } from '@/features/pages/tab-actions';
 import { lookupLabel, lookupOptions, recipeListOptions } from './queries';
 
 type SearchParams = {
@@ -34,6 +34,16 @@ function single(value: string | string[] | undefined) {
   return typeof value === 'string' ? value.trim() : '';
 }
 
+/** Resizing the filter viewport does not rebuild the search/results screen. */
+function SearchFilterViewport({ children }: PropsWithChildren) {
+  const { height } = useWindowDimensions();
+  return (
+    <ScrollView style={{ height: Math.min(600, height * 0.7) }} testID="search-filter-scroll">
+      {children}
+    </ScrollView>
+  );
+}
+
 export default function SearchScreen() {
   const params = useLocalSearchParams<SearchParams>();
   return <SearchContent key={single(params.q)} params={params} />;
@@ -42,7 +52,6 @@ export default function SearchScreen() {
 function SearchContent({ params }: { params: SearchParams }) {
   const { t } = useTranslation();
   const focused = useIsFocused();
-  const { height } = useWindowDimensions();
   const [text, setText] = useState(single(params.q));
   const [search, setSearch] = useState(text);
   const categoryUuid = single(params.categoryUuid);
@@ -60,7 +69,6 @@ function SearchContent({ params }: { params: SearchParams }) {
     setDraftFilters({ categoryUuid, cuisineUuid, difficultyUuid });
     setSheet(true);
   }, [categoryUuid, cuisineUuid, difficultyUuid]);
-  const { setAction } = useTabActions();
   useEffect(() => {
     const nextSearch = text.trim();
     if (nextSearch === search) return;
@@ -70,14 +78,11 @@ function SearchContent({ params }: { params: SearchParams }) {
     }, 300);
     return () => clearTimeout(timer);
   }, [text, search]);
-  useEffect(() => {
-    setAction('search', {
-      kind: filterCount ? 'active-filters' : 'filters',
-      label: filterCount ? t('search.openActiveFilters') : t('search.openFilters'),
-      onPress: openFilters,
-    });
-    return () => setAction('search', undefined);
-  }, [setAction, filterCount, openFilters, t]);
+  useRegisterTabAction('search', {
+    kind: filterCount ? 'active-filters' : 'filters',
+    label: filterCount ? t('search.openActiveFilters') : t('search.openFilters'),
+    onPress: openFilters,
+  });
   const categoryOptions = lookupOptions('FoodCategory');
   const cuisineOptions = lookupOptions('Cuisine');
   const difficultyOptions = lookupOptions('Difficulty');
@@ -160,8 +165,8 @@ function SearchContent({ params }: { params: SearchParams }) {
         </Column>
       ) : null}
       <BottomSheet isPresented={sheet} onDismiss={() => setSheet(false)}>
-        <ScrollView style={{ height: Math.min(600, height * 0.7) }} testID="search-filter-scroll">
-          <Column spacing={16} style={{ padding: 24 }}>
+        <SearchFilterViewport>
+          <Column spacing={16} modifiers={nativeFillWidth}>
             <Text variant="title" testID="search-filter-title">
               {t('search.filterTitle')}
             </Text>
@@ -172,7 +177,7 @@ function SearchContent({ params }: { params: SearchParams }) {
                 ['difficultyUuid', t('common.difficulty'), difficulties],
               ] as const
             ).map(([key, label, lookup]) => (
-              <Column key={key} spacing={8}>
+              <Column key={key} spacing={8} modifiers={nativeFillWidth}>
                 <Text>{label}</Text>
                 <QueryContent query={lookup}>
                   <Picker
@@ -192,6 +197,7 @@ function SearchContent({ params }: { params: SearchParams }) {
             ))}
             <UniversalButtonContent
               variant="link"
+              fullWidth
               label={t('search.clearFilters')}
               testID="search-clear-filters"
               onPress={() => setDraftFilters(emptyFilters)}
@@ -209,12 +215,13 @@ function SearchContent({ params }: { params: SearchParams }) {
             />
             <UniversalButtonContent
               variant="link"
+              fullWidth
               label={t('auth.cancel')}
               testID="search-filter-cancel"
               onPress={() => setSheet(false)}
             />
           </Column>
-        </ScrollView>
+        </SearchFilterViewport>
       </BottomSheet>
     </PageScreen>
   );

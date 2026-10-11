@@ -37,7 +37,7 @@ function setup(platform) {
     },
     '@/hooks/use-color-scheme': { useColorScheme: (scheme) => scheme ?? 'light' },
     '@/context/layout-direction.context': { useLayoutDirection: () => 'ltr' },
-    'react-native': { View: native(), useWindowDimensions: () => ({ fontScale: 1 }) },
+    'react-native': { View: native() },
     '@/components/ui/native/native-fill-width': { nativeFillWidth: [] },
     '@/components/ui/text-input/text-input-modifiers': {
       inputRowFlex: [],

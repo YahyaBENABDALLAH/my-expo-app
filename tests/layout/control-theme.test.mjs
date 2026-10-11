@@ -77,7 +77,7 @@ function setup(platform) {
       return state.current;
     },
   };
-  const load = createSourceLoader({
+  const mocks = {
     '@expo/ui': universal,
     '@expo/ui/jetpack-compose': compose,
     '@expo/ui/jetpack-compose/modifiers': modifiers,
@@ -93,19 +93,23 @@ function setup(platform) {
     '@expo/material-symbols/keyboard_arrow_down.xml': 'chevron',
     '@/hooks/use-color-scheme': { useColorScheme: (scheme) => scheme ?? 'light' },
     '@/context/layout-direction.context': { useLayoutDirection: () => 'ltr' },
-  });
+  };
+  const load = createSourceLoader(mocks);
+  mocks['@/components/ui/list-item/list-item-appearance'] = load(
+    `components/ui/list-item/list-item-appearance.${platform}.tsx`,
+  );
   const controls = Object.assign(
     {},
     ...[
       'checkbox',
       'slider',
       'picker',
-      'list-item',
       'list',
       'field-group',
       'collapsible',
       'segmented-control',
     ].map((name) => load(`components/ui/${name}/${name}.${platform}.tsx`)),
+    load('components/ui/list-item/list-item.tsx'),
   );
   return {
     ...controls,
@@ -293,6 +297,77 @@ for (const platform of ['android', 'ios']) {
     }
     assert.equal(selectedSegment, 'b');
     assert.equal(expanded, true);
+    view.unmount();
+  });
+}
+
+for (const platform of ['ios', 'android']) {
+  test(`${platform}: the shared row retains slots, caller overrides and actions across live Host themes`, () => {
+    const s = setup(platform);
+    let setScheme;
+    let presses = 0;
+    const customModifier = { name: 'custom' };
+    const richSupporting = h('RichSupporting');
+    function Screen() {
+      const [scheme, changeScheme] = useState('light');
+      setScheme = changeScheme;
+      return h(
+        s.UniversalHost,
+        { colorScheme: scheme },
+        h(
+          s.ListItem,
+          {
+            supportingText: richSupporting,
+            leading: 0,
+            trailing: 'Open',
+            colors: { trailingContentColor: '#123456' },
+            modifiers: [customModifier],
+            testID: 'shared-row',
+            onPress: () => presses++,
+          },
+          h(
+            Fragment,
+            null,
+            'Headline',
+            h(Fragment, null, h(s.ListItem.Supporting, null, 0)),
+            h(s.ListItem.Leading, null, 'Badge'),
+            h(s.ListItem.Trailing, null, h('RichTrailing')),
+          ),
+        ),
+      );
+    }
+    const view = renderFixture(h(Screen));
+    const instance = view.findAll('ListItem')[0];
+    for (const scheme of ['light', 'dark', 'light']) {
+      view.flush(() => setScheme(scheme));
+      const row = view.findAll('ListItem')[0];
+      assert.equal(row, instance);
+      assert.equal(row.props.testID, 'shared-row');
+      assert.equal(row.props.supportingText, richSupporting);
+      assert.ok(row.props.modifiers.includes(customModifier));
+      if (platform === 'android') {
+        assert.equal(row.props.colors.containerColor, s.colors[scheme].controlSurface);
+        assert.equal(row.props.colors.contentColor, s.colors[scheme].text);
+        assert.equal(row.props.colors.trailingContentColor, '#123456');
+        assert.equal(row.props.modifiers.at(-1).args[0], 'shared-row');
+        assert.equal(row.props.leading, 0);
+      } else {
+        assert.equal(
+          row.props.modifiers.find((m) => m.name === 'listRowBackground').args[0],
+          s.colors[scheme].controlSurface,
+        );
+        const supporting = row.props.children.find(
+          (child) => child?.type === s.ListItem.Supporting,
+        );
+        assert.equal(supporting.props.children.props.children, 0);
+        assert.equal(supporting.props.children.props.modifiers[0].args[0], s.colors[scheme].muted);
+        const trailing = row.props.children.find((child) => child?.type === s.ListItem.Trailing);
+        assert.equal(trailing.props.children.props.children.type, 'RichTrailing');
+        assert.equal(trailing.props.children.props.modifiers[0].args[0], s.colors[scheme].muted);
+      }
+      view.flush(row.props.onPress);
+    }
+    assert.equal(presses, 3);
     view.unmount();
   });
 }

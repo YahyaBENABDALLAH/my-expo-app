@@ -4,7 +4,7 @@ import { createContext, createElement, useContext, useEffect, useState } from 'r
 import { createSourceLoader } from '../helpers/load-source.mjs';
 import { renderFixture } from '../helpers/render-fixture.mjs';
 
-function setup(isRTL = false) {
+function setup(isRTL = false, platform = 'android') {
   const SafeAreaInsetsContext = createContext({ top: 0, bottom: 0, left: 0, right: 0 });
   const useSafeAreaInsets = () => useContext(SafeAreaInsetsContext);
   const native = (type) =>
@@ -13,6 +13,7 @@ function setup(isRTL = false) {
     };
   const mocks = {
     'react-native': {
+      Platform: { OS: platform },
       I18nManager: {
         isRTL,
         forceRTL: () => assert.fail('Switching direction must not mutate global RTL.'),
@@ -40,6 +41,10 @@ function setup(isRTL = false) {
     },
     '@/components/ui/navigation/navigation-tab': { NavigationTab: native('NavigationTab') },
     '@expo/ui/jetpack-compose': { Icon: native('Icon'), IconButton: native('IconButton') },
+    '@expo/ui/swift-ui/modifiers': {
+      frame: (config) => ({ frame: config }),
+      onGeometryChange: (handler) => ({ onGeometryChange: handler }),
+    },
     '@expo/ui/jetpack-compose/modifiers': {
       semantics: (props) => ({ semantics: props }),
       size: (width, height) => ({ width, height }),
@@ -131,6 +136,7 @@ for (const scheme of ['light', 'dark']) {
       assert.equal(sheet.props.isPresented, true);
       assert.equal(sheet.props.containerColor, s.colors[scheme].surface);
       assert.equal(sheet.props.contentColor, s.colors[scheme].text);
+      assert.equal(sheet.props.contentPadding, 24);
       assert.equal(mounts, 1);
       assert.equal(unmounts, 0);
     }
@@ -196,6 +202,8 @@ test('direction switch starts checked on an RTL device and switches off to LTR',
 test('sheet bridge preserves explicit chrome colors and dismissal callback', () => {
   const s = setup();
   let dismissed = 0;
+  const contentPadding = { top: 8, bottom: 32, left: 20, right: 12 };
+  const snapPoints = ['half', 'full'];
   const view = renderFixture(
     createElement(
       s.LayoutDirectionProvider,
@@ -206,6 +214,8 @@ test('sheet bridge preserves explicit chrome colors and dismissal callback', () 
           isPresented: true,
           containerColor: '#123456',
           contentColor: '#abcdef',
+          contentPadding,
+          snapPoints,
           onDismiss: () => dismissed++,
         },
         createElement('SheetContent'),
@@ -215,10 +225,72 @@ test('sheet bridge preserves explicit chrome colors and dismissal callback', () 
   const { props } = view.findAll('BottomSheet')[0];
   assert.equal(props.containerColor, '#123456');
   assert.equal(props.contentColor, '#abcdef');
+  assert.equal(props.contentPadding, contentPadding);
+  assert.equal(props.snapPoints, snapPoints);
   props.onDismiss();
   assert.equal(dismissed, 1);
   view.unmount();
 });
+
+test('iOS sheet resizes its content to the presented width without losing local state', () => {
+  const s = setup(false, 'ios');
+  let changeDraft;
+  function Draft() {
+    const [draft, setDraft] = useState('');
+    changeDraft = setDraft;
+    return createElement('SheetDraft', { draft });
+  }
+  const view = renderFixture(
+    createElement(
+      s.UniversalHost,
+      { colorScheme: 'dark', layoutDirection: 'rightToLeft' },
+      createElement(s.BottomSheet, { isPresented: true, onDismiss() {} }, createElement(Draft)),
+    ),
+  );
+  try {
+    const sheet = view.findAll('BottomSheet')[0];
+    const host = view.findAll('Host')[1];
+    const draft = view.findAll('SheetDraft')[0];
+    const geometry = view.findAll('Column')[0].props.modifiers.find((mod) => mod.onGeometryChange);
+    view.flush(() => changeDraft('مسودة Draft 123'));
+    for (const width of [342, 492, 300]) {
+      view.flush(() => geometry.onGeometryChange({ x: 0, y: 0, width, height: 280 }));
+      assert.equal(view.findAll('Host')[1], host);
+      assert.equal(host.props.style.at(-1).width, width);
+      assert.deepEqual(host.props.matchContents, { vertical: true });
+      assert.equal(host.props.layoutDirection, 'rightToLeft');
+      assert.equal(host.props.colorScheme, 'dark');
+      assert.equal(view.findAll('BottomSheet')[0], sheet);
+      assert.equal(view.findAll('SheetDraft')[0], draft);
+      assert.equal(draft.props.draft, 'مسودة Draft 123');
+    }
+    for (const width of [0, -1, NaN, Infinity]) {
+      view.flush(() => geometry.onGeometryChange({ x: 0, y: 0, width, height: 280 }));
+      assert.equal(host.props.style.at(-1).width, 300);
+    }
+  } finally {
+    view.unmount();
+  }
+});
+
+for (const snapPoints of [undefined, [], ['half', 'full']]) {
+  test(`iOS sheet ${snapPoints?.length ? 'anchors explicit detents to the top' : 'keeps auto-sized height'}`, () => {
+    const s = setup(false, 'ios');
+    const view = renderFixture(
+      createElement(
+        s.BottomSheet,
+        { isPresented: true, snapPoints, contentPadding: 0, onDismiss() {} },
+        createElement('SheetContent'),
+      ),
+    );
+    const { frame } = view.findAll('Column')[0].props.modifiers[0];
+    assert.equal(frame.alignment, 'topLeading');
+    assert.equal(frame.maxWidth, Infinity);
+    assert.equal(frame.maxHeight, snapPoints?.length ? Infinity : undefined);
+    assert.equal(view.findAll('BottomSheet')[0].props.contentPadding, 0);
+    view.unmount();
+  });
+}
 
 test('Android page back arrow flips live and retains the same press target', () => {
   const s = setup();

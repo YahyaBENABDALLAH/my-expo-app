@@ -71,7 +71,7 @@ export function LoginPreferences() {
         onDismiss={() => setLanguageOpen(false)}
         testID="auth-login-language-sheet"
       >
-        <Column spacing={12} modifiers={nativeFillWidth} style={{ padding: 24 }}>
+        <Column spacing={12} modifiers={nativeFillWidth}>
           <Text variant="title">{t('common.language')}</Text>
           {SUPPORTED_LANGUAGES.map((value) => (
             <UniversalButtonContent
@@ -89,6 +89,7 @@ export function LoginPreferences() {
           ))}
           <UniversalButtonContent
             variant="link"
+            fullWidth
             label={t('common.close')}
             testID="auth-login-language-close"
             onPress={() => setLanguageOpen(false)}

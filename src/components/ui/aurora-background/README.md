@@ -9,6 +9,10 @@ and secondary tokens. Optional `hue` supports the interactive canvas page.
 
 The decorative wrapper and canvas ignore touches and are hidden from accessibility.
 Resolution follows actual native layout, including narrow previews. A UI-thread
+shared value starts at a safe 1 × 1 resolution until layout arrives; there is no
+window-dimension subscription or React sizing state. Equal size reports skip the
+shared-value write, and invalid reports retain the last valid geometry.
+The UI-thread
 clock pauses for explicit static mode, inactive/background app state and live
 Reduce Motion changes. It freezes its current frame and resumes without a jump.
 Keep this specialized rendering boundary separate from ordinary Expo UI layout.

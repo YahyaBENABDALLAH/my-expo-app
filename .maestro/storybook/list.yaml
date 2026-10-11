@@ -17,3 +17,21 @@ env:
 - assertVisible:
     id: expo-ui-list-status
     text: 'Selected row: 2.*'
+- runFlow:
+    file: ../helpers/open-story.yaml
+    env:
+      STORY_ID: expo-ui-universal-list--compound-slots
+      READY_ID: list-compound-row
+- assertVisible:
+    id: list-compound-status
+    text: 'Row presses: 0'
+- tapOn:
+    id: list-compound-row
+- assertVisible:
+    id: list-compound-status
+    text: 'Row presses: 1'
+- tapOn:
+    id: list-compound-passive-row
+- assertVisible:
+    id: list-compound-status
+    text: 'Row presses: 1'

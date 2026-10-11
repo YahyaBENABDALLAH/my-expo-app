@@ -6,11 +6,11 @@ import {
   frame,
   onGeometryChange,
 } from '@expo/ui/swift-ui/modifiers';
-import { useState } from 'react';
+import { useMeasuredWidth } from '@/hooks/use-measured-width';
 import type { RecipeStepperLayoutProps } from './recipe-stepper-layout.types';
 
 export function RecipeStepperLayout({ artwork, steps, indicatorHeight }: RecipeStepperLayoutProps) {
-  const [width, setWidth] = useState(0);
+  const [width, setWidth] = useMeasuredWidth();
   return (
     <ZStack alignment="top" modifiers={[frame({ minWidth: 0, maxWidth: Infinity })]}>
       {width > 0 && <RNHostView matchContents>{artwork(width)}</RNHostView>}

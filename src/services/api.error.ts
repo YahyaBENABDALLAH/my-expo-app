@@ -1,4 +1,4 @@
-import type { ApiError as ApiErrorShape } from '@/types/api.types';
+import type { ApiError as ApiErrorShape, ApiErrorKind } from '@/types/api.types';
 import i18n from '@/lib/i18n';
 
 export class ApiError extends Error implements ApiErrorShape {
@@ -7,6 +7,7 @@ export class ApiError extends Error implements ApiErrorShape {
     public readonly status: number,
     public readonly data: unknown,
     public readonly displayMessage: string | string[],
+    public readonly kind: ApiErrorKind = status === 0 ? 'unexpected' : 'http',
   ) {
     super(message);
     this.name = 'ApiError';
@@ -17,7 +18,7 @@ export class ApiError extends Error implements ApiErrorShape {
 export class ApiConfigurationError extends ApiError {
   constructor() {
     const message = 'Missing `EXPO_PUBLIC_API_URL`. Set it before calling the API client.';
-    super(message, 0, null, i18n.t('auth.requestFailed'));
+    super(message, 0, null, i18n.t('auth.requestFailed'), 'configuration');
     this.name = 'ApiConfigurationError';
   }
 }
@@ -26,7 +27,7 @@ export class ApiConfigurationError extends ApiError {
 export class ApiResponseValidationError extends ApiError {
   constructor(status: number) {
     const message = i18n.t('api.invalidResponse');
-    super(message, status, null, message);
+    super(message, status, null, message, 'invalid-response');
     this.name = 'ApiResponseValidationError';
   }
 }

@@ -6,32 +6,29 @@ import {
   UniversalTextContent as Text,
   PageScreen,
   LanguagePicker,
+  nativeFillWidth,
 } from '@components/ui';
 import { useMutation } from '@tanstack/react-query';
 import { router } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useAuthContext } from '@/context/auth.context';
 
-import { useTabActions } from '@/features/pages/tab-actions';
+import { useRegisterTabAction } from '@/features/pages/tab-actions';
 
 export default function MoreScreen() {
   const { t } = useTranslation();
   const { user, signOut, developmentGuest } = useAuthContext();
-  const { setAction } = useTabActions();
   const [profile, setProfile] = useState(false);
   const logout = useMutation({ mutationFn: signOut, networkMode: 'always', retry: 0 });
   const fullName =
     [user?.firstName, user?.lastName].filter(Boolean).join(' ') ||
     user?.userName ||
     (developmentGuest ? t('tools.guest') : t('common.account'));
-  useEffect(() => {
-    setAction('more', {
-      kind: 'profile',
-      label: t('account.openPreferences'),
-      onPress: () => setProfile(true),
-    });
-    return () => setAction('more', undefined);
-  }, [setAction, t]);
+  useRegisterTabAction('more', {
+    kind: 'profile',
+    label: t('account.openPreferences'),
+    onPress: () => setProfile(true),
+  });
   return (
     <PageScreen
       title={t('common.more')}
@@ -94,7 +91,7 @@ export default function MoreScreen() {
       />
       {logout.error ? <Text>{t('account.signOutFailed')}</Text> : null}
       <BottomSheet isPresented={profile} onDismiss={() => setProfile(false)}>
-        <Column spacing={16} style={{ padding: 24 }}>
+        <Column spacing={16} modifiers={nativeFillWidth}>
           <Text variant="title" testID="profile-preferences-title">
             {t('profile.title')}
           </Text>
@@ -104,6 +101,7 @@ export default function MoreScreen() {
           <LanguagePicker testID="profile-language-picker" />
           <UniversalButtonContent
             variant="secondary"
+            fullWidth
             label={t('account.details')}
             onPress={() => {
               setProfile(false);
@@ -112,6 +110,7 @@ export default function MoreScreen() {
           />
           <UniversalButtonContent
             variant="primary"
+            fullWidth
             label={t('common.done')}
             testID="profile-preferences-done"
             onPress={() => setProfile(false)}

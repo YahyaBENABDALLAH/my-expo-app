@@ -8,11 +8,11 @@ import {
   testID,
   weight,
 } from '@expo/ui/jetpack-compose/modifiers';
-import { useState } from 'react';
+import { useMeasuredWidth } from '@/hooks/use-measured-width';
 import type { RecipeStepperLayoutProps } from './recipe-stepper-layout.types';
 
 export function RecipeStepperLayout({ artwork, steps, indicatorHeight }: RecipeStepperLayoutProps) {
-  const [width, setWidth] = useState(0);
+  const [width, setWidth] = useMeasuredWidth();
   return (
     <Box contentAlignment="topStart" modifiers={[fillMaxWidth()]}>
       {width > 0 && (

@@ -19,6 +19,10 @@ import { useAuthForm } from '../hooks/use-auth-form';
 import { verifyEmailResolver } from '@/validation/resolvers/auth';
 import type { VerifyEmailFormValues } from '@/validation/schemas/auth';
 
+const resendSeconds = (deadline: number, now: number) =>
+  Number.isFinite(deadline) ? Math.max(0, Math.ceil((deadline - now) / 1000)) : 0;
+const codeExpired = (deadline: number, now: number) => Number.isFinite(deadline) && deadline <= now;
+
 export function VerifyEmailScreen() {
   const { t } = useTranslation();
   const {
@@ -30,6 +34,8 @@ export function VerifyEmailScreen() {
   } = useAuthFlow();
   const { colors } = useAuthTheme();
   const [now, setNow] = useState(() => Date.now());
+  const resendAt = Date.parse(challenge?.otpResendAvailableAtUtc ?? '');
+  const expiresAt = Date.parse(challenge?.otpExpiresAtUtc ?? '');
   const { form, submit, pending } = useAuthForm<VerifyEmailFormValues>(
     verifyEmailResolver,
     { code: '' },
@@ -44,14 +50,27 @@ export function VerifyEmailScreen() {
     },
   });
   useEffect(() => {
-    const timer = setInterval(() => setNow(Date.now()), 1000);
-    return () => clearInterval(timer);
-  }, []);
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const tick = () => {
+      const next = Date.now();
+      setNow((current) =>
+        resendSeconds(resendAt, current) === resendSeconds(resendAt, next) &&
+        codeExpired(expiresAt, current) === codeExpired(expiresAt, next)
+          ? current
+          : next,
+      );
+      // Once resend is ready, wake only at expiry instead of rendering each second.
+      const countdownDelay = resendAt > next ? Math.min(1000, resendAt - next) : Infinity;
+      const expiryDelay = expiresAt > next ? expiresAt - next : Infinity;
+      const delay = Math.min(countdownDelay, expiryDelay);
+      if (Number.isFinite(delay)) timer = setTimeout(tick, delay);
+    };
+    tick();
+    return () => clearTimeout(timer);
+  }, [resendAt, expiresAt]);
   if (!challenge?.challengeId) return <Redirect href="/login" />;
-  const resendAt = Date.parse(challenge.otpResendAvailableAtUtc ?? '');
-  const expiresAt = Date.parse(challenge.otpExpiresAtUtc ?? '');
-  const seconds = Number.isFinite(resendAt) ? Math.max(0, Math.ceil((resendAt - now) / 1000)) : 0;
-  const expired = Number.isFinite(expiresAt) && expiresAt <= now;
+  const seconds = resendSeconds(resendAt, now);
+  const expired = codeExpired(expiresAt, now);
   const busy = pending || resend.isPending;
   return (
     <AuthScreenFrame

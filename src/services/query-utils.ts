@@ -42,8 +42,11 @@ export function infiniteListQueryOptions<TItem, TQuery extends PaginationQuery>(
     queryFn: ({ pageParam, signal }) => fetchList({ ...params, page: pageParam }, { signal }),
     initialPageParam: 1,
     getNextPageParam: (lastPage, _pages, lastPageParam) =>
-      lastPage.data.length > 0 && lastPage.meta.hasNextPage && lastPage.meta.page >= lastPageParam
-        ? lastPage.meta.page + 1
+      lastPage.data.length > 0 &&
+      lastPage.meta.hasNextPage &&
+      lastPage.meta.page === lastPageParam &&
+      lastPage.meta.page < lastPage.meta.pageCount
+        ? lastPageParam + 1
         : undefined,
     staleTime,
   });

@@ -44,7 +44,7 @@ for (const platform of ['ios', 'android']) {
     'floating-action/floating-action-layout.tsx',
     'home-recipe-card/home-recipe-card-image.tsx',
     'list/list.tsx',
-    'list-item/list-item.tsx',
+    'list-item/list-item-appearance.tsx',
     'loading/loading-indicator.tsx',
     'native/native-fill-width.ts',
     'navigation/navigation-glass-surface.tsx',
@@ -71,6 +71,21 @@ for (const platform of ['ios', 'android']) {
             `src/components/ui/${component.replace(/(\.tsx?)$/, `.${platform}$1`)}`,
           ),
         ),
+      );
+    });
+  }
+  for (const component of [
+    'list-item/list-item.tsx',
+    'navigation/navigation-tab-icons.ts',
+    'floating-action/floating-action-icons.ts',
+    'refreshable-scroll-view/use-pending-refresh.ts',
+  ]) {
+    test(`${component} resolves to the shared runtime on ${platform}`, () => {
+      const result = resolve(context, `./${component.replace(/\.tsx?$/, '')}`, platform);
+      assert.equal(result.type, 'sourceFile');
+      assert.equal(
+        result.filePath,
+        realpathSync(path.join(projectRoot, 'src/components/ui', component)),
       );
     });
   }

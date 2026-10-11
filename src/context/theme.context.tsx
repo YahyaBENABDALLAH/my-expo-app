@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, type PropsWithChildren } from 'react';
+import { createContext, useContext, useMemo, useState, type PropsWithChildren } from 'react';
 import type { ThemeId } from '@/constants/themes/index';
 import type { AppColorScheme } from '@/constants/themes/tokens';
 
@@ -24,11 +24,11 @@ export function ThemePreferencesProvider({
 }>) {
   const [themeId, setThemeId] = useState(initialTheme);
   const [colorScheme, setColorScheme] = useState(initialColorScheme);
-  return (
-    <ThemeContext.Provider value={{ themeId, colorScheme, setThemeId, setColorScheme }}>
-      {children}
-    </ThemeContext.Provider>
+  const value = useMemo(
+    () => ({ themeId, colorScheme, setThemeId, setColorScheme }),
+    [themeId, colorScheme],
   );
+  return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
 }
 
 export function useThemePreferences() {

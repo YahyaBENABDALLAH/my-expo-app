@@ -4,6 +4,19 @@ The API layer covers the 16 entity contracts in `Reference/`. It uses the existi
 
 ## Error notifications
 
+The HTTP client normalizes failures into `ApiError.kind`: `http`, `network`,
+`timeout`, `configuration`, `invalid-response`, or `unexpected`. `message` is a
+diagnostic; `displayMessage` is localized user feedback. Setup and programming
+failures keep their diagnostic message without showing it in the UI. Timeout
+diagnostics use the request's configured duration, including custom timeouts.
+Backend validation-message lists retain only nonempty strings.
+
+The shared query client retries network failures, timeouts and HTTP
+408/500/502/503/504 once. Other HTTP failures, invalid responses, configuration
+failures and unexpected errors are terminal. Status zero alone does not imply a
+connection failure. Auth refresh remains owned by the HTTP interceptor, and
+mutations have no automatic retry or deferred offline replay.
+
 The app's shared `QueryCache` and `MutationCache` report failed operations through `src/lib/error-toasts.ts`. Query notifications fire only after retries finish, once per shared query. Auth forms, recipe writes, lookups, profile reads, and pull-to-refresh use the same toast flow. Background session refresh and best-effort remote logout also report errors while retaining their existing auth behavior.
 
 `ErrorToastHost` is mounted above navigation after the launch screen. It retains errors received before mounting, displays distinct messages in order, and coalesces identical messages while queued or visible. Notifications survive navigation and auth redirects. Canceled reads, aborts, and `SessionChangedError` are excluded; Axios preserves these errors instead of converting them to `ApiError`. API `displayMessage` values and validation-message arrays are used, with existing friendly auth/server fallbacks.
@@ -87,7 +100,10 @@ if (feed.hasNextPage && !feed.isFetchingNextPage) {
 
 List and infinite hooks accept a second `{ enabled }` argument. Detail hooks accept an optional identifier and use `skipToken` until every identifier is present. Composite detail hooks require both identifiers.
 
-Infinite queries begin at page 1, derive the next page from `meta`, and stop on the final page, an empty page, or repeated page metadata. Finite and infinite queries use separate cache namespaces.
+Infinite queries begin at page 1 and advance only when `meta.page` matches the
+requested page, `hasNextPage` is true, and `pageCount` includes another page. Empty,
+repeated, skipped or contradictory final-page metadata stops pagination. Finite
+and infinite queries use separate cache namespaces.
 
 Catalog data is fresh for five minutes; recipes, profiles, and activity data are fresh for one minute. Query hooks inherit the provider's mobile focus/reconnect behavior and retry policy. Every query forwards TanStack's `AbortSignal` through Axios.
 
@@ -220,8 +236,15 @@ The chef-by-user helper scans documented profile list pages because the backend 
 
 ## Verification
 
-`npm run test:services` runs 79 tests against real Axios interceptors and TanStack Query caches with an in-memory network adapter. They check endpoint contracts, normalization, pagination, cancellation, scoped invalidation, callback ordering, screen refresh, offline behavior, malformed response rejection and session races. They are included in `npm test`. Complete fixtures live in `tests/helpers/api-fixtures.mjs`; the adapter does not repair malformed payloads.
+`npm run test:services` exercises real Axios interceptors and TanStack Query caches
+with an in-memory network adapter. It checks endpoint contracts, normalization,
+pagination, cancellation, scoped invalidation, callback ordering, screen refresh,
+offline behavior, malformed response rejection and session races. Transport error
+tests also verify actual retry counts, timeout durations, safe feedback and
+preflight storage failures. The suite is included in `npm test`. Complete fixtures
+live in `tests/helpers/api-fixtures.mjs`; the adapter does not repair malformed
+payloads.
 
 Screen-refresh tests cover exact filters/pages, inactive/disabled queries, request reuse, completion ordering, cached content after errors, and offline local collections. Native short/tall composition stories are in Pages/Navigation shell. Run `maestro test .maestro/storybook/pull-to-refresh.yaml` against a connected development build with Metro running for gesture, pending-duplicate, failure and recovery checks. Device execution is still required to verify native interaction and indicator geometry on iOS and Android.
 
-The DTOs and endpoints come from the repository's reference contracts. Live backend and device behavior require separate integration verification. Implementation patterns were checked through Context7 against TanStack Query v5 documentation: [query options](https://tanstack.com/query/v5/docs/framework/react/guides/query-options), [infinite queries](https://tanstack.com/query/v5/docs/framework/react/guides/infinite-queries), [cancellation](https://tanstack.com/query/v5/docs/framework/react/guides/query-cancellation), and [mutation invalidation](https://tanstack.com/query/v5/docs/framework/react/guides/invalidations-from-mutations).
+The DTOs and endpoints come from the repository's reference contracts. Live backend and device behavior require separate integration verification. Implementation patterns were checked through Context7 and installed packages against TanStack Query v5 documentation: [query options](https://tanstack.com/query/v5/docs/framework/react/guides/query-options), [infinite queries](https://tanstack.com/query/v5/docs/framework/react/guides/infinite-queries), [cancellation](https://tanstack.com/query/v5/docs/framework/react/guides/query-cancellation), and [mutation invalidation](https://tanstack.com/query/v5/docs/framework/react/guides/invalidations-from-mutations). Axios normalization follows its [error handling](https://axios-http.com/docs/handling_errors) and [cancellation](https://axios-http.com/docs/cancellation) contracts.

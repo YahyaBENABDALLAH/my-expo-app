@@ -5,6 +5,7 @@ import {
   UniversalText,
   UniversalTextContent,
   UniversalButton,
+  nativeFillWidth,
 } from '@components/ui';
 import {
   UniversalBottomSheet,
@@ -58,7 +59,7 @@ function BottomSheetDemo({ title, content, onOpen, onClose, ...args }: DemoProps
           args.onDismiss();
         }}
       >
-        <Column testID={`${args.testID}-content`} spacing={16} style={{ paddingVertical: 16 }}>
+        <Column testID={`${args.testID}-content`} spacing={16} modifiers={nativeFillWidth}>
           <UniversalTextContent
             testID={`${args.testID}-title`}
             textStyle={{ fontSize: 24, fontWeight: '700', color: ink }}
@@ -73,6 +74,7 @@ function BottomSheetDemo({ title, content, onOpen, onClose, ...args }: DemoProps
           </UniversalTextContent>
           <UniversalButtonContent
             variant="secondary"
+            fullWidth
             testID={`${args.testID}-close`}
             label="Close"
             onPress={() => {
@@ -158,3 +160,10 @@ export const EdgePadding: Story = {
 };
 export const LightTheme: Story = { args: { colorScheme: 'light' } };
 export const DarkTheme: Story = { args: { colorScheme: 'dark' } };
+export const LongContent: Story = {
+  args: {
+    title: 'A longer title that wraps onto multiple lines in a narrow sheet',
+    content:
+      'This description should wrap inside the sheet with the same leading edge as the title and the full-width Close button. Resize the sheet on iPad to check that it follows the presented width.',
+  },
+};

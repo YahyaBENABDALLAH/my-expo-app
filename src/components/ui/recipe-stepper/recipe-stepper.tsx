@@ -11,7 +11,7 @@ import {
   Skia,
   vec,
 } from '@shopify/react-native-skia';
-import { useEffect } from 'react';
+import { memo, useEffect } from 'react';
 import { View } from 'react-native';
 import {
   cancelAnimation,
@@ -152,7 +152,7 @@ export interface RecipeStepperProps {
 }
 
 /** Compose inside an Expo UI Host. Progress follows the recipe form's validation. */
-export function RecipeStepper({
+export const RecipeStepper = memo(function RecipeStepper({
   current,
   isCurrentValid = false,
   animate = true,
@@ -299,4 +299,4 @@ export function RecipeStepper({
       </Text>
     </Column>
   );
-}
+});

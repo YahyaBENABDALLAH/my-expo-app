@@ -1,4 +1,4 @@
-import type { PropsWithChildren } from 'react';
+import { useMemo, type PropsWithChildren } from 'react';
 import { View } from 'react-native';
 import { SafeAreaInsetsContext, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { PageHeader } from './page-header';
@@ -15,6 +15,10 @@ export function PageFrame({
   colorScheme?: 'light' | 'dark';
 }>) {
   const insets = useSafeAreaInsets();
+  const contentInsets = useMemo(
+    () => ({ top: 0, bottom: insets.bottom, left: insets.left, right: insets.right }),
+    [insets.bottom, insets.left, insets.right],
+  );
   return (
     <View style={{ flex: 1 }}>
       <View
@@ -27,7 +31,7 @@ export function PageFrame({
       >
         {title ? <PageHeader title={title} onBack={onBack} colorScheme={colorScheme} /> : null}
       </View>
-      <SafeAreaInsetsContext.Provider value={{ ...insets, top: 0 }}>
+      <SafeAreaInsetsContext.Provider value={contentInsets}>
         <View style={{ flex: 1 }}>{children}</View>
       </SafeAreaInsetsContext.Provider>
     </View>

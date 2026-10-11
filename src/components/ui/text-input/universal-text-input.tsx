@@ -1,7 +1,8 @@
 import { useThemeColors } from '@/hooks/use-theme';
 import { Column, Icon, Row, Text, TextInput, type IconProps, type TextInputProps } from '@expo/ui';
 import { useRef, useState } from 'react';
-import { useWindowDimensions, View } from 'react-native';
+import { useMeasuredWidth } from '@/hooks/use-measured-width';
+import { View } from 'react-native';
 import { UniversalHost, useHostColorScheme } from '../host/universal-host';
 import { nativeFillWidth } from '../native/native-fill-width';
 import { inputFieldAppearance, inputRowFlex } from './text-input-modifiers';
@@ -44,7 +45,7 @@ export function UniversalTextInput({
   onPress,
   ...props
 }: UniversalTextInputProps) {
-  const [containerWidth, setContainerWidth] = useState(0);
+  const [containerWidth, setContainerWidth] = useMeasuredWidth();
   return (
     <View
       testID={props.testID ? `${props.testID}-container` : undefined}
@@ -88,7 +89,6 @@ export function UniversalTextInputContent({
   ...inputProps
 }: Omit<UniversalTextInputProps, 'onPress'>) {
   const scheme = useHostColorScheme(colorScheme);
-  const { fontScale } = useWindowDimensions();
   const [focused, setFocused] = useState(false);
   const focusedRef = useRef(false);
   const themeColors = useThemeColors(scheme);
@@ -96,6 +96,7 @@ export function UniversalTextInputContent({
   const semanticColor = status === 'default' ? undefined : colors[status];
   const hasIconAction = rightIcon != null && !!onRightIconPress;
   const contentStyle = { opacity: disabled ? 0.5 : 1 };
+  const iconStyle = { width: 20, height: 20, ...contentStyle };
   const fieldStyle = {
     paddingHorizontal: style?.paddingHorizontal ?? style?.padding ?? 14,
     paddingVertical: style?.paddingVertical ?? style?.padding ?? 14,
@@ -115,20 +116,8 @@ export function UniversalTextInputContent({
     paddingTop: fieldStyle.paddingTop ?? fieldStyle.paddingVertical,
     paddingBottom: fieldStyle.paddingBottom ?? fieldStyle.paddingVertical,
   };
-  // Secure and visible native text can have different intrinsic heights.
-  // Reserve the same single-line geometry through focus and visibility changes.
-  const lineHeight = textStyle?.lineHeight ?? (textStyle?.fontSize ?? 16) * 1.5;
-  const singleLineHeight =
-    typeof inputPadding.paddingTop === 'number' && typeof inputPadding.paddingBottom === 'number'
-      ? Math.max(
-          hasIconAction ? 48 : 0,
-          Math.ceil(lineHeight * fontScale) + inputPadding.paddingTop + inputPadding.paddingBottom,
-        ) +
-        fieldStyle.borderWidth * 2
-      : undefined;
   const fieldAppearance = inputFieldAppearance({
     ...fieldStyle,
-    height: fieldStyle.height ?? (inputProps.multiline ? undefined : singleLineHeight),
     paddingVertical: 0,
     paddingTop: 0,
     paddingBottom: 0,
@@ -190,7 +179,7 @@ export function UniversalTextInputContent({
             name={leftIcon}
             size={20}
             color={colors.muted}
-            style={contentStyle}
+            style={iconStyle}
             testID={inputProps.testID ? `${inputProps.testID}-left-icon` : undefined}
           />
         ) : null}
@@ -203,14 +192,14 @@ export function UniversalTextInputContent({
               accessibilityLabel={rightIconAccessibilityLabel}
               testID={inputProps.testID ? `${inputProps.testID}-right-icon` : undefined}
             >
-              <Icon name={rightIcon} size={20} color={colors.tint} style={contentStyle} />
+              <Icon name={rightIcon} size={20} color={colors.tint} style={iconStyle} />
             </TextInputIconButton>
           ) : (
             <Icon
               name={rightIcon}
               size={20}
               color={colors.muted}
-              style={contentStyle}
+              style={iconStyle}
               testID={inputProps.testID ? `${inputProps.testID}-right-icon` : undefined}
             />
           )

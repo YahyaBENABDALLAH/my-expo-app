@@ -1,4 +1,5 @@
 import Colors from '@/constants/colors';
+import { useMemo } from 'react';
 import { useThemeColors } from '@/hooks/use-theme';
 import { useHostColorScheme } from '../host/universal-host';
 
@@ -20,9 +21,10 @@ export const authButtonPalettes = {
 export function useAuthTheme(colorScheme?: 'light' | 'dark') {
   const scheme = useHostColorScheme(colorScheme);
   const colors = useThemeColors(scheme);
+  const buttonPalette = useMemo(() => ({ ...colors, onAccent: colors.onPrimary }), [colors]);
   return {
     scheme,
     colors,
-    buttonPalette: { ...colors, onAccent: colors.onPrimary },
+    buttonPalette,
   };
 }
