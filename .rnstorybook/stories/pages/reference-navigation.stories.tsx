@@ -216,12 +216,22 @@ export const PageOverlap: Story = {
     docs: {
       description: {
         story:
-          'Page content reaches the borderless dock. The action overlaps only the center; tap the lower edge of Page presses to verify the transparent area beside it passes touches to the page.',
+          'Page content reaches the dock with rounded top corners. The action overlaps only the center; tap the lower edge of Page presses to verify the transparent area beside it passes touches to the page.',
       },
     },
   },
 };
-export const SafeArea: Story = { args: { bottomInset: 34 } };
+export const SafeArea: Story = {
+  args: { bottomInset: 34, animate: false },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'The 56-point tab row sits above one 34-point home-indicator inset, with no extra bottom spacing. Inspect the rounded top corners in light and dark modes; set bottomInset to 0 to compare a device without a home indicator. This JS fixture does not emulate native safe areas.',
+      },
+    },
+  },
+};
 export const SideCutouts: Story = { args: { leftInset: 44, rightInset: 20 } };
 export const NarrowPhone: Story = { args: { width: 320 } };
 export const CreationRoute: Story = {

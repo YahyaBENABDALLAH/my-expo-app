@@ -1,5 +1,17 @@
 # Universal component catalog
 
+2026-10-11 header/navigation spacing follow-up: `PageHeader` keeps its existing
+props, title layout and title/text tokens. iOS vertical padding is 4 points;
+Android remains 8. `PageFrame` applies the status-bar inset once and the header
+Host ignores automatic safe areas. `ReferenceNavigationBar` retains its existing
+props and theme roles, adds 20-point rounded top corners to the dock/glass/tab
+feedback, and reserves only the 56-point dock plus the actual bottom inset.
+`Pages/Navigation shell` / `NotchedPhone`, `HeaderWithBackArrow`,
+and `DarkHeaderWithBackArrow`, together with
+`Pages/Reference navigation` / `SafeArea` and `PageOverlap`, cover the compositions.
+Native safe-area spacing, glass clipping and corner
+taps still require iOS/Android device inspection.
+
 `PageFrame` supports `headerOverlay` for full-height specialized content beneath a
 transparent, safe-area-protected title. Cartes uses it while retaining the root
 animated wave and native map control insets. Title-only overlays pass touches to

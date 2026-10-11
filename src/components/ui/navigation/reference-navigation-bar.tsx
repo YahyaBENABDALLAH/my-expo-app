@@ -79,6 +79,8 @@ export function ReferenceNavigationBar({
           left: 0,
           right: 0,
           bottom: 0,
+          borderTopLeftRadius: 20,
+          borderTopRightRadius: 20,
           backgroundColor: colors.tabBarGlassTint,
           shadowColor: colors.tabBarShadow,
           shadowOpacity: scheme === 'dark' ? 0.3 : 0,
@@ -89,7 +91,16 @@ export function ReferenceNavigationBar({
           elevation: scheme === 'dark' ? 8 : 0,
         }}
       >
-        <NavigationGlassSurface colorScheme={scheme} />
+        <View
+          style={{
+            flex: 1,
+            borderTopLeftRadius: 20,
+            borderTopRightRadius: 20,
+            overflow: 'hidden',
+          }}
+        >
+          <NavigationGlassSurface colorScheme={scheme} />
+        </View>
       </View>
       {/* Side cutouts protect controls without insetting the bar surface.
             The raised action remains a sibling of the clipped tab row. */}
@@ -101,6 +112,8 @@ export function ReferenceNavigationBar({
           left: leftInset,
           right: rightInset,
           height: 56,
+          borderTopLeftRadius: 20,
+          borderTopRightRadius: 20,
           overflow: 'hidden',
           zIndex: 1,
           elevation: scheme === 'dark' ? 9 : 0,

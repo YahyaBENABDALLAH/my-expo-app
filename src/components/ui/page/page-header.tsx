@@ -1,4 +1,5 @@
 import { Column, Row } from '@expo/ui';
+import { Platform } from 'react-native';
 import { useThemeColors } from '@/hooks/use-theme';
 import { UniversalHost, useHostColorScheme } from '../host/universal-host';
 import { UniversalTextContent as Text } from '../text/universal-text';
@@ -17,12 +18,13 @@ export function PageHeader({
 }) {
   const scheme = useHostColorScheme(colorScheme);
   const colors = useThemeColors(scheme);
+  const isIOS = Platform.OS === 'ios';
   return (
     <UniversalHost colorScheme={scheme} ignoreSafeArea="all" testID="page-header">
       <Column
         spacing={8}
         modifiers={nativeFillWidth}
-        style={{ paddingHorizontal: 16, paddingVertical: 8 }}
+        style={{ paddingHorizontal: 16, paddingVertical: isIOS ? 4 : 8 }}
       >
         {title ? (
           <Row alignment="center" spacing={8} modifiers={nativeFillWidth}>

@@ -56,7 +56,17 @@ const notchedInsets: Story['decorators'] = [
     </SafeAreaInsetsContext.Provider>
   ),
 ];
-export const NotchedPhone: Story = { decorators: notchedInsets };
+export const NotchedPhone: Story = {
+  decorators: notchedInsets,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'The header adds the simulated status-bar inset once, with 4-point vertical spacing on iOS and 8-point spacing on Android. The existing title layout is preserved.',
+      },
+    },
+  },
+};
 export const TransparentHeader: Story = {
   decorators: notchedInsets,
   args: { title: 'Cartes' },

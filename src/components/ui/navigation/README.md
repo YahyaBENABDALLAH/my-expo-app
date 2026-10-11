@@ -7,10 +7,15 @@ Exports: `ReferenceNavigationBar` and navigation tab types.
 `navigation-glass-surface.*` owns passive native glass/blur artwork.
 Each adapter's types stay here.
 
-The borderless dock fills the screen width and bottom edge. Its glass continues
+The borderless dock has 20-point rounded top corners and fills the screen width
+and bottom edge. The glass and native tab feedback clip to those corners while
+the raised action remains outside the clip. Its glass continues
 under the bottom safe area; side insets apply only to destination controls.
 The 84-point touch frame overlaps the page by 28 points through a negative top
 margin, so layout reserves only the 56-point dock plus the system bottom inset.
+There is no extra bottom padding: on a device reporting 34 points for the home
+indicator, the reserved dock height is 90 points. Keep the actual device inset
+instead of capping it, so the tab buttons stay above system gestures.
 The transparent frame uses `box-none`: page controls beside the raised action
 remain reachable, and the complete action stays inside its parent's touch bounds.
 

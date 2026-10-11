@@ -11,6 +11,9 @@ Its adjusted safe-area context keeps a stable identity until content insets chan
 so unrelated parent updates do not notify every inset consumer.
 `tests/layout/render-stability.test.mjs` checks this and real inset propagation.
 `page-header.tsx` uses the private `page-back-button.*` adapters.
+The existing title layout is preserved. iOS adds only 4 points of vertical
+header padding; Android retains 8. The status-bar inset is applied once by
+`PageFrame`, while the header Host ignores automatic native safe areas.
 `page-motion-overlay.tsx` contains the shared animated top-edge wave artwork.
 Its two fixed SVG paths are parsed once into immutable Skia objects and reused
 by every drawing instance. Animation updates transforms, with no path parsing
