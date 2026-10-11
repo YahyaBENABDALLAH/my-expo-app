@@ -9,7 +9,7 @@ export function NavigationGlassSurface({ colorScheme }: NavigationGlassSurfacePr
   const colors = useThemeColors(colorScheme);
   const backdrop = useRef<View>(null);
   return (
-    <View style={{ flex: 1, borderRadius: 28, overflow: 'hidden' }}>
+    <View style={{ flex: 1, overflow: 'hidden' }}>
       {/* The target contains only the dock's tonal backdrop, never the blur
           or native controls themselves. The bar keeps its normal-flow layout. */}
       <BlurTargetView ref={backdrop} style={StyleSheet.absoluteFill}>

@@ -57,66 +57,80 @@ export function ReferenceNavigationBar({
   return (
     <View
       testID="main-tab-bar"
+      pointerEvents="box-none"
       style={{
         direction: direction === 'rightToLeft' ? 'rtl' : 'ltr',
-        paddingBottom: bottomInset,
-        paddingLeft: 6 + leftInset,
-        paddingRight: 6 + rightInset,
-        backgroundColor: colors.background,
+        height: 84 + bottomInset,
+        // Keep the whole action inside the touch bounds while reserving only
+        // the 56-point dock and system inset in the navigator's layout.
+        marginTop: -28,
+        flexShrink: 0,
+        zIndex: 1,
       }}
     >
-      <View style={{ height: 84, justifyContent: 'flex-end' }}>
-        <View
-          pointerEvents="none"
-          accessibilityElementsHidden
-          importantForAccessibility="no-hide-descendants"
-          style={{
-            position: 'absolute',
-            top: 28,
-            left: 0,
-            right: 0,
-            height: 56,
-            borderWidth: 1,
-            borderColor: colors.tabBarGlassBorder,
-            borderRadius: 28,
-            backgroundColor: colors.tabBarGlassTint,
-            shadowColor: colors.tabBarShadow,
-            shadowOpacity: scheme === 'dark' ? 0.3 : 0,
-            shadowRadius: 16,
-            shadowOffset: { width: 0, height: 6 },
-            // Android elevation casts its own shadow independently of shadowOpacity.
-            // zIndex below keeps the controls above the glass without a light-mode shadow.
-            elevation: scheme === 'dark' ? 8 : 0,
-          }}
+      <View
+        testID="tab-dock-surface"
+        pointerEvents="none"
+        accessibilityElementsHidden
+        importantForAccessibility="no-hide-descendants"
+        style={{
+          position: 'absolute',
+          top: 28,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: colors.tabBarGlassTint,
+          shadowColor: colors.tabBarShadow,
+          shadowOpacity: scheme === 'dark' ? 0.3 : 0,
+          shadowRadius: 16,
+          shadowOffset: { width: 0, height: 6 },
+          // Android elevation casts its own shadow independently of shadowOpacity.
+          // zIndex below keeps the controls above the glass without a light-mode shadow.
+          elevation: scheme === 'dark' ? 8 : 0,
+        }}
+      >
+        <NavigationGlassSurface colorScheme={scheme} />
+      </View>
+      {/* Side cutouts protect controls without insetting the bar surface.
+            The raised action remains a sibling of the clipped tab row. */}
+      <View
+        testID="tab-dock-controls"
+        style={{
+          position: 'absolute',
+          top: 28,
+          left: leftInset,
+          right: rightInset,
+          height: 56,
+          overflow: 'hidden',
+          zIndex: 1,
+          elevation: scheme === 'dark' ? 9 : 0,
+        }}
+      >
+        <UniversalHost
+          colorScheme={scheme}
+          matchContents={false}
+          ignoreSafeArea="all"
+          style={{ flex: 1, height: 56 }}
         >
-          <NavigationGlassSurface colorScheme={scheme} />
-        </View>
-        {/* Clip tab feedback to the same outline as the dock. The raised
-            action is a sibling so its upper half and pulse stay visible. */}
-        <View
-          testID="tab-dock-controls"
-          style={{
-            height: 56,
-            paddingHorizontal: 1,
-            borderRadius: 28,
-            overflow: 'hidden',
-            zIndex: 1,
-            elevation: scheme === 'dark' ? 9 : 0,
-          }}
-        >
-          <UniversalHost
-            colorScheme={scheme}
-            matchContents={false}
-            ignoreSafeArea="all"
-            style={{ flex: 1, height: 56 }}
-          >
-            <Row alignment="center" modifiers={nativeFillWidth} style={{ height: 56 }}>
-              {destinations.slice(0, 2).map(tab)}
-              <Spacer size={84} />
-              {destinations.slice(2).map(tab)}
-            </Row>
-          </UniversalHost>
-        </View>
+          <Row alignment="center" modifiers={nativeFillWidth} style={{ height: 56 }}>
+            {destinations.slice(0, 2).map(tab)}
+            <Spacer size={84} />
+            {destinations.slice(2).map(tab)}
+          </Row>
+        </UniversalHost>
+      </View>
+      <View
+        testID="tab-action-overlay"
+        pointerEvents="box-none"
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: leftInset,
+          right: rightInset,
+          height: 84,
+          zIndex: 2,
+        }}
+      >
         <View
           style={{
             position: 'absolute',
@@ -128,7 +142,6 @@ export function ReferenceNavigationBar({
             padding: 4,
             borderRadius: 42,
             backgroundColor: colors.tabBarGlassTint,
-            zIndex: 2,
             elevation: scheme === 'dark' ? 10 : 0,
           }}
         >

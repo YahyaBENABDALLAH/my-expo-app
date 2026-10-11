@@ -2,7 +2,7 @@ import {
   AuthText,
   AuroraBackground,
   Column,
-  ErrorToastHost,
+  ToastHost,
   UniversalHost as Host,
   LaunchScreen,
   LoadingContent,
@@ -112,7 +112,7 @@ function RootLayoutContent() {
           onExitComplete={finishBrandScreen}
         />
       )}
-      {!showBrandScreen && <ErrorToastHost />}
+      {!showBrandScreen && <ToastHost />}
     </View>
   );
 }

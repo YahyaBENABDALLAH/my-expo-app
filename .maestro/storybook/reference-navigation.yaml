@@ -97,3 +97,17 @@ env:
     waitToSettleTimeoutMs: 1000
     point: '50%,10%'
 - assertVisible: 'Selected: index; action presses: 2'
+- runFlow:
+    file: ../helpers/open-story.yaml
+    env:
+      STORY_ID: pages-reference-navigation--page-overlap
+      READY_ID: navigation-story-page-action
+- tapOn:
+    id: navigation-story-page-action
+    point: '50%,80%'
+- assertVisible: 'Page presses: 1'
+- tapOn:
+    id: tab-context-action
+    point: '50%,5%'
+    waitToSettleTimeoutMs: 1000
+- assertVisible: 'Selected: index; action presses: 1'

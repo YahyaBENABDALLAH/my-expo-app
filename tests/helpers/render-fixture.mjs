@@ -1,7 +1,7 @@
 import Reconciler from 'react-reconciler';
 import { DefaultEventPriority } from 'react-reconciler/constants.js';
 
-// Skia already installs React's reconciler. This small in-memory renderer exercises
+// The reconciler is pinned directly as a dev dependency. This in-memory renderer exercises
 // real hooks and updates without adding a test stack or pretending to render native UI.
 const context = {};
 const noop = () => {};

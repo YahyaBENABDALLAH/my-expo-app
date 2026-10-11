@@ -10,7 +10,7 @@ export function NavigationGlassSurface({ colorScheme }: NavigationGlassSurfacePr
   const colors = useThemeColors(colorScheme);
   const liquidGlass = Number.parseInt(String(Platform.Version), 10) >= 26;
   return (
-    <View style={{ flex: 1, borderRadius: 28, overflow: 'hidden' }}>
+    <View style={{ flex: 1, overflow: 'hidden' }}>
       <UniversalHost
         colorScheme={colorScheme}
         matchContents={false}
@@ -23,13 +23,9 @@ export function NavigationGlassSurface({ colorScheme }: NavigationGlassSurfacePr
             liquidGlass
               ? glassEffect({
                   glass: { variant: 'regular', tint: colors.tabBarGlassTint },
-                  shape: 'roundedRectangle',
-                  cornerRadius: 28,
+                  shape: 'rectangle',
                 })
-              : background(
-                  { type: 'material', material: 'thin' },
-                  shapes.roundedRectangle({ cornerRadius: 28 }),
-                ),
+              : background({ type: 'material', material: 'thin' }, shapes.rectangle()),
           ]}
         >
           <Spacer />

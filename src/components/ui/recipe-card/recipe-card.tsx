@@ -4,19 +4,23 @@ import { useThemeColors } from '@/hooks/use-theme';
 import { Column, RNHostView } from '@expo/ui';
 import { UniversalButtonContent } from '../button/universal-button-content';
 import { Image } from 'expo-image';
-import { router } from 'expo-router';
 import { UniversalTextContent as Text } from '../text/universal-text';
 import { useHostColorScheme } from '../host/universal-host';
 import type { RecipeCardData } from '@/types/recipe.types';
 
-export const RecipeCard = memo(function RecipeCard({ recipe }: { recipe: RecipeCardData }) {
+export type RecipeCardProps = {
+  recipe: RecipeCardData;
+  onPress: (recipeUuid: string) => void;
+};
+
+export const RecipeCard = memo(function RecipeCard({ recipe, onPress }: RecipeCardProps) {
   const { t } = useTranslation();
   const colors = useThemeColors(useHostColorScheme());
   return (
     <UniversalButtonContent
       variant="link"
       testID={`recipe-card-${recipe.uuid}`}
-      onPress={() => router.push({ pathname: '/recipe/[uuid]', params: { uuid: recipe.uuid } })}
+      onPress={() => onPress(recipe.uuid)}
     >
       <Column
         spacing={8}

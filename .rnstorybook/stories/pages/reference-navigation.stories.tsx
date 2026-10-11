@@ -1,11 +1,16 @@
 import {
   Column,
+  Row,
+  Spacer,
   Text,
+  UniversalButtonContent,
   type FloatingActionKind,
   FloatingActionButton,
   type NavigationTabName,
   UniversalHost,
   ReferenceNavigationBar,
+  nativeFillWidth,
+  nativeRowWeight,
 } from '@components/ui';
 import type { Meta, StoryObj } from '@storybook/react-native';
 import { useState } from 'react';
@@ -41,6 +46,7 @@ function NavigationDemo({
   leftInset,
   rightInset,
   width,
+  pageContent,
 }: {
   colorScheme: 'light' | 'dark';
   kind: FloatingActionKind;
@@ -52,9 +58,11 @@ function NavigationDemo({
   leftInset: number;
   rightInset: number;
   width?: number;
+  pageContent: boolean;
 }) {
   const [selected, setSelected] = useState(initialSelected);
   const [presses, setPresses] = useState(0);
+  const [pagePresses, setPagePresses] = useState(0);
   const actionKind = contextual ? contextKinds[selected] : kind;
   return (
     <View
@@ -66,12 +74,45 @@ function NavigationDemo({
         alignSelf: width ? 'center' : 'stretch',
       }}
     >
-      <UniversalHost colorScheme={colorScheme} style={{ marginBottom: 40 }}>
-        <Column spacing={8}>
-          <Text testID="navigation-story-state">{`Selected: ${selected}; action presses: ${presses}`}</Text>
-          <Text testID="navigation-story-action">{actionLabels[actionKind]}</Text>
-        </Column>
-      </UniversalHost>
+      <View
+        testID="navigation-story-page"
+        style={{
+          flex: 1,
+          justifyContent: 'flex-end',
+          backgroundColor: pageContent ? Colors[colorScheme].surfaceRaised : undefined,
+        }}
+      >
+        <UniversalHost colorScheme={colorScheme} style={{ marginBottom: 40 }}>
+          <Column spacing={8}>
+            <Text testID="navigation-story-state">{`Selected: ${selected}; action presses: ${presses}`}</Text>
+            <Text testID="navigation-story-action">{actionLabels[actionKind]}</Text>
+          </Column>
+        </UniversalHost>
+        {pageContent ? (
+          <UniversalHost
+            colorScheme={colorScheme}
+            matchContents={false}
+            ignoreSafeArea="all"
+            style={{ height: 56 }}
+          >
+            <Row alignment="center" modifiers={nativeFillWidth} style={{ height: 56 }}>
+              <Column modifiers={nativeRowWeight}>
+                <UniversalButtonContent
+                  variant="link"
+                  testID="navigation-story-page-action"
+                  onPress={() => setPagePresses((count) => count + 1)}
+                >
+                  {`Page presses: ${pagePresses}`}
+                </UniversalButtonContent>
+              </Column>
+              <Spacer size={84} />
+              <Column modifiers={nativeRowWeight}>
+                <Text>Page content</Text>
+              </Column>
+            </Row>
+          </UniversalHost>
+        ) : null}
+      </View>
       <ReferenceNavigationBar
         colorScheme={colorScheme}
         selected={selected}
@@ -104,6 +145,7 @@ const meta = {
     bottomInset: 0,
     leftInset: 0,
     rightInset: 0,
+    pageContent: false,
   },
   argTypes: {
     animate: { control: 'boolean' },
@@ -163,7 +205,18 @@ export const DockFeedback: Story = {
     docs: {
       description: {
         story:
-          'Hold Home and More to inspect feedback at the curved dock ends. Tap the upper and lower edges of the raised action; change the colorScheme control to inspect both themes.',
+          'Hold Home and More to inspect feedback at the screen edges. Tap the upper and lower edges of the raised action; change the colorScheme control to inspect both themes.',
+      },
+    },
+  },
+};
+export const PageOverlap: Story = {
+  args: { pageContent: true, animate: false },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Page content reaches the borderless dock. The action overlaps only the center; tap the lower edge of Page presses to verify the transparent area beside it passes touches to the page.',
       },
     },
   },

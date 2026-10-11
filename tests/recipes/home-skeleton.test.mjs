@@ -15,6 +15,7 @@ function setup() {
   let setFocused;
   let queryReads = 0;
   let motionReads = 0;
+  const destinations = [];
   const ui = {
     Column: native('Column'),
     Row: native('Row'),
@@ -50,7 +51,7 @@ function setup() {
       skeletonModifiers: (style) => [{ ...style, skeleton: true }],
     },
     'expo-router': {
-      router: { push() {}, navigate() {} },
+      router: { push: (href) => destinations.push(href), navigate() {} },
       useIsFocused: () => {
         const [focused, update] = useState(true);
         setFocused = update;
@@ -82,6 +83,7 @@ function setup() {
     focus: (focused) => setFocused(focused),
     queryReads: () => queryReads,
     motionReads: () => motionReads,
+    destinations,
     placeholders: (view) =>
       view.findAll('Column').filter((node) => node.props.modifiers?.[0]?.skeleton),
     preview: (view) =>
@@ -153,6 +155,11 @@ test('home presents live recipes without sample controls, timed skeletons or dup
   const view = renderFixture(h(s.HomeScreen));
   try {
     assert.equal(view.findAll('RecipeCard').length, 1);
+    const openRecipe = view.findAll('RecipeCard')[0].props.onPress;
+    view.flush(() => openRecipe('recipe-1'));
+    assert.deepEqual(s.destinations, [
+      { pathname: '/recipe/[uuid]', params: { uuid: 'recipe-1' } },
+    ]);
     assert.equal(s.preview(view).length, 0);
     assert.equal(view.findAll('Switch').length, 0);
     assert.equal(view.findAll('List').length, 0);
@@ -165,6 +172,7 @@ test('home presents live recipes without sample controls, timed skeletons or dup
     view.flush(() => s.focus(true));
     await view.findAll('PageScreen')[0].props.onRefresh();
     assert.equal(view.findAll('RecipeCard').length, 1);
+    assert.equal(view.findAll('RecipeCard')[0].props.onPress, openRecipe);
     assert.equal(timeouts.mock.calls.length, 0);
   } finally {
     view.unmount();

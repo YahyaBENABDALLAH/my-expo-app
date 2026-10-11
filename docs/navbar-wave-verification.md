@@ -1,5 +1,22 @@
 # Middle-button wave verification
 
+## Edge-to-edge dock and page overlap (2026-10-11)
+
+The dock is now rectangular and borderless, with no decorative left/right or
+bottom spacing. Its glass reaches the physical screen edges; native destination
+controls retain side cutout protection and the bottom system gesture area remains
+below the controls. The 84-point action frame overlaps the page by 28 points,
+reserving only the 56-point dock plus the actual bottom safe-area inset. The
+transparent frame passes touches beside the action through to the page, while
+the complete floating button remains inside its parent's touch bounds.
+
+`PageOverlap` adds a page control next to the raised action and exposes its press
+count. The existing navigation Maestro flow now exercises its lower edge and the
+floating action's upper edge. ADB reports no connected Android device; native
+iOS/Android rendering, safe-area appearance and touch delivery remain unverified.
+Lint, typecheck and all 150 layout checks pass; Storybook registration was regenerated.
+Earlier rounded geometry and full 84-point layout descriptions below are historical.
+
 ## Light-mode dock shadow (2026-10-04)
 
 The grey halo in the Home screenshot comes from the dock, control clip and raised-action surround using Android elevations of 8, 9 and 10. React Native elevation generates its own native drop shadow, independently of `shadowOpacity`; the light background makes it conspicuous. All three elevations and the dock shadow are now disabled in light mode. Existing `zIndex` values preserve their visual order. Dark-mode values and the native glass finish are unchanged. The shared top wave animation is unchanged, while all PageScreen pages now use the Home title style with an optional native back arrow and no duplicate native toolbar.

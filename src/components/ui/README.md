@@ -15,7 +15,7 @@ README with its purpose, usage constraints and available story coverage.
 | Lists and disclosure    | [list](list/README.md), [list-item](list-item/README.md), [collapsible](collapsible/README.md)                                                                             |
 | Screen composition      | [page](page/README.md), [auth](auth/README.md), [refreshable-scroll-view](refreshable-scroll-view/README.md)                                                               |
 | Theme and native layout | [host](host/README.md), [text](text/README.md), [native](native/README.md), [appearance](appearance/README.md)                                                             |
-| Feedback and overlays   | [loading](loading/README.md), [error-toast](error-toast/README.md), [bottom-sheet](bottom-sheet/README.md), [skeleton](skeleton/README.md)                                 |
+| Feedback and overlays   | [loading](loading/README.md), [toast](toast/README.md), [bottom-sheet](bottom-sheet/README.md), [skeleton](skeleton/README.md)                                             |
 | Recipe presentation     | [recipe-card](recipe-card/README.md), [home-recipe-card](home-recipe-card/README.md), [recipe-stepper](recipe-stepper/README.md)                                           |
 | Navigation and artwork  | [navigation](navigation/README.md), [aurora-background](aurora-background/README.md), [launch-screen](launch-screen/README.md), [map-experience](map-experience/README.md) |
 

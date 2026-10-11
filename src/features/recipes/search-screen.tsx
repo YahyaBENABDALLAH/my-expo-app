@@ -20,6 +20,7 @@ import { useWindowDimensions } from 'react-native';
 import { useScreenRefresh } from '@/hooks/use-screen-refresh';
 import { useRegisterTabAction } from '@/features/pages/tab-actions';
 import { lookupLabel, lookupOptions, recipeListOptions } from './queries';
+import { openRecipe } from './recipe-navigation';
 
 type SearchParams = {
   q?: string | string[];
@@ -127,7 +128,7 @@ function SearchContent({ params }: { params: SearchParams }) {
       ) : null}
       <QueryContent query={query} empty={empty} emptyMessage={t('search.noResults')}>
         {query.data?.data.map((recipe) => (
-          <RecipeCard key={recipe.uuid} recipe={recipe} />
+          <RecipeCard key={recipe.uuid} recipe={recipe} onPress={openRecipe} />
         ))}
       </QueryContent>
       {empty && (search || filterCount) ? (

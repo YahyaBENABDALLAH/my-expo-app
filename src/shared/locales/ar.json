@@ -70,6 +70,10 @@
     "steps": "الخطوات",
     "dismiss": "إغلاق",
     "dismissError": "إغلاق إشعار الخطأ",
+    "errorNotificationTitle": "حدث خطأ",
+    "successNotificationTitle": "تم بنجاح",
+    "warningNotificationTitle": "تنبيه",
+    "dismissNotification": "إغلاق الإشعار",
     "close": "إغلاق"
   },
   "auth": {

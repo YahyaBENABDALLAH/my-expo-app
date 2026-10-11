@@ -18,6 +18,7 @@ import { collectionOptions } from './collections';
 import { collectionMutationOptions } from './mutations';
 
 import { chefProfileOptions, recipeListOptions, likedOptions } from './queries';
+import { openRecipe } from './recipe-navigation';
 
 export function MyRecipesScreen() {
   const { t } = useTranslation();
@@ -105,7 +106,7 @@ export function SavedRecipesScreen() {
           disabledMessage={t('recipes.loginFavorites')}
         >
           {favorites.data?.map((recipe) => (
-            <RecipeCard key={recipe.uuid} recipe={recipe} />
+            <RecipeCard key={recipe.uuid} recipe={recipe} onPress={openRecipe} />
           ))}
         </QueryContent>
       ) : (
@@ -151,7 +152,7 @@ export function HistoryScreen() {
         disabledMessage={t('recipes.loginHistory')}
       >
         {query.data?.map((recipe) => (
-          <RecipeCard key={recipe.uuid} recipe={recipe} />
+          <RecipeCard key={recipe.uuid} recipe={recipe} onPress={openRecipe} />
         ))}
       </QueryContent>
       <UniversalButtonContent
@@ -192,7 +193,7 @@ export function CreationsScreen() {
       <QueryContent query={query} empty={recipes.length === 0}>
         <Column spacing={12}>
           {recipes.map((recipe) => (
-            <RecipeCard key={recipe.uuid} recipe={recipe} />
+            <RecipeCard key={recipe.uuid} recipe={recipe} onPress={openRecipe} />
           ))}
         </Column>
         <Text variant="caption">{t('recipes.creationsLimit')}</Text>

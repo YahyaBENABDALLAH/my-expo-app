@@ -70,6 +70,10 @@
     "steps": "Étapes",
     "dismiss": "Fermer",
     "dismissError": "Fermer la notification d’erreur",
+    "errorNotificationTitle": "Une erreur est survenue",
+    "successNotificationTitle": "Opération réussie",
+    "warningNotificationTitle": "Attention",
+    "dismissNotification": "Fermer la notification",
     "close": "Fermer"
   },
   "auth": {

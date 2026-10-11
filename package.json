@@ -72,6 +72,7 @@
     "husky": "9.1.7",
     "lint-staged": "16.4.0",
     "prettier": "3.9.9",
+    "react-reconciler": "0.31.0",
     "storybook": "10.4.0",
     "typescript": "~6.0.3"
   },

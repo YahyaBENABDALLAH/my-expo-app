@@ -15,6 +15,7 @@ import { useQuery } from '@tanstack/react-query';
 import { router, useIsFocused } from 'expo-router';
 import { useScreenRefresh } from '@/hooks/use-screen-refresh';
 import { lookupLabel, lookupOptions, recipeListOptions } from './queries';
+import { openRecipe } from './recipe-navigation';
 
 export default function HomeScreen() {
   const { t } = useTranslation();
@@ -72,7 +73,7 @@ export default function HomeScreen() {
       >
         <Column spacing={12}>
           {recipes.data?.data.map((recipe) => (
-            <RecipeCard key={recipe.uuid} recipe={recipe} />
+            <RecipeCard key={recipe.uuid} recipe={recipe} onPress={openRecipe} />
           ))}
         </Column>
       </QueryContent>

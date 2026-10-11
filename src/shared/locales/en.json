@@ -70,6 +70,10 @@
     "steps": "Steps",
     "dismiss": "Dismiss",
     "dismissError": "Dismiss error notification",
+    "errorNotificationTitle": "Something went wrong",
+    "successNotificationTitle": "Success",
+    "warningNotificationTitle": "Heads up",
+    "dismissNotification": "Dismiss notification",
     "close": "Close"
   },
   "auth": {

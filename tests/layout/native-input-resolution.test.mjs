@@ -39,6 +39,7 @@ for (const platform of ['ios', 'android']) {
     'checkbox/checkbox.tsx',
     'collapsible/collapsible.tsx',
     'error-toast/error-toast.tsx',
+    'toast/toast.tsx',
     'field-group/field-group.tsx',
     'floating-action/floating-action-button.tsx',
     'floating-action/floating-action-layout.tsx',

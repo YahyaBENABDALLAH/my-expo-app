@@ -37,8 +37,12 @@ preview, resizing and locale changes. See the layout follow-up in the
 and `.rnstorybook/stories/pages/recipe-card.stories.tsx` covering light/dark,
 embedded/missing images, long titles, unrelated parent updates and changed likes.
 Its `recipe` prop accepts `RecipeCardData`; it inherits Host/theme/language and
-opens its UUID route. The visual fixture route has no live API record. It shares
-existing surface/text tokens and adds no theme roles.
+requires `onPress(recipeUuid)`. Recipe screens pass their stable feature navigation
+action; the Storybook callback increments a visible count and logs the UUID without
+leaving the fixture. Keep both data and callback stable for memoization. It shares
+existing surface/text tokens and adds no theme roles. Activation/current-callback
+checks accompany the render tests; `.maestro/storybook/recipe-card.yaml` covers
+native presses when a device is available.
 `RecipeStepper` uses default memo comparison for current/validity/animation/theme
 props while retaining its native geometry and shared-value motion. Its existing
 step/validity/static/light/dark composition stories remain applicable.
@@ -94,7 +98,7 @@ See the [folder guide](../../../../src/components/ui/README.md).
 | [Button](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/button/)           | `button/universal-button.tsx`, `button/universal-button-content.<platform>.tsx`         | `button.stories.tsx`                                | Required intent variants, disabled suppresses actions, one press produces one action, full visible surface responds |
 | [ScrollView](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/scrollview/)   | Direct Expo UI export; `refreshable-scroll-view/refreshable-scroll-view.<platform>.tsx` | `scroll-view.stories.tsx`; Pages/Navigation shell   | Scrolling, keyboard, short/tall content; refresh completion, repeated gestures, errors and recovery                 |
 | [Switch](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/switch/)           | `switch/switch.<platform>.tsx`                                                          | `switch.stories.tsx`                                | On/off, disabled, callback updates visible state, reset                                                             |
-| [Slider](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/slider/)           | `slider/slider.<platform>.tsx`                                                          | `slider.stories.tsx`                                | Minimum/maximum, step, disabled, value updates, drag interaction                                                    |
+| [Slider](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/slider/)           | `slider/slider.<platform>.tsx`                                                          | `slider.stories.tsx`; TokenColors                   | Minimum/maximum, step, disabled, value updates, drag interaction; seed color does not override control tokens       |
 | [Checkbox](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/checkbox/)       | `checkbox/checkbox.<platform>.tsx`                                                      | `checkbox.stories.tsx`                              | Checked/unchecked, disabled, state change and reset                                                                 |
 | [BottomSheet](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/bottomsheet/) | `bottom-sheet/bottom-sheet.tsx`                                                         | `bottom-sheet.stories.tsx`                          | Open/close, swipe/back/outside dismissal where supported, reopen, scrolling tall content                            |
 | [Collapsible](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/collapsible/) | `collapsible/collapsible.<platform>.tsx`                                                | `collapsible.stories.tsx`                           | Expand/collapse reveals and hides content, long header/content                                                      |
@@ -158,7 +162,7 @@ shared controls, text, layouts and states through this entry point. UI
 implementations use sibling imports. Shared presentation now includes
 `AuthScreenFrame`, `AuthText`, `FormTextInput`, `FormSubmit`, `NativeField`,
 `PageScreen`, `QueryContent`, `RecipeCard`, `ReferenceNavigationBar`, `ScreenError`,
-`ErrorToastHost`, `AuroraBackground` and `LaunchScreen`. Feature modules retain
+`ToastHost`, `AuroraBackground` and `LaunchScreen`. Feature modules retain
 workflow state and the tab navigation controller.
 
 `AuthButton` has been removed. All auth actions use `UniversalButtonContent` with
@@ -331,13 +335,13 @@ and release smoothness have not been checked on a device.
 - List is for short native groups, not a virtualization solution for unbounded feeds. Do not silently replace it with a disallowed UI control or render huge data trees. Raise the requirement and resolve an approved approach if needed.
 - Existing wrappers and stories can contain styling or RN content that predates the mobile-only skill. Their presence is not an exception for new work. Correct only the touched scope and document remaining drift.
 
-## Error notifications
+## Toast notifications
 
-`error-toast.android.tsx` uses [Compose SnackbarHost](https://docs.expo.dev/versions/v57.0.0/sdk/ui/jetpack-compose/snackbar/). SDK 57 has no universal or SwiftUI Snackbar; `error-toast.ios.tsx` composes native SwiftUI HStack/Text/Button inside UniversalHost. The shared contract is `message`, `onDismiss`, and optional `colorScheme`; mount a new keyed instance per notification. Colors consume `surface`, `error`, and `text`; native button and Snackbar geometry are retained. Android uses the long native timeout and close control. iOS wraps multiline text, announces to VoiceOver, holds while a screen reader is enabled, and otherwise dismisses after six seconds.
+`toast.android.tsx` uses a rounded [Compose Surface](https://docs.expo.dev/versions/v57.0.0/sdk/ui/jetpack-compose/surface/) and native IconButton; `toast.ios.tsx` uses SwiftUI background/shadow and a native Button. Both compose universal Row/Column/Icon and hosted text inside UniversalHost. Required props are `variant` (`error`, `success`, `warning`), `message`, and `onDismiss`; optional props are `title` and `colorScheme`. All variants share a localized heading, wrapping message, badge and close control (44pt iOS, 48dp Android). Success uses a green checkmark, warning an amber triangle and error a red alert. Colors consume `surfaceRaised`, `text`, `muted`, the variant's semantic accent/container and iOS `shadow`. Appearance and layout direction inherit from the owning Host. Mount a new keyed instance per notification. The lifetime hook dismisses after six seconds, respects Android's recommended accessibility timeout, announces the heading/message, and holds while VoiceOver/TalkBack is enabled. See [Toast README](../../../../src/components/ui/toast/README.md).
 
-`ErrorToastHost` provides a safe-area top overlay above navigation, queue retention before mounting, and stable dismissal IDs. Shared query/mutation cache callbacks and imperative auth failures report through `src/lib/error-toasts.ts`; client-side field validation and retry buttons stay on screens. `FormTextInput.onEdited` is now optional because auth forms no longer maintain inline API errors; existing stories can still use it for local feedback.
+`ToastHost` provides a safe-area top overlay above navigation, queue retention before mounting, and stable dismissal IDs. `showToast({ variant, message, title? })` from `src/lib/toasts.ts` queues all variants, coalescing identical variant/message/title combinations. Shared query/mutation cache callbacks and imperative auth failures keep reporting through `reportErrorToast` in `src/lib/error-toasts.ts`, preserving cancellation/session filters and friendly translations. `ErrorToast` and `ErrorToastHost` remain compatibility exports. Client-side field validation and retry buttons stay on screens. `FormTextInput.onEdited` remains optional for local feedback.
 
-`error-toast.stories.tsx` covers light/dark, long text, multiline validation messages, dismissal count, and reopening. `.maestro/storybook/error-toast.yaml` checks visible text, dismissal, and reopening. Real Axios/TanStack tests cover error messages, coalescing, queues, retries, callbacks, canceled reads and session changes. Metro-resolution checks cover both native implementations. Native appearance, font scaling, narrow screens, VoiceOver/TalkBack, overlay stacking, keyboard visibility, and dismiss selectors require devices; no native execution is claimed.
+`toast.stories.tsx` covers error/success/warning in light/dark, custom headings, long text, multiline validation messages, right-to-left content, dismissal count, and reopening. `.maestro/storybook/error-toast.yaml` exercises headings, visible text and close/dismissal for all three variants, plus reopening. Real Axios/TanStack tests cover API error messages, retries, callbacks, canceled reads and session changes; `toasts.test.mjs` checks mixed queues, coalescing by variant/title, stale dismissals, blank input and reshowing feedback. Metro-resolution checks cover both native implementations and compatibility adapters. Native appearance, font scaling, narrow screens, VoiceOver/TalkBack, overlay stacking, keyboard visibility, and dismiss selectors require devices; no native execution is claimed.
 
 ## Maintain this inventory
 
@@ -430,3 +434,7 @@ FloatingActionLayout is a host-free Box/ZStack platform adapter for stacking RN 
 ### Light navigation dock shadow correction (2026-10-04)
 
 ReferenceNavigationBar disables shadowOpacity and all three RN elevation layers in light mode. Android elevation independently casts a shadow, so lowering shadowOpacity alone would retain the grey halo. Existing zIndex values keep the controls and raised action above the decorative glass. Dark-mode elevations, glass adapters, dock geometry, native tab feedback and action motion are retained. The existing Light/Dark and GlassAndTap/DarkGlassAndTap stories cover appearance; actual blur, stacking and edge taps require native verification.
+
+### Navigation edge spacing (2026-10-11)
+
+`ReferenceNavigationBar` now renders a borderless rectangular dock flush with the screen edges. Its existing `leftInset` and `rightInset` protect only native destination controls; `bottomInset` extends the glass to the bottom edge beneath the system gesture area. The 84-point action touch frame has a negative 28-point top margin and transparent `box-none` handling, reserving only the 56-point dock plus the bottom inset while allowing page content and touches beside the raised action. Floating-action appearance and motion are unchanged. `PageOverlap` in `reference-navigation.stories.tsx` exposes a page press count beside the action; `.maestro/storybook/reference-navigation.yaml` exercises this page control and the action's upper edge. Native iOS/Android overlap, hit delivery, glass and safe-area appearance require device verification.

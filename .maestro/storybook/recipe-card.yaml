@@ -1,0 +1,26 @@
+appId: com.hyrkul.likan
+name: Recipe card activation stays in its Storybook fixture
+tags: [smoke, storybook]
+env:
+  STORYBOOK_URL: myappexpo://storybook
+---
+- runFlow:
+    file: ../helpers/open-story.yaml
+    env:
+      STORY_ID: recipes-compact-recipe-card--light
+      READY_ID: recipe-card-storybook-recipe
+- assertVisible:
+    id: recipe-card-press-count
+    text: 'Presses: 0'
+- tapOn:
+    id: recipe-card-storybook-recipe
+- assertVisible:
+    id: recipe-card-press-count
+    text: 'Presses: 1'
+- tapOn:
+    id: recipe-card-storybook-recipe
+- assertVisible:
+    id: recipe-card-press-count
+    text: 'Presses: 2'
+- assertVisible:
+    id: storybook-screen

@@ -341,8 +341,12 @@ test('tab bar follows live direction, keeps the action centered and preserves ph
     view.flush(() => settings.setDirection(direction));
     const bar = view.findAll('View').find(({ props }) => props.testID === 'main-tab-bar');
     assert.equal(bar.props.style.direction, direction);
-    assert.equal(bar.props.style.paddingLeft, 50);
-    assert.equal(bar.props.style.paddingRight, 6);
+    const controls = view.findAll('View').find(({ props }) => props.testID === 'tab-dock-controls');
+    assert.equal(controls.props.style.left, 44);
+    assert.equal(controls.props.style.right, 0);
+    const overlay = view.findAll('View').find(({ props }) => props.testID === 'tab-action-overlay');
+    assert.equal(overlay.props.style.left, controls.props.style.left);
+    assert.equal(overlay.props.style.right, controls.props.style.right);
     const action = view.findAll('View').find(({ props }) => props.style?.start === '50%');
     assert.equal(action.props.style.marginStart, -action.props.style.width / 2);
     assert.equal(
@@ -461,7 +465,7 @@ for (const authenticated of [false, true]) {
       LaunchScreen: s.native('LaunchScreen'),
       AuroraBackground: s.native('AuroraBackground'),
       PageMotionOverlay: s.native('PageMotionOverlay'),
-      ErrorToastHost: s.native('ErrorToastHost'),
+      ToastHost: s.native('ToastHost'),
       PageFrame: s.native('RestorationPanel'),
       Column: s.native('Column'),
       LoadingContent: s.native('LoadingContent'),

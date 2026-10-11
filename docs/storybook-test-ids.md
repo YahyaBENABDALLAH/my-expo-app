@@ -39,6 +39,12 @@ The root ID is forwarded to the native component where its installed Expo UI imp
 
 Selectors only exist in stories that render the relevant elements. For example, use **Imperative Actions** for input focus/blur/clear buttons and **Controlled Native State** for set/reset buttons.
 
+The **Recipes/Compact recipe card** stories use `recipe-card-storybook-recipe`
+for the native action and `recipe-card-press-count` for its visible activation
+count. Each press logs the recipe UUID and increments the count without navigating.
+Use `recipes-compact-recipe-card--light` with the existing story-opening helper;
+`.maestro/storybook/recipe-card.yaml` asserts repeated activation and the canvas.
+
 ## Installed SDK limitations
 
 - Collapsible has no native `testID` prop. Its root ID is applied to its Host. Tap the native header within that host and assert `expo-ui-collapsible-content` after expanding.

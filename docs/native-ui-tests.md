@@ -36,15 +36,16 @@ To save a JUnit report:
 maestro test --format junit --output .maestro/results/report.xml .maestro
 ```
 
-| Flow                         | Expected behavior                                                     |
-| ---------------------------- | --------------------------------------------------------------------- |
-| `text-input-empty.yaml`      | Empty field accepts a tap, typing, and deletion without crashing      |
-| `text-input-actions.yaml`    | Focus, blur, clear, and subsequent editing work                       |
-| `text-input-controlled.yaml` | JavaScript updates, reset, and uppercase transformation work          |
-| `switch.yaml`                | Toggle changes its value and reset returns it to Off                  |
-| `checkbox.yaml`              | Toggle changes from Unchecked to Checked and back                     |
-| `bottom-sheet.yaml`          | Opening shows content; closing dismisses it and restores Closed state |
-| `list.yaml`                  | Pressing the second row changes the selected-row status               |
+| Flow                         | Expected behavior                                                      |
+| ---------------------------- | ---------------------------------------------------------------------- |
+| `text-input-empty.yaml`      | Empty field accepts a tap, typing, and deletion without crashing       |
+| `text-input-actions.yaml`    | Focus, blur, clear, and subsequent editing work                        |
+| `text-input-controlled.yaml` | JavaScript updates, reset, and uppercase transformation work           |
+| `switch.yaml`                | Toggle changes its value and reset returns it to Off                   |
+| `checkbox.yaml`              | Toggle changes from Unchecked to Checked and back                      |
+| `bottom-sheet.yaml`          | Opening shows content; closing dismisses it and restores Closed state  |
+| `list.yaml`                  | Pressing the second row changes the selected-row status                |
+| `recipe-card.yaml`           | Repeated card presses increment the count while remaining in Storybook |
 
 ## Direct story links
 

@@ -293,9 +293,12 @@ for (const [file, exported, props, calls, updated] of [
   [
     'components/ui/recipe-card/recipe-card.tsx',
     'RecipeCard',
-    { recipe: recipeFixture({ coverImageUrl: 'https://example.test/image.jpg' }) },
+    {
+      recipe: recipeFixture({ coverImageUrl: 'https://example.test/image.jpg' }),
+      onPress: () => {},
+    },
     'cards',
-    (value) => ({ recipe: { ...value.recipe, title: 'Updated recipe' } }),
+    (value) => ({ ...value, recipe: { ...value.recipe, title: 'Updated recipe' } }),
   ],
   [
     'components/ui/recipe-stepper/recipe-stepper.tsx',
@@ -338,3 +341,35 @@ for (const [file, exported, props, calls, updated] of [
     }
   });
 }
+
+test('RecipeCard activation uses the current UUID and the latest caller action', () => {
+  const s = setup();
+  const { RecipeCard } = s.load('components/ui/recipe-card/recipe-card.tsx');
+  const presses = [];
+  const first = (uuid) => presses.push(['first', uuid]);
+  const second = (uuid) => presses.push(['second', uuid]);
+  const initial = recipeFixture({ uuid: 'first-recipe' });
+  let update;
+  function App() {
+    const [props, setProps] = useState({ recipe: initial, onPress: first });
+    update = setProps;
+    return h(RecipeCard, props);
+  }
+  const view = renderFixture(h(App));
+  try {
+    const press = () => view.findAll('Button')[0].props.onPress();
+    view.flush(press);
+    const next = { ...initial, uuid: 'next-recipe' };
+    view.flush(() => update({ recipe: next, onPress: first }));
+    view.flush(press);
+    view.flush(() => update({ recipe: next, onPress: second }));
+    view.flush(press);
+    assert.deepEqual(presses, [
+      ['first', 'first-recipe'],
+      ['first', 'next-recipe'],
+      ['second', 'next-recipe'],
+    ]);
+  } finally {
+    view.unmount();
+  }
+});

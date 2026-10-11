@@ -1,5 +1,6 @@
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react-native';
+import { action } from 'storybook/actions';
 import {
   Column,
   RecipeCard,
@@ -36,6 +37,11 @@ function CardStory({
 }) {
   const [parentUpdates, setParentUpdates] = useState(0);
   const [likes, setLikes] = useState(example.likesCount);
+  const [presses, setPresses] = useState(0);
+  const onPress = useCallback((uuid: string) => {
+    setPresses((value) => value + 1);
+    action('recipe card pressed')(uuid);
+  }, []);
   const recipe = useMemo(
     () => ({
       ...example,
@@ -51,7 +57,8 @@ function CardStory({
     <UniversalHost colorScheme={colorScheme} matchContents={false} style={{ flex: 1 }}>
       <ScrollView>
         <Column spacing={16} style={{ padding: 24 }}>
-          <RecipeCard recipe={recipe} />
+          <RecipeCard recipe={recipe} onPress={onPress} />
+          <Text testID="recipe-card-press-count">{`Presses: ${presses}`}</Text>
           <Text testID="recipe-card-parent-updates">{`Parent updates: ${parentUpdates}`}</Text>
           <UniversalButtonContent
             variant="secondary"
@@ -65,7 +72,7 @@ function CardStory({
             label="Add a like"
             onPress={() => setLikes((value) => value + 1)}
           />
-          <Text variant="caption">Card activation opens its recipe route.</Text>
+          <Text variant="caption">Card activation updates the count and logs its UUID.</Text>
         </Column>
       </ScrollView>
     </UniversalHost>

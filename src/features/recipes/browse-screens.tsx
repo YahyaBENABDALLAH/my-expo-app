@@ -15,6 +15,7 @@ import { useScreenRefresh } from '@/hooks/use-screen-refresh';
 import { isValidRouteIdentifier } from '@/lib/route-identifier';
 
 import { lookupLabel, lookupOptions, recipeListOptions } from './queries';
+import { openRecipe } from './recipe-navigation';
 
 export function CategoryScreen() {
   const { t } = useTranslation();
@@ -39,7 +40,7 @@ export function CategoryScreen() {
       {valid ? (
         <QueryContent query={query} empty={query.data?.data.length === 0}>
           {query.data?.data.map((recipe) => (
-            <RecipeCard key={recipe.uuid} recipe={recipe} />
+            <RecipeCard key={recipe.uuid} recipe={recipe} onPress={openRecipe} />
           ))}
         </QueryContent>
       ) : null}
