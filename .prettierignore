@@ -1,6 +1,7 @@
 node_modules/
 .expo/
 .git/
+.husky/_/
 android/
 ios/
 dist/
@@ -13,3 +14,5 @@ expo-env.d.ts
 google-services.json
 AGENTS.md
 Reference/
+.scannerwork/
+.sonarqube-local/

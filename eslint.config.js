@@ -1,6 +1,7 @@
 // https://docs.expo.dev/guides/using-eslint/
 const { defineConfig } = require('eslint/config');
 const expoConfig = require('eslint-config-expo/flat');
+const prettierConfig = require('eslint-config-prettier/flat');
 const nativeControlImports = [
   {
     name: 'react-native',
@@ -53,8 +54,11 @@ module.exports = defineConfig([
       'android/**',
       'ios/**',
       '.expo/**',
+      '.scannerwork/**',
+      '.sonarqube-local/**',
       '.maestro/results/**',
       '.rnstorybook/storybook.requires.ts',
+      '.husky/_/**',
     ],
   },
   {
@@ -197,4 +201,5 @@ module.exports = defineConfig([
     files: ['*.config.js', 'scripts/**/*.js'],
     languageOptions: { sourceType: 'commonjs', globals: { __dirname: 'readonly' } },
   },
+  prettierConfig,
 ]);

@@ -65,6 +65,20 @@ restores on startup; Arabic uses RTL without reloading the app. See
 - `npm run format` applies the shared formatting rules; `npm run format:check` checks them.
 - `npm run storybook:generate` regenerates story discovery after adding or moving stories.
 
+`npm ci` also installs the Husky pre-commit hook. Each commit runs ESLint fixes
+followed by Prettier on staged JavaScript/TypeScript files, and Prettier on staged
+JSON, Markdown, YAML, CSS and HTML files. Lint errors or warnings block the commit;
+the full `npm run check` remains the CI gate. Run `npm run lint:staged` to check
+staged changes manually. Hook installation is skipped in CI, production installs,
+or when `HUSKY=0` is set.
+
+Install the workspace's recommended ESLint and Prettier VS Code extensions to
+enable lint fixes and formatting on save. Prettier is pinned to an exact version
+so dependency updates do not unexpectedly change formatting.
+
+See [local SonarQube analysis](docs/sonarqube.md) for the dashboard, scan scope,
+credentials, and repeat-scan commands.
+
 Open **Browse all pages** and select **Storybook** in a development or preview build to browse native stories. Signed-out testers can use **Browse all pages as guest (dev)** on Login. See [guest browsing and preview builds](docs/development-guest-mode.md) and [the test-ID reference](docs/storybook-test-ids.md) for selectors and SDK limitations.
 
 Run `npm run test:e2e` with Maestro installed and a development build connected to Metro. See [native UI testing](docs/native-ui-tests.md) for device setup, individual flows, and platform requirements.

@@ -67,7 +67,10 @@
     "@types/react": "~19.2.2",
     "eslint": "^9.0.0",
     "eslint-config-expo": "~57.0.2",
-    "prettier": "^3.9.9",
+    "eslint-config-prettier": "10.1.8",
+    "husky": "9.1.7",
+    "lint-staged": "16.4.0",
+    "prettier": "3.9.9",
     "storybook": "10.4.0",
     "typescript": "~6.0.3"
   },
@@ -96,6 +99,8 @@
     "ios": "expo run:ios",
     "storybook:generate": "sb-rn-get-stories",
     "lint": "expo lint . --max-warnings=0",
+    "lint:staged": "lint-staged",
+    "prepare": "node .husky/install.mjs",
     "typecheck": "tsc --noEmit",
     "test:validation": "node --test tests/validation/*.test.mjs",
     "test:navigation": "node --test tests/navigation/router.test.mjs",
@@ -113,6 +118,13 @@
     "check": "npm run typecheck && npm run lint && npm run format:check && npm test",
     "test:localization": "node --test tests/localization/*.test.mjs",
     "test:architecture": "node --test tests/architecture/*.test.mjs"
+  },
+  "lint-staged": {
+    "*.{js,jsx,mjs,cjs,ts,tsx}": [
+      "eslint --fix --max-warnings=0 --no-warn-ignored",
+      "prettier --write"
+    ],
+    "*.{json,jsonc,md,mdx,yaml,yml,css,scss,html}": "prettier --write"
   },
   "private": true,
   "expo": {

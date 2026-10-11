@@ -36,6 +36,10 @@ yarn-error.*
 # typescript
 *.tsbuildinfo
 
+# SonarQube scanner output
+.scannerwork/
+.sonarqube-local/
+
 # Native UI test artifacts
 .maestro/results/
 
