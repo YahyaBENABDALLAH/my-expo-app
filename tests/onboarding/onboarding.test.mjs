@@ -8,11 +8,8 @@ function setup(storage = {}, step) {
   const writes = [];
   const navigation = [];
   const native = (name) => (props) => h(name, props, props.children);
-  const Icon = native('Icon');
-  Icon.select = ({ ios, android }) => {
-    assert.equal(typeof android?.then, 'undefined', 'Native icons require a synchronous asset.');
-    return storage.platform === 'android' ? android : ios;
-  };
+  const gestures = [];
+  const publicUI = {};
   const load = createSourceLoader({
     '@react-native-async-storage/async-storage': {
       getItem: (key) => storage.getItem?.(key) ?? Promise.resolve(storage.value ?? null),
@@ -22,11 +19,13 @@ function setup(storage = {}, step) {
         storage.value = value;
       },
     },
-    '@components/ui': {
+    '@components/ui': publicUI,
+    '@expo/ui': {
       Column: native('Column'),
       Row: native('Row'),
       ScrollView: native('ScrollView'),
-      Icon,
+      RNHostView: native('RNHostView'),
+      Spacer: native('Spacer'),
       LoadingContent: native('Loading'),
       PageFrame: native('PageFrame'),
       UniversalHost: native('Host'),
@@ -35,10 +34,54 @@ function setup(storage = {}, step) {
       nativeFillWidth: [],
       nativeRowWeight: [],
     },
-    '@expo/material-symbols/restaurant.xml': 1,
-    '@expo/material-symbols/menu_book.xml': 2,
-    '@expo/material-symbols/bookmark.xml': 3,
-    'react-native': { View: native('View') },
+    '@assets/images/recipe-examples/salad.jpg': 1,
+    '@assets/images/recipe-examples/pasta.jpg': 2,
+    '@assets/images/recipe-examples/breakfast.jpg': 3,
+    'expo-image': { Image: native('Image') },
+    '@/components/ui/host/universal-host': {
+      UniversalHost: native('Host'),
+      useHostColorScheme: (scheme) => scheme ?? 'light',
+    },
+    '@/components/ui/button/universal-button-content': { UniversalButtonContent: native('Button') },
+    '@/components/ui/text/universal-text': { UniversalTextContent: native('Text') },
+    '@/components/ui/loading/loading-state': { LoadingContent: native('Loading') },
+    '@/components/ui/native/native-fill-width': { nativeFillWidth: [], nativeRowWeight: [] },
+    '@/context/language.context': { useLanguage: () => ({ language: storage.language ?? 'en' }) },
+    '@/context/layout-direction.context': { useLayoutDirection: () => storage.direction ?? 'ltr' },
+    'react-native': {
+      View: native('View'),
+      Platform: { OS: storage.platform ?? 'android' },
+      useWindowDimensions: () => storage.dimensions ?? { width: 390, height: 844, fontScale: 1 },
+    },
+    'react-native-gesture-handler': {
+      GestureHandlerRootView: native('GestureRoot'),
+      GestureDetector: native('GestureDetector'),
+      Gesture: {
+        Pan: () => {
+          const gesture = {
+            enabled(value) {
+              this.isEnabled = value;
+              return this;
+            },
+            activeOffsetX() {
+              return this;
+            },
+            failOffsetY() {
+              return this;
+            },
+            runOnJS() {
+              return this;
+            },
+            onEnd(handler) {
+              this.end = handler;
+              return this;
+            },
+          };
+          gestures.push(gesture);
+          return gesture;
+        },
+      },
+    },
     'react-native-safe-area-context': {
       useSafeAreaInsets: () => ({ top: 59, bottom: 34, left: 0, right: 0 }),
     },
@@ -46,13 +89,14 @@ function setup(storage = {}, step) {
     '@/hooks/use-theme': { useThemeColors: () => ({}) },
     'expo-router': {
       router: {
-        push: (href) => navigation.push(['push', href]),
+        navigate: (href) => navigation.push(['navigate', href]),
         replace: (href) => navigation.push(['replace', href]),
         canGoBack: () => storage.canGoBack ?? true,
         back: () => navigation.push(['back']),
       },
     },
   });
+  publicUI.OnboardingPage = load('components/ui/onboarding/onboarding-page.tsx').OnboardingPage;
   const { OnboardingProvider, useOnboarding } = load('context/onboarding.context.tsx');
   const Screen =
     step === undefined ? null : load('features/onboarding/onboarding-screen.tsx').OnboardingScreen;
@@ -66,6 +110,7 @@ function setup(storage = {}, step) {
     view,
     writes,
     navigation,
+    gestures,
     context: () => context,
     flushAsync: async () => {
       await new Promise(setImmediate);
@@ -185,7 +230,7 @@ for (const step of [0, 1, 2]) {
       assert.equal(
         s.view.findAll('Text').find(({ props }) => props.testID === 'onboarding-progress')
           .children[0].text,
-        `Introduction progress · ${step + 1} / 3`,
+        `${step + 1} of 3`,
       );
       assert.equal(
         s.view.findAll('Button').some(({ props }) => props.testID === 'onboarding-back'),
@@ -195,7 +240,7 @@ for (const step of [0, 1, 2]) {
         assert.equal(s.button('onboarding-next').label, 'Next');
         s.view.flush(() => s.button('onboarding-next').onPress());
         assert.deepEqual(s.navigation, [
-          ['push', step === 0 ? '/(onboarding)/cook' : '/(onboarding)/save'],
+          ['navigate', step === 0 ? '/(onboarding)/cook' : '/(onboarding)/save'],
         ]);
         assert.equal(s.writes.length, 0);
       } else {
@@ -230,14 +275,61 @@ test('direct entry to a later page has a safe previous-page fallback', async () 
   }
 });
 
-test('all three Android pages resolve native icons to their installed XML assets', async () => {
+test('all three pages display passive bundled photos without a network request', async () => {
   for (const step of [0, 1, 2]) {
     const s = setup({ platform: 'android' }, step);
     try {
       await s.flushAsync();
-      assert.equal(s.view.findAll('Icon')[0].props.name, step + 1);
+      const photo = s.view.findAll('Image')[0].props;
+      assert.equal(photo.source, step + 1);
+      assert.equal(photo.pointerEvents, 'none');
+      assert.equal(photo.accessible, false);
     } finally {
       s.view.unmount();
     }
+  }
+});
+
+for (const direction of ['ltr', 'rtl']) {
+  test(`${direction}: deliberate horizontal swipes navigate; small movements and swiping beyond the final page do not complete onboarding`, async () => {
+    const forward = direction === 'rtl' ? 120 : -120;
+    const s = setup({ direction }, 1);
+    try {
+      await s.flushAsync();
+      s.view.flush(() => s.gestures.at(-1).end({ translationX: forward / 4, velocityX: 0 }));
+      assert.equal(s.navigation.length, 0);
+      s.view.flush(() => s.gestures.at(-1).end({ translationX: forward, velocityX: 0 }));
+      assert.deepEqual(s.navigation.at(-1), ['navigate', '/(onboarding)/save']);
+      s.view.flush(() => s.gestures.at(-1).end({ translationX: -forward, velocityX: 0 }));
+      assert.deepEqual(s.navigation.at(-1), ['back']);
+    } finally {
+      s.view.unmount();
+    }
+    const last = setup({ direction }, 2);
+    try {
+      await last.flushAsync();
+      last.view.flush(() => last.gestures.at(-1).end({ translationX: forward, velocityX: 0 }));
+      assert.equal(last.writes.length, 0);
+      assert.equal(last.context().completed, false);
+    } finally {
+      last.view.unmount();
+    }
+  });
+}
+
+test('compact screens and enlarged text keep the primary action outside the scrollable content', async () => {
+  const s = setup({ dimensions: { width: 360, height: 640, fontScale: 1.6 } }, 0);
+  try {
+    await s.flushAsync();
+    const hosts = s.view.findAll('Host');
+    assert.equal(hosts.length, 3);
+    assert.equal(s.view.findAll('Image')[0].props.style.height, 179);
+    const contains = (node, testID) =>
+      node.props?.testID === testID || node.children.some((child) => contains(child, testID));
+    assert.equal(contains(hosts[1], 'onboarding-next'), false);
+    assert.equal(contains(hosts[2], 'onboarding-next'), true);
+    assert.equal(s.button('onboarding-next').fullWidth, true);
+  } finally {
+    s.view.unmount();
   }
 });

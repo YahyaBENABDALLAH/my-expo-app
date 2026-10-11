@@ -134,6 +134,19 @@ See the [folder guide](../../../../src/components/ui/README.md).
 
 ## Compound exports and helpers
 
+`OnboardingPage` (`onboarding/onboarding-page.tsx`) supplies photo-led introduction
+content with fixed native navigation and action Hosts, a scrollable body, safe
+areas, responsive image sizing, RTL-aware horizontal swipes, and persistence
+feedback. It accepts an image, category/title/description, step, Next/Previous/Skip
+callbacks, saving/error state, and an optional scheme. It uses shared background,
+text, muted, border and tint tokens. `Pages/Onboarding` covers all three steps,
+light/dark, saving and failure with interactive completion/replay. Behavioral tests
+cover swipe direction/thresholds, disabled suppression and persistence recovery.
+Android light/French rendering and interactions were checked with the production
+component in an isolated native preview, including enlarged text and action touch
+bounds. The updated first-launch Maestro flow was not executed because the full
+app's native build fails. Native iOS, RTL and dark rendering remain unverified.
+
 ### Shared UI cleanup (2026-10-11)
 
 `list-item/list-item.tsx` now owns the common root ListItem composition, Host theme

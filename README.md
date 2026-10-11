@@ -57,10 +57,14 @@ restores on startup; Arabic uses RTL without reloading the app. See
 [localization](docs/localization.md) for conventions and verification.
 
 The first launch shows Discover, Cook, and Save introduction pages before sign-in.
-Next and Previous navigate between them; Skip or Let’s get started saves
+The pages use bundled food photography, large headings, and a bottom action that
+stays visible when content scrolls. Next, Previous and horizontal swipes navigate
+between them; swipe direction follows the selected language. Skip or Let’s get started saves
 `onboardingCompleted` in AsyncStorage. Later launches and sign-outs keep that
 preference. Startup waits for the preference before choosing a route, and a failed
 save offers a retry without marking the introduction complete.
+The `Pages/Onboarding` native Storybook stories preview every page, light/dark
+appearance, and persistence feedback without changing the saved preference.
 
 - `npm start` starts Metro.
 - Use Node 22.18 or newer and `npm ci` to install the locked dependencies.

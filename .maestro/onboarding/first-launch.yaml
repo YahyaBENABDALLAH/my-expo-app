@@ -15,35 +15,50 @@ env:
     id: onboarding-discover
 - assertNotVisible:
     id: auth-login-submit
-- scrollUntilVisible:
-    element:
-      id: onboarding-next
+- assertVisible:
+    id: onboarding-next
 - tapOn:
     id: onboarding-next
 - assertVisible:
     id: onboarding-cook
-- scrollUntilVisible:
-    element:
-      id: onboarding-back
+- assertVisible:
+    id: onboarding-back
 - tapOn:
     id: onboarding-back
 - assertVisible:
     id: onboarding-discover
-- scrollUntilVisible:
-    element:
-      id: onboarding-next
-- tapOn:
-    id: onboarding-next
-- scrollUntilVisible:
-    element:
-      id: onboarding-next
+- swipe:
+    start: 80%, 30%
+    end: 20%, 30%
+    duration: 400
+- assertVisible:
+    id: onboarding-cook
+- swipe:
+    start: 20%, 30%
+    end: 80%, 30%
+    duration: 400
+- assertVisible:
+    id: onboarding-discover
 - tapOn:
     id: onboarding-next
 - assertVisible:
+    id: onboarding-cook
+- swipe:
+    start: 80%, 30%
+    end: 20%, 30%
+    duration: 400
+- assertVisible:
     id: onboarding-save
-- scrollUntilVisible:
-    element:
-      id: onboarding-start
+- assertVisible:
+    id: onboarding-start
+- swipe:
+    start: 80%, 30%
+    end: 20%, 30%
+    duration: 400
+- assertVisible:
+    id: onboarding-save
+- assertNotVisible:
+    id: auth-login-submit
 - tapOn:
     id: onboarding-start
 - extendedWaitUntil:

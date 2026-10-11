@@ -236,23 +236,28 @@
   "onboarding": {
     "discover": {
       "title": "Good food starts here.",
-      "subtitle": "Find something you’ll love to cook.",
+      "subtitle": "Find fresh ideas for everyday meals and your next kitchen adventure.",
+      "category": "FIND YOUR INSPIRATION",
       "detail": "Fresh ideas. Everyday ingredients."
     },
     "save": {
       "title": "Keep the good ones.",
-      "subtitle": "Your favorite recipes, always close by.",
+      "subtitle": "Save the recipes you love. A little inspiration, ready whenever you are.",
+      "category": "MADE FOR YOUR TASTE",
       "detail": "A little collection of what you love."
     },
     "cook": {
       "title": "Make it your own.",
-      "subtitle": "Cook, create, and share your next favorite.",
+      "subtitle": "Follow the steps, add your own twist, and share something delicious.",
+      "category": "FROM IDEA TO YOUR TABLE",
       "detail": "Your kitchen. Your inspiration."
     },
     "start": "Let’s get started",
     "next": "Next",
     "saveFailed": "We couldn’t save your progress. Please try again.",
     "skip": "Skip to sign in",
+    "skipShort": "Skip",
+    "page": "{{current}} of {{total}}",
     "back": "Previous",
     "progress": "Introduction progress"
   },

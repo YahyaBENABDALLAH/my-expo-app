@@ -236,23 +236,28 @@
   "onboarding": {
     "discover": {
       "title": "Le plaisir commence ici.",
-      "subtitle": "Trouvez une recette qui vous donne envie.",
+      "subtitle": "Des idées fraîches pour vos repas du quotidien et vos prochaines découvertes.",
+      "category": "TROUVEZ L’INSPIRATION",
       "detail": "Des idées fraîches. Des ingrédients simples."
     },
     "save": {
       "title": "Gardez vos coups de cœur.",
-      "subtitle": "Vos recettes préférées, toujours à portée de main.",
+      "subtitle": "Gardez les recettes que vous aimez. L’inspiration vous attend quand vous en avez envie.",
+      "category": "À VOTRE GOÛT",
       "detail": "Une collection de ce que vous aimez."
     },
     "cook": {
       "title": "À vous de jouer.",
-      "subtitle": "Cuisinez, créez et partagez vos envies.",
+      "subtitle": "Suivez les étapes, ajoutez votre touche et partagez un moment gourmand.",
+      "category": "DE L’IDÉE À L’ASSIETTE",
       "detail": "Votre cuisine. Votre inspiration."
     },
     "start": "C’est parti",
     "next": "Suivant",
     "saveFailed": "Impossible d’enregistrer votre progression. Veuillez réessayer.",
     "skip": "Passer à la connexion",
+    "skipShort": "Passer",
+    "page": "{{current}} sur {{total}}",
     "back": "Précédent",
     "progress": "Progression de la présentation"
   },

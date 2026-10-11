@@ -87,7 +87,7 @@ function RootLayoutContent() {
   const { restoring } = useAuthGuards();
   const { error } = useAuthContext();
   const { ready: languageReady } = useLanguage();
-  const { ready: onboardingReady } = useOnboarding();
+  const { ready: onboardingReady, completed: onboardingCompleted } = useOnboarding();
   // Restoration failures must expose their retry UI instead of keeping the launch overlay.
   const ready = languageReady && onboardingReady && (!restoring || Boolean(error));
   const finishBrandScreen = useCallback(() => setShowBrandScreen(false), []);
@@ -103,12 +103,12 @@ function RootLayoutContent() {
     >
       <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
       <AuroraBackground
-        animate={!showBrandScreen}
+        animate={!showBrandScreen && onboardingCompleted}
         colorScheme={colorScheme}
         style={{ position: 'absolute', top: 0, right: 0, bottom: 0, left: 0 }}
       />
       {ready || !showBrandScreen ? <RootLayoutNav /> : null}
-      <PageMotionOverlay animate={!showBrandScreen} />
+      {onboardingCompleted && <PageMotionOverlay animate={!showBrandScreen} />}
       {showBrandScreen && (
         <LaunchScreen
           exiting={ready}
