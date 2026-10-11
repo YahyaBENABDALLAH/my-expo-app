@@ -15,7 +15,7 @@ export default function StorybookRoute() {
   if (!StorybookScreen) return <Redirect href="/skia" />;
 
   return (
-    <PageFrame title={t('tools.storybook')} tab>
+    <PageFrame title={t('tools.storybook')}>
       <Suspense fallback={<LoadingScreen label={t('tools.loadingStories')} />}>
         <StorybookScreen />
       </Suspense>

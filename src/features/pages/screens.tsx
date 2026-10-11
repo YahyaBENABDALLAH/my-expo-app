@@ -97,6 +97,7 @@ export function DevelopmentPagesScreen() {
         },
         { label: t('common.myRecipes'), testID: 'page-action-my-recipes', href: '/recipes' },
         { label: t('common.more'), testID: 'page-action-more', href: '/more' },
+        { label: t('settings.title'), testID: 'page-action-app-settings', href: '/settings' },
         { label: t('common.account'), testID: 'page-action-account', href: '/account' },
         {
           label: t('chefProfile.heroTitle'),

@@ -48,8 +48,6 @@ SplashScreen.preventAutoHideAsync().catch(() => {
 });
 SplashScreen.setOptions({ duration: 0, fade: false });
 
-const BRAND_DURATION_MS = 3000;
-
 export default function RootLayout() {
   const [loaded, error] = useFonts({
     'Inter-Black': require('@assets/fonts/Inter-Black.otf'),
@@ -83,8 +81,6 @@ function RootLayoutContent() {
   const colorScheme = useColorScheme();
   const colors = useThemeColors(colorScheme);
   const [showBrandScreen, setShowBrandScreen] = useState(true);
-  const [brandScreenVisible, setBrandScreenVisible] = useState(false);
-  const [brandDurationElapsed, setBrandDurationElapsed] = useState(false);
   const { restoring } = useAuthGuards();
   const { error } = useAuthContext();
   const { ready: languageReady } = useLanguage();
@@ -92,16 +88,8 @@ function RootLayoutContent() {
   const ready = languageReady && (!restoring || Boolean(error));
   const finishBrandScreen = useCallback(() => setShowBrandScreen(false), []);
   const revealBrandScreen = useCallback(() => {
-    // Begin the three seconds only once the animated screen has native layout.
     SplashScreen.hide();
-    setBrandScreenVisible(true);
   }, []);
-
-  useEffect(() => {
-    if (!brandScreenVisible) return;
-    const timeout = setTimeout(() => setBrandDurationElapsed(true), BRAND_DURATION_MS);
-    return () => clearTimeout(timeout);
-  }, [brandScreenVisible]);
 
   return (
     <View
@@ -119,7 +107,7 @@ function RootLayoutContent() {
       <PageMotionOverlay animate={!showBrandScreen} />
       {showBrandScreen && (
         <LaunchScreen
-          exiting={ready && brandDurationElapsed}
+          exiting={ready}
           onReady={revealBrandScreen}
           onExitComplete={finishBrandScreen}
         />
@@ -207,6 +195,7 @@ function RootLayoutNav() {
           <Stack.Screen name="my-recipes/history" options={{ title: t('common.recipeHistory') }} />
           <Stack.Screen name="my-recipes/creations" options={{ title: t('common.creations') }} />
           <Stack.Screen name="ingredients" options={{ title: t('common.ingredients') }} />
+          <Stack.Screen name="settings" options={{ title: t('settings.title') }} />
           <Stack.Screen name="become-chef" options={{ title: t('chefProfile.heroTitle') }} />
           <Stack.Screen name="device-info" options={{ title: t('tools.deviceInfo') }} />
           <Stack.Screen name="health-check" options={{ title: t('common.healthCheck') }} />

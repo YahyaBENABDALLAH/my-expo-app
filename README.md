@@ -61,6 +61,7 @@ restores on startup; Arabic uses RTL without reloading the app. See
 - `npm run test:services` checks API contracts, pagination, cancellation and mutation cache behavior.
 - `npm run lint` checks app source, Storybook source, and project scripts/configuration with zero warnings allowed.
 - `npm run typecheck` checks app source, platform implementations, and Storybook stories with strict TypeScript.
+- `npm run test:architecture` checks import boundaries with real ESLint probes.
 - `npm run format` applies the shared formatting rules; `npm run format:check` checks them.
 - `npm run storybook:generate` regenerates story discovery after adding or moving stories.
 
@@ -75,3 +76,7 @@ See [the cleanup report](docs/project-cleanup.md) for review findings, dependenc
 See [API services and TanStack Query](docs/api-services.md) for the 16 entity services, typed hooks, documented writes, cache invalidation and examples.
 
 Use `$expo-api-services` when adding or updating entity services. The [project skill](.agents/skills/expo-api-services/SKILL.md) describes the contracts, query keys, mutation lifecycle and checks to preserve.
+
+See [engineering quality](docs/engineering-quality.md) for the product cleanup,
+retry policy, architecture checks and CI gate. Local recipe and control examples
+are available through **UI showcase → Recipe UI examples**.

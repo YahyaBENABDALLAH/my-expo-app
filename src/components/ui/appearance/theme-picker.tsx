@@ -9,7 +9,7 @@ export function ThemePicker() {
       selectedValue={themeId}
       onValueChange={setThemeId}
       appearance="menu"
-      testID="page-theme-picker"
+      testID="app-settings-theme-picker"
     >
       {themeIds.map((id) => (
         <Picker.Item key={id} label={themes[id].label} value={id} />

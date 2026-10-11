@@ -24,6 +24,26 @@ const nativeControlImports = [
   },
 ];
 
+// Flat-config rule options replace one another. Every scoped import policy must
+// include these shared boundaries so a later override cannot reopen them.
+const sharedImportPatterns = [
+  {
+    group: ['@storybook', '@storybook/*', 'storybook/*', '**/.rnstorybook', '**/.rnstorybook/**'],
+    message: 'Keep Storybook imports in src/features/storybook and .rnstorybook.',
+  },
+  {
+    group: ['@/app/**', '**/app/**'],
+    message: 'Import feature modules instead of route files.',
+  },
+];
+
+function restrictImports(patterns = []) {
+  return [
+    'error',
+    { paths: nativeControlImports, patterns: [...sharedImportPatterns, ...patterns] },
+  ];
+}
+
 module.exports = defineConfig([
   expoConfig,
   {
@@ -40,77 +60,71 @@ module.exports = defineConfig([
   {
     files: ['src/**/*.{ts,tsx}'],
     ignores: ['src/features/storybook/**'],
-    rules: {
-      'no-restricted-imports': [
-        'error',
-        {
-          paths: nativeControlImports,
-          patterns: [
-            {
-              group: ['@storybook', '@storybook/*', 'storybook/*', '**/.rnstorybook/**'],
-              message: 'Keep Storybook imports in src/features/storybook and .rnstorybook.',
-            },
-            {
-              group: ['@/app/*'],
-              message: 'Import feature modules instead of route files.',
-            },
-          ],
-        },
-      ],
-    },
+    rules: { 'no-restricted-imports': restrictImports() },
   },
   {
     files: ['src/features/recipes/*screen*.tsx'],
     rules: {
-      'no-restricted-imports': [
-        'error',
+      'no-restricted-imports': restrictImports([
         {
-          paths: nativeControlImports,
-          patterns: [
-            {
-              group: ['@storybook', '@storybook/*', 'storybook/*', '**/.rnstorybook/**'],
-              message: 'Keep development tooling out of production screens.',
-            },
-            { group: ['@/app/**'], message: 'Import feature modules instead of route files.' },
-            {
-              group: [
-                '@/services/api',
-                './recipe.api',
-                '@react-native-async-storage/async-storage',
-                '@/services/auth/auth.session',
-              ],
-              message:
-                'Screens compose feature queries/mutations; transport, storage and session writes belong in feature adapters.',
-            },
+          group: [
+            '@/services/api',
+            '**/services/api',
+            './recipe.api',
+            '@react-native-async-storage/async-storage',
+            '@/services/auth/auth.session',
+            '**/services/auth/auth.session',
           ],
+          message:
+            'Screens compose feature queries/mutations; transport, storage and session writes belong in feature adapters.',
         },
-      ],
+        {
+          group: ['@/features/ui-showcase/**', '**/ui-showcase/**'],
+          message: 'Keep sample content in the UI showcase; product screens render real data.',
+        },
+      ]),
     },
   },
   {
     files: ['src/services/**/*.{ts,tsx}'],
     rules: {
-      'no-restricted-imports': [
-        'error',
+      'no-restricted-imports': restrictImports([
         {
-          paths: nativeControlImports,
-          patterns: [
-            {
-              group: [
-                '@/features/**',
-                '@/app/**',
-                '@/components/**',
-                '@components/**',
-                '@/context/**',
-                '**/features/**',
-                '**/components/**',
-                '**/app/**',
-              ],
-              message: 'Infrastructure must not depend on screens or UI.',
-            },
+          group: [
+            '@/features/**',
+            '@/components/**',
+            '@components/**',
+            '@/context/**',
+            '**/features/**',
+            '**/components/**',
+            '**/context/**',
           ],
+          message: 'Infrastructure must not depend on screens or UI.',
         },
-      ],
+      ]),
+    },
+  },
+  {
+    files: ['src/services/**/*.service.ts'],
+    rules: {
+      'no-restricted-imports': restrictImports([
+        {
+          group: [
+            'react',
+            '@tanstack/**',
+            'expo-router',
+            '@/features/**',
+            '@/components/**',
+            '@components/**',
+            '@/context/**',
+            '**/features/**',
+            '**/components/**',
+            '**/context/**',
+          ],
+          message:
+            'Entity services own transport contracts; rendering and cache effects belong in consumers and query/mutation modules.',
+        },
+      ]),
     },
   },
   {
@@ -120,27 +134,26 @@ module.exports = defineConfig([
       'src/features/recipes/query-keys.ts',
     ],
     rules: {
-      'no-restricted-imports': [
-        'error',
+      'no-restricted-imports': restrictImports([
         {
-          patterns: [
-            {
-              group: [
-                'react',
-                'react-native',
-                'expo*',
-                '@expo/**',
-                '@tanstack/**',
-                '@/services/**',
-                '@/context/**',
-                '@/components/**',
-                '@components/**',
-              ],
-              message: 'Domain rules and cache identifiers stay independent of rendering and I/O.',
-            },
+          group: [
+            'react',
+            'react-native',
+            'expo*',
+            '@expo/**',
+            '@tanstack/**',
+            '@react-native-async-storage/**',
+            '@/services/**',
+            '@/context/**',
+            '@/components/**',
+            '@components/**',
+            '**/services/**',
+            '**/context/**',
+            '**/components/**',
           ],
+          message: 'Domain rules and cache identifiers stay independent of rendering and I/O.',
         },
-      ],
+      ]),
     },
   },
   {
@@ -167,23 +180,13 @@ module.exports = defineConfig([
   {
     files: ['src/components/ui/**/*.{ts,tsx}'],
     rules: {
-      'no-restricted-imports': [
-        'error',
+      'no-restricted-imports': restrictImports([
         {
-          paths: nativeControlImports,
-          patterns: [
-            {
-              group: ['@/features/**', '@/app/**', '@components/ui'],
-              message:
-                'UI implementations import siblings directly and stay independent of feature workflows and route modules.',
-            },
-            {
-              group: ['@storybook', '@storybook/*', 'storybook/*', '**/.rnstorybook/**'],
-              message: 'Keep development fixtures out of the shared UI library.',
-            },
-          ],
+          group: ['@/features/**', '**/features/**', '@components/ui'],
+          message:
+            'UI implementations import siblings directly and stay independent of feature workflows and route modules.',
         },
-      ],
+      ]),
     },
   },
   {
@@ -192,9 +195,6 @@ module.exports = defineConfig([
   },
   {
     files: ['*.config.js', 'scripts/**/*.js'],
-    languageOptions: {
-      sourceType: 'commonjs',
-      globals: { __dirname: 'readonly' },
-    },
+    languageOptions: { sourceType: 'commonjs', globals: { __dirname: 'readonly' } },
   },
 ]);

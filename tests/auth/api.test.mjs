@@ -109,7 +109,13 @@ test('missing API configuration reports an actionable error without making a req
     const auth = setup(() => assert.fail('Should not send request'));
     await assert.rejects(
       auth.createApiClient({ includeAuth: false }).post('/api/auth/login'),
-      (error) => error.status === 0 && error.displayMessage.includes('EXPO_PUBLIC_API_URL'),
+      (error) => {
+        assert.equal(error.name, 'ApiConfigurationError');
+        assert.equal(error.status, 0);
+        assert.ok(error.message.includes('EXPO_PUBLIC_API_URL'));
+        assert.equal(error.displayMessage.includes('EXPO_PUBLIC_API_URL'), false);
+        return true;
+      },
     );
     assert.equal(auth.requests.length, 0);
   } finally {

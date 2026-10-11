@@ -17,6 +17,7 @@ import { scheduleOnRN } from 'react-native-worklets';
 import { action } from 'storybook/actions';
 
 import Colors from '@/constants/colors';
+import { authInputIcons } from '@/components/ui/auth/auth-input-icons';
 
 const searchIcon = Icon.select({
   ios: 'magnifyingglass',
@@ -341,6 +342,74 @@ export const Password: Story = {
     helperText: 'Native secure entry; selection and multiline are unavailable on iOS.',
   },
 };
+
+function PasswordVisibilityDemo(args: UniversalTextInputProps) {
+  const value = useNativeState(args.defaultValue ?? '');
+  const [shown, setShown] = useState(false);
+  const geometry = useRef<{ height: number; baseline?: number }>({ height: 0 });
+  const [heightChange, setHeightChange] = useState<number>();
+  const colors = Colors[args.colorScheme ?? 'dark'];
+  return (
+    <View style={{ gap: 20 }}>
+      <View
+        onLayout={({ nativeEvent }) => {
+          const height = Math.round(nativeEvent.layout.height);
+          geometry.current.height = height;
+          const baseline = geometry.current.baseline;
+          if (baseline !== undefined) {
+            setHeightChange((previous) => Math.max(previous ?? 0, Math.abs(height - baseline)));
+          }
+        }}
+      >
+        <UniversalTextInput
+          {...args}
+          value={value}
+          secureTextEntry={!shown}
+          leftIcon={authInputIcons.password}
+          rightIcon={shown ? authInputIcons.hidePassword : authInputIcons.showPassword}
+          rightIconAccessibilityLabel={shown ? 'Hide password' : 'Show password'}
+          onRightIconPress={() => setShown((current) => !current)}
+        />
+      </View>
+      <Host colorScheme={args.colorScheme} style={{ width: '100%' }}>
+        <Column spacing={10}>
+          <Text testID={`${args.testID}-visibility`} textStyle={{ color: colors.text }}>
+            {`Password: ${shown ? 'visible' : 'hidden'}`}
+          </Text>
+          <Text testID={`${args.testID}-height-change`} textStyle={{ color: colors.text }}>
+            {heightChange === undefined
+              ? 'Height baseline pending'
+              : `Height change: ${heightChange}`}
+          </Text>
+          <UniversalButtonContent
+            variant="secondary"
+            testID={`${args.testID}-record-height`}
+            label="Record height"
+            onPress={() => {
+              if (geometry.current.height <= 0) return;
+              geometry.current.baseline = geometry.current.height;
+              setHeightChange(0);
+            }}
+          />
+        </Column>
+      </Host>
+    </View>
+  );
+}
+
+export const PasswordVisibility: Story = {
+  ...Password,
+  args: {
+    ...Password.args,
+    helperText: 'Record the height, then reveal, hide, edit and clear the password.',
+  },
+  render: (args) => <PasswordVisibilityDemo key={args.defaultValue} {...args} />,
+};
+export const PasswordVisibilityLargeText: Story = {
+  ...PasswordVisibility,
+  args: { ...PasswordVisibility.args, textStyle: { fontSize: 24, lineHeight: 36 } },
+};
+
 export const Multiline: Story = {
   args: {
     label: 'Bio',

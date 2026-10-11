@@ -29,6 +29,9 @@ function flatten(value, prefix = '') {
 const flat = Object.fromEntries(
   Object.entries(dictionaries).map(([key, value]) => [key, flatten(value)]),
 );
+// The stable translation contract belongs in the repository. CI must not depend
+// on the ignored local Reference checkout or freeze editable product copy.
+const requiredKeys = JSON.parse(readFileSync(new URL('./required-keys.json', import.meta.url)));
 
 test('all dictionaries retain the reference keys and have matching nonempty translations and placeholders', () => {
   const keys = Object.keys(flat.en).sort();
@@ -36,13 +39,7 @@ test('all dictionaries retain the reference keys and have matching nonempty tran
     [...text.matchAll(/\{\{([^}]+)\}\}/g)].map((match) => match[1]).sort();
   for (const language of ['fr', 'en', 'ar']) {
     assert.deepEqual(Object.keys(flat[language]).sort(), keys);
-    const reference = flatten(
-      JSON.parse(
-        readFileSync(new URL(`../../reference/shared/locales/${language}.json`, import.meta.url)),
-      ),
-    );
-    for (const [key, text] of Object.entries(reference))
-      assert.equal(flat[language][key], text, key);
+    for (const key of requiredKeys) assert.ok(flat[language][key]?.trim(), `${language}: ${key}`);
     for (const key of keys) {
       assert.ok(flat[language][key].trim(), `${language}: ${key}`);
       assert.deepEqual(

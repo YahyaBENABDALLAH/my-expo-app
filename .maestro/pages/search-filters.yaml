@@ -1,0 +1,41 @@
+appId: com.hyrkul.likan
+name: Search filters support cancel, draft clearing and apply
+tags: [pages, recipes, search]
+---
+- runFlow:
+    file: ../helpers/open-page.yaml
+    env:
+      PAGE_ROUTE: search
+      PAGE_TITLE: Search
+- tapOn:
+    id: search-filters
+- assertVisible:
+    id: search-filter-title
+- scrollUntilVisible:
+    element:
+      id: search-clear-filters
+    direction: DOWN
+- tapOn:
+    id: search-clear-filters
+- scrollUntilVisible:
+    element:
+      id: search-filter-cancel
+    direction: DOWN
+- tapOn:
+    id: search-filter-cancel
+- assertNotVisible:
+    id: search-filter-title
+- tapOn:
+    id: tab-context-action
+- assertVisible:
+    id: search-filter-title
+- scrollUntilVisible:
+    element:
+      id: search-filter-done
+    direction: DOWN
+- tapOn:
+    id: search-filter-done
+- assertNotVisible:
+    id: search-filter-title
+- assertVisible:
+    id: recipe-search-input

@@ -1,9 +1,9 @@
-import type { TFunction } from 'i18next';
 import type { HomeRecipeCardData } from '@components/ui';
+import type { TFunction } from 'i18next';
 
 export type HomeRecipeExample = HomeRecipeCardData & { id: string };
 
-/** Twenty-one local samples share three photos and never require a network request. */
+/** Four local samples share three photos and never require a network request. */
 export function homeRecipeExamples(t: TFunction): HomeRecipeExample[] {
   const samples: HomeRecipeExample[] = [
     {
@@ -40,7 +40,7 @@ export function homeRecipeExamples(t: TFunction): HomeRecipeExample[] {
       secondaryMeta: t('home.cards.vegetarian'),
     },
   ];
-  return Array.from({ length: 21 }, (_, index) => {
+  return Array.from({ length: 4 }, (_, index) => {
     const sample = samples[index % samples.length];
     if (index < samples.length) return sample;
     return {

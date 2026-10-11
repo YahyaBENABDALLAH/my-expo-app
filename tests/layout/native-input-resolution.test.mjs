@@ -34,6 +34,7 @@ const context = {
 
 for (const platform of ['ios', 'android']) {
   for (const component of [
+    'auth/auth-icon-button.tsx',
     'button/universal-button-content.tsx',
     'checkbox/checkbox.tsx',
     'collapsible/collapsible.tsx',

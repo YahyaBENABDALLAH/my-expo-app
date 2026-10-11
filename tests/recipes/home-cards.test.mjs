@@ -62,7 +62,7 @@ function setup() {
   });
   ui.HomeRecipeCard = load('components/ui/home-recipe-card/home-recipe-card.tsx').HomeRecipeCard;
   return {
-    ...load('features/recipes/home-card-examples.tsx'),
+    ...load('features/ui-showcase/home-card-examples.tsx'),
     i18n: load('lib/i18n.ts').default,
     resize: (dimensions) => resize(dimensions),
     byId: (view, type, testID) => view.findAll(type).find((node) => node.props.testID === testID),
@@ -76,7 +76,7 @@ test('sample card taps open the matching local preview, and close and native dis
   const s = setup();
   const view = renderFixture(h(s.HomeCardExamples));
   try {
-    assert.equal(view.findAll('CardImage').length, 42);
+    assert.equal(view.findAll('CardImage').length, 8);
     const buttons = view.findAll('Button');
     const popularIds = buttons
       .map((node) => node.props.testID)
@@ -84,8 +84,12 @@ test('sample card taps open the matching local preview, and close and native dis
     const editorialIds = buttons
       .map((node) => node.props.testID)
       .filter((id) => id?.startsWith('home-editorial-example-'));
-    assert.equal(popularIds.length, 21);
-    assert.equal(new Set(popularIds).size, 21);
+    assert.deepEqual(popularIds, [
+      'home-popular-example-toast',
+      'home-popular-example-salad',
+      'home-popular-example-pasta',
+      'home-popular-example-toast-4',
+    ]);
     assert.deepEqual(
       editorialIds,
       popularIds.map((id) => id.replace('home-popular-example-', 'home-editorial-example-')),
@@ -109,7 +113,7 @@ test('sample card taps open the matching local preview, and close and native dis
       view.flush(() => s.byId(view, 'Button', lastCardId).props.onPress());
       assert.equal(
         s.byId(view, 'Text', 'home-example-recipe-title').props.children,
-        'Pesto pasta · 21',
+        'Avocado toast · 4',
       );
       view.flush(() => view.findAll('BottomSheet')[0].props.onDismiss());
     }

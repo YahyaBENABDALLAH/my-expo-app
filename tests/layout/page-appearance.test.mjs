@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { createContext, createElement, useContext, useEffect, useState } from 'react';
+import { Fragment, createContext, createElement, useContext, useEffect, useState } from 'react';
 import { createSourceLoader } from '../helpers/load-source.mjs';
 import { renderFixture } from '../helpers/render-fixture.mjs';
 
@@ -12,7 +12,7 @@ function setup(deviceScheme = 'light') {
   const SafeAreaInsetsContext = createContext({ top: 59, bottom: 34, left: 0, right: 0 });
   const Picker = native('Picker');
   Picker.Item = native('PickerItem');
-  const load = createSourceLoader({
+  const mocks = {
     'react-native': {
       View: native('View'),
       KeyboardAvoidingView: native('KeyboardAvoidingView'),
@@ -34,6 +34,7 @@ function setup(deviceScheme = 'light') {
       Column: native('Column'),
       Row: native('Row'),
       Text: native('Text'),
+      ScrollView: native('ScrollView'),
     },
     '@/components/ui/native/native-fill-width': {
       nativeFillWidth: [],
@@ -47,8 +48,9 @@ function setup(deviceScheme = 'light') {
     '@/components/ui/switch/switch': { Switch: native('Switch') },
     '@/components/ui/picker/picker': { Picker },
     '@/components/ui/page/page-back-button': { PageBackButton: native('BackButton') },
-  });
-  return {
+  };
+  const load = createSourceLoader(mocks);
+  const exports = {
     ...load('context/theme.context.tsx'),
     ...load('context/layout-direction.context.tsx'),
     ...load('hooks/use-theme.ts'),
@@ -56,16 +58,27 @@ function setup(deviceScheme = 'light') {
     ...load('components/ui/page/page-frame.tsx'),
     ...load('components/ui/page/page-screen.tsx'),
     ...load('components/ui/auth/auth-screen-frame.tsx'),
+    ...load('components/ui/loading/screen-error.tsx'),
+    ...load('components/ui/appearance/theme-picker.tsx'),
+    ...load('components/ui/appearance/color-scheme-control.tsx'),
     themes: load('constants/themes/index.ts').themes,
     SafeAreaInsetsContext,
   };
+  mocks['@components/ui'] = {
+    ...exports,
+    Column: mocks['@expo/ui'].Column,
+    nativeFillWidth: [],
+    ...load('components/ui/text/universal-text.tsx'),
+  };
+  return { ...exports, SettingsScreen: load('features/settings/settings-screen.tsx').default };
 }
 
 for (const initialScheme of ['light', 'dark']) {
-  test(`${initialScheme}: page controls update every brand without losing drafts, and preferences carry to the next page`, () => {
+  test(`${initialScheme}: App Settings updates every brand without losing drafts, and preferences carry back to pages`, () => {
     const s = setup(initialScheme);
     let setDraft;
     let navigate;
+    let showSettings;
     let mounts = 0;
     function Content() {
       const [draft, updateDraft] = useState('');
@@ -79,8 +92,15 @@ for (const initialScheme of ['light', 'dark']) {
     }
     function Pages() {
       const [page, setPage] = useState('First page');
+      const [settingsOpen, setSettingsOpen] = useState(true);
       navigate = setPage;
-      return createElement(s.PageFrame, { key: page, title: page }, createElement(Content));
+      showSettings = setSettingsOpen;
+      return createElement(
+        Fragment,
+        null,
+        createElement(s.PageFrame, { key: page, title: page }, createElement(Content)),
+        settingsOpen ? createElement(s.SettingsScreen) : null,
+      );
     }
     const view = renderFixture(
       createElement(
@@ -90,53 +110,52 @@ for (const initialScheme of ['light', 'dark']) {
       ),
     );
     const header = view.findAll('Host')[0];
-    const footer = view.findAll('Host')[1];
+    const settingsHost = view.findAll('Host').at(-1);
     const control = (id) => view.findAll('Switch').find((node) => node.props.testID === id);
     const draft = view.findAll('Draft')[0];
-    assert.equal(view.findAll('Host').length, 2);
-    assert.equal(footer.props.testID, 'page-appearance-footer-container');
+    assert.equal(view.findAll('Host').length, 3);
     assert.equal(descendants(header, 'Switch').length, 0);
     assert.equal(descendants(header, 'Picker').length, 0);
-    assert.equal(descendants(footer, 'Switch').length, 2);
-    assert.equal(view.findAll('Switch').length, 2);
-    assert.equal(control('page-color-scheme-switch').props.value, initialScheme === 'dark');
+    assert.equal(descendants(settingsHost, 'Switch').length, 1);
+    assert.equal(view.findAll('Switch').length, 1);
+    assert.equal(control('app-settings-color-scheme-switch').props.value, initialScheme === 'dark');
     const themePicker = () =>
-      view.findAll('Picker').find((node) => node.props.testID === 'page-theme-picker');
+      view.findAll('Picker').find((node) => node.props.testID === 'app-settings-theme-picker');
     assert.equal(descendants(themePicker(), 'PickerItem').length, 4);
-    assert.equal(
-      view.findAll('Picker').find((node) => node.props.testID === 'page-language-picker').props
-        .enabled,
-      false,
-    );
+    assert.equal(view.findAll('Picker').length, 1);
     assert.equal(
       view.findAll('View').find((node) => node.props.testID === 'page-header-safe-area').props.style
         .paddingTop,
       59,
     );
-    assert.deepEqual(draft.props.insets, { top: 0, bottom: 0, left: 0, right: 0 });
+    assert.deepEqual(draft.props.insets, { top: 0, bottom: 34, left: 0, right: 0 });
     view.flush(() => setDraft('مسودة Draft 123'));
     for (const themeId of Object.keys(s.themes)) {
       view.flush(() => themePicker().props.onValueChange(themeId));
       for (const scheme of ['dark', 'light']) {
         view.flush(() =>
-          control('page-color-scheme-switch').props.onValueChange(scheme === 'dark'),
+          control('app-settings-color-scheme-switch').props.onValueChange(scheme === 'dark'),
         );
-        view.flush(() => control('page-layout-direction-switch').props.onValueChange(true));
         assert.equal(view.findAll('Host')[0], header);
-        assert.equal(view.findAll('Host')[1], footer);
-        assert.equal(footer.props.seedColor, s.themes[themeId].colors[scheme].tint);
-        assert.equal(footer.props.layoutDirection, 'rightToLeft');
+        assert.equal(view.findAll('Host').at(-1), settingsHost);
+        assert.equal(settingsHost.props.seedColor, s.themes[themeId].colors[scheme].tint);
+        assert.equal(settingsHost.props.colorScheme, scheme);
         assert.equal(draft.props.draft, 'مسودة Draft 123');
         assert.equal(draft.props.colors, s.themes[themeId].colors[scheme]);
         assert.equal(mounts, 1);
       }
     }
+    view.flush(() => showSettings(false));
+    assert.equal(view.findAll('Host').length, 1);
+    assert.equal(view.findAll('Picker').length, 0);
+    assert.equal(view.findAll('Switch').length, 0);
+    assert.equal(draft.props.draft, 'مسودة Draft 123');
     view.flush(() => navigate('Second page'));
-    assert.equal(view.findAll('Host').length, 2);
-    assert.equal(themePicker().props.selectedValue, 'tiktok');
-    assert.equal(control('page-color-scheme-switch').props.value, false);
-    assert.equal(control('page-layout-direction-switch').props.value, true);
     assert.equal(view.findAll('Draft')[0].props.themeId, 'tiktok');
+    assert.equal(view.findAll('Draft')[0].props.scheme, 'light');
+    view.flush(() => showSettings(true));
+    assert.equal(themePicker().props.selectedValue, 'tiktok');
+    assert.equal(control('app-settings-color-scheme-switch').props.value, false);
     view.unmount();
   });
 }
@@ -148,8 +167,14 @@ function descendants(root, type) {
   ]);
 }
 
-for (const kind of ['page', 'auth']) {
-  test(`${kind}: appearance controls are the last scroll-content section after page actions`, () => {
+for (const kind of ['page', 'auth', 'frame', 'error']) {
+  test(`${kind}: shared page shells contain no direction, language or theme controls`, (t) => {
+    const previousDev = globalThis.__DEV__;
+    globalThis.__DEV__ = true;
+    t.after(() => {
+      if (previousDev === undefined) delete globalThis.__DEV__;
+      else globalThis.__DEV__ = previousDev;
+    });
     const s = setup();
     const props =
       kind === 'page'
@@ -158,8 +183,15 @@ for (const kind of ['page', 'auth']) {
             description: 'Page content',
             actions: [{ label: 'Next', href: '/ui' }],
           }
-        : { title: 'Login', description: 'Auth content', testID: 'auth-example' };
-    const Screen = kind === 'page' ? s.PageScreen : s.AuthScreenFrame;
+        : kind === 'error'
+          ? { error: new Error('Example failure'), retry() {} }
+          : { title: 'Login', description: 'Auth content', testID: 'auth-example' };
+    const Screen = {
+      page: s.PageScreen,
+      auth: s.AuthScreenFrame,
+      frame: s.PageFrame,
+      error: s.ScreenError,
+    }[kind];
     const view = renderFixture(
       createElement(
         s.LayoutDirectionProvider,
@@ -171,22 +203,18 @@ for (const kind of ['page', 'auth']) {
         ),
       ),
     );
-    const scroll = view.findAll('ScrollView')[0];
-    const footer = descendants(scroll, 'Column').find(
-      (node) => node.props.testID === 'page-appearance-footer',
-    );
-    assert.ok(footer, 'Footer must scroll with the page content.');
-    const content = descendants(scroll, 'Column').find((node) => node.children.includes(footer));
-    assert.equal(content.children.at(-1), footer);
-    assert.equal(descendants(scroll, 'Switch').length, 2);
-    assert.equal(descendants(scroll, 'Picker').length, 2);
+    assert.equal(view.findAll('Switch').length, 0);
+    assert.equal(view.findAll('Picker').length, 0);
     assert.equal(
       view.findAll('Host').some((node) => node.props.testID === 'page-appearance-footer-container'),
       false,
-      'Scroll pages must not also mount a fixed footer.',
+      'No page shell should mount the removed footer.',
     );
     const header = view.findAll('Host').find((node) => node.props.testID === 'page-header');
     if (header) assert.equal(descendants(header, 'Switch').length, 0);
+    if (kind === 'page') assert.equal(view.findAll('Button').at(-1).props.label, 'Next');
+    if (kind === 'error')
+      assert.equal(view.findAll('Button').at(-1).props.testID, 'screen-error-retry');
     view.unmount();
   });
 }

@@ -1,25 +1,30 @@
-# Page footers and appearance themes
+# App Settings and appearance themes
 
-The bottom of every page's content contains an RTL switch (off = LTR), a Dark
-switch (off = light), and a native theme picker for WhatsApp, Facebook, Instagram
-and TikTok. Titles and back actions stay at the top.
+Open **More → App Settings** (`/settings`) to choose WhatsApp, Facebook,
+Instagram or TikTok and switch between light and dark mode. The settings route
+shares the authenticated/development-guest guard with the app's other pages.
 
-`PageAppearanceControls` is appended after all content and actions inside the
-existing native scroll view in `PageScreen`, `AuthScreenFrame` and screen error
-recovery. It scrolls with the page; it is never pinned above that content. Map,
-Skia, Storybook and session recovery use `PageFrame` to append a native footer
-below their main view. Its footer consumes the unowned bottom safe area; tabs
-leave that edge to the tab bar. There is no global preference toolbar.
+Login also offers a sun/moon button at the top right for light/dark mode and a
+language icon at the top left. These compact controls are fixed above the
+scrolling form; they use the same providers and preserve drafts. The language
+sheet follows the app direction while the top bar keeps its physical positions.
+
+The shared RTL/LTR, language and theme footer has been removed from all page
+shells, including authentication, error recovery, maps, Skia and Storybook.
+`PageFrame` owns the header's top safe area; its content retains the bottom and
+side insets. Native scroll pages handle those remaining edges, and tabs leave
+the bottom edge to the tab bar. Language selection remains in More's profile
+preferences, where Arabic also selects RTL automatically.
 
 The UI showcase at `/ui` lists separate component pages at
 `/ui-component/[name]`: Switch, Buttons, Text input, Checkbox, Slider, Picker,
 Segmented control, Collapsible, List rows and Theme tokens. Each demo lives in its
-own feature module and uses the same appearance footer. The tokens page lists every role
+own feature module. The tokens page lists every role
 for the currently selected brand and appearance.
 
 `ThemePreferencesProvider` stores the selected brand and appearance for the
 current app session, alongside `LayoutDirectionProvider`. It initially follows
-device appearance and defaults to WhatsApp. Page controls update these providers
+device appearance and defaults to WhatsApp. App Settings updates these providers
 without replacing navigation, forms, query caches or open sheets. Settings
 survive navigation; restarting the app restores the defaults.
 
@@ -54,13 +59,14 @@ active control tokens.
 
 ## Verification
 
-`Pages/Appearance footer` has light, dark, RTL and brand fixtures with an editable
-draft. `Expo UI/Theme Tokens` has all eight brand/appearance combinations and
+`Pages/App Settings` renders the production settings screen in light, dark, RTL
+and brand fixtures. `Expo UI/Theme Tokens` has all eight brand/appearance combinations and
 displays every role plus native controls. JS fixture tests exercise live changes,
 draft preservation, preferences across pages, safe-area ownership and text/action
-contrast. The Maestro appearance-footer flow checks controls and navigation.
+contrast. The Maestro `pages/app-settings.yaml` flow checks theme selection,
+mode changes and preferences retained after leaving and reopening settings.
 Native menu appearance, focus, switch touch targets and cutouts still require
 iOS/Android device verification.
 
-Selectors: `page-appearance-footer`, `page-layout-direction-switch`,
-`page-color-scheme-switch`, `page-theme-picker`.
+Selectors: `page-action-app-settings`, `app-settings-appearance`,
+`app-settings-color-scheme-switch`, `app-settings-theme-picker`.

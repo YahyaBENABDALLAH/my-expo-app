@@ -241,6 +241,10 @@
     "back": "Précédent",
     "progress": "Progression de la présentation"
   },
+  "settings": {
+    "title": "Paramètres de l’application",
+    "description": "Choisissez le thème de l’application et passez du mode clair au mode sombre."
+  },
   "appearance": {
     "dark": "Sombre",
     "light": "Clair",
@@ -278,7 +282,7 @@
   },
   "home": {
     "description": "Découvrez des recettes et parcourez les catégories.",
-    "search": "Trouvez des recettes, chefs ou ingrédients…",
+    "search": "Trouver une recette",
     "popular": "Recettes populaires",
     "trending": "Tendances de la semaine",
     "viewAll": "Tout voir",
@@ -300,17 +304,25 @@
       "toastDescription": "De l’avocat crémeux sur du pain grillé, avec un œuf au plat et une pincée de piment.",
       "saladDescription": "Pois chiches, avocat et légumes croquants avec une vinaigrette au citron.",
       "pastaDescription": "Pesto au basilic, tomates cerises et pâtes fondantes. Un dîner frais et simple en 25 minutes."
-    }
+    },
+    "categories": "Parcourir les catégories",
+    "discover": "Recettes à découvrir",
+    "empty": "Aucune recette pour le moment. Revenez bientôt."
   },
   "search": {
-    "description": "Trouvez des recettes, chefs ou ingrédients.",
+    "description": "Trouvez votre prochaine recette par nom, catégorie, cuisine ou difficulté.",
     "recipes": "Rechercher des recettes",
     "filters": "Filtres",
     "filterTitle": "Filtres de recherche",
     "openFilters": "Ouvrir les filtres de recherche",
     "openActiveFilters": "Ouvrir les filtres actifs",
     "filtered": "Recherche : {{filters}}",
-    "clearFilters": "Effacer les filtres"
+    "clearFilters": "Effacer les filtres",
+    "activeFilters": "Filtres : {{count}}",
+    "resultCount": "Recettes trouvées : {{count}}",
+    "noResults": "Aucune recette ne correspond à cette recherche. Essayez un autre nom ou réinitialisez les filtres.",
+    "resetSearch": "Réinitialiser la recherche",
+    "applyFilters": "Appliquer les filtres"
   },
   "recipes": {
     "openLiked": "Ouvrir les recettes aimées et favorites",
@@ -508,7 +520,9 @@
     "swipeMeals": "Faites défiler les idées de repas.",
     "vertical": "Défilement vertical",
     "swipeTips": "Faites défiler les conseils de cuisine vers le haut.",
-    "tip": "Conseil {{index}}"
+    "tip": "Conseil {{index}}",
+    "homeExamples": "Exemples d’interface de recettes",
+    "homeExamplesDescription": "Cartes locales, squelettes et contrôles interactifs pour le développement. Ces exemples ne modifient pas vos préférences de recettes."
   },
   "examples": {
     "toast": "Tartine d’avocat",

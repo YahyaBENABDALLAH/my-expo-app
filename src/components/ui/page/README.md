@@ -2,8 +2,8 @@
 
 Exports: `PageScreen`, `PageFrame`, `PageHeader` and `PageMotionOverlay`.
 
-`page-screen.tsx` composes scrolling content, actions and an appearance footer.
-`page-frame.tsx` handles title/content/footer safe-area boundaries.
+`page-screen.tsx` composes scrolling content and actions.
+`page-frame.tsx` handles the header's safe area and leaves other edges to content.
 `page-header.tsx` uses the private `page-back-button.*` adapters.
 `page-motion-overlay.tsx` contains the shared animated top-edge wave artwork.
 Its default `overlay` variant decorates headers; `variant="splash"` places the
@@ -14,9 +14,9 @@ as the default background.
 Frames, headers and page content are transparent so they reveal that shared
 canvas; native cards and controls keep their usual semantic surfaces.
 
-Ordinary pages place appearance controls after scroll content. Specialized
-map/canvas pages use the frame's hosted footer. Keep system insets outside
-keyboard padding and preserve the existing tab-bar inset ownership.
+Theme controls live in App Settings, with no preference footer on page shells.
+Keep system insets outside keyboard padding and preserve the existing tab-bar
+inset ownership.
 
 Page actions accept stable `testID` values independent of translated labels.
 Motion follows focus/activity/reduced-motion guards and ignores touches.

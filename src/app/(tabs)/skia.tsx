@@ -13,7 +13,7 @@ export default function SkiaScreen() {
   const focused = useIsFocused();
   const scheme = useColorScheme();
   return (
-    <PageFrame title={t('tools.skia')} tab>
+    <PageFrame title={t('tools.skia')}>
       {focused ? <StatusBar style={scheme === 'dark' ? 'light' : 'dark'} /> : null}
       <Suspense fallback={<LoadingScreen label={t('tools.loadingCanvas')} />}>
         <SkiaExperience />

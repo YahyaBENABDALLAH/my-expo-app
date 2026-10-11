@@ -1,11 +1,10 @@
 import { useTranslation } from 'react-i18next';
 import { Column } from '@expo/ui';
-import type { PropsWithChildren } from 'react';
+import type { PropsWithChildren, ReactNode } from 'react';
 import { KeyboardAvoidingView, Platform } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuthTheme } from './auth-theme';
 import { nativeFillWidth, nativeFillWidthCenter } from '../native/native-fill-width';
-import { PageAppearanceControls } from '../appearance/page-appearance-controls';
 import { PageFrame } from '../page/page-frame';
 import { RefreshableScrollView } from '../refreshable-scroll-view/refreshable-scroll-view';
 import { UniversalHost } from '../host/universal-host';
@@ -13,9 +12,13 @@ import { UniversalTextContent as AuthText } from '../text/universal-text';
 import { useLanguage } from '@/context/language.context';
 
 /** Owns the native Host; children must stay in the Expo UI rendering tree. */
-export function AuthScreenFrame(props: Parameters<typeof AuthScreenContent>[0]) {
+export function AuthScreenFrame({
+  topBar,
+  ...props
+}: Parameters<typeof AuthScreenContent>[0] & { topBar?: ReactNode }) {
   return (
-    <PageFrame colorScheme={props.colorScheme} showAppearanceFooter={false}>
+    <PageFrame colorScheme={props.colorScheme}>
+      {topBar}
       <AuthScreenContent {...props} />
     </PageFrame>
   );
@@ -98,7 +101,6 @@ function AuthScreenContent({
                 </AuthText>
               </Column>
               {children}
-              <PageAppearanceControls />
             </Column>
           </Column>
         </RefreshableScrollView>

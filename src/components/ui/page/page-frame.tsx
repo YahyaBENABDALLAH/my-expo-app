@@ -2,22 +2,17 @@ import type { PropsWithChildren } from 'react';
 import { View } from 'react-native';
 import { SafeAreaInsetsContext, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { PageHeader } from './page-header';
-import { PageAppearanceFooter } from '../appearance/page-appearance-controls';
 
-/** RN separates title, specialized content and its footer; native scroll pages supply their own footer. */
+/** Owns the header safe area; content handles the remaining edges. */
 export function PageFrame({
   children,
   title,
   onBack,
   colorScheme,
-  showAppearanceFooter = true,
-  tab = false,
 }: PropsWithChildren<{
   title?: string;
   onBack?: () => void;
   colorScheme?: 'light' | 'dark';
-  showAppearanceFooter?: boolean;
-  tab?: boolean;
 }>) {
   const insets = useSafeAreaInsets();
   return (
@@ -32,22 +27,9 @@ export function PageFrame({
       >
         {title ? <PageHeader title={title} onBack={onBack} colorScheme={colorScheme} /> : null}
       </View>
-      <SafeAreaInsetsContext.Provider
-        value={{ ...insets, top: 0, bottom: showAppearanceFooter ? 0 : insets.bottom }}
-      >
+      <SafeAreaInsetsContext.Provider value={{ ...insets, top: 0 }}>
         <View style={{ flex: 1 }}>{children}</View>
       </SafeAreaInsetsContext.Provider>
-      {showAppearanceFooter ? (
-        <View
-          style={{
-            paddingLeft: insets.left,
-            paddingRight: insets.right,
-            paddingBottom: tab ? 0 : insets.bottom,
-          }}
-        >
-          <PageAppearanceFooter colorScheme={colorScheme} />
-        </View>
-      ) : null}
     </View>
   );
 }

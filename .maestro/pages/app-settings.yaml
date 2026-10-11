@@ -1,0 +1,72 @@
+appId: com.hyrkul.likan
+name: Theme and dark mode are changed in App Settings and retained across navigation
+tags: [pages, theme, signed-in]
+---
+- runFlow:
+    file: ../helpers/open-page.yaml
+    env:
+      PAGE_ROUTE: more
+      PAGE_TITLE: '.*'
+- scrollUntilVisible:
+    element:
+      id: page-action-app-settings
+- tapOn:
+    id: page-action-app-settings
+- extendedWaitUntil:
+    visible:
+      id: app-settings-theme-picker
+    timeout: 60000
+- assertNotVisible:
+    id: page-appearance-footer
+- assertNotVisible:
+    id: page-layout-direction-switch
+- assertNotVisible:
+    id: page-language-picker
+- tapOn:
+    id: app-settings-theme-picker
+- tapOn: Facebook
+- assertVisible: Facebook
+- runFlow:
+    when:
+      visible:
+        id: app-settings-color-scheme-switch
+        checked: true
+    commands:
+      - tapOn:
+          id: app-settings-color-scheme-switch
+- assertVisible:
+    id: app-settings-color-scheme-switch
+    checked: false
+- tapOn:
+    id: app-settings-color-scheme-switch
+- assertVisible:
+    id: app-settings-color-scheme-switch
+    checked: true
+- tapOn:
+    id: page-back
+- assertNotVisible:
+    id: app-settings-theme-picker
+- assertNotVisible:
+    id: app-settings-color-scheme-switch
+- scrollUntilVisible:
+    element:
+      id: page-action-app-settings
+- tapOn:
+    id: page-action-app-settings
+- extendedWaitUntil:
+    visible:
+      id: app-settings-theme-picker
+    timeout: 60000
+- assertVisible: Facebook
+- assertVisible:
+    id: app-settings-color-scheme-switch
+    checked: true
+- tapOn:
+    id: app-settings-theme-picker
+- tapOn: WhatsApp
+- assertVisible: WhatsApp
+- tapOn:
+    id: app-settings-color-scheme-switch
+- assertVisible:
+    id: app-settings-color-scheme-switch
+    checked: false

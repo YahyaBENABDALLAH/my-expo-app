@@ -7,7 +7,6 @@ import { UniversalHost } from '../host/universal-host';
 import { RefreshableScrollView } from '../refreshable-scroll-view/refreshable-scroll-view';
 import { nativeFillWidth } from '../native/native-fill-width';
 import { PageFrame } from './page-frame';
-import { PageAppearanceControls } from '../appearance/page-appearance-controls';
 import { UniversalTextContent } from '../text/universal-text';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import type { ReactNode } from 'react';
@@ -35,12 +34,7 @@ export function PageScreen({
   const scheme = useColorScheme(colorScheme);
   const goBack = onBack ?? (() => (router.canGoBack() ? router.back() : router.replace('/')));
   return (
-    <PageFrame
-      title={title}
-      onBack={tab ? undefined : goBack}
-      colorScheme={scheme}
-      showAppearanceFooter={false}
-    >
+    <PageFrame title={title} onBack={tab ? undefined : goBack} colorScheme={scheme}>
       <PageContent
         description={description}
         actions={actions}
@@ -101,7 +95,6 @@ function PageContent({
                   onPress={() => router.push(href)}
                 />
               ))}
-              <PageAppearanceControls />
             </Column>
           </RefreshableScrollView>
         </UniversalHost>

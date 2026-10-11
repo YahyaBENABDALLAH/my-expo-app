@@ -5,6 +5,7 @@ import {
   nativeFillWidthEnd,
   UniversalButtonContent,
   AuthScreenFrame,
+  LoginPreferences,
   FormSubmit,
   FormTextInput,
   authInputIcons,
@@ -37,6 +38,7 @@ export function LoginScreen() {
       testID="auth-login"
       title={t('auth.welcomeBack')}
       description={t('auth.loginDescription')}
+      topBar={<LoginPreferences />}
     >
       {appDevEnabled && (
         <UniversalButtonContent

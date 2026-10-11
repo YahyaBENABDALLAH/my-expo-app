@@ -7,20 +7,12 @@ import {
   UniversalTextContent as Text,
 } from '@components/ui';
 import type { Meta, StoryObj } from '@storybook/react-native';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { View } from 'react-native';
 
-function StartupDemo() {
+function StartupDemo({ ready }: { ready: boolean }) {
   const [showLaunch, setShowLaunch] = useState(true);
-  const [visible, setVisible] = useState(false);
-  const [exiting, setExiting] = useState(false);
-  const reveal = useCallback(() => setVisible(true), []);
   const finish = useCallback(() => setShowLaunch(false), []);
-  useEffect(() => {
-    if (!visible) return;
-    const timeout = setTimeout(() => setExiting(true), 3000);
-    return () => clearTimeout(timeout);
-  }, [visible]);
   return (
     <View style={{ flex: 1, minHeight: 600, overflow: 'hidden' }}>
       <AuroraBackground
@@ -32,17 +24,15 @@ function StartupDemo() {
           <Text testID="startup-status">{showLaunch ? 'Splash visible' : 'Splash finished'}</Text>
           <UniversalButtonContent
             variant="secondary"
-            label="Replay three-second splash"
+            label="Replay startup transition"
             testID="startup-replay"
             onPress={() => {
-              setVisible(false);
-              setExiting(false);
               setShowLaunch(true);
             }}
           />
         </Column>
       </UniversalHost>
-      {showLaunch && <LaunchScreen exiting={exiting} onReady={reveal} onExitComplete={finish} />}
+      {showLaunch && <LaunchScreen exiting={ready} onExitComplete={finish} />}
     </View>
   );
 }
@@ -50,16 +40,19 @@ function StartupDemo() {
 const meta = {
   title: 'Pages/Animated splash',
   component: StartupDemo,
+  args: { ready: true },
+  argTypes: { ready: { control: 'boolean' } },
   parameters: {
     layout: 'fullscreen',
     docs: {
       description: {
         component:
-          'Three-second splash followed by a two-second upward reveal, using the same moving wave paths as the page header.',
+          'Startup stays visible while resources are unavailable. Ready triggers a 300-ms transition; reduced motion finishes immediately. Toggle ready to exercise both states.',
       },
     },
   },
 } satisfies Meta<typeof StartupDemo>;
 export default meta;
 type Story = StoryObj<typeof meta>;
-export const ThreeSeconds: Story = {};
+export const Ready: Story = {};
+export const Waiting: Story = { args: { ready: false } };

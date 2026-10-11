@@ -5,7 +5,7 @@ import { UniversalTextContent as Text } from '../text/universal-text';
 import { PageBackButton } from './page-back-button';
 import { nativeFillWidth, nativeRowWeight } from '../native/native-fill-width';
 
-/** Page title and optional navigation action. Preferences belong after page content. */
+/** Page title and optional navigation action. Preferences live in App Settings. */
 export function PageHeader({
   title,
   onBack,

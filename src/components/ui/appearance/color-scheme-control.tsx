@@ -9,8 +9,8 @@ export function ColorSchemeControl() {
   const scheme = useColorScheme();
   return (
     <Switch
-      label={t('appearance.dark')}
-      testID="page-color-scheme-switch"
+      label={t('common.darkMode')}
+      testID="app-settings-color-scheme-switch"
       value={scheme === 'dark'}
       onValueChange={(dark) => setColorScheme(dark ? 'dark' : 'light')}
     />

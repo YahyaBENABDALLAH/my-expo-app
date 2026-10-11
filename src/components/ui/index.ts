@@ -15,12 +15,12 @@ export {
 export * from './appearance/color-scheme-control';
 export * from './appearance/language-picker';
 export * from './appearance/layout-direction-control';
-export * from './appearance/page-appearance-controls';
 export * from './appearance/theme-picker';
 export * from './aurora-background/aurora-background';
 export * from './auth/auth-input-icons';
 export * from './auth/auth-screen-frame';
 export * from './auth/auth-theme';
+export * from './auth/login-preferences';
 export * from './bottom-sheet/bottom-sheet';
 export * from './button/universal-button';
 export * from './button/universal-button-content';

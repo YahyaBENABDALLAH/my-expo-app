@@ -10,6 +10,7 @@ import SegmentsScreen from './segments-screen';
 import CollapsibleScreen from './collapsible-screen';
 import ListScreen from './list-screen';
 import TokensScreen from './tokens-screen';
+import HomeExamplesScreen from './home-examples-screen';
 
 const screens = {
   switch: SwitchScreen,
@@ -22,6 +23,7 @@ const screens = {
   collapsible: CollapsibleScreen,
   list: ListScreen,
   tokens: TokensScreen,
+  'home-examples': HomeExamplesScreen,
 };
 
 export function ComponentScreen({ name }: { name?: string }) {

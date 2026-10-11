@@ -18,7 +18,7 @@ export default function MapsScreen() {
   const focused = useIsFocused();
   const scheme = useColorScheme();
   return (
-    <PageFrame title={t('tools.maps')} tab>
+    <PageFrame title={t('tools.maps')}>
       {focused ? <StatusBar style={scheme === 'dark' ? 'light' : 'dark'} /> : null}
       <Suspense fallback={<LoadingScreen label={t('tools.loadingMap')} />}>
         <MapExperience />

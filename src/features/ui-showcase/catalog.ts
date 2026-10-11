@@ -9,4 +9,5 @@ export const componentPages = [
   { name: 'collapsible', label: 'showcase.collapsible', testID: 'page-action-collapsible' },
   { name: 'list', label: 'showcase.list', testID: 'page-action-list-rows' },
   { name: 'tokens', label: 'showcase.tokens', testID: 'page-action-theme-tokens' },
+  { name: 'home-examples', label: 'showcase.homeExamples', testID: 'page-action-home-examples' },
 ] as const;

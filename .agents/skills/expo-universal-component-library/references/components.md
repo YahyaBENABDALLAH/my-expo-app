@@ -1,10 +1,27 @@
 # Universal component catalog
 
+2026-10-10 product cleanup: local recipe card fixtures and control examples are
+colocated under `src/features/ui-showcase/` and reachable through Recipe UI examples.
+LaunchScreen's Ready/Waiting stories follow resource readiness and a 300-ms exit,
+with immediate completion under reduced motion. Root fixtures verify readiness
+gates; native rendering and transitions require device checks.
+
 SDK/package versions refreshed 2026-10-10: Expo `~57.0.27` and installed `@expo/ui` `57.0.21` (exact manifest pin). Expo UI `57.0.22` crashes on Android numeric widths; the pin and scoped dependency-validation exclusion are documented in `docs/build-verification.md`. The component inventory uses [SDK 57 universal documentation](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/); resolve actual installed versions before future edits. Packages are installed without project patches.
 
 Authoritative local export inventory: `node_modules/@expo/ui/src/universal/index.ts`. Read component `types.ts` and native implementations alongside the linked API page. This catalog records availability and proposed verification, not proof that all behavior has passed.
 
 ## All 19 components
+
+App Settings (`/settings`) uses the existing `ThemePicker` and
+`ColorSchemeControl` wrappers with `app-settings-theme-picker` and
+`app-settings-color-scheme-switch` selectors. `Pages/App Settings` covers light,
+dark, RTL and all brands. `tests/layout/page-appearance.test.mjs` checks live
+preference changes, draft retention, navigation retention and footer removal
+across page/auth/error/specialized shells. The native flow is
+`.maestro/pages/app-settings.yaml`; menu layout and switch hit areas remain
+unverified without a connected device. Controls inherit native Host palette
+roles. Language remains in profile preferences; manual direction is a Storybook
+preview control. `PageAppearanceControls` and `PageAppearanceFooter` are removed.
 
 Application wrapper names below refer to `src/components/ui/`. The hosted showcase
 wrappers for BottomSheet, Checkbox, Collapsible, Column, FieldGroup, Icon, List,
@@ -42,6 +59,18 @@ See the [folder guide](../../../../src/components/ui/README.md).
 | [TextInput](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/textinput/)     | `text-input/universal-text-input.tsx`                                                   | `text-input.stories.tsx`                            | Empty/type/clear/reset, controlled updates, password, editable/read-only, focus/blur, keyboard, multiline           |
 
 ## Compound exports and helpers
+
+`AuthScreenFrame` has an optional `topBar` ReactNode slot outside its scrolling
+form. Login uses `LoginPreferences` there: native 48-point icon controls for
+language (left) and light/dark mode (right), with translated accessibility
+labels, app preference providers and auth tint tokens. Its Host fixes physical
+placement in RTL while the separate native language sheet follows the app's
+direction. Private `auth-icon-button.<platform>.tsx` adapters preserve native
+feedback and disabled suppression. `Pages/Login preferences` has light/dark
+draft fixtures; `tests/auth/login-preferences.test.mjs` checks readiness,
+provider updates, draft retention and dismissal. The native flow is
+`.maestro/storybook/login-preferences.yaml`; native touch geometry, keyboard and
+accessibility remain unverified without a device.
 
 ### Public UI entry point (2026-10-04)
 
@@ -212,6 +241,7 @@ and release smoothness have not been checked on a device.
 - Right-icon spacing refinement: `text-input-icon-button.android.tsx` uses Expo UI's native Compose IconButton instead of a text Button with Material text-button padding. iOS keeps a plain 44-point button; Android uses a 48-dp icon target. The field places vertical padding on the editable text only and reduces right inset to 2, avoiding button height plus two outer padding layers. Existing ClickableRightIcon/light/disabled and PasswordIcons stories exercise this shared composition; existing icon/auth Maestro flows retain their selectors. Device geometry remains unverified.
 - Native icon button resolution: shared declarations live in `text-input-icon-button.d.ts`, never a declaration-only `.ts` beside `.ios.tsx`/`.android.tsx`. Metro checks source extensions in order, so a plain `.ts` can shadow native `.tsx` implementations and produce an undefined component. `tests/layout/native-input-resolution.test.mjs` checks both platforms with the installed Metro resolver and Expo extension ordering; native interaction still requires devices.
 - TextInput maintenance review: Context7 examples were cross-checked with SDK 57 docs and installed source because search results included newer versions. All icon fields now apply resolved vertical padding to the text once; explicit shorthand/directional padding is respected without padding the native action twice. The private icon button uses a narrow shared props interface, avoiding unsupported Button props on Android. FormTextInput shares its visibility callback/label and preserves an explicitly supplied secureTextEntry for non-password-mode callers. CustomPaddingIcons and ReadOnlyIcons stories cover the changed contract; the icon Maestro flow also covers a read-only field's separate action. Observable values, caller refs, native Host ownership, and isolated platform modifiers remain the intended design. React Hook Form validation still runs on JS; no per-keystroke wrapper state was added. Native focus/cursor across iOS secure/nonsecure swaps, screen-reader labels, font scaling, and geometry require devices.
+- Password height stability: single-line TextInput fields reserve a height from the font scale, line height (or 1.5 times font size), resolved vertical padding and border, with at least 48 points/dp for a right action. The height does not depend on masking, focus or text content. Explicit `style.height` takes precedence; multiline fields keep native growth. `PasswordVisibility` and `PasswordVisibilityLargeText` stories record actual RN container geometry and retain the largest height change after a manual baseline. `.maestro/storybook/text-input-password-height.yaml` asserts zero change through reveal/hide, clearing, editing and larger text. This flow has not run on a device; iOS/Android geometry, larger system font scales and focus across secure-field swaps remain unverified.
 
 - Root imports select SwiftUI on iOS and Compose on Android. Ordinary native trees need Host. BottomSheet in this installed version creates its own internal native Host; follow its implementation and existing wrapper rather than blindly nesting another host.
 - BottomSheet uses `isPresented` and `onDismiss`. Android Material sheet states do not guarantee exact parity with iOS fractional/height detents; document and verify each supported platform behavior.

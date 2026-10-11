@@ -1,7 +1,7 @@
 import { useThemeColors } from '@/hooks/use-theme';
 import { Column, Icon, Row, Text, TextInput, type IconProps, type TextInputProps } from '@expo/ui';
 import { useRef, useState } from 'react';
-import { View } from 'react-native';
+import { useWindowDimensions, View } from 'react-native';
 import { UniversalHost, useHostColorScheme } from '../host/universal-host';
 import { nativeFillWidth } from '../native/native-fill-width';
 import { inputFieldAppearance, inputRowFlex } from './text-input-modifiers';
@@ -88,6 +88,7 @@ export function UniversalTextInputContent({
   ...inputProps
 }: Omit<UniversalTextInputProps, 'onPress'>) {
   const scheme = useHostColorScheme(colorScheme);
+  const { fontScale } = useWindowDimensions();
   const [focused, setFocused] = useState(false);
   const focusedRef = useRef(false);
   const themeColors = useThemeColors(scheme);
@@ -114,8 +115,20 @@ export function UniversalTextInputContent({
     paddingTop: fieldStyle.paddingTop ?? fieldStyle.paddingVertical,
     paddingBottom: fieldStyle.paddingBottom ?? fieldStyle.paddingVertical,
   };
+  // Secure and visible native text can have different intrinsic heights.
+  // Reserve the same single-line geometry through focus and visibility changes.
+  const lineHeight = textStyle?.lineHeight ?? (textStyle?.fontSize ?? 16) * 1.5;
+  const singleLineHeight =
+    typeof inputPadding.paddingTop === 'number' && typeof inputPadding.paddingBottom === 'number'
+      ? Math.max(
+          hasIconAction ? 48 : 0,
+          Math.ceil(lineHeight * fontScale) + inputPadding.paddingTop + inputPadding.paddingBottom,
+        ) +
+        fieldStyle.borderWidth * 2
+      : undefined;
   const fieldAppearance = inputFieldAppearance({
     ...fieldStyle,
+    height: fieldStyle.height ?? (inputProps.multiline ? undefined : singleLineHeight),
     paddingVertical: 0,
     paddingTop: 0,
     paddingBottom: 0,

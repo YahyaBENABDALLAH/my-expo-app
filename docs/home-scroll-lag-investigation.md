@@ -1,5 +1,10 @@
 # Home scroll lag investigation
 
+Current placement (2026-10-10): sample cards, timed skeletons and demo controls
+now live in the UI showcase. The product home renders live recipes and category
+navigation with one vertical page scroll. The investigation below describes the
+earlier screen; it does not establish current native frame rates.
+
 Date: 2026-10-06. Reported platform: Android. Expo SDK 57, React Native 0.86.3, installed Expo UI 57.0.21.
 
 The initial investigation identified nested vertical scrolling and persistent decorative rendering as the strongest home-specific candidates. The code establishes both workloads; it does **not** establish which causes the reported lag. `adb devices -l` returned no attached devices, and no Metro server was listening on ports 8081 or 8082. Build mode and device model are unknown. No FPS, native layout timing, GPU timing, or gesture trace was captured. The findings below describe the original implementation.
@@ -20,11 +25,11 @@ Four lifecycle regressions in `tests/recipes/home-skeleton.test.mjs` pass: timed
 
 Three more vertical scroll containers live inside it:
 
-| Home content                                         | Source                                     | Android implementation                                                                                    |
-| ---------------------------------------------------- | ------------------------------------------ | --------------------------------------------------------------------------------------------------------- |
+| Home content                                         | Source                                     | Android implementation                                                                                                |
+| ---------------------------------------------------- | ------------------------------------------ | --------------------------------------------------------------------------------------------------------------------- |
 | Preferences form, 240 points high                    | `src/features/recipes/home-screen.tsx:205` | The project `FieldGroup` adapter embeds a `LazyColumn` at `src/components/ui/field-group/field-group.android.tsx:68`. |
-| Three sample meal rows, inside a 240-point container | `src/features/recipes/home-screen.tsx:231` | The project `List` adapter embeds a `LazyColumn` at `src/components/ui/list/list.android.tsx:24`.              |
-| Six tips, 224 points high                            | `src/features/recipes/home-screen.tsx:283` | Another universal vertical `ScrollView`.                                                                  |
+| Three sample meal rows, inside a 240-point container | `src/features/recipes/home-screen.tsx:231` | The project `List` adapter embeds a `LazyColumn` at `src/components/ui/list/list.android.tsx:24`.                     |
+| Six tips, 224 points high                            | `src/features/recipes/home-screen.tsx:283` | Another universal vertical `ScrollView`.                                                                              |
 
 These containers are bounded, so this is not an unbounded nested-list diagnosis. They still own separate scrolling gestures. If the page feels sticky specifically when a swipe begins over the form, meal list, or tips, gesture consumption and fling handoff are the first things to inspect. Frame drops are a separate symptom and must be measured separately.
 

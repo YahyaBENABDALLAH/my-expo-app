@@ -9,8 +9,8 @@ import {
   UniversalHost,
   UniversalTextContent as Text,
 } from '@components/ui';
-import { homeRecipeExamples } from '@/features/recipes/home-card-examples.data';
-import { HomeCardExamples } from '@/features/recipes/home-card-examples';
+import { homeRecipeExamples } from '@/features/ui-showcase/home-card-examples.data';
+import { HomeCardExamples } from '@/features/ui-showcase/home-card-examples';
 
 function CardStory({
   variant,

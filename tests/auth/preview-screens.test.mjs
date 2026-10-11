@@ -90,6 +90,7 @@ for (const [name, env, development, allowed] of [
         PageScreen: native('PageScreen'),
         UniversalButtonContent: native('Button'),
         AuthScreenFrame: native('AuthScreenFrame'),
+        LoginPreferences: native('LoginPreferences'),
         Column: native('Column'),
         FormSubmit: native('FormSubmit'),
         FormTextInput: native('FormTextInput'),

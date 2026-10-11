@@ -13,6 +13,15 @@ export class ApiError extends Error implements ApiErrorShape {
   }
 }
 
+/** Configuration failures cannot recover by repeating an HTTP request. */
+export class ApiConfigurationError extends ApiError {
+  constructor() {
+    const message = 'Missing `EXPO_PUBLIC_API_URL`. Set it before calling the API client.';
+    super(message, 0, null, i18n.t('auth.requestFailed'));
+    this.name = 'ApiConfigurationError';
+  }
+}
+
 /** Do not attach the invalid body: auth responses can contain credentials. */
 export class ApiResponseValidationError extends ApiError {
   constructor(status: number) {

@@ -1,4 +1,9 @@
-import { NativeField, PageScreen, UniversalTextContent as Text } from '@components/ui';
+import {
+  LanguagePicker,
+  NativeField,
+  PageScreen,
+  UniversalTextContent as Text,
+} from '@components/ui';
 import type { Meta, StoryObj } from '@storybook/react-native';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -20,11 +25,12 @@ function LocalizationPreview() {
         testID="locale-draft"
       />
       <Text testID="locale-draft-value">{t('showcase.draftValue', { value: draft })}</Text>
+      <LanguagePicker />
     </PageScreen>
   );
 }
 
-// Uses the app's actual provider and language footer. The native flow selects its starting locale.
+// Uses the app's actual provider and profile language picker. The flow selects its starting locale.
 const meta = {
   title: 'Pages/Localization',
   component: LocalizationPreview,

@@ -241,6 +241,10 @@
     "back": "Previous",
     "progress": "Introduction progress"
   },
+  "settings": {
+    "title": "App Settings",
+    "description": "Choose your app theme and switch between light and dark mode."
+  },
   "appearance": {
     "dark": "Dark",
     "light": "Light",
@@ -278,7 +282,7 @@
   },
   "home": {
     "description": "Discover recipes and browse categories.",
-    "search": "Find recipes, chefs, or ingredients…",
+    "search": "Find a recipe",
     "popular": "Popular recipes",
     "trending": "Trending this week",
     "viewAll": "View all",
@@ -300,17 +304,25 @@
       "toastDescription": "Creamy avocado on crisp toast, topped with a fried egg and a pinch of chili.",
       "saladDescription": "Chickpeas, avocado and crunchy vegetables with a bright lemon dressing.",
       "pastaDescription": "Basil pesto, cherry tomatoes and tender pasta. A fresh, simple dinner in 25 minutes."
-    }
+    },
+    "categories": "Browse categories",
+    "discover": "Recipes to try",
+    "empty": "No recipes yet. Check back soon."
   },
   "search": {
-    "description": "Find recipes, chefs, or ingredients.",
+    "description": "Find your next recipe by name, category, cuisine, or difficulty.",
     "recipes": "Search recipes",
     "filters": "Filters",
     "filterTitle": "Search filters",
     "openFilters": "Open search filters",
     "openActiveFilters": "Open active search filters",
     "filtered": "Searching for: {{filters}}",
-    "clearFilters": "Clear filters"
+    "clearFilters": "Clear filters",
+    "activeFilters": "Filters: {{count}}",
+    "resultCount": "Recipes found: {{count}}",
+    "noResults": "No recipes match this search. Try another name or reset your filters.",
+    "resetSearch": "Reset search",
+    "applyFilters": "Apply filters"
   },
   "recipes": {
     "openLiked": "Open liked recipes and favorites",
@@ -508,7 +520,9 @@
     "swipeMeals": "Swipe across the meal ideas.",
     "vertical": "Vertical scroll view",
     "swipeTips": "Swipe up inside the cooking tips.",
-    "tip": "Tip {{index}}"
+    "tip": "Tip {{index}}",
+    "homeExamples": "Recipe UI examples",
+    "homeExamplesDescription": "Local sample cards, skeletons, and interactive controls for development. These examples do not change your recipe preferences."
   },
   "examples": {
     "toast": "Avocado toast",

@@ -359,7 +359,7 @@ test('compact switches keep distinct prefixes for global, story and sheet contro
 });
 
 for (const authenticated of [false, true]) {
-  test(`${authenticated ? 'signed-in' : 'signed-out'} root shows three seconds of branding, waits for restoration and retains navigation/providers when direction flips`, (t) => {
+  test(`${authenticated ? 'signed-in' : 'signed-out'} root exits when resources are ready and retains navigation/providers when direction flips`, (t) => {
     t.mock.timers.enable({ apis: ['setTimeout'] });
     const s = setup();
     let directionSettings;
@@ -443,18 +443,10 @@ for (const authenticated of [false, true]) {
     assert.equal(background.props.animate, false);
     assert.equal(headerWave.props.animate, false);
     assert.equal(launch.props.exiting, false);
-    // Asset loading before native layout must not consume the visible branding time.
+    // Time alone cannot release startup while required resources are unavailable.
     view.flush(() => t.mock.timers.tick(5_000));
     assert.equal(launch.props.exiting, false);
     view.flush(() => launch.props.onReady());
-    if (authenticated) {
-      view.flush(() => t.mock.timers.tick(3_000));
-      assert.equal(
-        launch.props.exiting,
-        false,
-        'Elapsed branding must still wait for restoration.',
-      );
-    }
     assert.equal(view.findAll('Stack').length, 0);
     assert.equal(view.findAll('RestorationPanel').length, 0);
     view.flush(finishLanguage);
@@ -462,13 +454,11 @@ for (const authenticated of [false, true]) {
     assert.equal(view.findAll('RestorationPanel').length, 0);
     view.flush(finishRestore);
     const stack = view.findAll('Stack')[0];
-    if (!authenticated) {
-      assert.equal(launch.props.exiting, false, 'Fast restoration must still show the animation.');
-      view.flush(() => t.mock.timers.tick(2_999));
-      assert.equal(launch.props.exiting, false);
-      view.flush(() => t.mock.timers.tick(1));
-    }
-    assert.equal(launch.props.exiting, true);
+    assert.equal(
+      launch.props.exiting,
+      true,
+      'Readiness must begin the exit without a branding delay.',
+    );
     assert.equal(
       view.findAll('View').some((node) => node.props.testID === 'app-ready'),
       false,

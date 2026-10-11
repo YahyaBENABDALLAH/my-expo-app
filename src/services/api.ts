@@ -5,7 +5,7 @@ import {
   assertSessionVersion,
 } from '@/services/auth/auth.session';
 import { isSessionInvalid, SessionChangedError } from '@/services/auth/auth.errors';
-import { ApiError, ApiResponseValidationError } from '@/services/api.error';
+import { ApiConfigurationError, ApiError, ApiResponseValidationError } from '@/services/api.error';
 import { requestNewToken } from '@/services/auth/auth.refresh';
 import i18n, { getCurrentLanguage } from '@/lib/i18n';
 import type { z } from 'zod';
@@ -103,10 +103,10 @@ export function extractApiMessage(data: unknown): string | string[] | null {
 }
 
 function getBaseUrl(override?: string) {
-  const baseUrl = override ?? process.env.EXPO_PUBLIC_API_URL;
+  const baseUrl = (override ?? process.env.EXPO_PUBLIC_API_URL)?.trim();
 
   if (!baseUrl) {
-    throw new Error('Missing `EXPO_PUBLIC_API_URL`. Set it before calling the API client.');
+    throw new ApiConfigurationError();
   }
 
   return baseUrl.replace(/\/+$/, '');

@@ -24,7 +24,7 @@ import { UniversalTextContent } from '../text/universal-text';
 import { nativeFillSize } from '../native/native-fill-width';
 import { PageMotionOverlay, PAGE_WAVE_HEIGHT as WAVE_HEIGHT } from '../page/page-motion-overlay';
 
-const EXIT_DURATION_MS = 2000;
+const EXIT_DURATION_MS = 300;
 // LottieView accepts Metro's numeric asset ID on native, though its source type omits it.
 const bluePepeSource = bluePepe as unknown as string;
 

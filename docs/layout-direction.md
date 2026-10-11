@@ -1,24 +1,19 @@
 # Live LTR / RTL
 
-Use the **RTL switch at the bottom of each page's content**:
-**off = LTR, on = RTL**. Scroll below the page's last action to reach it. Map,
-canvas and Storybook routes place the controls below their main view. Changes
-apply immediately in the current session and preserve navigation, form state and
-the TanStack Query cache. The initial direction follows the device; manual
-selection is session-only. Layout direction does not translate text.
+Arabic selected in **More → Preferences** applies RTL; French and English
+apply LTR. Language changes preserve navigation, form state and the TanStack
+Query cache. The shared direction/language/theme footer has been removed from
+production pages. Manual direction controls remain available in native
+Storybook for layout previews; those changes are session-only.
 
 `LayoutDirectionProvider` updates Expo Router's public `LocaleProvider` and the
 root React Native view's `direction`. Every `UniversalHost` receives an explicit
 `layoutDirection` on each render. Avoid `I18nManager.forceRTL` / `allowRTL` and
 reload APIs: global direction changes require a subsequent app launch.
 
-`PageAppearanceControls` composes the switches and picker inside the owning
-native scroll content. `PageFrame` retains a title/back header and consumes the
-top safe area once. Native scroll pages disable its separate footer to avoid
-duplicating controls; specialized RN map/canvas boundaries append that footer
-after their content. Direction changes retain both content and controls.
-The selector is `page-layout-direction-switch`; isolated stories and sheets use
-distinct prefixes. Native sheets cover the page while presented; the direction
+`PageFrame` retains a title/back header and consumes the top safe area once;
+content owns the remaining edges. Isolated stories and sheets use distinct
+direction-control selectors. Native sheets cover the page while presented; the direction
 composition story includes an in-sheet switch for that scenario.
 
 Compose content in the shared Expo UI Row / Column controls. Use logical start /
@@ -40,10 +35,9 @@ switch. Its direction-only frame lives in
 outside the production UI API. `.maestro/storybook/layout-direction.yaml` checks draft preservation and
 open-sheet updates. Native appearance, text cursor/focus and back gestures still
 require iOS and Android verification; JS fixture tests cannot prove those.
-`.maestro/auth/layout-direction.yaml` exercises the footer on auth pages with a
-typed draft; `.maestro/pages/layout-direction.yaml` covers tabs, a detail/back
-transition and Storybook. The page flow requires a signed-in or development guest
-session, as do the other signed-in page flows.
+The `appearance-controls-removed.yaml` flows under `.maestro/auth/` and
+`.maestro/pages/` check that production pages no longer expose the footer.
+The page flow requires a signed-in or development guest session.
 
 Sources: [Expo localization](https://docs.expo.dev/guides/localization/),
 [SDK 57 Host](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/host/),

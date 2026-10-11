@@ -7,7 +7,7 @@ import {
   FormSubmit,
   FormTextInput,
 } from '@components/ui';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { router, useLocalSearchParams } from 'expo-router';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -22,17 +22,29 @@ import {
 import { useAuthForm } from '../hooks/use-auth-form';
 
 export function ResetPasswordScreen() {
-  const { t } = useTranslation();
   const { challengeId } = useLocalSearchParams<{ challengeId?: string | string[] }>();
-  const valid = isValidPasswordResetChallengeId(challengeId);
+  const validChallenge = isValidPasswordResetChallengeId(challengeId) ? challengeId : null;
+  return <ResetPasswordForm key={validChallenge ?? 'invalid'} challengeId={validChallenge} />;
+}
+
+function ResetPasswordForm({ challengeId }: { challengeId: string | null }) {
+  const { t } = useTranslation();
+  const valid = challengeId !== null;
   const [saved, setSaved] = useState(false);
+  const mounted = useRef(true);
+  useEffect(() => {
+    mounted.current = true;
+    return () => {
+      mounted.current = false;
+    };
+  }, []);
   const { form, submit, pending } = useAuthForm<PasswordResetFormValues>(
     zodResolver(passwordResetSchema),
     { code: '', newPassword: '', confirmPassword: '' },
     async (values) => {
-      if (!valid) throw new Error(t('auth.openRecovery'));
+      if (!challengeId) throw new Error(t('auth.openRecovery'));
       await resetPassword({ challengeId, code: values.code, newPassword: values.newPassword });
-      setSaved(true);
+      if (mounted.current) setSaved(true);
     },
   );
   return (
@@ -62,7 +74,7 @@ export function ResetPasswordScreen() {
             name="newPassword"
             testID="auth-reset-password-new-password"
             label={t('auth.newPassword')}
-            secureTextEntry
+            password
             disabled={pending}
           />
           <FormTextInput
@@ -70,7 +82,7 @@ export function ResetPasswordScreen() {
             name="confirmPassword"
             testID="auth-reset-password-confirm-password"
             label={t('auth.confirmPassword')}
-            secureTextEntry
+            password
             disabled={pending}
           />
           <FormSubmit

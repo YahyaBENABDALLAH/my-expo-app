@@ -8,7 +8,6 @@ import { UniversalButtonContent } from '../button/universal-button-content';
 import { UniversalTextContent as Text } from '../text/universal-text';
 import { nativeFillWidth } from '../native/native-fill-width';
 import { PageFrame } from '../page/page-frame';
-import { PageAppearanceControls } from '../appearance/page-appearance-controls';
 
 /** Recovery UI uses the same native Expo UI controls as the rest of the app. */
 export function ScreenError({ error, retry }: ErrorBoundaryProps) {
@@ -16,7 +15,7 @@ export function ScreenError({ error, retry }: ErrorBoundaryProps) {
   const colors = useThemeColors();
   const insets = useSafeAreaInsets();
   return (
-    <PageFrame title={t('recovery.title')} showAppearanceFooter={false}>
+    <PageFrame title={t('recovery.title')}>
       <UniversalHost
         testID="screen-error"
         matchContents={false}
@@ -44,7 +43,6 @@ export function ScreenError({ error, retry }: ErrorBoundaryProps) {
                 void retry();
               }}
             />
-            <PageAppearanceControls />
           </Column>
         </ScrollView>
       </UniversalHost>

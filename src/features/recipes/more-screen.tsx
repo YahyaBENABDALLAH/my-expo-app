@@ -39,6 +39,11 @@ export default function MoreScreen() {
       tab
       actions={[
         {
+          label: t('settings.title'),
+          testID: 'page-action-app-settings',
+          href: '/settings',
+        },
+        {
           label: t('tools.browsePages'),
           testID: 'page-action-browse-all-pages',
           href: '/development-pages',

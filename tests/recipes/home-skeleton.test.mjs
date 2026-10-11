@@ -67,7 +67,7 @@ function setup() {
       },
     },
     '@/hooks/use-screen-refresh': { useScreenRefresh: () => async () => {} },
-    '@/features/recipes/home-card-examples': { HomeCardExamples: () => null },
+    '@/features/ui-showcase/home-card-examples': { HomeCardExamples: () => null },
     '@/features/recipes/queries': {
       lookupLabel: (item) => item.name,
       lookupOptions: () => ({ queryKey: ['categories'] }),
@@ -78,6 +78,7 @@ function setup() {
   return {
     ...ui,
     HomeScreen: load('features/recipes/home-screen.tsx').default,
+    HomeExamplesScreen: load('features/ui-showcase/home-examples-screen.tsx').default,
     focus: (focused) => setFocused(focused),
     queryReads: () => queryReads,
     motionReads: () => motionReads,
@@ -88,11 +89,11 @@ function setup() {
   };
 }
 
-test('home shows static placeholders for ten seconds, then removes them without rerendering queries or resetting controls', (t) => {
+test('showcase static placeholders expire without resetting controls or making API reads', (t) => {
   t.mock.timers.enable({ apis: ['setTimeout', 'setInterval'] });
   const intervals = t.mock.method(globalThis, 'setInterval');
   const s = setup();
-  const view = renderFixture(h(s.HomeScreen));
+  const view = renderFixture(h(s.HomeExamplesScreen));
   try {
     const quickMeals = () =>
       view.findAll('Switch').find((node) => node.props.testID === 'home-quick-meals-switch');
@@ -108,23 +109,20 @@ test('home shows static placeholders for ten seconds, then removes them without 
     assert.equal(s.placeholders(view).length, 0);
     assert.equal(s.queryReads(), initialQueryReads);
     assert.equal(quickMeals().props.value, false);
-    assert.ok(view.findAll('RecipeCard').length > 0);
+    assert.equal(s.queryReads(), 0);
   } finally {
     view.unmount();
   }
 });
 
-test('home focus changes and refresh do not restart an expired preview', async (t) => {
+test('showcase control updates do not restart an expired preview', (t) => {
   t.mock.timers.enable({ apis: ['setTimeout', 'setInterval'] });
   const s = setup();
-  const view = renderFixture(h(s.HomeScreen));
+  const view = renderFixture(h(s.HomeExamplesScreen));
   try {
-    view.flush(() => t.mock.timers.tick(6_000));
-    view.flush(() => s.focus(false));
-    view.flush(() => t.mock.timers.tick(4_000));
+    view.flush(() => t.mock.timers.tick(10_000));
     assert.equal(s.preview(view).length, 0);
-    view.flush(() => s.focus(true));
-    await view.findAll('PageScreen')[0].props.onRefresh();
+    view.flush(() => view.findAll('Switch')[0].props.onValueChange(true));
     view.flush(() => t.mock.timers.tick(10_000));
     assert.equal(s.preview(view).length, 0);
     assert.equal(s.motionReads(), 0);
@@ -133,12 +131,12 @@ test('home focus changes and refresh do not restart an expired preview', async (
   }
 });
 
-test('leaving home before expiry cancels its pending timeout', (t) => {
+test('leaving the showcase cancels its pending preview timeout', (t) => {
   t.mock.timers.enable({ apis: ['setTimeout', 'setInterval'] });
   const timeouts = t.mock.method(globalThis, 'setTimeout');
   const clear = t.mock.method(globalThis, 'clearTimeout');
   const s = setup();
-  const view = renderFixture(h(s.HomeScreen));
+  const view = renderFixture(h(s.HomeExamplesScreen));
   const timeout = timeouts.mock.calls.find((call) => call.arguments[1] === 10_000);
   assert.ok(timeout);
   view.flush(() => t.mock.timers.tick(5_000));
@@ -146,6 +144,31 @@ test('leaving home before expiry cancels its pending timeout', (t) => {
   assert.ok(clear.mock.calls.some((call) => call.arguments[0] === timeout.result));
   t.mock.timers.tick(10_000);
   assert.equal(s.placeholders(view).length, 0);
+});
+
+test('home presents live recipes without sample controls, timed skeletons or duplicate cards', async (t) => {
+  t.mock.timers.enable({ apis: ['setTimeout', 'setInterval'] });
+  const timeouts = t.mock.method(globalThis, 'setTimeout');
+  const s = setup();
+  const view = renderFixture(h(s.HomeScreen));
+  try {
+    assert.equal(view.findAll('RecipeCard').length, 1);
+    assert.equal(s.preview(view).length, 0);
+    assert.equal(view.findAll('Switch').length, 0);
+    assert.equal(view.findAll('List').length, 0);
+    assert.equal(timeouts.mock.calls.length, 0);
+    assert.equal(
+      view.findAll('Button').some((node) => node.props.testID === 'home-browse-pages'),
+      false,
+    );
+    view.flush(() => s.focus(false));
+    view.flush(() => s.focus(true));
+    await view.findAll('PageScreen')[0].props.onRefresh();
+    assert.equal(view.findAll('RecipeCard').length, 1);
+    assert.equal(timeouts.mock.calls.length, 0);
+  } finally {
+    view.unmount();
+  }
 });
 
 test('animated skeletons retain one shared pulse clock and pausing releases it', (t) => {

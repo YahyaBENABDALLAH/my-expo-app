@@ -1,0 +1,64 @@
+appId: com.hyrkul.likan
+name: Login corner preferences update theme and language while preserving the draft
+tags: [storybook, auth, theme, localization]
+env:
+  STORYBOOK_URL: myappexpo://storybook
+---
+- runFlow:
+    file: ../helpers/open-story.yaml
+    env:
+      STORY_ID: pages-login-preferences--light
+      READY_ID: auth-login-language
+- tapOn:
+    id: auth-login-language
+- tapOn:
+    id: auth-login-language-en
+- assertVisible:
+    id: login-preferences-status
+    text: en · light · ltr
+- tapOn:
+    id: login-preferences-draft
+- inputText: draft@example.com
+- tapOn:
+    id: auth-login-color-scheme
+- hideKeyboard
+- assertVisible:
+    id: login-preferences-status
+    text: en · dark · ltr
+- assertVisible:
+    id: login-preferences-draft-value
+    text: draft@example.com
+- tapOn:
+    id: auth-login-language
+- tapOn:
+    id: auth-login-language-ar
+- assertVisible:
+    id: login-preferences-status
+    text: ar · dark · rtl
+- assertVisible:
+    id: login-preferences-draft-value
+    text: draft@example.com
+- tapOn:
+    id: auth-login-color-scheme
+- assertVisible:
+    id: login-preferences-status
+    text: ar · light · rtl
+- tapOn:
+    id: auth-login-language
+- tapOn:
+    id: auth-login-language-close
+- assertNotVisible:
+    id: auth-login-language-en
+- assertVisible:
+    id: login-preferences-status
+    text: ar · light · rtl
+- tapOn:
+    id: auth-login-language
+- tapOn:
+    id: auth-login-language-en
+- assertVisible:
+    id: login-preferences-status
+    text: en · light · ltr
+- assertVisible:
+    id: login-preferences-draft-value
+    text: draft@example.com
