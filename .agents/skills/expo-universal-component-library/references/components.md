@@ -312,18 +312,24 @@ applies opacity to the fill color itself, preserving an existing color alpha and
 avoiding a separate compositing layer for each placeholder.
 
 The pulse fades between the requested opacity and 45% of it in 900 ms per direction.
-`src/components/ui/skeleton/use-skeleton-pulse.ts` shares one endpoint timer across mounted animated shapes;
-SwiftUI opacity and Compose background-color modifiers interpolate frames natively.
-No frame-by-frame React renders, extra Hosts, layout measurements, or dependencies.
-JS congestion can delay the next endpoint; this is not an autonomous UI-runtime
-loop. `animate={false}`, live reduced motion, and inactive app state unsubscribe
+Standalone `Skeleton` uses Reanimated CSS keyframes on its existing RN Host, with no
+endpoint timer, additional view layer, or periodic React renders. Its shape stays
+in Expo UI. `SkeletonContent` retains one shared endpoint timer in
+`src/components/ui/skeleton/use-skeleton-pulse.ts`; SwiftUI opacity and Compose
+background-color modifiers interpolate frames natively. CSS cannot directly target
+those native modifier trees; adding RN bridges and Hosts per shape would increase
+view overhead. Content's next endpoint can still be delayed by JS congestion.
+All visible animation consumers share lifecycle/accessibility subscriptions through
+`useMotionEnabled`. No frame-by-frame React renders, layout measurements, or dependencies.
+`animate={false}`, live reduced motion, and inactive app state stop motion
 and restore the configured opacity. Static shapes bypass the pulse hook entirely,
-creating no pulse timer or motion lifecycle subscriptions. Home uses this static
-path and unmounts the complete preview ten seconds after the screen mounts;
+creating no pulse timer or motion lifecycle subscriptions. The development Home
+examples use this static path and unmount the complete preview ten seconds after mounting;
 refreshing or switching tabs does not restart that preview.
 
 `.rnstorybook/stories/expo-ui/skeleton.stories.tsx` covers Light/Dark, image, circle,
-pill, custom appearance, static mode, StaticReferenceCard, pause/resume, opacity 0/0.35/1 and Reference search-card compositions with inherited
+pill, custom appearance, static mode, StaticReferenceCard, native pause/resume,
+CSSAnimationControls, opacity 0/0.35/1 and Reference search-card compositions with inherited
 scheme and narrow/full-width layout. Verify native size/fill, clipping, Host theme
 inheritance, explicit overrides and screen-reader traversal on both platforms.
 Android Maestro preview flows passed for reference cards in dark, light and narrow

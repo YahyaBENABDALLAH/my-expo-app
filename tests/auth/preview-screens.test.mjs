@@ -89,6 +89,8 @@ for (const [name, env, development, allowed] of [
       '@components/ui': {
         PageScreen: native('PageScreen'),
         UniversalButtonContent: native('Button'),
+        UniversalTextContent: native('Text'),
+        OtpBottomSheet: native('OtpBottomSheet'),
         AuthScreenFrame: native('AuthScreenFrame'),
         LoginPreferences: native('LoginPreferences'),
         Column: native('Column'),

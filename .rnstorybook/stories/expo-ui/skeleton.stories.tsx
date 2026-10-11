@@ -199,3 +199,50 @@ export const AnimationControls: Story = {
     <ReferenceCardDemo animate={args.animate} colorScheme={args.colorScheme} playback />
   ),
 };
+
+/** Standalone Hosts exercise CSS playback without changing the native content stories. */
+function CSSAnimationControlsDemo({
+  colorScheme = 'light',
+  animate = true,
+}: {
+  colorScheme?: 'light' | 'dark';
+  animate?: boolean;
+}) {
+  const [playing, setPlaying] = useState(true);
+  return (
+    <NativeStoryFrame colorScheme={colorScheme}>
+      <UniversalHost colorScheme={colorScheme}>
+        <Column spacing={12}>
+          <UniversalButtonContent
+            variant="secondary"
+            testID="skeleton-css-toggle"
+            label={playing ? 'Pause animation' : 'Resume animation'}
+            onPress={() => setPlaying((value) => !value)}
+          />
+          <UniversalTextContent testID="skeleton-css-state">
+            {animate && playing ? 'CSS animation playing' : 'CSS animation paused'}
+          </UniversalTextContent>
+        </Column>
+      </UniversalHost>
+      <Skeleton
+        animate={animate && playing}
+        colorScheme={colorScheme}
+        testID="skeleton-css-fixed"
+        style={{ width: 200, height: 28, opacity: 0.35 }}
+      />
+      <Skeleton
+        animate={animate && playing}
+        colorScheme={colorScheme}
+        testID="skeleton-css-fill"
+        style={{ width: '100%', height: 16 }}
+      />
+    </NativeStoryFrame>
+  );
+}
+
+export const CSSAnimationControls: Story = {
+  args: { colorScheme: 'light' },
+  render: (args) => (
+    <CSSAnimationControlsDemo animate={args.animate} colorScheme={args.colorScheme} />
+  ),
+};

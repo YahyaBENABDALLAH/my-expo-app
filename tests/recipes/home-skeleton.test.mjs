@@ -15,9 +15,14 @@ function setup() {
   let setFocused;
   let queryReads = 0;
   let motionReads = 0;
+  let shapeRenders = 0;
+  let setMotion;
   const destinations = [];
   const ui = {
-    Column: native('Column'),
+    Column: (props) => {
+      if (props.modifiers?.[0]?.skeleton) shapeRenders++;
+      return h('Column', props, props.children);
+    },
     Row: native('Row'),
     FieldGroup,
     List: native('List'),
@@ -38,10 +43,16 @@ function setup() {
     '@expo/ui': { Column: ui.Column },
     '@/hooks/use-theme': { useThemeColors: () => colors },
     '@/hooks/use-motion-enabled': {
-      useMotionEnabled: (animate) => {
+      useMotionEnabled: (animate = true) => {
         motionReads++;
-        return animate;
+        const [allowed, update] = useState(true);
+        setMotion = update;
+        return animate && allowed;
       },
+    },
+    'react-native-reanimated': {
+      createAnimatedComponent: (component) => component,
+      cubicBezier: (...points) => points,
     },
     '@/components/ui/host/universal-host': {
       UniversalHost: native('Host'),
@@ -83,6 +94,8 @@ function setup() {
     focus: (focused) => setFocused(focused),
     queryReads: () => queryReads,
     motionReads: () => motionReads,
+    shapeRenders: () => shapeRenders,
+    motion: (enabled) => setMotion(enabled),
     destinations,
     placeholders: (view) =>
       view.findAll('Column').filter((node) => node.props.modifiers?.[0]?.skeleton),
@@ -112,6 +125,58 @@ test('showcase static placeholders expire without resetting controls or making A
     assert.equal(s.queryReads(), initialQueryReads);
     assert.equal(quickMeals().props.value, false);
     assert.equal(s.queryReads(), 0);
+  } finally {
+    view.unmount();
+  }
+});
+
+test('standalone CSS skeletons avoid pulse timers and React work between lifecycle changes', (t) => {
+  t.mock.timers.enable({ apis: ['setTimeout', 'setInterval'] });
+  const intervals = t.mock.method(globalThis, 'setInterval');
+  const s = setup();
+  const view = renderFixture(
+    h(s.Skeleton, { testID: 'css-skeleton', style: { width: 160, height: 28, opacity: 0.35 } }),
+  );
+  try {
+    const host = () => view.findAll('Host')[0].props;
+    const shape = () => s.placeholders(view)[0].props.modifiers[0];
+    assert.equal(view.findAll('Host').length, 1);
+    assert.equal(host().inline, true);
+    assert.equal(host().pointerEvents, 'none');
+    assert.equal(host().importantForAccessibility, 'no-hide-descendants');
+    assert.equal(host().style.animationIterationCount, 'infinite');
+    assert.equal(host().style.animationDuration, 900);
+    assert.equal(shape().width, 160);
+    assert.equal(shape().height, 28);
+    assert.equal(shape().opacity, 0.35);
+    assert.equal(shape().animationDuration, undefined);
+    const renders = s.shapeRenders();
+    view.flush(() => t.mock.timers.tick(9_000));
+    assert.equal(s.shapeRenders(), renders);
+    assert.equal(intervals.mock.calls.length, 0);
+    view.flush(() => s.motion(false));
+    assert.equal(host().style.animationName, undefined);
+    assert.equal(host().style.opacity, 1);
+    assert.equal(shape().opacity, 0.35);
+    view.flush(() => s.motion(true));
+    assert.equal(host().style.animationIterationCount, 'infinite');
+    assert.equal(intervals.mock.calls.length, 0);
+  } finally {
+    view.unmount();
+  }
+});
+
+test('static standalone skeletons bypass motion and retain flexible native sizing', () => {
+  const s = setup();
+  const view = renderFixture(
+    h(s.Skeleton, { animate: false, style: { width: '100%', opacity: 0 } }),
+  );
+  try {
+    assert.equal(s.motionReads(), 0);
+    assert.equal(view.findAll('Host')[0].props.inline, false);
+    assert.equal(view.findAll('Host')[0].props.style.animationName, undefined);
+    assert.equal(s.placeholders(view)[0].props.modifiers[0].width, undefined);
+    assert.equal(s.placeholders(view)[0].props.modifiers[0].opacity, 0);
   } finally {
     view.unmount();
   }
