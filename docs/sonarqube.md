@@ -6,7 +6,8 @@ See the [2026-10-11 analysis report](sonarqube-report-2026-10-11.md) for finding
 The [HIGH-impact fix report](sonarqube-high-impact-fixes-2026-10-11.md) records the
 first remediation pass. The [MEDIUM-impact fix report](sonarqube-medium-impact-fixes-2026-10-11.md)
 records the severity fixes. The [duplication cleanup report](sonarqube-duplication-fixes-2026-10-11.md)
-records the latest scan: 0.0% duplication and zero open MEDIUM and HIGH findings.
+records the duplication pass. The latest session-restoration follow-up below
+retains 0.0% duplication and zero open BLOCKER, HIGH and MEDIUM findings.
 The Docker container is named `my-app-expo-sonarqube` and publishes its web port
 only on `127.0.0.1`. Its data, logs, and extensions use dedicated Docker volumes.
 This is a local evaluation instance with an embedded database.
@@ -16,6 +17,24 @@ GitHub workflows, and app/build configuration. Tests and their helpers are
 classified as test code. Generated `storybook.requires.ts` is excluded.
 Dependencies, native build output, assets, and documentation are outside the
 configured source roots. Scanner output and local credentials are Git-ignored.
+
+## Session restoration follow-up — 2026-10-11 UTC
+
+`restoreSession` in `src/services/auth/auth.lifecycle.ts` now returns its session
+snapshot once. Matching the session generation gates background refresh, and a
+named validity check preserves the treatment of expired or missing expiry dates.
+Cached identity remains available while refresh runs; failures keep the existing
+toast handling. A regression verifies that a generation change during loading
+does not schedule refresh and still returns the original snapshot.
+
+Sonar marks `S3516` and the related negated-comparison finding `S1940` **FIXED**.
+All **423 tests** passed, as did lint, typecheck and formatting. The completed
+analysis has no new issues, 118 remaining LOW findings and 0.0% duplication.
+Compute task `fb052873-f38d-4066-92dc-a1607a410686` completed with **SUCCESS** at
+**09:39:25 UTC**; analysis ID `867b26a0-d093-4cf8-882a-b501ad31eaa7`.
+The quality gate still fails solely on missing new-code coverage (0.0% against
+80%). Evidence is saved under the Git-ignored `.sonarqube-local/restore-session-*`
+files. This follow-up adds no native dependency and does not require another build.
 
 ## Start and stop
 

@@ -197,7 +197,12 @@ test('restoration returns its snapshot without scheduling a refresh after the se
   const { restoreSession } = load('services/auth/auth.lifecycle.ts');
   const restoration = restoreSession();
   version++;
-  const snapshot = { ...token(), expiresAtUtc: '2000-01-01T00:00:00Z' };
+  const snapshot = {
+    accessToken: 'access-1',
+    refreshToken: 'refresh-access-1',
+    expiresAtUtc: '2000-01-01T00:00:00Z',
+    user: { uuid: 'alice', isChef: true },
+  };
   read.resolve(snapshot);
   assert.strictEqual(await restoration, snapshot);
   assert.equal(requestNewToken.mock.callCount(), 0);
