@@ -1,4 +1,5 @@
 import { Stack } from 'expo-router';
+import { Platform } from 'react-native';
 import { useReducedMotion } from 'react-native-reanimated';
 import { useOnboarding } from '@/context/onboarding.context';
 
@@ -13,6 +14,7 @@ export default function OnboardingLayout() {
         headerShown: false,
         contentStyle: { backgroundColor: 'transparent' },
         animation: reducedMotion ? 'fade' : 'default',
+        freezeOnBlur: Platform.OS === 'android',
         gestureEnabled: !saving,
       }}
     >

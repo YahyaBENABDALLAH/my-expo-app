@@ -3,7 +3,7 @@ import { ReferenceNavigationBar, type FloatingActionKind } from '@components/ui'
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { router, useIsFocused, type Tabs } from 'expo-router';
 import { useEffect, useRef, useState, type ComponentProps } from 'react';
-import { Keyboard } from 'react-native';
+import { Keyboard, Platform } from 'react-native';
 import { useTabActions } from './tab-actions';
 
 type BottomTabBarProps = Parameters<NonNullable<ComponentProps<typeof Tabs>['tabBar']>>[0];
@@ -40,7 +40,7 @@ export function ReferenceTabBar({ state, navigation, insets }: BottomTabBarProps
     <ReferenceNavigationBar
       colorScheme={scheme}
       selected={activeRoute.name}
-      animate={focused}
+      animate={focused && Platform.OS !== 'android'}
       leftInset={insets.left}
       rightInset={insets.right}
       bottomInset={insets.bottom}

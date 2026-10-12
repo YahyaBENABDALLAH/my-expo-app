@@ -19,7 +19,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { View } from 'react-native';
+import { Platform, View } from 'react-native';
 import { useReducedMotion } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -88,6 +88,8 @@ function RootLayoutContent() {
   const { error } = useAuthContext();
   const { ready: languageReady } = useLanguage();
   const { ready: onboardingReady, completed: onboardingCompleted } = useOnboarding();
+  // Leave Android's frame budget for native screen transitions and scrolling.
+  const animatePageArtwork = Platform.OS !== 'android' && !showBrandScreen;
   // Restoration failures must expose their retry UI instead of keeping the launch overlay.
   const ready = languageReady && onboardingReady && (!restoring || Boolean(error));
   const finishBrandScreen = useCallback(() => setShowBrandScreen(false), []);
@@ -103,12 +105,12 @@ function RootLayoutContent() {
     >
       <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
       <AuroraBackground
-        animate={!showBrandScreen && onboardingCompleted}
+        animate={animatePageArtwork && onboardingCompleted}
         colorScheme={colorScheme}
         style={{ position: 'absolute', top: 0, right: 0, bottom: 0, left: 0 }}
       />
       {ready || !showBrandScreen ? <RootLayoutNav /> : null}
-      {onboardingCompleted && <PageMotionOverlay animate={!showBrandScreen} />}
+      {onboardingCompleted && <PageMotionOverlay animate={animatePageArtwork} />}
       {showBrandScreen && (
         <LaunchScreen
           exiting={ready}
@@ -181,6 +183,7 @@ function RootLayoutNav() {
         screenOptions={{
           animation: reducedMotion ? 'fade' : 'default',
           animationMatchesGesture: reducedMotion,
+          freezeOnBlur: Platform.OS === 'android',
           contentStyle: { backgroundColor: 'transparent', direction },
           headerShown: false,
           headerShadowVisible: false,

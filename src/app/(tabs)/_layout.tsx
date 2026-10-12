@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { ReferenceTabBar } from '@/features/pages/reference-tab-bar';
 import { Tabs } from 'expo-router';
+import { Platform } from 'react-native';
 
 import { TabActionsProvider } from '@/features/pages/tab-actions';
 
@@ -19,6 +20,7 @@ export default function TabLayout() {
         screenOptions={{
           headerShown: false,
           animation: 'none',
+          freezeOnBlur: Platform.OS === 'android',
           sceneStyle: { backgroundColor: 'transparent' },
         }}
       >

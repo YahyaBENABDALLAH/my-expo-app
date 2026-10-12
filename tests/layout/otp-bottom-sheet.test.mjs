@@ -1,11 +1,24 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { createElement, useImperativeHandle, useRef, useState } from 'react';
+import {
+  createContext,
+  createElement,
+  useContext,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from 'react';
 import { createSourceLoader } from '../helpers/load-source.mjs';
 import { renderFixture } from '../helpers/render-fixture.mjs';
 
 // Real component state/callbacks; native rendering, geometry, keyboard and motion are mocked.
-function setup(t, props = {}) {
+function setup(
+  t,
+  props = {},
+  { platform = 'android', height = 844, fontScale = 1, width = 312 } = {},
+) {
+  const WindowContext = createContext({ height, fontScale, width });
+  let resizeWindow;
   const element = (tag) => {
     function NativeBoundary({ children, ...other }) {
       return createElement(tag, other, children);
@@ -35,14 +48,17 @@ function setup(t, props = {}) {
       },
     },
     'react-native': {
-      Platform: { OS: 'android' },
+      Platform: { OS: platform },
+      useWindowDimensions: () => useContext(WindowContext),
       AccessibilityInfo: { announceForAccessibility() {} },
     },
     '@expo/ui/swift-ui/modifiers': { onGeometryChange: () => ({}) },
     '@expo/ui/jetpack-compose/modifiers': { onSizeChanged: () => ({}) },
     '@expo/material-symbols/lock.xml': 1,
     '@/hooks/use-theme': { useThemeColors: () => ({}) },
-    '@/hooks/use-measured-width': { useMeasuredWidth: () => [312, () => {}] },
+    '@/hooks/use-measured-width': {
+      useMeasuredWidth: () => [useContext(WindowContext).width, () => {}],
+    },
     '@/components/ui/host/universal-host': {
       UniversalHost: element('Host'),
       useHostColorScheme: () => 'light',
@@ -53,33 +69,71 @@ function setup(t, props = {}) {
     },
     '@/components/ui/loading/loading-state': { LoadingContent: element('Loading') },
     '@/components/ui/text/universal-text': { UniversalTextContent: element('Text') },
-    '@/components/ui/native/native-fill-width': { nativeFillWidth: [], nativeRowWeight: [] },
+    '@/components/ui/native/native-fill-width': {
+      nativeFillWidth: [{ $type: 'frame', maxWidth: Infinity }],
+      nativeRowWeight: [{ $type: 'frame', maxWidth: Infinity }],
+    },
     '@/components/ui/otp-bottom-sheet/otp-feedback': { OtpFeedback: element('Feedback') },
     '@/components/ui/otp-bottom-sheet/otp-input-layout': {
-      OtpInputLayout: ({ input }) => {
+      OtpInputLayout: ({ input, slots, ...layout }) => {
         useImperativeHandle(input.ref, () => ({ focus() {}, blur() {} }), []);
         const { ref, ...rest } = input;
-        return createElement('Input', rest);
+        return createElement('InputLayout', layout, slots, createElement('Input', rest));
       },
     },
   };
+  if (platform === 'ios') {
+    // Exercise the installed style translator: a width-only frame escape hatch erases height.
+    mocks['@expo/ui/swift-ui/modifiers'] = new Proxy(
+      {},
+      {
+        get: (_, name) => (params) => ({
+          $type: name,
+          ...(typeof params === 'object' ? params : { value: params }),
+        }),
+      },
+    );
+    const { transformToModifiers } = createSourceLoader(mocks)(
+      '../node_modules/@expo/ui/src/universal/transformStyle.ios.ts',
+    );
+    mocks['@expo/ui'].Column = function Column({ children, style, modifiers, ...other }) {
+      return createElement(
+        'Column',
+        { ...other, style, modifiers: transformToModifiers(style, {}, modifiers) },
+        children,
+      );
+    };
+    mocks['@expo/ui'].ScrollView = function ScrollView({ children, style, modifiers, ...other }) {
+      return createElement(
+        'ScrollView',
+        { ...other, style, modifiers: transformToModifiers(style, {}, modifiers) },
+        children,
+      );
+    };
+  }
   const { OtpBottomSheet } = createSourceLoader(mocks)(
     'components/ui/otp-bottom-sheet/otp-bottom-sheet.tsx',
   );
   function Harness() {
     const [open, setOpen] = useState(true);
+    const [window, setWindow] = useState({ height, fontScale, width });
+    resizeWindow = (next) => setWindow((previous) => ({ ...previous, ...next }));
     return createElement(
-      'Root',
-      null,
-      createElement('Open', { onPress: () => setOpen(true) }),
-      createElement(OtpBottomSheet, {
-        isPresented: open,
-        onDismiss: () => setOpen(false),
-        recipient: 'preview@example.com',
-        resendCooldownSeconds: 0,
-        onVerify: () => true,
-        ...props,
-      }),
+      WindowContext.Provider,
+      { value: window },
+      createElement(
+        'Root',
+        null,
+        createElement('Open', { onPress: () => setOpen(true) }),
+        createElement(OtpBottomSheet, {
+          isPresented: open,
+          onDismiss: () => setOpen(false),
+          recipient: 'preview@example.com',
+          resendCooldownSeconds: 0,
+          onVerify: () => true,
+          ...props,
+        }),
+      ),
     );
   }
   const fixture = renderFixture(createElement(Harness));
@@ -93,6 +147,7 @@ function setup(t, props = {}) {
     press: (suffix) => fixture.flush(() => button(suffix).onPress()),
     close: () => fixture.flush(() => fixture.findAll('Sheet')[0].props.onDismiss()),
     open: () => fixture.flush(() => fixture.findAll('Open')[0].props.onPress()),
+    resize: (next) => fixture.flush(() => resizeWindow(next)),
     status: () => fixture.findAll('Feedback')[0].props.status,
     settle: async () => {
       await new Promise(setImmediate);
@@ -100,6 +155,41 @@ function setup(t, props = {}) {
     },
   };
 }
+
+for (const platform of ['ios', 'android']) {
+  test(`${platform} OTP scrolling has a finite viewport on opening, resizing and reopening`, (t) => {
+    const fixture = setup(t, {}, { platform, height: 640 });
+    const scrollHeight = () => {
+      const scroll = fixture.findAll('ScrollView')[0].props;
+      return platform === 'ios'
+        ? scroll.modifiers.find((modifier) => modifier.$type === 'frame')?.height
+        : scroll.style?.height;
+    };
+    assert.ok(scrollHeight() > 0 && scrollHeight() < 640);
+    fixture.resize({ height: 320 });
+    assert.ok(scrollHeight() > 0 && scrollHeight() < 320);
+    fixture.close();
+    fixture.open();
+    assert.ok(scrollHeight() > 0 && scrollHeight() < 320);
+  });
+}
+
+test('iOS digit boxes keep equal explicit frames, fit narrow widths and grow for large text', (t) => {
+  const fixture = setup(t, {}, { platform: 'ios', width: 272 });
+  const frames = () =>
+    fixture
+      .findAll('Column')
+      .filter(({ props }) => props.testID?.startsWith('otp-sheet-slot-'))
+      .map(({ props }) => props.modifiers.find((modifier) => modifier.$type === 'frame'));
+  assert.equal(frames().length, 6);
+  assert.ok(frames().every((frame) => frame.height === 64 && frame.width === frames()[0].width));
+  assert.ok(Math.abs(frames().reduce((total, frame) => total + frame.width, 40) - 272) < 0.01);
+  fixture.resize({ fontScale: 2 });
+  assert.ok(frames().every((frame) => frame.height >= 35 * 2 + 24));
+  assert.equal(fixture.findAll('InputLayout')[0].props.height, frames()[0].height);
+  fixture.type('012345');
+  assert.ok(frames().every((frame) => frame.width > 0 && frame.height > 64));
+});
 
 test('incomplete codes and duplicate taps cannot submit; accepted codes show success', async (t) => {
   let calls = 0;

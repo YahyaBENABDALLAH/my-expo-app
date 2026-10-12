@@ -13,6 +13,15 @@ env:
     id: otp-demo-open
 - assertVisible:
     id: otp-sheet-title
+# Opening and dismissing without typing exercises native sheet measurement each time.
+- tapOn:
+    id: otp-sheet-close
+- assertNotVisible:
+    id: otp-sheet-title
+- tapOn:
+    id: otp-demo-open
+- assertVisible:
+    id: otp-sheet-title
 - tapOn:
     id: otp-sheet-input
 - inputText: '000000'

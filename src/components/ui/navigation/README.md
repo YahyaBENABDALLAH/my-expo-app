@@ -4,7 +4,11 @@ Exports: `ReferenceNavigationBar` and navigation tab types.
 
 `reference-navigation-bar.tsx` composes the dock and raised floating action.
 `navigation-tab.*` owns destination controls;
-`navigation-glass-surface.*` owns passive native glass/blur artwork.
+`navigation-glass-surface.*` owns passive dock artwork: native glass on iOS and
+static tonal gradients on Android. Android avoids blurring an already smooth
+gradient. The production Android tab bar also keeps its floating action artwork
+static to leave the frame budget for navigation; native press feedback and haptics
+still run.
 Each adapter's types stay here.
 
 The borderless dock has 20-point rounded top corners and fills the screen width

@@ -4,6 +4,9 @@ Export: `AuroraBackground`. Implementation: `aurora-background.tsx`.
 
 The root's default full-screen Skia background for all routed pages. An optional
 `colorScheme` overrides its Host/device appearance; `animate` defaults to true.
+The production root passes `animate={false}` on Android to avoid a full-screen
+shader redraw on every frame during navigation and scrolling. The artwork and
+theme changes remain visible. iOS and the interactive Skia demo retain motion.
 The shader consumes the selected theme's background, raised surface, primary
 and secondary tokens. Optional `hue` supports the interactive canvas page.
 

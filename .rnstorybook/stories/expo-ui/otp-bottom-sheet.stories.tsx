@@ -15,6 +15,7 @@ import { NativeStoryFrame } from '../../components/native-story-frame';
 const previewI18n = i18n.cloneInstance({ lng: 'en', initAsync: false });
 
 type DemoProps = Pick<OtpBottomSheetProps, 'colorScheme' | 'resendCooldownSeconds'> & {
+  recipient?: string;
   requestFailure?: boolean;
   resendFailure?: boolean;
 };
@@ -24,6 +25,7 @@ function OtpDemo({
   resendCooldownSeconds = 0,
   requestFailure,
   resendFailure,
+  recipient = 'hello@likan.app',
 }: DemoProps) {
   const [open, setOpen] = useState(false);
   const [resends, setResends] = useState(0);
@@ -44,7 +46,7 @@ function OtpDemo({
         isPresented={open}
         onDismiss={() => setOpen(false)}
         colorScheme={colorScheme}
-        recipient="hello@likan.app"
+        recipient={recipient}
         hint="Preview code: 123456"
         resendCooldownSeconds={resendCooldownSeconds}
         onVerify={async (code) => {
@@ -90,3 +92,6 @@ export const Dark: Story = { args: { colorScheme: 'dark' } };
 export const ResendCountdown: Story = { args: { resendCooldownSeconds: 30 } };
 export const RequestFailure: Story = { args: { requestFailure: true } };
 export const ResendFailure: Story = { args: { resendFailure: true } };
+export const LongRecipient: Story = {
+  args: { recipient: 'a.long.verification.address@example.com' },
+};

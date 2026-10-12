@@ -9,7 +9,7 @@ import {
   type TextInputRef,
 } from '@expo/ui';
 import { useEffect, useRef, useState } from 'react';
-import { AccessibilityInfo, Platform } from 'react-native';
+import { AccessibilityInfo, Platform, useWindowDimensions } from 'react-native';
 import { onGeometryChange } from '@expo/ui/swift-ui/modifiers';
 import { onSizeChanged } from '@expo/ui/jetpack-compose/modifiers';
 import { useTranslation } from 'react-i18next';
@@ -19,7 +19,7 @@ import { BottomSheet } from '../bottom-sheet/bottom-sheet';
 import { UniversalButtonContent } from '../button/universal-button-content';
 import { UniversalHost, useHostColorScheme } from '../host/universal-host';
 import { LoadingContent } from '../loading/loading-state';
-import { nativeFillWidth, nativeRowWeight } from '../native/native-fill-width';
+import { nativeFillWidth } from '../native/native-fill-width';
 import { UniversalTextContent } from '../text/universal-text';
 import { normalizeOtpCode, OTP_LENGTH } from './otp-code';
 import { OtpFeedback } from './otp-feedback';
@@ -82,9 +82,14 @@ function OtpForm({
   const { t } = useTranslation();
   const scheme = useHostColorScheme();
   const colors = useThemeColors(scheme);
+  const { height, fontScale } = useWindowDimensions();
   const cooldown = Number.isFinite(resendCooldownSeconds) ? Math.max(0, resendCooldownSeconds) : 30;
   const value = useNativeState('');
   const [width, setWidth] = useMeasuredWidth();
+  // Intrinsic sheet Hosts measure with an unbounded height. Compose scrolling needs a limit.
+  const viewportHeight = Math.min(620, height * 0.7);
+  const inputHeight = Math.max(64, Math.ceil(35 * fontScale + 24));
+  const slotWidth = Math.max(5, (width - 8 * (OTP_LENGTH - 1)) / OTP_LENGTH);
   const inputRef = useRef<TextInputRef>(null);
   const session = useRef(0);
   const pending = useRef(false);
@@ -182,7 +187,7 @@ function OtpForm({
     }
   }
   return (
-    <ScrollView modifiers={nativeFillWidth}>
+    <ScrollView style={{ height: viewportHeight }}>
       <Column
         alignment="center"
         spacing={24}
@@ -251,6 +256,7 @@ function OtpForm({
                 >
                   <OtpInputLayout
                     accessibilityLabel={t('otp.codeLabel')}
+                    height={inputHeight}
                     input={{
                       ref: inputRef,
                       value,
@@ -270,38 +276,55 @@ function OtpForm({
                     slots={Array.from({ length: OTP_LENGTH }, (_, index) => {
                       const active = focused && index === Math.min(code.length, OTP_LENGTH - 1);
                       const filled = index < code.length;
+                      const borderWidth = active || error ? 2 : 1;
+                      const borderColor = error
+                        ? colors.error
+                        : active || filled
+                          ? colors.tint
+                          : colors.border;
+                      const backgroundColor = error
+                        ? colors.errorContainer
+                        : filled || active
+                          ? colors.selection
+                          : colors.surface;
                       return (
                         <Column
                           key={index}
+                          testID={`${testID}-slot-${index}`}
                           alignment="center"
-                          modifiers={nativeRowWeight}
+                          spacing={0}
                           style={{
-                            height: 64,
-                            paddingVertical: 14,
+                            width: slotWidth,
+                            height: inputHeight,
+                            padding: borderWidth,
                             borderRadius: 14,
-                            borderWidth: active || error ? 2 : 1,
-                            borderColor: error
-                              ? colors.error
-                              : active || filled
-                                ? colors.tint
-                                : colors.border,
-                            backgroundColor: error
-                              ? colors.errorContainer
-                              : filled || active
-                                ? colors.selection
-                                : colors.surface,
+                            backgroundColor: borderColor,
                           }}
                         >
-                          <UniversalTextContent
-                            fontSize={28}
-                            fontWeight="600"
-                            textStyle={{
-                              textAlign: 'center',
-                              color: filled ? colors.text : colors.muted,
+                          {/* Inset fills preserve rounded borders on SwiftUI as well as Compose. */}
+                          <Column
+                            alignment="center"
+                            spacing={0}
+                            style={{
+                              width: slotWidth - borderWidth * 2,
+                              height: inputHeight - borderWidth * 2,
+                              borderRadius: 14 - borderWidth,
+                              backgroundColor,
                             }}
                           >
-                            {code[index] ?? '·'}
-                          </UniversalTextContent>
+                            <Spacer flexible size={0} />
+                            <UniversalTextContent
+                              fontSize={28}
+                              fontWeight="600"
+                              textStyle={{
+                                textAlign: 'center',
+                                color: filled ? colors.text : colors.muted,
+                              }}
+                            >
+                              {code[index] ?? '·'}
+                            </UniversalTextContent>
+                            <Spacer flexible size={0} />
+                          </Column>
                         </Column>
                       );
                     })}

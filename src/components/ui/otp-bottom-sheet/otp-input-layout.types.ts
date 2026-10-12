@@ -5,4 +5,5 @@ export interface OtpInputLayoutProps {
   slots: ReactNode;
   input: TextInputProps;
   accessibilityLabel: string;
+  height: number;
 }

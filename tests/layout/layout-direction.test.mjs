@@ -445,15 +445,17 @@ test('compact switches keep distinct prefixes for global, story and sheet contro
   view.unmount();
 });
 
-for (const [authenticated, introductionRequired] of [
+for (const [platform, authenticated, introductionRequired] of [
   [false, false],
   [false, true],
   [true, false],
   [true, true],
-]) {
-  test(`${authenticated ? 'signed-in' : 'signed-out'} root, onboarding ${introductionRequired ? 'required' : 'completed'}, exits when resources are ready and retains navigation/providers when direction flips`, (t) => {
+].flatMap(([authenticated, introductionRequired]) =>
+  ['android', 'ios'].map((platform) => [platform, authenticated, introductionRequired]),
+)) {
+  test(`${platform}: ${authenticated ? 'signed-in' : 'signed-out'} root, onboarding ${introductionRequired ? 'required' : 'completed'}, exits when resources are ready and retains navigation/providers when direction flips`, (t) => {
     t.mock.timers.enable({ apis: ['setTimeout'] });
-    const s = setup();
+    const s = setup(false, platform);
     let directionSettings;
     let finishRestore;
     let finishLanguage;
@@ -578,10 +580,10 @@ for (const [authenticated, introductionRequired] of [
     view.flush(() => launch.props.onExitComplete());
     assert.equal(view.findAll('LaunchScreen').length, 0);
     assert.equal(view.findAll('AuroraBackground')[0], background);
-    assert.equal(background.props.animate, !introductionRequired);
+    assert.equal(background.props.animate, platform === 'ios' && !introductionRequired);
     assert.equal(view.findAll('PageMotionOverlay').length, introductionRequired ? 0 : 1);
     assert.equal(view.findAll('PageMotionOverlay')[0], headerWave);
-    assert.equal(headerWave?.props.animate, introductionRequired ? undefined : true);
+    assert.equal(headerWave?.props.animate, introductionRequired ? undefined : platform === 'ios');
     assert.equal(
       view.findAll('View').some((node) => node.props.testID === 'app-ready'),
       true,
@@ -607,8 +609,8 @@ for (const [authenticated, introductionRequired] of [
       );
       assert.equal(view.findAll('AuthProvider')[0], authProvider);
       headerWave = view.findAll('PageMotionOverlay')[0];
-      assert.equal(headerWave.props.animate, true);
-      assert.equal(background.props.animate, true);
+      assert.equal(headerWave.props.animate, platform === 'ios');
+      assert.equal(background.props.animate, platform === 'ios');
     }
     for (const direction of ['rtl', 'ltr']) {
       view.flush(() => directionSettings.setDirection(direction));

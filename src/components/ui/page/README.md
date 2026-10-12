@@ -24,6 +24,9 @@ edge. Both use the exported `PAGE_WAVE_HEIGHT` and the same motion guards.
 The back wave resolves theme opacity first; the splash keeps full opacity.
 The root mounts it above navigation, alongside `AuroraBackground` behind navigation
 as the default background.
+The production root keeps both layers static on Android so decorative redraws
+do not compete with native navigation and scrolling. The splash and dedicated
+motion stories retain their own animation settings.
 Frames, headers and page content are transparent so they reveal that shared
 canvas; native cards and controls keep their usual semantic surfaces.
 
