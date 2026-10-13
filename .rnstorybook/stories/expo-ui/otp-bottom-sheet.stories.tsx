@@ -88,7 +88,9 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 export const Light: Story = {};
-export const Dark: Story = { args: { colorScheme: 'dark' } };
+export const Dark: Story = {
+  args: { colorScheme: 'dark', recipient: 'h***o@likan.app', resendCooldownSeconds: 30 },
+};
 export const ResendCountdown: Story = { args: { resendCooldownSeconds: 30 } };
 export const RequestFailure: Story = { args: { requestFailure: true } };
 export const ResendFailure: Story = { args: { resendFailure: true } };

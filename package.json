@@ -116,6 +116,7 @@
     "test:e2e:onboarding": "maestro test .maestro/onboarding",
     "test:e2e:pages": "maestro test .maestro/pages",
     "test:e2e:input": "maestro test .maestro/storybook/text-input-empty.yaml",
+    "test:e2e:home": "maestro test .maestro/storybook/home-catalog.yaml",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "test": "npm run test:validation && npm run test:navigation && npm run test:onboarding && npm run test:auth && npm run test:recipes && npm run test:services && npm run test:layout && npm run test:localization && npm run test:architecture",

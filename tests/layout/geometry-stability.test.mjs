@@ -215,6 +215,70 @@ for (const platform of ['ios', 'android']) {
   });
 }
 
+for (const platform of ['ios', 'android']) {
+  test(`${platform}: first sheet layout has usable padding-aware width without a caller seed`, () => {
+    for (const [props, expected] of [
+      [{}, 342],
+      [{ contentPadding: 0 }, 390],
+      [{ contentPadding: 16 }, 358],
+      [{ contentPadding: { top: 8, left: 20, right: 12 } }, 358],
+      [{ contentPadding: { top: 8 } }, 390],
+      [{ contentPadding: 300 }, 1],
+      ...[0, -1, NaN, Infinity].map((initialContentWidth) => [{ initialContentWidth }, 342]),
+    ]) {
+      const s = setup(platform);
+      const { BottomSheet, useBottomSheetContentWidth } = s.load(
+        'components/ui/bottom-sheet/bottom-sheet.tsx',
+      );
+      function Content() {
+        return h('Content', { width: useBottomSheetContentWidth() });
+      }
+      const view = renderFixture(
+        h(BottomSheet, { isPresented: true, onDismiss() {}, ...props }, h(Content)),
+      );
+      try {
+        assert.equal(view.findAll('Host')[0].props.style.width, expected);
+        assert.equal(view.findAll('Content')[0].props.width, expected);
+        assert.equal(view.findAll('Sheet')[0].props.snapPoints, undefined);
+      } finally {
+        view.unmount();
+      }
+    }
+  });
+
+  test(`${platform}: sheet starts at its supplied width, then native measurements take precedence without remounting content`, () => {
+    const s = setup(platform);
+    const { BottomSheet } = s.load('components/ui/bottom-sheet/bottom-sheet.tsx');
+    const view = renderFixture(
+      h(BottomSheet, { isPresented: true, initialContentWidth: 342, onDismiss() {} }, h('Content')),
+    );
+    const report = (width) =>
+      view.flush(() =>
+        view
+          .findAll('Column')[0]
+          .props.modifiers.find((value) => value.geometry)
+          .geometry({ width, height: 250 }),
+      );
+    try {
+      const content = view.findAll('Content')[0];
+      assert.equal(view.findAll('Host')[0].props.style.width, 342);
+      assert.equal(view.findAll('Sheet')[0].props.initialContentWidth, undefined);
+      report(0);
+      assert.equal(view.findAll('Host')[0].props.style.width, 342);
+      report(294);
+      assert.equal(view.findAll('Host')[0].props.style.width, 294);
+      assert.equal(view.findAll('Content')[0], content);
+      report(NaN);
+      assert.equal(view.findAll('Host')[0].props.style.width, 294);
+      report(492);
+      assert.equal(view.findAll('Host')[0].props.style.width, 492);
+      assert.equal(view.findAll('Content')[0], content);
+    } finally {
+      view.unmount();
+    }
+  });
+}
+
 test('RN input bridge skips duplicate rounded width updates and preserves the native field across resize', () => {
   const s = setup();
   const { UniversalTextInput } = s.load('components/ui/text-input/universal-text-input.tsx');

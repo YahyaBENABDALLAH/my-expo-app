@@ -14,6 +14,7 @@ function setup(isRTL = false, platform = 'android') {
   const mocks = {
     'react-native': {
       Platform: { OS: platform },
+      useWindowDimensions: () => ({ width: 390, height: 844, fontScale: 1 }),
       I18nManager: {
         isRTL,
         forceRTL: () => assert.fail('Switching direction must not mutate global RTL.'),

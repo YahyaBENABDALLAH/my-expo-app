@@ -12,11 +12,13 @@ import { useMutation } from '@tanstack/react-query';
 import { router } from 'expo-router';
 import { useState } from 'react';
 import { useAuthContext } from '@/context/auth.context';
+import { useThemeColors } from '@/hooks/use-theme';
 
 import { useRegisterTabAction } from '@/features/pages/tab-actions';
 
 export default function MoreScreen() {
   const { t } = useTranslation();
+  const colors = useThemeColors();
   const { user, signOut, developmentGuest } = useAuthContext();
   const [profile, setProfile] = useState(false);
   const logout = useMutation({ mutationFn: signOut, networkMode: 'always', retry: 0 });
@@ -85,7 +87,11 @@ export default function MoreScreen() {
         onPress={() => logout.mutate()}
       />
       {logout.error ? <Text>{t('account.signOutFailed')}</Text> : null}
-      <BottomSheet isPresented={profile} onDismiss={() => setProfile(false)}>
+      <BottomSheet
+        isPresented={profile}
+        onDismiss={() => setProfile(false)}
+        containerColor={colors.background}
+      >
         <Column spacing={16} modifiers={nativeFillWidth}>
           <Text variant="title" testID="profile-preferences-title">
             {t('profile.title')}

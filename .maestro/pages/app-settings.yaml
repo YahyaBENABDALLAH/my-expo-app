@@ -1,5 +1,5 @@
 appId: com.hyrkul.likan
-name: Theme and dark mode are changed in App Settings and retained across navigation
+name: Theme, dark mode and language are changed in grouped App Settings
 tags: [pages, theme, signed-in]
 ---
 - runFlow:
@@ -14,14 +14,38 @@ tags: [pages, theme, signed-in]
     id: page-action-app-settings
 - extendedWaitUntil:
     visible:
-      id: app-settings-theme-picker
+      id: app-settings-groups
     timeout: 60000
+- scrollUntilVisible:
+    element:
+      id: app-settings-theme-picker
 - assertNotVisible:
     id: page-appearance-footer
 - assertNotVisible:
     id: page-layout-direction-switch
 - assertNotVisible:
     id: page-language-picker
+- scrollUntilVisible:
+    element:
+      id: app-settings-language
+- tapOn:
+    id: app-settings-language
+- assertVisible:
+    id: app-settings-language-title
+- tapOn:
+    id: app-settings-language-en
+- assertNotVisible:
+    id: app-settings-language-title
+- assertVisible: English
+- tapOn:
+    id: app-settings-language
+- tapOn:
+    id: app-settings-language-close
+- assertNotVisible:
+    id: app-settings-language-title
+- scrollUntilVisible:
+    element:
+      id: app-settings-theme-picker
 - tapOn:
     id: app-settings-theme-picker
 - tapOn: Facebook
@@ -55,8 +79,11 @@ tags: [pages, theme, signed-in]
     id: page-action-app-settings
 - extendedWaitUntil:
     visible:
-      id: app-settings-theme-picker
+      id: app-settings-groups
     timeout: 60000
+- scrollUntilVisible:
+    element:
+      id: app-settings-theme-picker
 - assertVisible: Facebook
 - assertVisible:
     id: app-settings-color-scheme-switch
@@ -70,3 +97,13 @@ tags: [pages, theme, signed-in]
 - assertVisible:
     id: app-settings-color-scheme-switch
     checked: false
+- scrollUntilVisible:
+    element:
+      id: app-settings-language
+- assertVisible: English
+- tapOn:
+    id: app-settings-language
+- tapOn:
+    id: app-settings-language-fr
+- assertNotVisible:
+    id: app-settings-language-title

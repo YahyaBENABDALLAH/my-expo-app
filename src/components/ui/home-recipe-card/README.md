@@ -2,6 +2,31 @@
 
 Exports: `HomeRecipeCard`, `HomeRecipeCardData` and `HomeRecipeCardProps`.
 
+`HomeCatalogCard`, `HomeCatalogItem` and `HomeCatalogCardProps` supply the
+store-style home compositions: `hero`, `landscape`, `artwork`, `compact` and
+`giveaway`. Explicit widths size photos; compact rows share a
+thumbnail, title, duration badge and the existing secondary Button. Hero cards
+add a tinted footer and an optional save action. Giveaway artwork can include a
+status ribbon. Actions are callbacks supplied by the screen; no queries or
+navigation live in the card. Each item supplies an `image` source. Artwork hosts
+passive `expo-image` content in Expo UI `RNHostView`, with explicit dimensions,
+cover cropping, corners and memory/disk caching. Native Columns, text and controls
+retain the layout and interaction. A neutral surface remains while images load
+or fail; artwork-only buttons retain a native title below the photo.
+
+Colors inherit the owning Host and use `warningContainer`, `surfaceVariant`,
+`text`, `muted`, `tint`, `info` and `onInfo`. Button implementation, native
+geometry and feedback are unchanged. `Recipes/Home catalog` provides light/dark
+composition stories with bundled image fixtures, sample preview and local save interaction.
+`tests/recipes/home-catalog.test.mjs` exercises the production cards and sections
+with native rendering boundaries mocked: preview selection, retained dismissal
+content, reopening, save toggling, routing, resizing, live translations and stable
+Picsum sources shared by artwork and thumbnails.
+`.maestro/storybook/home-catalog.yaml` exercises repeated Details presentation,
+closing, Android back dismissal and selection after horizontal and vertical scrolling. Run it
+with `npm run test:e2e:home`. Native execution results are recorded in
+[Home catalog layout](../../../../docs/home-catalog-layout.md).
+
 `home-recipe-card.tsx` composes display data with an explicit `width`,
 `onPress`, optional `testID` and `variant="popular"` or `"editorial"`.
 The image platform adapters place native badges above passive `expo-image`

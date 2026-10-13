@@ -12,6 +12,11 @@ function setup(deviceScheme = 'light') {
   const SafeAreaInsetsContext = createContext({ top: 59, bottom: 34, left: 0, right: 0 });
   const Picker = native('Picker');
   Picker.Item = native('PickerItem');
+  const FieldGroup = native('FieldGroup');
+  FieldGroup.Section = native('Section');
+  FieldGroup.SectionFooter = native('Footer');
+  const Icon = native('Icon');
+  Icon.select = ({ ios }) => ios;
   const mocks = {
     'react-native': {
       View: native('View'),
@@ -48,6 +53,11 @@ function setup(deviceScheme = 'light') {
     '@/components/ui/switch/switch': { Switch: native('Switch') },
     '@/components/ui/picker/picker': { Picker },
     '@/components/ui/page/page-back-button': { PageBackButton: native('BackButton') },
+    '@/context/language.context': { useLanguage: () => ({ language: 'en', ready: true }) },
+    '@expo/material-symbols/open_in_new.xml': 1,
+    '@expo/material-symbols/chevron_right.xml': 1,
+    '@expo/material-symbols/person.xml': 1,
+    '@expo/material-symbols/check.xml': 1,
   };
   const load = createSourceLoader(mocks);
   const exports = {
@@ -67,11 +77,86 @@ function setup(deviceScheme = 'light') {
   mocks['@components/ui'] = {
     ...exports,
     Column: mocks['@expo/ui'].Column,
+    Row: mocks['@expo/ui'].Row,
+    Icon,
+    FieldGroup,
+    Switch: mocks['@/components/ui/switch/switch'].Switch,
+    UniversalButtonContent:
+      mocks['@/components/ui/button/universal-button-content'].UniversalButtonContent,
+    BottomSheet: ({ isPresented, children, ...props }) =>
+      createElement('Sheet', { isPresented, ...props }, isPresented ? children : null),
     nativeFillWidth: [],
+    nativeFillSize: [],
+    nativeRowWeight: [],
+    ...load('components/ui/host/universal-host.tsx'),
     ...load('components/ui/text/universal-text.tsx'),
   };
-  return { ...exports, SettingsScreen: load('features/settings/settings-screen.tsx').default };
+  const settings = load('features/settings/settings-screen.tsx');
+  return { ...exports, SettingsScreen: settings.default, SettingsPage: settings.SettingsPage };
 }
+
+test('the language sheet waits for readiness, selects each autonym, updates direction and dismisses without changing a selection', (t) => {
+  const s = setup();
+  let setReady;
+  let selected;
+  const changes = [];
+  function Preferences() {
+    const [language, setLanguage] = useState('en');
+    const [ready, updateReady] = useState(false);
+    const { setDirection } = s.useLayoutDirectionSettings();
+    setReady = updateReady;
+    selected = language;
+    return createElement(s.SettingsPage, {
+      language,
+      languageReady: ready,
+      onLanguageChange: (value) => {
+        changes.push(value);
+        setLanguage(value);
+        setDirection(value === 'ar' ? 'rtl' : 'ltr');
+      },
+    });
+  }
+  const view = renderFixture(
+    createElement(
+      s.LayoutDirectionProvider,
+      null,
+      createElement(s.ThemePreferencesProvider, null, createElement(Preferences)),
+    ),
+  );
+  t.after(() => view.unmount());
+  const row = (id) => view.findAll('Column').find(({ props }) => props.testID === id).props;
+  const sheet = () => view.findAll('Sheet')[0].props;
+  const press = (id) => view.flush(() => row(id).onPress());
+  assert.equal(row('app-settings-language').disabled, true);
+  press('app-settings-language');
+  assert.equal(sheet().isPresented, false);
+  view.flush(() => setReady(true));
+  for (const language of ['fr', 'ar', 'en']) {
+    press('app-settings-language');
+    assert.equal(sheet().isPresented, true);
+    assert.deepEqual(
+      ['fr', 'en', 'ar'].map((value) => {
+        const node = view
+          .findAll('Column')
+          .find(({ props }) => props.testID === `app-settings-language-${value}`);
+        return descendants(node, 'Text')[0].props.children;
+      }),
+      ['Français', 'English', 'العربية'],
+    );
+    press(`app-settings-language-${language}`);
+    assert.equal(selected, language);
+    assert.equal(sheet().isPresented, false);
+    assert.equal(
+      view.findAll('LocaleProvider')[0].props.direction,
+      language === 'ar' ? 'rtl' : 'ltr',
+    );
+  }
+  press('app-settings-language');
+  view.flush(() => sheet().onDismiss());
+  assert.equal(sheet().isPresented, false);
+  assert.equal(selected, 'en');
+  assert.deepEqual(changes, ['fr', 'ar', 'en']);
+});
 
 for (const initialScheme of ['light', 'dark']) {
   test(`${initialScheme}: App Settings updates every brand without losing drafts, and preferences carry back to pages`, () => {
@@ -116,8 +201,11 @@ for (const initialScheme of ['light', 'dark']) {
     assert.equal(view.findAll('Host').length, 3);
     assert.equal(descendants(header, 'Switch').length, 0);
     assert.equal(descendants(header, 'Picker').length, 0);
-    assert.equal(descendants(settingsHost, 'Switch').length, 1);
-    assert.equal(view.findAll('Switch').length, 1);
+    assert.equal(descendants(settingsHost, 'Switch').length, 4);
+    assert.equal(view.findAll('Switch').length, 4);
+    for (const placeholder of ['chat', 'invitations', 'authentication']) {
+      assert.equal(control(`app-settings-${placeholder}`).props.disabled, true);
+    }
     assert.equal(control('app-settings-color-scheme-switch').props.value, initialScheme === 'dark');
     const themePicker = () =>
       view.findAll('Picker').find((node) => node.props.testID === 'app-settings-theme-picker');

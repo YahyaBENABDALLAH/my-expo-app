@@ -10,6 +10,8 @@ Additional flows under `.maestro/auth/` cover login, registration, password-reco
 2. Start an Android emulator or connect an Android device with USB debugging enabled. For iOS, boot an iOS Simulator with the app installed.
 3. Install the app's development build. It must contain the native libraries used by this project; Expo Go is not the target of these flows.
 4. Run `npm start` and open the project once in the development client. Keep Metro running and reachable from the test device. Dismiss first-run development-client instructions before starting tests.
+   In Expo's developer menu, turn off **Tools button** before automation; its
+   floating overlay can cover app controls, including onboarding Skip.
 5. Select English in the page's language picker for flows that assert English
    validation or accessibility text. The app defaults to French and preserves the
    selected language across restarts.
@@ -30,6 +32,12 @@ Run just the regression test for pressing an empty input:
 npm run test:e2e:input
 ```
 
+Run Home's Details sheet regression:
+
+```sh
+npm run test:e2e:home
+```
+
 To save a JUnit report:
 
 ```sh
@@ -46,6 +54,7 @@ maestro test --format junit --output .maestro/results/report.xml .maestro
 | `bottom-sheet.yaml`          | Opening shows content; closing dismisses it and restores Closed state  |
 | `list.yaml`                  | Pressing the second row changes the selected-row status                |
 | `recipe-card.yaml`           | Repeated card presses increment the count while remaining in Storybook |
+| `home-catalog.yaml`          | Details reopens, dismisses, and selects the recipe after a rail swipe  |
 
 ## Direct story links
 
@@ -62,7 +71,8 @@ To add coverage, create a flow under `.maestro/storybook/`, reuse `../helpers/op
 ## Validation limits
 
 The 2026-10-10 Android execution results are recorded in
-[the build verification report](build-verification.md). Remaining flows and all
+[the build verification report](build-verification.md). Home's 2026-10-13 Android
+execution is recorded in [Home catalog layout](home-catalog-layout.md). Remaining flows and all
 iOS interactions still need native execution. TypeScript, lint, YAML parsing, and
 native bundling cannot validate a device's accessibility hierarchy. If an ID is
 absent, inspect the hierarchy in Maestro Studio and use the fallback documented

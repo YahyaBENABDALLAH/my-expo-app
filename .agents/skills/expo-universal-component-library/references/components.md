@@ -105,32 +105,42 @@ Existing stories are recorded without implying full behavioral coverage.
 
 `OtpBottomSheet` composes the native [BottomSheet](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/bottomsheet/) and [TextInput](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/textinput/) with six visible digit slots. Its public props control presentation, recipient, verification/resend callbacks, cooldown, helper copy, theme and selector prefix. Platform overlay stacks keep a single transparent native input above the slots; an explicit-width direction bridge keeps digits LTR in Arabic. Slots use equal measured widths, explicit font-scale-aware heights and inset rounded fills; the iOS input uses plain field styling. A finite scroll viewport (70% of window height, at most 620 points/dp) prevents unbounded Compose measurement; its iOS frame preserves that height. Shared text/surface/tint/selection/border and success/error roles style the form. A fixed-size Reanimated boundary animates only the native shield and respects reduced motion. `otp-bottom-sheet.stories.tsx` covers both themes, cooldown, request failures and a long recipient using isolated English copy; `.maestro/storybook/otp-bottom-sheet.yaml` covers opening/dismissal, rejection, backspace, success, incomplete input, resend and reopening. Portable checks cover paste/numeric scripts, finite viewport sizing and the installed iOS style translation for narrow rows and larger text. Native keyboard/autofill, accessibility, hit areas, large fonts and constrained geometry remain unverified without devices. See [component guide](../../../../src/components/ui/otp-bottom-sheet/README.md).
 
+OTP opening uses the sheet's first-frame width and shared content-width context,
+so the input no longer waits for its own geometry callback. Reopening resets
+form state without a forced keyed remount. Resend countdown state is isolated
+to its button and its timer stops at expiry or dismissal; hidden feedback does
+not allocate animation hooks. The existing OTP stories and Maestro flow cover
+this composition. Portable checks assert input readiness before measurement,
+width corrections without losing input state, and unchanged form render counts
+during countdown ticks. Release-build latency and frame rate still require
+native performance measurement.
+
 Each component family has a folder and README. Keep its implementation,
 platform adapters, types and private helpers together. The root public barrel
 retains existing imports; implementations import concrete files directly.
 See the [folder guide](../../../../src/components/ui/README.md).
 
-| Component / official SDK 57 API                                                     | Local wrapper                                                                           | Existing story                                      | Scenarios to document and verify                                                                                    |
-| ----------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- | --------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
-| [Host](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/host/)               | `host/universal-host.tsx`                                                               | Used by stories; dedicated coverage pending         | Light/dark, seed color, intrinsic versus constrained sizing, direction, nested content visibility                   |
-| [Column](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/column/)           | Direct Expo UI export; Storybook showcase                                               | `column.stories.tsx`                                | Spacing/alignment, long text, nested rows, narrow screens                                                           |
-| [Row](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/row/)                 | Direct Expo UI export                                                                   | Dedicated coverage pending                          | Alignment/spacing, RTL, fitting text and controls without clipping                                                  |
-| [Text](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/text/)               | `text/universal-text.tsx`                                                               | `text.stories.tsx`                                  | Theme roles, long content, font scaling, supported typography                                                       |
-| [Button](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/button/)           | `button/universal-button.tsx`, `button/universal-button-content.<platform>.tsx`         | `button.stories.tsx`                                | Required intent variants, disabled suppresses actions, one press produces one action, full visible surface responds |
-| [ScrollView](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/scrollview/)   | Direct Expo UI export; `refreshable-scroll-view/refreshable-scroll-view.<platform>.tsx` | `scroll-view.stories.tsx`; Pages/Navigation shell   | Scrolling, keyboard, short/tall content; refresh completion, repeated gestures, errors and recovery                 |
-| [Switch](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/switch/)           | `switch/switch.<platform>.tsx`                                                          | `switch.stories.tsx`                                | On/off, disabled, callback updates visible state, reset                                                             |
-| [Slider](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/slider/)           | `slider/slider.<platform>.tsx`                                                          | `slider.stories.tsx`; TokenColors                   | Minimum/maximum, step, disabled, value updates, drag interaction; seed color does not override control tokens       |
-| [Checkbox](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/checkbox/)       | `checkbox/checkbox.<platform>.tsx`                                                      | `checkbox.stories.tsx`                              | Checked/unchecked, disabled, state change and reset                                                                 |
-| [BottomSheet](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/bottomsheet/) | `bottom-sheet/bottom-sheet.tsx`                                                         | `bottom-sheet.stories.tsx`                          | Open/close, swipe/back/outside dismissal where supported, reopen, scrolling tall content                            |
-| [Collapsible](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/collapsible/) | `collapsible/collapsible.<platform>.tsx`                                                | `collapsible.stories.tsx`                           | Expand/collapse reveals and hides content, long header/content                                                      |
-| [FieldGroup](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/fieldgroup/)   | `field-group/field-group.<platform>.tsx`                                                | `field-group.stories.tsx`                           | Labels/supporting text, grouped fields, empty/error composition, keyboard                                           |
-| [Icon](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/icon/)               | Direct Expo UI export; Storybook showcase                                               | `icon.stories.tsx`                                  | Valid symbols on both platforms, size/tint, meaning conveyed by adjacent text                                       |
-| [List](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/list/)               | `list/list.<platform>.tsx`                                                              | `list.stories.tsx`                                  | Empty/short groups, row selection, refresh if exposed, scroll behavior                                              |
-| [ListItem](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/list/)           | `list-item/list-item.tsx`; direct `UniversalListItem` alias                             | Within `list.stories.tsx`; focused coverage pending | Leading/supporting/trailing slots, press/disabled, long text, accessory alignment                                   |
-| [Picker](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/picker/)           | `picker/picker.<platform>.tsx`                                                          | `picker.stories.tsx`                                | Menu/wheel differences, selected value, disabled, value callback, long option labels                                |
-| [RNHostView](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/rnhostview/)   | Direct Expo UI export                                                                   | Dedicated coverage pending                          | Necessary RN infrastructure inside native trees, intrinsic sizing and interaction; no substitute RN controls        |
-| [Spacer](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/spacer/)           | Direct Expo UI export                                                                   | `spacer.stories.tsx`                                | Horizontal/vertical expansion in constrained layouts                                                                |
-| [TextInput](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/textinput/)     | `text-input/universal-text-input.tsx`                                                   | `text-input.stories.tsx`                            | Empty/type/clear/reset, controlled updates, password, editable/read-only, focus/blur, keyboard, multiline           |
+| Component / official SDK 57 API                                                     | Local wrapper                                                                           | Existing story                                      | Scenarios to document and verify                                                                                     |
+| ----------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- | --------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| [Host](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/host/)               | `host/universal-host.tsx`                                                               | Used by stories; dedicated coverage pending         | Light/dark, seed color, intrinsic versus constrained sizing, direction, nested content visibility                    |
+| [Column](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/column/)           | Direct Expo UI export; Storybook showcase                                               | `column.stories.tsx`                                | Spacing/alignment, long text, nested rows, narrow screens                                                            |
+| [Row](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/row/)                 | Direct Expo UI export                                                                   | Dedicated coverage pending                          | Alignment/spacing, RTL, fitting text and controls without clipping                                                   |
+| [Text](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/text/)               | `text/universal-text.tsx`                                                               | `text.stories.tsx`                                  | Theme roles, long content, font scaling, supported typography                                                        |
+| [Button](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/button/)           | `button/universal-button.tsx`, `button/universal-button-content.<platform>.tsx`         | `button.stories.tsx`                                | Required intent variants, disabled suppresses actions, one press produces one action, full visible surface responds  |
+| [ScrollView](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/scrollview/)   | Direct Expo UI export; `refreshable-scroll-view/refreshable-scroll-view.<platform>.tsx` | `scroll-view.stories.tsx`; Pages/Navigation shell   | Scrolling, keyboard, short/tall content; refresh completion, repeated gestures, errors and recovery                  |
+| [Switch](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/switch/)           | `switch/switch.<platform>.tsx`                                                          | `switch.stories.tsx`                                | On/off, disabled, callback updates visible state, reset                                                              |
+| [Slider](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/slider/)           | `slider/slider.<platform>.tsx`                                                          | `slider.stories.tsx`; TokenColors                   | Minimum/maximum, step, disabled, value updates, drag interaction; seed color does not override control tokens        |
+| [Checkbox](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/checkbox/)       | `checkbox/checkbox.<platform>.tsx`                                                      | `checkbox.stories.tsx`                              | Checked/unchecked, disabled, state change and reset                                                                  |
+| [BottomSheet](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/bottomsheet/) | `bottom-sheet/bottom-sheet.tsx`                                                         | `bottom-sheet.stories.tsx`                          | Padding-aware first width, width seed, native resize, open/close, swipe/back/outside dismissal, reopen, tall content |
+| [Collapsible](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/collapsible/) | `collapsible/collapsible.<platform>.tsx`                                                | `collapsible.stories.tsx`                           | Expand/collapse reveals and hides content, long header/content                                                       |
+| [FieldGroup](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/fieldgroup/)   | `field-group/field-group.<platform>.tsx`                                                | `field-group.stories.tsx`                           | Labels/supporting text, grouped fields, empty/error composition, keyboard                                            |
+| [Icon](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/icon/)               | Direct Expo UI export; Storybook showcase                                               | `icon.stories.tsx`                                  | Valid symbols on both platforms, size/tint, meaning conveyed by adjacent text                                        |
+| [List](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/list/)               | `list/list.<platform>.tsx`                                                              | `list.stories.tsx`                                  | Empty/short groups, row selection, refresh if exposed, scroll behavior                                               |
+| [ListItem](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/list/)           | `list-item/list-item.tsx`; direct `UniversalListItem` alias                             | Within `list.stories.tsx`; focused coverage pending | Leading/supporting/trailing slots, press/disabled, long text, accessory alignment                                    |
+| [Picker](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/picker/)           | `picker/picker.<platform>.tsx`                                                          | `picker.stories.tsx`                                | Menu/wheel differences, selected value, disabled, value callback, long option labels                                 |
+| [RNHostView](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/rnhostview/)   | Direct Expo UI export                                                                   | Dedicated coverage pending                          | Necessary RN infrastructure inside native trees, intrinsic sizing and interaction; no substitute RN controls         |
+| [Spacer](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/spacer/)           | Direct Expo UI export                                                                   | `spacer.stories.tsx`                                | Horizontal/vertical expansion in constrained layouts                                                                 |
+| [TextInput](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/textinput/)     | `text-input/universal-text-input.tsx`                                                   | `text-input.stories.tsx`                            | Empty/type/clear/reset, controlled updates, password, editable/read-only, focus/blur, keyboard, multiline            |
 
 ## Compound exports and helpers
 
@@ -146,6 +156,31 @@ Android light/French rendering and interactions were checked with the production
 component in an isolated native preview, including enlarged text and action touch
 bounds. The updated first-launch Maestro flow was not executed because the full
 app's native build fails. Native iOS, RTL and dark rendering remain unverified.
+
+### Settings and OTP layouts (2026-10-12)
+
+`FieldGroup` keeps its Section/Header/Footer API and now connects Android rows
+with rounded outer corners and thin `divider` separators. It retains Host theme
+roles (`background`, `controlSurface`, `text`, `muted`, `divider`) and native iOS
+Form grouping. `Pages/App Settings` exercises the production groups in light,
+dark, RTL and brand fixtures, with isolated language choices. Theme controls
+retain their existing design; language opens a native sheet. Other sections are
+placeholders. The settings viewport and FieldGroup reveal the shared app Aurora
+background; settings language and profile preference sheets use the app
+`background` token. The settings stories render the same static Aurora backdrop
+within their theme fixture. `tests/layout/page-appearance.test.mjs` checks readiness, selection,
+dismissal, direction and disabled notification switches alongside existing theme
+checks. `.maestro/pages/app-settings.yaml` covers native selection and reopening.
+
+`OtpBottomSheet` retains its controlled presentation, recipient, verify/resend
+callbacks, cooldown, hint, scheme and selector props. Its heading follows the
+locale's leading edge, and neutral rounded digit boxes have a text-colored focus
+outline. It uses `surfaceRaised`, `surfaceVariant`, `text`, `muted`, `border` and
+feedback tokens, plus the unchanged shared buttons. The existing OTP stories now
+include a masked-recipient dark fixture with a resend countdown. Portable checks
+cover verification, failures, resend, stale requests, normalization and sizing;
+the existing OTP Maestro flow covers entry and recovery. Device rendering,
+keyboard/autofill, large text and row hit areas remain unverified.
 
 ### Shared UI cleanup (2026-10-11)
 
@@ -297,6 +332,33 @@ Metro resolution checks cover both image adapters. Native stacking/touch
 coverage, RTL, large type and release smoothness require device verification.
 See `docs/home-recipe-card-examples.md` for implementation and limitations.
 
+2026-10-13: `HomeCatalogCard` adds `hero`, `landscape`, `artwork`, `compact`
+and `giveaway` compositions for the supplied store reference. Its display item
+contains id/image/title/duration/category/description/chef; required props are
+`variant`, `width`, `actionLabel` and `onPress`. Optional `saved`, `saveLabel`,
+`onSave` and `ribbon` support the hero and giveaway. Artwork renders passive
+`expo-image` content inside Expo UI `RNHostView`, with explicit sizes, cover
+cropping, corners and memory/disk caching. Native Columns and controls retain
+layout and interaction. Colors inherit Host appearance
+and use warningContainer, surfaceVariant, text, muted, tint, info and onInfo.
+The existing Button implementation and native interaction defaults are retained.
+Home uses one vertical ScrollView with horizontal card rails, four-row columns,
+and a final inline catalog. Items reuse translated sample copy with random Picsum
+photos seeded once per Home mount, shared by artwork and thumbnails, and stable
+across state/locale changes. Recipe API data is not requested.
+`pages/home-catalog.stories.tsx` uses bundled images and covers light/dark compositions,
+local save toggling and preview dismissal. See `docs/home-catalog-layout.md`
+for current testing and native verification limits.
+
+`tests/recipes/home-catalog.test.mjs` covers page
+scroll ownership, preview continuity, selection, save toggling, navigation, compact
+resizing, live translations and photo-source stability. The selected preview retains its ID rather than
+stale translated data. `tests/layout/geometry-stability.test.mjs` covers initial
+sheet width and measured-width precedence on both platform adapters. The Maestro
+flow is `.maestro/storybook/home-catalog.yaml`, exposed as `npm run test:e2e:home`
+and discovered by the existing Storybook suite. See the layout guide for execution
+results and native verification limits; JS fixtures do not prove absence of flicker.
+
 ### Skeleton placeholders (2026-10-04)
 
 `Skeleton` / `SkeletonContent` (`src/components/ui/skeleton/skeleton.tsx`) adapt Reference's
@@ -380,6 +442,7 @@ native scroll handoff and artwork still require device checks.
 
 - Root imports select SwiftUI on iOS and Compose on Android. Ordinary native trees need Host. BottomSheet in this installed version creates its own internal native Host; follow its implementation and existing wrapper rather than blindly nesting another host.
 - BottomSheet uses `isPresented` and `onDismiss`. Android Material sheet states do not guarantee exact parity with iOS fractional/height detents; document and verify each supported platform behavior.
+- `BottomSheet` also accepts optional positive `initialContentWidth` for its first presented frame; actual native measurement takes precedence. Home seeds the preview width, keeps the sheet mounted, and retains selected content during native dismissal. `Recipes/Home catalog` exercises this composition, with lifecycle checks in the Home catalog tests and first-frame width checks in geometry-stability tests. See the Home layout guide for native Maestro results and flicker verification limits.
 - The shared BottomSheet owns 24-point edge padding (`contentPadding` overrides it), surface/text theme roles and a full-width leading Column. Both platforms use one universal render tree; `onGeometryChange` on iOS and `onSizeChanged` on Android measure the padded native Column and give the nested Host a numeric width. Percentage width can collapse content in the self-sizing Android RN bridge. Auto-sized sheets retain intrinsic height; explicit iOS detents anchor content at the top. The bottom-sheet story covers wrapping text/full-width actions, and `Pages/Login preferences` plus its Maestro flow cover visibility of all three language choices, selection, reopening and draft retention. JS checks cover resizing, duplicate/invalid reports and state retention on both platforms; native geometry still requires a device.
 - Picker wheel appearance is iOS-specific; Android uses its dropdown behavior.
 - List is for short native groups, not a virtualization solution for unbounded feeds. Do not silently replace it with a disallowed UI control or render huge data trees. Raise the requirement and resolve an approved approach if needed.

@@ -263,7 +263,25 @@
   },
   "settings": {
     "title": "Paramètres de l’application",
-    "description": "Choisissez le thème de l’application et passez du mode clair au mode sombre."
+    "description": "Gérez vos préférences d’apparence et de langue.",
+    "appearance": "Apparence",
+    "yourAccount": "Votre compte",
+    "comingSoon": "Bientôt disponible",
+    "socialNotifications": "Notifications sociales",
+    "chat": "Chat",
+    "chatDescription": "Messages directs, messages de groupe et invitations de groupe.",
+    "invitations": "Invitations",
+    "invitationsDescription": "Demandes d’amis et invitations à un groupe.",
+    "accountNotifications": "Notifications de compte",
+    "authenticationRequests": "Demandes d’authentification",
+    "about": "À propos",
+    "support": "Assistance",
+    "appVersion": "Version de l’app",
+    "privacyPolicy": "Politique de confidentialité",
+    "openSourceLicenses": "Licences open source",
+    "licensesDescription": "Détails des licences du logiciel open source",
+    "legalInformation": "Informations légales",
+    "legalDescription": "Accord de licence d’utilisateur final"
   },
   "appearance": {
     "dark": "Sombre",
@@ -307,6 +325,17 @@
     "trending": "Tendances de la semaine",
     "viewAll": "Tout voir",
     "editorsChoice": "Sélection de la rédaction",
+    "catalog": {
+      "featured": "À la une",
+      "fromOurKitchen": "De notre cuisine",
+      "experiences": "Inspiration cuisine",
+      "freeRecipes": "Recettes gratuites",
+      "weeklyPicks": "De nouvelles idées chaque semaine",
+      "freeNow": "Gratuit maintenant",
+      "quickMeals": "Repas rapides",
+      "chefPicks": "Sélection des chefs",
+      "save": "Enregistrer"
+    },
     "cards": {
       "title": "Exemples de cartes recettes",
       "sampleHint": "{{count}} cartes d’exemple dans chaque liste. Touchez une carte pour l’aperçu.",

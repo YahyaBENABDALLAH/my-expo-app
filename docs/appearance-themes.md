@@ -1,7 +1,13 @@
 # App Settings and appearance themes
 
 Open **More → App Settings** (`/settings`) to choose WhatsApp, Facebook,
-Instagram or TikTok and switch between light and dark mode. The settings route
+Instagram or TikTok and switch between light and dark mode. Appearance also has a
+language row that opens a native bottom sheet with French, English and Arabic.
+The settings viewport and FieldGroup reveal the shared app Aurora background;
+settings language and profile preference sheets use the app `background` token.
+Account, social notifications, account notifications and about sections follow
+the grouped reference layout; their unfinished options are visible placeholders.
+The settings route
 shares the authenticated/development-guest guard with the app's other pages.
 
 Login also offers a sun/moon button at the top right for light/dark mode and a
@@ -14,7 +20,7 @@ shells, including authentication, error recovery, maps, Skia and Storybook.
 `PageFrame` owns the header's top safe area; its content retains the bottom and
 side insets. Native scroll pages handle those remaining edges, and tabs leave
 the bottom edge to the tab bar. Language selection remains in More's profile
-preferences, where Arabic also selects RTL automatically.
+preferences and App Settings, where Arabic also selects RTL automatically.
 
 The UI showcase at `/ui` lists separate component pages at
 `/ui-component/[name]`: Switch, Buttons, Text input, Checkbox, Slider, Picker,
@@ -64,9 +70,11 @@ and brand fixtures. `Expo UI/Theme Tokens` has all eight brand/appearance combin
 displays every role plus native controls. JS fixture tests exercise live changes,
 draft preservation, preferences across pages, safe-area ownership and text/action
 contrast. The Maestro `pages/app-settings.yaml` flow checks theme selection,
-mode changes and preferences retained after leaving and reopening settings.
+mode changes, language sheet selection/dismissal and preferences retained after leaving and reopening settings.
 Native menu appearance, focus, switch touch targets and cutouts still require
 iOS/Android device verification.
 
 Selectors: `page-action-app-settings`, `app-settings-appearance`,
-`app-settings-color-scheme-switch`, `app-settings-theme-picker`.
+`app-settings-color-scheme-switch`, `app-settings-theme-picker`, `app-settings-language`,
+`app-settings-language-sheet`, `app-settings-language-fr`, `app-settings-language-en`,
+`app-settings-language-ar`.

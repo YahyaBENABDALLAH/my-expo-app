@@ -1,9 +1,18 @@
 import type { Meta, StoryObj } from '@storybook/react-native';
+import { useState } from 'react';
+import { I18nextProvider } from 'react-i18next';
+import { View } from 'react-native';
+import { AuroraBackground } from '@components/ui';
 import { SafeAreaInsetsContext } from 'react-native-safe-area-context';
 import { ThemePreferencesProvider } from '@/context/theme.context';
-import { LayoutDirectionProvider, type LayoutDirection } from '@/context/layout-direction.context';
+import {
+  LayoutDirectionProvider,
+  useLayoutDirectionSettings,
+  type LayoutDirection,
+} from '@/context/layout-direction.context';
 import { themes, type ThemeId } from '@/constants/themes/index';
-import SettingsScreen from '@/features/settings/settings-screen';
+import { SettingsPage } from '@/features/settings/settings-screen';
+import i18n, { type Language } from '@/lib/i18n';
 
 const zeroInsets = { top: 0, bottom: 0, left: 0, right: 0 };
 
@@ -24,10 +33,37 @@ function SettingsDemo({
           initialTheme={themeId}
           initialColorScheme={colorScheme}
         >
-          <SettingsScreen />
+          <View style={{ flex: 1 }}>
+            <AuroraBackground
+              animate={false}
+              colorScheme={colorScheme}
+              style={{ position: 'absolute', top: 0, right: 0, bottom: 0, left: 0 }}
+            />
+            <SettingsPreview key={direction} initialLanguage={direction === 'rtl' ? 'ar' : 'fr'} />
+          </View>
         </ThemePreferencesProvider>
       </LayoutDirectionProvider>
     </SafeAreaInsetsContext.Provider>
+  );
+}
+
+function SettingsPreview({ initialLanguage }: { initialLanguage: Language }) {
+  const [language, setLanguage] = useState(initialLanguage);
+  const [previewI18n] = useState(() =>
+    i18n.cloneInstance({ lng: initialLanguage, initAsync: false }),
+  );
+  const { setDirection } = useLayoutDirectionSettings();
+  return (
+    <I18nextProvider i18n={previewI18n}>
+      <SettingsPage
+        language={language}
+        onLanguageChange={(value) => {
+          setLanguage(value);
+          void previewI18n.changeLanguage(value);
+          setDirection(value === 'ar' ? 'rtl' : 'ltr');
+        }}
+      />
+    </I18nextProvider>
   );
 }
 

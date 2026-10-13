@@ -4,7 +4,14 @@ Exports: `ColorSchemeControl`, `LayoutDirectionControl`, `LanguagePicker` and `T
 
 `ThemePicker` and `ColorSchemeControl` render inside App Settings (`/settings`),
 using the `app-settings-theme-picker` and `app-settings-color-scheme-switch`
-selectors. Preferences stay in the root providers across navigation. The removed
+selectors, inside the Appearance FieldGroup section. Preference sheets use the
+app background color. The settings viewport and
+FieldGroup are transparent so the shared app Aurora background remains visible.
+The language row (`app-settings-language`) opens a native bottom sheet with French, English and
+Arabic autonyms. Selection uses the existing language provider and dismisses the
+sheet; closing without selection preserves the current language. Account,
+notification and about options are placeholders with disabled switches and
+Coming soon footers. Preferences stay in the root providers across navigation. The removed
 page footer is no longer part of the public UI API.
 
 `LanguagePicker` accepts an optional `testID`, shows dictionary autonyms for

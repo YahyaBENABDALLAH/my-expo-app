@@ -263,7 +263,25 @@
   },
   "settings": {
     "title": "App Settings",
-    "description": "Choose your app theme and switch between light and dark mode."
+    "description": "Manage your appearance and language preferences.",
+    "appearance": "Appearance",
+    "yourAccount": "Your account",
+    "comingSoon": "Coming soon",
+    "socialNotifications": "Social notifications",
+    "chat": "Chat",
+    "chatDescription": "Direct messages, group messages and group invitations.",
+    "invitations": "Invitations",
+    "invitationsDescription": "Friend requests and invitations to a group.",
+    "accountNotifications": "Account notifications",
+    "authenticationRequests": "Authentication requests",
+    "about": "About",
+    "support": "Support",
+    "appVersion": "App version",
+    "privacyPolicy": "Privacy policy",
+    "openSourceLicenses": "Open source licenses",
+    "licensesDescription": "Details of open source software licenses",
+    "legalInformation": "Legal information",
+    "legalDescription": "End user license agreement"
   },
   "appearance": {
     "dark": "Dark",
@@ -307,6 +325,17 @@
     "trending": "Trending this week",
     "viewAll": "View all",
     "editorsChoice": "Editor’s choice",
+    "catalog": {
+      "featured": "Featured",
+      "fromOurKitchen": "From our kitchen",
+      "experiences": "Cooking inspiration",
+      "freeRecipes": "Free recipes",
+      "weeklyPicks": "Fresh picks every week",
+      "freeNow": "Free now",
+      "quickMeals": "Quick meals",
+      "chefPicks": "Chef picks",
+      "save": "Save"
+    },
     "cards": {
       "title": "Recipe card examples",
       "sampleHint": "{{count}} sample cards in each list. Tap a card to preview it.",

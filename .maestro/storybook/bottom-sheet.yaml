@@ -25,6 +25,20 @@ env:
     id: expo-ui-bottom-sheet-state
     text: 'State: Closed.*'
 
+- tapOn:
+    id: expo-ui-bottom-sheet-open
+- assertVisible:
+    id: expo-ui-bottom-sheet-title
+- assertVisible:
+    id: expo-ui-bottom-sheet-close
+- tapOn:
+    id: expo-ui-bottom-sheet-close
+- assertNotVisible:
+    id: expo-ui-bottom-sheet-title
+- assertVisible:
+    id: expo-ui-bottom-sheet-state
+    text: 'State: Closed.*'
+
 - runFlow:
     file: ../helpers/open-story.yaml
     env:

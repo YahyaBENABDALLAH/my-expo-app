@@ -41,6 +41,7 @@ export * from './form/form-submit';
 export * from './form/form-text-input';
 export * from './form/native-field';
 export * from './home-recipe-card/home-recipe-card';
+export * from './home-recipe-card/home-catalog-card';
 export * from './host/types';
 export * from './host/universal-host';
 export * from './launch-screen/launch-screen';

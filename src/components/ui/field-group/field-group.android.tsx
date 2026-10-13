@@ -18,7 +18,7 @@ function FieldSection({ children, title, titleUppercase = false, ...props }: Fie
     (title ? (
       <Text
         color={colors.muted}
-        style={{ typography: 'titleMedium', letterSpacing: titleUppercase ? 0.5 : undefined }}
+        style={{ typography: 'labelMedium', letterSpacing: titleUppercase ? 0.5 : undefined }}
       >
         {titleUppercase ? title.toUpperCase() : title}
       </Text>
@@ -26,7 +26,11 @@ function FieldSection({ children, title, titleUppercase = false, ...props }: Fie
   return (
     <UniversalColumn {...props} spacing={4}>
       {heading != null ? <Column modifiers={[padding(16, 0, 16, 8)]}>{heading}</Column> : null}
-      <Column verticalArrangement={{ spacedBy: 2 }} modifiers={[fillMaxWidth()]}>
+      <UniversalColumn
+        spacing={1}
+        modifiers={[fillMaxWidth()]}
+        style={{ backgroundColor: colors.divider, borderRadius: 20 }}
+      >
         {rows.map((row, index) => (
           <ListItem
             key={isRowKey(row, index)}
@@ -39,10 +43,10 @@ function FieldSection({ children, title, titleUppercase = false, ...props }: Fie
               fillMaxWidth(),
               clip(
                 Shapes.RoundedCorner({
-                  topStart: index === 0 ? 20 : 4,
-                  topEnd: index === 0 ? 20 : 4,
-                  bottomStart: index === rows.length - 1 ? 20 : 4,
-                  bottomEnd: index === rows.length - 1 ? 20 : 4,
+                  topStart: index === 0 ? 20 : 0,
+                  topEnd: index === 0 ? 20 : 0,
+                  bottomStart: index === rows.length - 1 ? 20 : 0,
+                  bottomEnd: index === rows.length - 1 ? 20 : 0,
                 }),
               ),
             ]}
@@ -50,7 +54,7 @@ function FieldSection({ children, title, titleUppercase = false, ...props }: Fie
             <ListItem.HeadlineContent>{row}</ListItem.HeadlineContent>
           </ListItem>
         ))}
-      </Column>
+      </UniversalColumn>
       {footer != null ? <Column modifiers={[padding(16, 4, 16, 0)]}>{footer}</Column> : null}
     </UniversalColumn>
   );

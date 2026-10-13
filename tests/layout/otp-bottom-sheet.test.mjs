@@ -4,6 +4,7 @@ import {
   createContext,
   createElement,
   useContext,
+  useEffect,
   useImperativeHandle,
   useRef,
   useState,
@@ -15,12 +16,15 @@ import { renderFixture } from '../helpers/render-fixture.mjs';
 function setup(
   t,
   props = {},
-  { platform = 'android', height = 844, fontScale = 1, width = 312 } = {},
+  { platform = 'android', height = 844, fontScale = 1, width = 360, initiallyOpen = true } = {},
 ) {
   const WindowContext = createContext({ height, fontScale, width });
+  const calls = { inputMounts: 0, inputRenders: 0, formRenders: 0, resendRenders: 0 };
   let resizeWindow;
   const element = (tag) => {
     function NativeBoundary({ children, ...other }) {
+      if (tag === 'ScrollView') calls.formRenders++;
+      if (tag === 'Button' && other.testID === 'otp-sheet-resend') calls.resendRenders++;
       return createElement(tag, other, children);
     }
     return NativeBoundary;
@@ -34,6 +38,7 @@ function setup(
       Spacer: element('Spacer'),
       ScrollView: element('ScrollView'),
       RNHostView: element('RNHostView'),
+      BottomSheet: element('Sheet'),
       Icon,
       useNativeState: (initial) => {
         const state = useRef(null);
@@ -52,18 +57,17 @@ function setup(
       useWindowDimensions: () => useContext(WindowContext),
       AccessibilityInfo: { announceForAccessibility() {} },
     },
-    '@expo/ui/swift-ui/modifiers': { onGeometryChange: () => ({}) },
-    '@expo/ui/jetpack-compose/modifiers': { onSizeChanged: () => ({}) },
+    '@expo/ui/swift-ui/modifiers': {
+      frame: (params) => ({ $type: 'frame', ...params }),
+      onGeometryChange: (geometry) => ({ geometry }),
+    },
+    '@expo/ui/jetpack-compose/modifiers': { onSizeChanged: (geometry) => ({ geometry }) },
     '@expo/material-symbols/lock.xml': 1,
     '@/hooks/use-theme': { useThemeColors: () => ({}) },
-    '@/hooks/use-measured-width': {
-      useMeasuredWidth: () => [useContext(WindowContext).width, () => {}],
-    },
     '@/components/ui/host/universal-host': {
       UniversalHost: element('Host'),
       useHostColorScheme: () => 'light',
     },
-    '@/components/ui/bottom-sheet/bottom-sheet': { BottomSheet: element('Sheet') },
     '@/components/ui/button/universal-button-content': {
       UniversalButtonContent: element('Button'),
     },
@@ -76,6 +80,10 @@ function setup(
     '@/components/ui/otp-bottom-sheet/otp-feedback': { OtpFeedback: element('Feedback') },
     '@/components/ui/otp-bottom-sheet/otp-input-layout': {
       OtpInputLayout: ({ input, slots, ...layout }) => {
+        calls.inputRenders++;
+        useEffect(() => {
+          calls.inputMounts++;
+        }, []);
         useImperativeHandle(input.ref, () => ({ focus() {}, blur() {} }), []);
         const { ref, ...rest } = input;
         return createElement('InputLayout', layout, slots, createElement('Input', rest));
@@ -87,10 +95,13 @@ function setup(
     mocks['@expo/ui/swift-ui/modifiers'] = new Proxy(
       {},
       {
-        get: (_, name) => (params) => ({
-          $type: name,
-          ...(typeof params === 'object' ? params : { value: params }),
-        }),
+        get: (_, name) => (params) =>
+          name === 'onGeometryChange'
+            ? { geometry: params }
+            : {
+                $type: name,
+                ...(typeof params === 'object' ? params : { value: params }),
+              },
       },
     );
     const { transformToModifiers } = createSourceLoader(mocks)(
@@ -104,6 +115,7 @@ function setup(
       );
     };
     mocks['@expo/ui'].ScrollView = function ScrollView({ children, style, modifiers, ...other }) {
+      calls.formRenders++;
       return createElement(
         'ScrollView',
         { ...other, style, modifiers: transformToModifiers(style, {}, modifiers) },
@@ -115,7 +127,7 @@ function setup(
     'components/ui/otp-bottom-sheet/otp-bottom-sheet.tsx',
   );
   function Harness() {
-    const [open, setOpen] = useState(true);
+    const [open, setOpen] = useState(initiallyOpen);
     const [window, setWindow] = useState({ height, fontScale, width });
     resizeWindow = (next) => setWindow((previous) => ({ ...previous, ...next }));
     return createElement(
@@ -142,12 +154,20 @@ function setup(
     fixture.findAll('Button').find(({ props }) => props.testID === `otp-sheet-${suffix}`).props;
   return {
     ...fixture,
+    calls,
     button,
     type: (value) => fixture.flush(() => fixture.findAll('Input')[0].props.onChangeText(value)),
     press: (suffix) => fixture.flush(() => button(suffix).onPress()),
     close: () => fixture.flush(() => fixture.findAll('Sheet')[0].props.onDismiss()),
     open: () => fixture.flush(() => fixture.findAll('Open')[0].props.onPress()),
     resize: (next) => fixture.flush(() => resizeWindow(next)),
+    measure: (width) =>
+      fixture.flush(() =>
+        fixture
+          .findAll('Column')[0]
+          .props.modifiers.find((modifier) => modifier.geometry)
+          .geometry({ width }),
+      ),
     status: () => fixture.findAll('Feedback')[0].props.status,
     settle: async () => {
       await new Promise(setImmediate);
@@ -157,6 +177,34 @@ function setup(
 }
 
 for (const platform of ['ios', 'android']) {
+  test(`${platform} OTP input renders before geometry arrives and shares the sheet's measured width`, (t) => {
+    const fixture = setup(t, {}, { platform, width: 360, initiallyOpen: false });
+    fixture.open();
+    const input = fixture.findAll('Input')[0];
+    const slotsWidth = () =>
+      fixture
+        .findAll('Column')
+        .filter(({ props }) => props.testID?.startsWith('otp-sheet-slot-'))
+        .reduce((total, { props }) => total + props.style.width, 40);
+    assert.ok(input, 'the input must be present before a native geometry callback');
+    assert.equal(slotsWidth(), 312);
+    fixture.type('٠١٢٣٤٥');
+    fixture.measure(272);
+    assert.ok(Math.abs(slotsWidth() - 272) < 0.01);
+    assert.equal(fixture.findAll('Input')[0], input);
+    assert.equal(input.props.value.value, '012345');
+    const before = fixture.calls.inputRenders;
+    for (const width of [272, 0, -1, NaN, Infinity]) fixture.measure(width);
+    assert.equal(fixture.calls.inputRenders, before);
+    fixture.close();
+    fixture.open();
+    assert.equal(fixture.findAll('Input')[0], input);
+    assert.equal(input.props.value.value, '');
+    assert.equal(fixture.calls.inputMounts, 1);
+    assert.ok(Math.abs(slotsWidth() - 272) < 0.01);
+    assert.equal(fixture.button('verify').disabled, true);
+  });
+
   test(`${platform} OTP scrolling has a finite viewport on opening, resizing and reopening`, (t) => {
     const fixture = setup(t, {}, { platform, height: 640 });
     const scrollHeight = () => {
@@ -174,8 +222,56 @@ for (const platform of ['ios', 'android']) {
   });
 }
 
+test('OTP countdown updates only resend, stops at zero, and restarts after resend or reopening', async (t) => {
+  t.mock.timers.enable({ apis: ['Date', 'setTimeout', 'setInterval'], now: 1_000_000 });
+  let resends = 0;
+  const fixture = setup(t, {
+    resendCooldownSeconds: 3,
+    onResend: () => {
+      resends++;
+    },
+  });
+  const before = { ...fixture.calls };
+  assert.match(fixture.button('resend').label, /3/);
+  for (const seconds of [2, 1]) {
+    fixture.flush(() => t.mock.timers.tick(1000));
+    assert.match(fixture.button('resend').label, new RegExp(String(seconds)));
+    assert.equal(fixture.button('resend').disabled, true);
+    fixture.press('resend');
+    assert.equal(resends, 0);
+  }
+  fixture.flush(() => t.mock.timers.tick(1000));
+  assert.equal(fixture.button('resend').disabled, false);
+  assert.equal(fixture.calls.formRenders, before.formRenders);
+  assert.equal(fixture.calls.inputRenders, before.inputRenders);
+  assert.equal(fixture.calls.inputMounts, before.inputMounts);
+  assert.equal(fixture.calls.resendRenders, before.resendRenders + 3);
+  fixture.flush(() => t.mock.timers.tick(60_000));
+  assert.equal(fixture.calls.resendRenders, before.resendRenders + 3);
+  fixture.press('resend');
+  await fixture.settle();
+  assert.equal(resends, 1);
+  assert.match(fixture.button('resend').label, /3/);
+  assert.equal(fixture.button('resend').disabled, true);
+  fixture.close();
+  const closed = { ...fixture.calls };
+  fixture.flush(() => t.mock.timers.tick(60_000));
+  assert.deepEqual(fixture.calls, closed);
+  fixture.open();
+  assert.match(fixture.button('resend').label, /3/);
+  assert.equal(fixture.button('resend').disabled, true);
+});
+
+test('OTP without a resend action has no countdown updates', (t) => {
+  t.mock.timers.enable({ apis: ['Date', 'setTimeout', 'setInterval'], now: 1_000_000 });
+  const fixture = setup(t, { resendCooldownSeconds: 30 });
+  const before = { ...fixture.calls };
+  fixture.flush(() => t.mock.timers.tick(60_000));
+  assert.deepEqual(fixture.calls, before);
+});
+
 test('iOS digit boxes keep equal explicit frames, fit narrow widths and grow for large text', (t) => {
-  const fixture = setup(t, {}, { platform: 'ios', width: 272 });
+  const fixture = setup(t, {}, { platform: 'ios', width: 320 });
   const frames = () =>
     fixture
       .findAll('Column')
@@ -259,6 +355,25 @@ test('rejected codes and request failures expose different retry messages', asyn
   message = fixture.findAll('Text').find(({ props }) => props.testID === 'otp-sheet-status')
     .props.children;
   assert.match(message, /couldn't verify/);
+  assert.equal(fixture.button('verify').disabled, false);
+});
+
+test('closing and reopening ignores an earlier resend completion without clearing the new code', async (t) => {
+  let finish;
+  const fixture = setup(t, {
+    onResend: () =>
+      new Promise((resolve) => {
+        finish = resolve;
+      }),
+  });
+  fixture.press('resend');
+  fixture.close();
+  fixture.open();
+  fixture.type('٠١٢٣٤٥');
+  finish();
+  await fixture.settle();
+  assert.equal(fixture.status(), 'idle');
+  assert.equal(fixture.findAll('Input')[0].props.value.value, '012345');
   assert.equal(fixture.button('verify').disabled, false);
 });
 

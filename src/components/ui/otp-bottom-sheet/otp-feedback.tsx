@@ -19,9 +19,18 @@ export function OtpFeedback({
   status: 'idle' | 'verifying' | 'resending' | 'error' | 'success';
   visible: boolean;
 }) {
+  if (!visible) return null;
+  return <AnimatedOtpFeedback status={status} />;
+}
+
+function AnimatedOtpFeedback({
+  status,
+}: {
+  status: 'idle' | 'verifying' | 'resending' | 'error' | 'success';
+}) {
   const scheme = useHostColorScheme();
   const colors = useThemeColors(scheme);
-  const motion = useMotionEnabled(visible);
+  const motion = useMotionEnabled(true);
   const scale = useSharedValue(1);
   const offset = useSharedValue(0);
   const opacity = useSharedValue(1);

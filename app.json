@@ -5,10 +5,11 @@
     "version": "1.0.0",
     "platforms": ["ios", "android"],
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/foodiya.png",
     "scheme": "myappexpo",
     "userInterfaceStyle": "automatic",
     "ios": {
+      "icon": "./assets/foodiya.png",
       "supportsTablet": true,
       "bundleIdentifier": "com.hyrkul.likan",
       "infoPlist": {
@@ -16,12 +17,13 @@
       }
     },
     "android": {
+      "icon": "./assets/foodiya.png",
       "googleServicesFile": "./google-services.json",
       "adaptiveIcon": {
         "backgroundColor": "#D9FDD3",
-        "foregroundImage": "./assets/images/android-icon-foreground.png",
-        "backgroundImage": "./assets/images/android-icon-background.png",
-        "monochromeImage": "./assets/images/android-icon-monochrome.png"
+        "foregroundImage": "./assets/foodiya.png",
+        "backgroundImage": "./assets/foodiya.png",
+        "monochromeImage": "./assets/foodiya.png"
       },
       "predictiveBackGestureEnabled": false,
       "package": "com.hyrkul.likan"

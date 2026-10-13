@@ -1,6 +1,5 @@
 import {
   Column,
-  Icon,
   RNHostView,
   Row,
   ScrollView,
@@ -8,14 +7,11 @@ import {
   useNativeState,
   type TextInputRef,
 } from '@expo/ui';
-import { useEffect, useRef, useState } from 'react';
-import { AccessibilityInfo, Platform, useWindowDimensions } from 'react-native';
-import { onGeometryChange } from '@expo/ui/swift-ui/modifiers';
-import { onSizeChanged } from '@expo/ui/jetpack-compose/modifiers';
+import { useLayoutEffect, useRef, useState } from 'react';
+import { AccessibilityInfo, useWindowDimensions } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useThemeColors } from '@/hooks/use-theme';
-import { useMeasuredWidth } from '@/hooks/use-measured-width';
-import { BottomSheet } from '../bottom-sheet/bottom-sheet';
+import { BottomSheet, useBottomSheetContentWidth } from '../bottom-sheet/bottom-sheet';
 import { UniversalButtonContent } from '../button/universal-button-content';
 import { UniversalHost, useHostColorScheme } from '../host/universal-host';
 import { LoadingContent } from '../loading/loading-state';
@@ -24,6 +20,9 @@ import { UniversalTextContent } from '../text/universal-text';
 import { normalizeOtpCode, OTP_LENGTH } from './otp-code';
 import { OtpFeedback } from './otp-feedback';
 import { OtpInputLayout } from './otp-input-layout';
+import { OtpResendButton } from './otp-resend-button';
+
+const CONTENT_PADDING = { top: 12, bottom: 24, left: 24, right: 24 };
 
 export interface OtpBottomSheetProps {
   isPresented: boolean;
@@ -46,14 +45,6 @@ export function OtpBottomSheet({
 }: OtpBottomSheetProps) {
   const scheme = useHostColorScheme(colorScheme);
   const colors = useThemeColors(scheme);
-  const [presentation, setPresentation] = useState({ visible: props.isPresented, id: 0 });
-  if (presentation.visible !== props.isPresented) {
-    // A new native presentation owns fresh input state; retain old content during dismissal.
-    setPresentation({
-      visible: props.isPresented,
-      id: presentation.id + (props.isPresented ? 1 : 0),
-    });
-  }
   return (
     <UniversalHost colorScheme={scheme}>
       <BottomSheet
@@ -61,9 +52,9 @@ export function OtpBottomSheet({
         onDismiss={props.onDismiss}
         testID={testID}
         containerColor={colors.surfaceRaised}
-        contentPadding={{ top: 12, bottom: 24, left: 24, right: 24 }}
+        contentPadding={CONTENT_PADDING}
       >
-        <OtpForm key={presentation.id} {...props} testID={testID} />
+        <OtpForm {...props} testID={testID} />
       </BottomSheet>
     </UniversalHost>
   );
@@ -85,7 +76,7 @@ function OtpForm({
   const { height, fontScale } = useWindowDimensions();
   const cooldown = Number.isFinite(resendCooldownSeconds) ? Math.max(0, resendCooldownSeconds) : 30;
   const value = useNativeState('');
-  const [width, setWidth] = useMeasuredWidth();
+  const width = useBottomSheetContentWidth();
   // Intrinsic sheet Hosts measure with an unbounded height. Compose scrolling needs a limit.
   const viewportHeight = Math.min(620, height * 0.7);
   const inputHeight = Math.max(64, Math.ceil(35 * fontScale + 24));
@@ -93,31 +84,48 @@ function OtpForm({
   const inputRef = useRef<TextInputRef>(null);
   const session = useRef(0);
   const pending = useRef(false);
-  const deadline = useRef(0);
+  const presented = useRef(false);
+  const [deadline, setDeadline] = useState(() => (isPresented ? Date.now() + cooldown * 1000 : 0));
   const [code, setCode] = useState('');
   const [focused, setFocused] = useState(false);
   const [status, setStatus] = useState<'idle' | 'verifying' | 'resending' | 'error' | 'success'>(
     'idle',
   );
   const [error, setError] = useState<'invalid' | 'verifyFailed' | 'resendFailed' | null>(null);
-  const [remaining, setRemaining] = useState(Math.ceil(cooldown));
   const [resent, setResent] = useState(false);
-  useEffect(() => {
+  const [presentation, setPresentation] = useState({ isPresented, cooldown });
+  if (presentation.isPresented !== isPresented || presentation.cooldown !== cooldown) {
+    setPresentation({ isPresented, cooldown });
+    if (isPresented) {
+      setDeadline(() => Date.now() + cooldown * 1000);
+      if (!presentation.isPresented) {
+        // Adjust local state before committing the new presentation, retaining the native field.
+        setCode('');
+        setFocused(false);
+        setStatus('idle');
+        setError(null);
+        setResent(false);
+      }
+    }
+  }
+  useLayoutEffect(() => {
+    const opening = isPresented && !presented.current;
+    presented.current = isPresented;
     session.current += 1;
     pending.current = false;
     if (!isPresented) {
       inputRef.current?.blur();
       return;
     }
-    deadline.current = Date.now() + cooldown * 1000;
-    const tick = () => setRemaining(Math.max(0, Math.ceil((deadline.current - Date.now()) / 1000)));
-    const timer = setInterval(tick, 1000);
+    if (opening) {
+      // Native state is synchronized separately from React's presentation reset.
+      value.set('');
+    }
     return () => {
       session.current += 1;
       pending.current = false;
-      clearInterval(timer);
     };
-  }, [isPresented, cooldown]);
+  }, [isPresented, cooldown, value]);
 
   const busy = status === 'verifying' || status === 'resending';
   const complete = code.length === OTP_LENGTH;
@@ -160,8 +168,7 @@ function OtpForm({
     }
   }
   async function resend() {
-    if (!isPresented || !onResend || pending.current || success || Date.now() < deadline.current)
-      return;
+    if (!isPresented || !onResend || pending.current || success || Date.now() < deadline) return;
     const currentSession = session.current;
     pending.current = true;
     setStatus('resending');
@@ -169,8 +176,7 @@ function OtpForm({
     try {
       await onResend();
       if (session.current !== currentSession) return;
-      deadline.current = Date.now() + cooldown * 1000;
-      setRemaining(Math.ceil(cooldown));
+      setDeadline(Date.now() + cooldown * 1000);
       value.set('');
       setCode('');
       setResent(true);
@@ -188,24 +194,8 @@ function OtpForm({
   }
   return (
     <ScrollView style={{ height: viewportHeight }}>
-      <Column
-        alignment="center"
-        spacing={24}
-        modifiers={[
-          ...nativeFillWidth,
-          Platform.OS === 'ios'
-            ? onGeometryChange((size) => setWidth(size.width))
-            : onSizeChanged((size) => setWidth(size.width)),
-        ]}
-      >
+      <Column alignment="center" spacing={24} modifiers={nativeFillWidth}>
         <Row modifiers={nativeFillWidth} alignment="center">
-          <UniversalTextContent
-            variant="caption"
-            fontWeight="700"
-            textStyle={{ color: colors.tint }}
-          >
-            {t('otp.eyebrow')}
-          </UniversalTextContent>
           <Spacer flexible />
           <UniversalButtonContent
             variant="link"
@@ -214,37 +204,32 @@ function OtpForm({
             testID={`${testID}-close`}
           />
         </Row>
-        <OtpFeedback status={status} visible={isPresented} />
-        <Column alignment="center" spacing={8} modifiers={nativeFillWidth}>
+        <OtpFeedback status={status} visible={isPresented && success} />
+        <Column alignment={success ? 'center' : 'start'} spacing={24} modifiers={nativeFillWidth}>
           <UniversalTextContent
             testID={`${testID}-title`}
             fontSize={30}
             fontWeight="700"
-            textStyle={{ textAlign: 'center' }}
+            textStyle={{ textAlign: success ? 'center' : undefined }}
           >
             {t(success ? 'otp.successTitle' : 'otp.title')}
           </UniversalTextContent>
-          <UniversalTextContent textStyle={{ textAlign: 'center', color: colors.muted }}>
-            {t(success ? 'otp.successDescription' : 'otp.description')}
-          </UniversalTextContent>
-          {!success && (
-            <UniversalTextContent fontWeight="600" textStyle={{ textAlign: 'center' }}>
-              {recipient}
+          <Column alignment={success ? 'center' : 'start'} spacing={8} modifiers={nativeFillWidth}>
+            <UniversalTextContent
+              fontSize={18}
+              textStyle={{ textAlign: success ? 'center' : undefined, color: colors.muted }}
+            >
+              {t(success ? 'otp.successDescription' : 'otp.description')}
             </UniversalTextContent>
-          )}
+            {!success && (
+              <UniversalTextContent fontSize={18} fontWeight="700">
+                {recipient}
+              </UniversalTextContent>
+            )}
+          </Column>
         </Column>
         {!success && (
           <Column spacing={12} modifiers={nativeFillWidth}>
-            <Row alignment="center" modifiers={nativeFillWidth}>
-              <UniversalTextContent variant="caption" fontWeight="600">
-                {t('otp.codeLabel')}
-              </UniversalTextContent>
-              <Spacer flexible />
-              <UniversalTextContent
-                variant="caption"
-                textStyle={{ color: colors.muted }}
-              >{`${code.length} / ${OTP_LENGTH}`}</UniversalTextContent>
-            </Row>
             {/* An explicit-width direction bridge keeps OTP digits LTR inside Arabic sheets. */}
             {width > 0 && (
               <RNHostView matchContents>
@@ -276,17 +261,13 @@ function OtpForm({
                     slots={Array.from({ length: OTP_LENGTH }, (_, index) => {
                       const active = focused && index === Math.min(code.length, OTP_LENGTH - 1);
                       const filled = index < code.length;
-                      const borderWidth = active || error ? 2 : 1;
+                      const borderWidth = active ? 3 : error ? 2 : 1;
                       const borderColor = error
                         ? colors.error
-                        : active || filled
-                          ? colors.tint
+                        : active
+                          ? colors.text
                           : colors.border;
-                      const backgroundColor = error
-                        ? colors.errorContainer
-                        : filled || active
-                          ? colors.selection
-                          : colors.surface;
+                      const backgroundColor = error ? colors.errorContainer : colors.surfaceVariant;
                       return (
                         <Column
                           key={index}
@@ -297,7 +278,7 @@ function OtpForm({
                             width: slotWidth,
                             height: inputHeight,
                             padding: borderWidth,
-                            borderRadius: 14,
+                            borderRadius: 10,
                             backgroundColor: borderColor,
                           }}
                         >
@@ -308,20 +289,20 @@ function OtpForm({
                             style={{
                               width: slotWidth - borderWidth * 2,
                               height: inputHeight - borderWidth * 2,
-                              borderRadius: 14 - borderWidth,
+                              borderRadius: 10 - borderWidth,
                               backgroundColor,
                             }}
                           >
                             <Spacer flexible size={0} />
                             <UniversalTextContent
                               fontSize={28}
-                              fontWeight="600"
+                              fontWeight="400"
                               textStyle={{
                                 textAlign: 'center',
                                 color: filled ? colors.text : colors.muted,
                               }}
                             >
-                              {code[index] ?? '·'}
+                              {code[index] ?? ''}
                             </UniversalTextContent>
                             <Spacer flexible size={0} />
                           </Column>
@@ -332,16 +313,18 @@ function OtpForm({
                 </UniversalHost>
               </RNHostView>
             )}
-            <UniversalTextContent
-              testID={`${testID}-status`}
-              variant="caption"
-              textStyle={{
-                color: error ? colors.error : resent ? colors.success : colors.muted,
-                textAlign: 'center',
-              }}
-            >
-              {error ? t(`otp.${error}`) : resent ? t('otp.resent') : (hint ?? t('otp.inputHint'))}
-            </UniversalTextContent>
+            {(error || resent || hint) && (
+              <UniversalTextContent
+                testID={`${testID}-status`}
+                variant="caption"
+                textStyle={{
+                  color: error ? colors.error : resent ? colors.success : colors.muted,
+                  textAlign: 'center',
+                }}
+              >
+                {error ? t(`otp.${error}`) : resent ? t('otp.resent') : hint}
+              </UniversalTextContent>
+            )}
           </Column>
         )}
         <UniversalButtonContent
@@ -360,31 +343,15 @@ function OtpForm({
         </UniversalButtonContent>
         {!success && onResend && (
           <Column alignment="center" spacing={0} modifiers={nativeFillWidth}>
-            <UniversalTextContent variant="caption" textStyle={{ color: colors.muted }}>
-              {t('otp.noCode')}
-            </UniversalTextContent>
-            <UniversalButtonContent
-              variant="link"
+            <OtpResendButton
               testID={`${testID}-resend`}
-              label={remaining > 0 ? t('otp.resendIn', { seconds: remaining }) : t('otp.resend')}
-              disabled={remaining > 0 || busy}
+              deadline={deadline}
+              isPresented={isPresented}
+              busy={busy}
               onPress={() => void resend()}
             />
           </Column>
         )}
-        <Row alignment="center" spacing={6}>
-          <Icon
-            name={Icon.select({
-              ios: 'lock.fill',
-              android: require('@expo/material-symbols/lock.xml'),
-            })}
-            size={12}
-            color={colors.muted}
-          />
-          <UniversalTextContent variant="caption" textStyle={{ color: colors.muted }}>
-            {t('otp.security')}
-          </UniversalTextContent>
-        </Row>
       </Column>
     </ScrollView>
   );

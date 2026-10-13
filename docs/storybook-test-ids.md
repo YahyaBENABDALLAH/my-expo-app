@@ -45,6 +45,13 @@ count. Each press logs the recipe UUID and increments the count without navigati
 Use `recipes-compact-recipe-card--light` with the existing story-opening helper;
 `.maestro/storybook/recipe-card.yaml` asserts repeated activation and the canvas.
 
+**Recipes/Home catalog** uses `home-card-<section>-sample-<1..8>-open` for
+Details and `home-card-hero-sample-<1..3>-save` for hero saves. The preview exposes
+`home-sample-preview-title`, `home-sample-preview-description`,
+`home-sample-preview-item-sample-<1..8>` and `home-sample-preview-close`.
+`.maestro/storybook/home-catalog.yaml` uses `recipes-home-catalog--dark` and checks
+reopening, dismissal and recipe selection through both scroll directions.
+
 ## Installed SDK limitations
 
 - Collapsible has no native `testID` prop. Its root ID is applied to its Host. Tap the native header within that host and assert `expo-ui-collapsible-content` after expanding.

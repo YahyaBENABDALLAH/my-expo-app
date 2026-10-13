@@ -98,7 +98,6 @@ function setup(recipeQuery) {
   Object.assign(ui, load('components/ui/skeleton/skeleton.tsx'));
   return {
     ...ui,
-    HomeScreen: load('features/recipes/home-screen.tsx').default,
     HomeExamplesScreen: load('features/ui-showcase/home-examples-screen.tsx').default,
     focus: (focused) => setFocused(focused),
     queryReads: () => queryReads,
@@ -223,89 +222,7 @@ test('leaving the showcase cancels its pending preview timeout', (t) => {
   assert.equal(s.placeholders(view).length, 0);
 });
 
-test('home combines food sections with live recipes without duplicate API cards or preview timers', async (t) => {
-  t.mock.timers.enable({ apis: ['setTimeout', 'setInterval'] });
-  const timeouts = t.mock.method(globalThis, 'setTimeout');
-  const s = setup();
-  const view = renderFixture(h(s.HomeScreen));
-  try {
-    assert.equal(view.findAll('RecipeCard').length, 1);
-    assert.equal(view.findAll('FoodExamples').length, 1);
-    assert.equal(view.findAll('FoodExamples')[0].props.editorialScroll, false);
-    const openRecipe = view.findAll('RecipeCard')[0].props.onPress;
-    view.flush(() => openRecipe('recipe-1'));
-    assert.deepEqual(s.destinations, [
-      { pathname: '/recipe/[uuid]', params: { uuid: 'recipe-1' } },
-    ]);
-    assert.equal(s.preview(view).length, 0);
-    assert.equal(view.findAll('Switch').length, 0);
-    assert.equal(view.findAll('List').length, 0);
-    assert.equal(timeouts.mock.calls.length, 0);
-    assert.equal(
-      view.findAll('Button').some((node) => node.props.testID === 'home-browse-pages'),
-      false,
-    );
-    view.flush(() => s.focus(false));
-    view.flush(() => s.focus(true));
-    await view.findAll('PageScreen')[0].props.onRefresh();
-    assert.equal(view.findAll('RecipeCard').length, 1);
-    assert.equal(view.findAll('RecipeCard')[0].props.onPress, openRecipe);
-    assert.equal(timeouts.mock.calls.length, 0);
-  } finally {
-    view.unmount();
-  }
-});
-
-test('home skeletons pulse only for an initial fetch and release the clock on blur or cached refresh', (t) => {
-  t.mock.timers.enable({ apis: ['setTimeout', 'setInterval'] });
-  const intervals = t.mock.method(globalThis, 'setInterval');
-  const clear = t.mock.method(globalThis, 'clearInterval');
-  const s = setup({ data: undefined, fetchStatus: 'fetching', isFetching: true });
-  const view = renderFixture(h(s.HomeScreen));
-  try {
-    assert.equal(s.placeholders(view).length, 8);
-    assert.equal(view.findAll('FoodExamples').length, 1);
-    assert.equal(intervals.mock.calls.length, 1);
-    const queryReads = s.queryReads();
-    view.flush(() => t.mock.timers.tick(900));
-    assert.ok(s.placeholders(view).every((node) => node.props.modifiers[0].opacity < 0.72));
-    assert.equal(s.queryReads(), queryReads);
-    view.flush(() => s.focus(false));
-    assert.equal(s.placeholders(view).length, 0);
-    assert.equal(clear.mock.calls.length, 1);
-    view.flush(() => s.focus(true));
-    assert.equal(s.placeholders(view).length, 8);
-    assert.equal(intervals.mock.calls.length, 2);
-    view.flush(() =>
-      s.recipes({
-        data: { data: [{ uuid: 'recipe-1' }] },
-        fetchStatus: 'fetching',
-        isFetching: true,
-      }),
-    );
-    assert.equal(s.placeholders(view).length, 0);
-    assert.equal(view.findAll('RecipeCard').length, 1);
-    assert.equal(clear.mock.calls.length, 2);
-  } finally {
-    view.unmount();
-  }
-});
-
-for (const fetchStatus of ['idle', 'paused']) {
-  test(`home does not animate loading skeletons while the query is ${fetchStatus}`, (t) => {
-    t.mock.timers.enable({ apis: ['setInterval'] });
-    const intervals = t.mock.method(globalThis, 'setInterval');
-    const s = setup({ data: undefined, fetchStatus, isFetching: false });
-    const view = renderFixture(h(s.HomeScreen));
-    try {
-      assert.equal(s.placeholders(view).length, 0);
-      assert.equal(view.findAll('FoodExamples').length, 1);
-      assert.equal(intervals.mock.calls.length, 0);
-    } finally {
-      view.unmount();
-    }
-  });
-}
+// The former live-query Home cases are covered by the placeholder catalog suite now.
 
 test('animated skeletons retain one shared pulse clock and pausing releases it', (t) => {
   t.mock.timers.enable({ apis: ['setTimeout', 'setInterval'] });

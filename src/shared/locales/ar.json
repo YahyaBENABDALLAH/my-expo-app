@@ -263,7 +263,25 @@
   },
   "settings": {
     "title": "إعدادات التطبيق",
-    "description": "اختر مظهر التطبيق وبدّل بين الوضع الفاتح والوضع الداكن."
+    "description": "إدارة تفضيلات المظهر واللغة.",
+    "appearance": "المظهر",
+    "yourAccount": "حسابك",
+    "comingSoon": "قريبًا",
+    "socialNotifications": "الإشعارات الاجتماعية",
+    "chat": "الدردشة",
+    "chatDescription": "الرسائل المباشرة ورسائل المجموعات ودعوات المجموعات.",
+    "invitations": "الدعوات",
+    "invitationsDescription": "طلبات الصداقة والدعوات إلى مجموعة.",
+    "accountNotifications": "إشعارات الحساب",
+    "authenticationRequests": "طلبات المصادقة",
+    "about": "حول التطبيق",
+    "support": "الدعم",
+    "appVersion": "إصدار التطبيق",
+    "privacyPolicy": "سياسة الخصوصية",
+    "openSourceLicenses": "تراخيص المصادر المفتوحة",
+    "licensesDescription": "تفاصيل تراخيص البرمجيات مفتوحة المصدر",
+    "legalInformation": "المعلومات القانونية",
+    "legalDescription": "اتفاقية ترخيص المستخدم النهائي"
   },
   "appearance": {
     "dark": "داكن",
@@ -307,6 +325,17 @@
     "trending": "الرائج هذا الأسبوع",
     "viewAll": "عرض الكل",
     "editorsChoice": "اختيار المحرّر",
+    "catalog": {
+      "featured": "المميّزة",
+      "fromOurKitchen": "من مطبخنا",
+      "experiences": "إلهام الطبخ",
+      "freeRecipes": "وصفات مجانية",
+      "weeklyPicks": "اختيارات جديدة كل أسبوع",
+      "freeNow": "مجانية الآن",
+      "quickMeals": "وجبات سريعة",
+      "chefPicks": "اختيارات الطهاة",
+      "save": "حفظ"
+    },
     "cards": {
       "title": "أمثلة بطاقات الوصفات",
       "sampleHint": "{{count}} بطاقة تجريبية في كل قائمة. اضغط على بطاقة لمعاينتها.",
