@@ -28,28 +28,20 @@ export function UniversalButtonContent({
     <NativeButton
       onClick={disabled ? undefined : onPress}
       enabled={!disabled}
-      shape={
-        borderRadius === undefined
-          ? undefined
-          : Shape.RoundedCorner({
-              cornerRadii: {
-                topStart: borderRadius,
-                topEnd: borderRadius,
-                bottomStart: borderRadius,
-                bottomEnd: borderRadius,
-              },
-            })
-      }
-      contentPadding={
-        contentPadding === undefined
-          ? undefined
-          : {
-              start: contentPadding,
-              end: contentPadding,
-              top: contentPadding,
-              bottom: contentPadding,
-            }
-      }
+      shape={Shape.RoundedCorner({
+        cornerRadii: {
+          topStart: borderRadius,
+          topEnd: borderRadius,
+          bottomStart: borderRadius,
+          bottomEnd: borderRadius,
+        },
+      })}
+      contentPadding={{
+        start: contentPadding,
+        end: contentPadding,
+        top: contentPadding,
+        bottom: contentPadding,
+      }}
       colors={{ ...(filled ? { containerColor: accent } : {}), contentColor: content }}
       modifiers={[
         ...(fullWidth ? [fillMaxWidth()] : []),

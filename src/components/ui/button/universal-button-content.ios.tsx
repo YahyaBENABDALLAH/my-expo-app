@@ -1,10 +1,10 @@
-import { Button, VStack, Text } from '@expo/ui/swift-ui';
+import { Button, Text, VStack } from '@expo/ui/swift-ui';
 import {
   buttonStyle,
   clipShape,
-  disabled as nativeDisabled,
   foregroundStyle,
   frame,
+  disabled as nativeDisabled,
   padding,
   tint,
 } from '@expo/ui/swift-ui/modifiers';
@@ -40,14 +40,14 @@ export function UniversalButtonContent({
         buttonStyle(nativeStyle),
         tint(accent),
         nativeDisabled(Boolean(disabled)),
-        ...(borderRadius === undefined ? [] : [clipShape('roundedRectangle', borderRadius)]),
+        clipShape('roundedRectangle', borderRadius),
       ]}
     >
       <VStack
         modifiers={[
           ...(fullWidth ? [frame({ maxWidth: Infinity })] : []),
           foregroundStyle(content),
-          ...(contentPadding === undefined ? [] : [padding({ all: contentPadding })]),
+          padding({ all: contentPadding }),
         ]}
       >
         {children ?? <Text>{label ?? ''}</Text>}

@@ -1,5 +1,5 @@
-import type { ReactNode } from 'react';
 import Colors from '@/constants/colors';
+import type { ReactNode } from 'react';
 
 export type UniversalButtonVariant =
   'primary' | 'secondary' | 'link' | 'success' | 'warning' | 'destructive';

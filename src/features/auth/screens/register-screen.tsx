@@ -1,31 +1,31 @@
+import {
+  authInputIcons,
+  Column,
+  FieldGroup,
+  FormSubmit,
+  FormTextInput,
+  ListItem,
+  nativeFillSize,
+  nativeFillWidth,
+  PageFrame,
+  Picker,
+  UniversalTextContent as Text,
+  UniversalButtonContent,
+  UniversalHost,
+  useAuthTheme,
+} from '@components/ui';
+import { router } from 'expo-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { KeyboardAvoidingView } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import {
-  Column,
-  nativeFillWidth,
-  nativeFillSize,
-  UniversalButtonContent,
-  UniversalHost,
-  UniversalTextContent as Text,
-  PageFrame,
-  FieldGroup,
-  ListItem,
-  Picker,
-  useAuthTheme,
-  FormSubmit,
-  FormTextInput,
-  authInputIcons,
-} from '@components/ui';
-import { router } from 'expo-router';
 
-import { useAuthForm } from '../hooks/use-auth-form';
-import { useAuthFlow } from '../auth-flow.context';
-import { registerResolver } from '@/validation/resolvers/auth';
-import type { RegisterFormValues } from '@/validation/schemas/auth';
 import { useLanguage } from '@/context/language.context';
 import i18n, { SUPPORTED_LANGUAGES, type Language } from '@/lib/i18n';
+import { registerResolver } from '@/validation/resolvers/auth';
+import type { RegisterFormValues } from '@/validation/schemas/auth';
+import { useAuthFlow } from '../auth-flow.context';
+import { useAuthForm } from '../hooks/use-auth-form';
 
 const languageLabels: Record<Language, string> = {
   fr: 'common.french',
@@ -37,7 +37,7 @@ export function RegisterScreen() {
   const { t } = useTranslation();
   const { language } = useLanguage();
   const [preferredLanguage, setPreferredLanguage] = useState<Language>(language);
-  const { colors, scheme, buttonPalette } = useAuthTheme();
+  const { colors, buttonPalette } = useAuthTheme();
   const insets = useSafeAreaInsets();
   const { register } = useAuthFlow();
   const { form, submit, pending } = useAuthForm<RegisterFormValues>(
@@ -61,22 +61,23 @@ export function RegisterScreen() {
       >
         <UniversalHost
           style={{ flex: 1, width: '100%', maxWidth: 480 }}
-          colorScheme={scheme}
           seedColor={colors.tint}
           buttonPalette={buttonPalette}
           matchContents={false}
           ignoreSafeArea="all"
         >
-          <FieldGroup testID="auth-register-scroll" modifiers={nativeFillSize}>
-            <FieldGroup.Section>
-              <Column spacing={12} modifiers={nativeFillWidth}>
-                <Text variant="caption" fontWeight="700" textStyle={{ color: colors.tint }}>
-                  {t('brand.wordmark')}
-                </Text>
-                <Text variant="heading">{t('auth.signUpTitle')}</Text>
-                <Text textStyle={{ color: colors.muted }}>{t('auth.registerDescription')}</Text>
-              </Column>
-            </FieldGroup.Section>
+          <FieldGroup
+            testID="auth-register-scroll"
+            modifiers={nativeFillSize}
+            style={{ backgroundColor: 'transparent' }}
+          >
+            <Column spacing={12} modifiers={nativeFillWidth}>
+              <Text variant="caption" fontWeight="700" textStyle={{ color: colors.tint }}>
+                {t('brand.wordmark')}
+              </Text>
+              <Text variant="heading">{t('auth.signUpTitle')}</Text>
+              <Text textStyle={{ color: colors.muted }}>{t('auth.registerDescription')}</Text>
+            </Column>
             <FieldGroup.Section title={t('auth.profileSection')} testID="auth-register-profile">
               <FormTextInput
                 {...shared}

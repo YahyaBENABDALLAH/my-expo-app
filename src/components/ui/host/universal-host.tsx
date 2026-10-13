@@ -2,9 +2,9 @@ import { Host } from '@expo/ui';
 import { createContext, useContext, type ComponentProps, type Ref } from 'react';
 import type { ColorSchemeName, View } from 'react-native';
 
+import { useLayoutDirection } from '@/context/layout-direction.context';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useThemeColors } from '@/hooks/use-theme';
-import { useLayoutDirection } from '@/context/layout-direction.context';
 import type { UniversalButtonPalette } from '../button/universal-button.types';
 
 const HostColorSchemeContext = createContext<'light' | 'dark' | undefined>(undefined);
