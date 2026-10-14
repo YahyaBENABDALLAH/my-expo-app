@@ -1,13 +1,13 @@
+import { useMeasuredWidth } from '@/hooks/use-measured-width';
 import { useThemeColors } from '@/hooks/use-theme';
 import {
-  BottomSheet as NativeBottomSheet,
   Column,
+  BottomSheet as NativeBottomSheet,
   RNHostView,
   type BottomSheetProps as NativeBottomSheetProps,
 } from '@expo/ui';
-import { frame, onGeometryChange } from '@expo/ui/swift-ui/modifiers';
 import { onSizeChanged } from '@expo/ui/jetpack-compose/modifiers';
-import { useMeasuredWidth } from '@/hooks/use-measured-width';
+import { frame, onGeometryChange } from '@expo/ui/swift-ui/modifiers';
 import { createContext, useContext } from 'react';
 import { Platform, useWindowDimensions } from 'react-native';
 import { UniversalHost, useHostColorScheme } from '../host/universal-host';
@@ -32,7 +32,7 @@ export function BottomSheet({
   children,
   containerColor,
   contentColor,
-  contentPadding = 24,
+
   snapPoints,
   initialContentWidth,
   ...props
@@ -41,17 +41,13 @@ export function BottomSheet({
   const colors = useThemeColors(scheme);
   const { width: windowWidth } = useWindowDimensions();
   const [width, setWidth] = useMeasuredWidth();
-  const horizontalPadding =
-    typeof contentPadding === 'number'
-      ? contentPadding * 2
-      : (contentPadding.left ?? 0) + (contentPadding.right ?? 0);
-  // A zero-width Host wraps text and changes the sheet's height while it is opening.
+
   const firstWidth =
     initialContentWidth !== undefined &&
     Number.isFinite(initialContentWidth) &&
     initialContentWidth > 0
       ? initialContentWidth
-      : Math.max(1, windowWidth - horizontalPadding);
+      : Math.max(1, windowWidth);
   const measureWidth = ({ width: nextWidth }: { width: number }) => {
     if (Number.isFinite(nextWidth) && nextWidth > 0) setWidth(nextWidth);
   };
@@ -70,7 +66,6 @@ export function BottomSheet({
       {...props}
       containerColor={containerColor ?? colors.surface}
       contentColor={contentColor ?? colors.text}
-      contentPadding={contentPadding}
       snapPoints={snapPoints}
     >
       <Column alignment="start" modifiers={sizing}>
