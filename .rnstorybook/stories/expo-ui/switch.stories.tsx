@@ -57,7 +57,6 @@ const meta = {
   },
   argTypes: {
     ...nativeThemeControls,
-    seedColor: { control: false, description: 'Switch colors use shared theme tokens.' },
     value: { control: 'boolean' },
     label: { control: 'text' },
     disabled: { control: 'boolean' },
@@ -84,4 +83,6 @@ export const LongLabel: Story = {
 };
 export const LightTheme: Story = { args: { colorScheme: 'light' } };
 export const DarkTheme: Story = { args: { colorScheme: 'dark' } };
-export const TokenColors: Story = { args: { value: true, label: 'Shared green switch tokens' } };
+export const NativeTheme: Story = {
+  args: { value: true, label: 'Native Host theme', seedColor: Colors.light.tint },
+};

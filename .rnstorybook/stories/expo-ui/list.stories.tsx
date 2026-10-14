@@ -200,3 +200,5 @@ export const CompoundSlotsLight: Story = {
   ...CompoundSlots,
   args: { colorScheme: 'light' },
 };
+
+export const NativeTheme: Story = { args: { seedColor: Colors.light.tint } };

@@ -1,7 +1,14 @@
 import type { ReactNode } from 'react';
 
 export type UniversalButtonVariant =
-  'primary' | 'secondary' | 'link' | 'success' | 'warning' | 'destructive';
+  | 'primary'
+  | 'secondary'
+  | 'link'
+  | 'success'
+  | 'warning'
+  | 'destructive'
+  /** Native glass on iOS 26+; native automatic on older iOS, outlined on Android. */
+  | 'glass';
 
 export type UniversalButtonContentProps = {
   variant: UniversalButtonVariant;

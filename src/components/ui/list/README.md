@@ -1,14 +1,9 @@
 # Native list
 
-Export: `List`.
+`list.tsx` delegates rows, scrolling, refresh indicator and appearance to the universal Expo UI List. It adds only shared promise coordination to coalesce pending refreshes and safely finish failures. The caller displays error feedback. Compose with ListItem inside a bounded Host; use the feature’s virtualized data list for large datasets.
 
-The iOS/Android adapters apply Host theme colors to grouped native lists.
-`list.d.ts` declares the shared contract. Compose with `ListItem` inside a Host.
+Import from `@components/ui` and compose inside `UniversalHost`. The Host uses the shared light/dark scheme and theme tint; Host seedColor overrides remain available; use native modifiers only where exposed by the component API. No custom glass layer or Android glass imitation is added.
 
-This is a native grouped-row control. Keep large dataset rendering decisions
-in the owning feature rather than expanding this wrapper.
+Native story: [expo-ui/list.stories.tsx](../../../../.rnstorybook/stories/expo-ui/list.stories.tsx). Light/dark and interaction fixtures remain available. JS checks cover public behavior and native module resolution; device appearance, glass and touch behavior still need iOS/Android verification.
 
-Existing composition story: [list.stories.tsx](../../../../.rnstorybook/stories/expo-ui/list.stories.tsx).
-
-Import public components from `@components/ui`; UI implementations import
-concrete files directly. [Back to the UI guide](../README.md).
+See [native control themes](../../../../docs/control-theme.md) and [UI guide](../README.md).

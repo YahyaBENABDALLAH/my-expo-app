@@ -58,7 +58,6 @@ const meta = {
   },
   argTypes: {
     ...nativeThemeControls,
-    seedColor: { control: false, description: 'Slider colors use shared theme tokens.' },
     value: { control: 'number' },
     min: { control: 'number' },
     max: { control: 'number' },
@@ -88,4 +87,4 @@ export const DisabledMinimum: Story = { args: { disabled: true, value: 0 } };
 export const DisabledMaximum: Story = { args: { disabled: true, value: 100 } };
 export const LightTheme: Story = { args: { colorScheme: 'light' } };
 export const DarkTheme: Story = { args: { colorScheme: 'dark' } };
-export const TokenColors: Story = { args: { value: 75 } };
+export const NativeTheme: Story = { args: { value: 75, seedColor: Colors.light.tint } };

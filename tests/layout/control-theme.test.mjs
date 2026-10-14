@@ -27,6 +27,7 @@ function setup(platform) {
       'menuAnchor',
       'padding',
       'pickerStyle',
+      'buttonStyle',
       'refreshable',
       'scrollContentBackground',
       'tag',
@@ -42,7 +43,10 @@ function setup(platform) {
     Host: native('Host'),
     Column: native('Column'),
     Text: native('Text'),
+    Switch: native('Switch'),
     Checkbox: native('Checkbox'),
+    Collapsible: native('Collapsible'),
+    List: native('List'),
     Slider: native('Slider'),
     Picker: compound('UniversalPicker', ['Item']),
     ListItem: compound('ListItem', ['Leading', 'Supporting', 'Trailing']),
@@ -108,7 +112,11 @@ function setup(platform) {
       'field-group',
       'collapsible',
       'segmented-control',
-    ].map((name) => load(`components/ui/${name}/${name}.${platform}.tsx`)),
+    ].map((name) =>
+      load(
+        `components/ui/${name}/${name}${['picker', 'segmented-control'].includes(name) || (name === 'field-group' && platform === 'ios') ? `.${platform}` : ''}.tsx`,
+      ),
+    ),
     load('components/ui/list-item/list-item.tsx'),
   );
   return {
@@ -170,12 +178,8 @@ for (const platform of ['android', 'ios']) {
     const view = renderFixture(h(Screen));
     const checkbox = () => view.findAll('Checkbox')[0];
     const slider = () => view.findAll('Slider')[0];
-    view.flush(() =>
-      platform === 'android'
-        ? checkbox().props.onCheckedChange(true)
-        : checkbox().props.onValueChange(true),
-    );
-    view.flush(() => slider().props.onValueChange(platform === 'android' ? 27 : 30));
+    view.flush(() => checkbox().props.onValueChange(true));
+    view.flush(() => slider().props.onValueChange(30));
     if (platform === 'android') {
       view.flush(() => view.findAll('DropdownBox')[0].props.onExpandedChange(true));
       assert.equal(view.findAll('MenuItem').length, 2);
@@ -189,33 +193,23 @@ for (const platform of ['android', 'ios']) {
       view.flush(() => setScheme(scheme));
       assert.equal(checkbox(), checkboxInstance);
       assert.deepEqual(values, { checked: true, amount: 30, selection: '1' });
-      const color = s.colors[scheme].controlActive;
-      if (platform === 'android') {
-        assert.equal(checkbox().props.colors.checkedColor, color);
-        assert.equal(slider().props.colors.activeTrackColor, color);
-        assert.equal(
-          view.findAll('Dropdown')[0].props.containerColor,
-          s.colors[scheme].controlSurface,
-        );
-      } else {
-        for (const node of [checkbox(), slider(), view.findAll('Picker')[0]]) {
-          assert.equal(node.props.modifiers.find((m) => m.name === 'tint').args[0], color);
-        }
-      }
+      const host = view.findAll('Host')[0];
+      assert.equal(host.props.colorScheme, scheme);
+      assert.equal(host.props.seedColor, s.colors[scheme].tint);
+      assert.equal(checkbox().props.colors, undefined);
+      assert.equal(slider().props.colors, undefined);
     }
     view.flush(() => setDisabled(true));
+    assert.equal(checkbox().props.disabled, true);
+    assert.equal(slider().props.disabled, true);
+    view.flush(() => {
+      checkbox().props.onValueChange(false);
+      slider().props.onValueChange(80);
+    });
     if (platform === 'android') {
-      assert.equal(checkbox().props.enabled, false);
-      assert.equal(checkbox().props.onCheckedChange, undefined);
-      assert.equal(slider().props.onValueChange, undefined);
       assert.equal(view.findAll('DropdownBox')[0].props.onExpandedChange, undefined);
       assert.ok(view.findAll('MenuItem').every((item) => !item.props.onClick));
-    } else
-      view.flush(() => {
-        checkbox().props.onValueChange(false);
-        slider().props.onValueChange(80);
-        view.findAll('Picker')[0].props.onSelectionChange(1);
-      });
+    } else view.flush(() => view.findAll('Picker')[0].props.onSelectionChange(1));
     assert.deepEqual(values, { checked: true, amount: 30, selection: '1' });
     view.unmount();
   });
@@ -279,22 +273,12 @@ for (const platform of ['android', 'ios']) {
     assert.equal(view.findAll('CustomFooter').length, 1);
     for (const type of ['DirectRow', 'SettingRow', 'LastRow'])
       assert.equal(view.findAll(type).length, 1);
-    if (platform === 'android') {
-      assert.equal(row.props.colors.containerColor, s.colors.dark.controlSurface);
-      assert.equal(view.findAll('ComposeListItem').length, 4); // Three form rows and one disclosure header.
+    assert.equal(row.props.colors, undefined);
+    if (platform === 'android')
       view.flush(() => view.findAll('SegmentedButton')[1].props.onClick());
-      const header = view.findAll('ComposeListItem').at(-1);
-      view.flush(() => header.props.modifiers.find((m) => m.name === 'clickable').args[0]());
-      assert.equal(view.findAll('AnimatedVisibility')[0].props.visible, true);
-    } else {
-      assert.equal(
-        row.props.modifiers.find((m) => m.name === 'listRowSeparatorTint').args[0],
-        s.colors.dark.divider,
-      );
-      assert.equal(view.findAll('FieldGroup.Section').length, 3);
-      view.flush(() => view.findAll('Picker')[0].props.onSelectionChange('b'));
-      view.flush(() => view.findAll('DisclosureGroup')[0].props.onIsExpandedChange(true));
-    }
+    else view.flush(() => view.findAll('Picker')[0].props.onSelectionChange('b'));
+    view.flush(() => view.findAll('Collapsible')[0].props.onOpenChange(true));
+    assert.equal(view.findAll('Collapsible')[0].props.isOpen, true);
     assert.equal(selectedSegment, 'b');
     assert.equal(expanded, true);
     view.unmount();
@@ -345,26 +329,13 @@ for (const platform of ['ios', 'android']) {
       assert.equal(row.props.testID, 'shared-row');
       assert.equal(row.props.supportingText, richSupporting);
       assert.ok(row.props.modifiers.includes(customModifier));
-      if (platform === 'android') {
-        assert.equal(row.props.colors.containerColor, s.colors[scheme].controlSurface);
-        assert.equal(row.props.colors.contentColor, s.colors[scheme].text);
-        assert.equal(row.props.colors.trailingContentColor, '#123456');
-        assert.equal(row.props.modifiers.at(-1).args[0], 'shared-row');
-        assert.equal(row.props.leading, 0);
-      } else {
-        assert.equal(
-          row.props.modifiers.find((m) => m.name === 'listRowBackground').args[0],
-          s.colors[scheme].controlSurface,
-        );
-        const supporting = row.props.children.find(
-          (child) => child?.type === s.ListItem.Supporting,
-        );
-        assert.equal(supporting.props.children.props.children, 0);
-        assert.equal(supporting.props.children.props.modifiers[0].args[0], s.colors[scheme].muted);
-        const trailing = row.props.children.find((child) => child?.type === s.ListItem.Trailing);
-        assert.equal(trailing.props.children.props.children.type, 'RichTrailing');
-        assert.equal(trailing.props.children.props.modifiers[0].args[0], s.colors[scheme].muted);
-      }
+      assert.equal(row.props.colors.trailingContentColor, '#123456');
+      assert.equal(row.props.leading, 0);
+      assert.equal(row.props.trailing, 'Open');
+      if (platform === 'android') assert.equal(row.props.modifiers.at(-1).args[0], 'shared-row');
+      const supporting = view.findAll('ListItem.Supporting')[0];
+      assert.equal(supporting.props.children, 0);
+      assert.equal(view.findAll('RichTrailing').length, 1);
       view.flush(row.props.onPress);
     }
     assert.equal(presses, 3);
@@ -372,7 +343,7 @@ for (const platform of ['ios', 'android']) {
   });
 }
 
-test('Android list refresh coalesces overlapping native requests and clears its indicator', async () => {
+test('list refresh coalesces overlapping native requests and releases them after completion', async () => {
   const s = setup('android');
   let finish,
     calls = 0;
@@ -393,15 +364,16 @@ test('Android list refresh coalesces overlapping native requests and clears its 
   );
   let first;
   view.flush(() => {
-    first = view.findAll('PullToRefreshBox')[0].props.onRefresh();
+    first = view.findAll('List')[0].props.onRefresh();
   });
-  view.flush(() => view.findAll('PullToRefreshBox')[0].props.onRefresh());
+  view.flush(() => view.findAll('List')[0].props.onRefresh());
+  await Promise.resolve();
   assert.equal(calls, 1);
-  assert.equal(view.findAll('PullToRefreshBox')[0].props.isRefreshing, true);
   finish();
   await first;
   await new Promise(setImmediate);
   view.flush(() => {});
-  assert.equal(view.findAll('PullToRefreshBox')[0].props.isRefreshing, false);
+  await view.findAll('List')[0].props.onRefresh();
+  assert.equal(calls, 2);
   view.unmount();
 });

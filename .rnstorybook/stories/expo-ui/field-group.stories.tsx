@@ -190,3 +190,5 @@ export const Hidden: Story = { args: { hidden: true } };
 export const CompactViewport: Story = { args: { viewportHeight: 260 } };
 export const LightTheme: Story = { args: { colorScheme: 'light' } };
 export const DarkTheme: Story = { args: { colorScheme: 'dark' } };
+
+export const NativeTheme: Story = { args: { seedColor: Colors.light.tint } };

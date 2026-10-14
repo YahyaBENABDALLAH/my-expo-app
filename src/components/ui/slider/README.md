@@ -1,17 +1,9 @@
 # Slider
 
-Export: `Slider`.
+`slider.tsx` uses the universal Expo UI control and guards disabled callbacks. Expo handles ranges, steps, native drag feedback and selectors. Colors inherit the Host. Supported iOS sliders retain native glass feedback during interaction; Android uses Material.
 
-The iOS/Android files apply the owning Host's control tokens to native sliders.
-`slider.d.ts` declares the shared contract. The caller owns the value.
-The showcase's `TokenColors` story demonstrates these tokens; its seed-color
-control is disabled because Host seed color does not override slider colors.
+Import from `@components/ui` and compose inside `UniversalHost`. The Host uses the shared light/dark scheme and theme tint; Host seedColor overrides remain available; use native modifiers only where exposed by the component API. No custom glass layer or Android glass imitation is added.
 
-Preserve native drag/step behavior and disabled suppression. SwiftUI owns thumb
-appearance; the installed Android API does not expose disabled slider colors.
-See [control theme coverage](../../../../docs/control-theme.md).
+Native story: [expo-ui/slider.stories.tsx](../../../../.rnstorybook/stories/expo-ui/slider.stories.tsx). Light/dark and interaction fixtures remain available. JS checks cover public behavior and native module resolution; device appearance, glass and touch behavior still need iOS/Android verification.
 
-Existing composition story: [slider.stories.tsx](../../../../.rnstorybook/stories/expo-ui/slider.stories.tsx).
-
-Import public components from `@components/ui`; UI implementations import
-concrete files directly. [Back to the UI guide](../README.md).
+See [native control themes](../../../../docs/control-theme.md) and [UI guide](../README.md).

@@ -22,14 +22,14 @@ Its default `overlay` variant decorates headers; `variant="splash"` places the
 same moving paths in normal flow with opaque fills for the launch screen's bottom
 edge. Both use the exported `PAGE_WAVE_HEIGHT` and the same motion guards.
 The back wave resolves theme opacity first; the splash keeps full opacity.
-The root mounts it above navigation, alongside `AuroraBackground` behind navigation
-as the default background.
-The production root enables both layers on Android and iOS after the launch screen
-exits. Android's full-screen aurora uses 30 updates per second; the small header
-wave retains its smooth transform animation. Both retain their activity and
-reduced-motion guards.
-Frames, headers and page content are transparent so they reveal that shared
-canvas; native cards and controls keep their usual semantic surfaces.
+The root mounts it above navigation and enables it on Android and iOS after the
+launch screen exits. It retains its activity and reduced-motion guards.
+Navigation themes, stack content and tab scenes use the active theme's opaque
+`background` token so outgoing text cannot show through an incoming screen.
+Frames, headers and page content reveal their owning scene's background;
+native cards and controls keep their usual semantic surfaces. The full-screen
+aurora remains in the launch screen and dedicated previews, rather than running
+behind opaque navigation scenes.
 
 Theme controls live in App Settings, with no preference footer on page shells.
 Keep system insets outside keyboard padding and preserve the existing tab-bar

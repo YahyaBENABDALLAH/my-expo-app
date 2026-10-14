@@ -1,24 +1,9 @@
 # List item
 
-Exports: `ListItem` and `UniversalListItem` (the same component).
+`list-item.tsx` forwards the universal Expo UI props and Leading, Supporting and Trailing slots. UniversalListItem is a direct compatibility alias. Native row colors and supporting/accessory typography inherit the Host. Caller colors/modifiers pass through. The only platform adaptation adds the actual Android row testID missing in the installed universal implementation. iOS props pass through unchanged.
 
-`list-item.tsx` owns the shared root Expo UI composition, Host theme lookup, and
-Leading, Supporting and Trailing slots. `list-item-appearance.ios.tsx` and
-`.android.tsx` adapt only native props: iOS slot text/background/separator colors,
-Android row palettes and selectors. Caller modifiers and Android color overrides
-keep their existing precedence; nested slots and numeric zero remain supported.
-`list-item-appearance.d.ts` declares the private native helper's contract.
-The public barrel exports the compatibility alias directly, without another file
-or rendering wrapper.
+Import from `@components/ui` and compose inside `UniversalHost`. The Host uses the shared light/dark scheme and theme tint; Host seedColor overrides remain available; use native modifiers only where exposed by the component API. No custom glass layer or Android glass imitation is added.
 
-Compose inside a native List/Host. Keep selection state in the caller.
+Native story: [expo-ui/list.stories.tsx](../../../../.rnstorybook/stories/expo-ui/list.stories.tsx). Light/dark and interaction fixtures remain available. JS checks cover public behavior and native module resolution; device appearance, glass and touch behavior still need iOS/Android verification.
 
-Existing composition story: [list.stories.tsx](../../../../.rnstorybook/stories/expo-ui/list.stories.tsx).
-CompoundSlots and CompoundSlotsLight exercise nested slot precedence, zero
-supporting text, row activation and a row without an action. The list Maestro flow
-includes the compound story; native execution remains pending. Control-theme
-tests check live Host changes, caller overrides, slots and single action delivery;
-Metro checks verify the shared component and platform appearance helpers.
-
-Import public components from `@components/ui`; UI implementations import
-concrete files directly. [Back to the UI guide](../README.md).
+See [native control themes](../../../../docs/control-theme.md) and [UI guide](../README.md).

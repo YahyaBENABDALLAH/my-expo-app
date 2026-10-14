@@ -67,7 +67,7 @@ function setup(platform) {
     `components/ui/refreshable-scroll-view/refreshable-scroll-view.${platform}.tsx`,
   );
   const colors = load('constants/colors.ts').default;
-  const { Switch } = load(`components/ui/switch/switch.${platform}.tsx`);
+  const { Switch } = load('components/ui/switch/switch.tsx');
   const render = (component, props, host = {}) =>
     renderToStaticMarkup(createElement(UniversalHost, host, createElement(component, props)));
   return { captured, colors, render, UniversalTextInputContent, RefreshableScrollView, Switch };
@@ -99,7 +99,7 @@ for (const scheme of ['light', 'dark']) {
   });
 
   for (const platform of ['android', 'ios']) {
-    test(`${platform}: switch inherits ${scheme} tokens and forwards one native change`, () => {
+    test(`${platform}: switch inherits ${scheme} Host appearance and forwards one native change`, () => {
       const s = setup(platform);
       const changes = [];
       const customModifier = { kind: 'custom', args: [] };
@@ -117,42 +117,25 @@ for (const scheme of ['light', 'dark']) {
       const toggle = s.captured.switches[0];
       assert.equal(toggle.value, false);
       assert.ok(toggle.modifiers.includes(customModifier));
-      if (platform === 'android') {
-        assert.equal(toggle.colors.checkedTrackColor, s.colors[scheme].switchTrackOn);
-        assert.equal(toggle.colors.uncheckedTrackColor, s.colors[scheme].switchTrackOff);
-        assert.equal(toggle.colors.checkedThumbColor, s.colors[scheme].switchThumbOn);
-        assert.equal(toggle.colors.uncheckedThumbColor, s.colors[scheme].switchThumbOff);
-        assert.equal(toggle.colors.uncheckedBorderColor, s.colors[scheme].switchBorderOff);
-        assert.equal(s.captured.texts[0].color, s.colors[scheme].text);
-        assert.equal(
-          toggle.modifiers.find(({ kind }) => kind === 'testID').args[0],
-          'theme-switch',
-        );
-        toggle.onCheckedChange(true);
-      } else {
-        assert.equal(
-          toggle.modifiers.find(({ kind }) => kind === 'tint').args[0],
-          s.colors[scheme].switchTrackOn,
-        );
-        assert.equal(toggle.testID, 'theme-switch');
-        toggle.onValueChange(true);
-      }
+      assert.equal(toggle.colors, undefined);
+      assert.equal(toggle.testID, 'theme-switch');
+      assert.equal(s.captured.hosts[0].colorScheme, scheme);
+      assert.equal(s.captured.hosts[0].seedColor, s.colors[scheme].tint);
+      toggle.onValueChange(true);
       assert.deepEqual(changes, [true]);
     });
 
-    test(`${platform}: refresh inherits ${scheme} tokens; Android indicator aligns to viewport center`, () => {
+    test(`${platform}: refresh inherits ${scheme} Host appearance; Android indicator aligns to viewport center`, () => {
       const s = setup(platform);
       s.render(s.RefreshableScrollView, { onRefresh: async () => {} }, { colorScheme: scheme });
       if (platform === 'android') {
-        const indicator = s.captured.refresh[0].indicator;
-        assert.equal(indicator.color, s.colors[scheme].tint);
-        assert.equal(indicator.containerColor, s.colors[scheme].surface);
+        assert.equal(s.captured.refresh[0].indicator, undefined);
         assert.equal(s.captured.refresh[0].contentAlignment, 'topCenter');
         assert.deepEqual(s.captured.refresh[0].modifiers, [{ kind: 'fillMaxSize', args: [] }]);
       } else {
         assert.equal(
-          s.captured.scrolls[0].modifiers.find(({ kind }) => kind === 'tint').args[0],
-          s.colors[scheme].tint,
+          s.captured.scrolls[0].modifiers.some(({ kind }) => kind === 'tint'),
+          false,
         );
       }
     });
@@ -186,19 +169,8 @@ for (const platform of ['android', 'ios']) {
       );
       const toggle = s.captured.switches.at(-1);
       assert.equal(toggle.value, value);
-      if (platform === 'android') {
-        assert.equal(toggle.enabled, false);
-        assert.equal(toggle.onCheckedChange, undefined);
-        assert.equal(toggle.colors.disabledCheckedTrackColor, s.colors.dark.switchTrackDisabledOn);
-        assert.equal(
-          toggle.colors.disabledUncheckedTrackColor,
-          s.colors.dark.switchTrackDisabledOff,
-        );
-        assert.equal(s.captured.texts.at(-1).color, s.colors.dark.muted);
-      } else {
-        assert.equal(toggle.disabled, true);
-        toggle.onValueChange(!value);
-      }
+      assert.equal(toggle.disabled, true);
+      toggle.onValueChange(!value);
     }
     assert.equal(changes, 0);
   });

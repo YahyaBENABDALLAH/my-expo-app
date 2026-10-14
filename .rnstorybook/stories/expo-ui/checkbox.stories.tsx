@@ -78,3 +78,5 @@ export const LongLabel: Story = {
 export const CustomTint: Story = { args: { seedColor: Colors.dark.primary, value: true } };
 export const LightTheme: Story = { args: { colorScheme: 'light' } };
 export const DarkTheme: Story = { args: { colorScheme: 'dark' } };
+
+export const NativeTheme: Story = { args: { seedColor: Colors.light.tint } };

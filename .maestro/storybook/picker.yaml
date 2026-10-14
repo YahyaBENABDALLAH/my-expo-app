@@ -1,0 +1,47 @@
+appId: com.hyrkul.likan
+name: Native picker selects, resets and suppresses disabled changes
+tags: [smoke, storybook]
+env:
+  STORYBOOK_URL: myappexpo://storybook
+---
+- runFlow:
+    file: ../helpers/open-story.yaml
+    env:
+      STORY_ID: expo-ui-universal-picker--menu
+      READY_ID: expo-ui-picker
+- assertVisible:
+    id: expo-ui-picker-value
+    text: 'Selected: casablanca'
+- tapOn:
+    id: expo-ui-picker
+- tapOn: Rabat
+- assertVisible:
+    id: expo-ui-picker-value
+    text: 'Selected: rabat'
+- tapOn:
+    id: expo-ui-picker-reset
+- assertVisible:
+    id: expo-ui-picker-value
+    text: 'Selected: casablanca'
+- runFlow:
+    file: ../helpers/open-story.yaml
+    env:
+      STORY_ID: expo-ui-universal-picker--numeric-values
+      READY_ID: expo-ui-picker
+- tapOn:
+    id: expo-ui-picker
+- tapOn: One
+- assertVisible:
+    id: expo-ui-picker-value
+    text: 'Selected: 1'
+- runFlow:
+    file: ../helpers/open-story.yaml
+    env:
+      STORY_ID: expo-ui-universal-picker--disabled
+      READY_ID: expo-ui-picker
+- tapOn:
+    id: expo-ui-picker
+- assertVisible:
+    id: expo-ui-picker-value
+    text: 'Selected: casablanca'
+- assertNotVisible: Rabat

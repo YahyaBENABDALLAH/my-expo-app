@@ -1,5 +1,17 @@
 # Theme tokens for native components
 
+## Native control defaults (2026-10-14)
+
+Universal controls use the owning Host's shared scheme and theme tint. Do not
+reintroduce per-state control color palettes, painted row surfaces or native
+geometry calculations. Caller colors and native modifiers remain available.
+Text retains shared text color with opt-in semantic typography; TextInput keeps
+form/status tokens and behavior. Native iOS glass is used where supported,
+including the menu Picker trigger; Android keeps Material defaults. Read
+[the current control contract](../../../../docs/control-theme.md) before adding
+an adapter. The `control*` and `switch*` roles remain exported for explicit
+application styling and compatibility, but standard controls no longer map them.
+
 ## Existing sources
 
 - `src/constants/colors.ts`: shared light/dark app palette and `buttonSeedColors` semantic seeds.

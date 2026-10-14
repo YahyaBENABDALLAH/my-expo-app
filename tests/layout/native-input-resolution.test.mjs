@@ -36,15 +36,11 @@ for (const platform of ['ios', 'android']) {
   for (const component of [
     'auth/auth-icon-button.tsx',
     'button/universal-button-content.tsx',
-    'checkbox/checkbox.tsx',
-    'collapsible/collapsible.tsx',
     'error-toast/error-toast.tsx',
     'toast/toast.tsx',
-    'field-group/field-group.tsx',
     'floating-action/floating-action-button.tsx',
     'floating-action/floating-action-layout.tsx',
     'home-recipe-card/home-recipe-card-image.tsx',
-    'list/list.tsx',
     'list-item/list-item-appearance.tsx',
     'loading/loading-indicator.tsx',
     'native/native-fill-width.ts',
@@ -56,8 +52,6 @@ for (const platform of ['ios', 'android']) {
     'refreshable-scroll-view/refreshable-scroll-view.tsx',
     'segmented-control/segmented-control.tsx',
     'skeleton/skeleton-modifiers.ts',
-    'slider/slider.tsx',
-    'switch/switch.tsx',
     'text-input/text-input-icon-button.tsx',
     'text-input/text-input-modifiers.ts',
   ]) {
@@ -76,6 +70,11 @@ for (const platform of ['ios', 'android']) {
     });
   }
   for (const component of [
+    'checkbox/checkbox.tsx',
+    'collapsible/collapsible.tsx',
+    'list/list.tsx',
+    'slider/slider.tsx',
+    'switch/switch.tsx',
     'list-item/list-item.tsx',
     'navigation/navigation-tab-icons.ts',
     'floating-action/floating-action-icons.ts',
@@ -90,6 +89,18 @@ for (const platform of ['ios', 'android']) {
       );
     });
   }
+  test(`FieldGroup resolves its native background adapter on ${platform}`, () => {
+    const result = resolve(context, './field-group/field-group', platform);
+    assert.equal(
+      result.filePath,
+      realpathSync(
+        path.join(
+          projectRoot,
+          `src/components/ui/field-group/field-group${platform === 'ios' ? '.ios' : ''}.tsx`,
+        ),
+      ),
+    );
+  });
   test(`the lazy map entry point resolves on ${platform}`, () => {
     const result = resolve(context, './map-experience', platform);
     assert.equal(result.type, 'sourceFile');

@@ -15,6 +15,12 @@ filled/prominent button, secondary uses outlined/bordered, and link uses
 text/plain. Status variants use the filled style; their callers pass the desired
 status colors explicitly. iOS also supplies the native destructive role.
 
+Use `variant="glass"` for a native glass button on iOS 26+, through Expo UI's
+[`buttonStyle('glass')`](https://docs.expo.dev/versions/v57.0.0/sdk/ui/swift-ui/button/).
+Expo UI falls back to the automatic native style on older iOS. Android uses an
+outlined Material button. The same color, geometry and disabled props apply;
+no additional dependency or decorative overlay is needed.
+
 `color` and `contentColor` are optional direct overrides. Without them, the native
 control chooses its colors and contrast. `UniversalButton` uses a plain Expo UI
 Host with optional `colorScheme`; `UniversalButtonContent` inherits its native
@@ -41,6 +47,10 @@ and disabled behavior remain platform-owned.
 Native stories: [button.stories.tsx](../../../../.rnstorybook/stories/expo-ui/button.stories.tsx).
 They cover variants, themes, direct colors, padding, radius and observable enabled/
 disabled actions. `.maestro/storybook/button.yaml` checks counting and reset.
+Glass, GlassDark, GlassDisabled, GlassFullWidth and GlassInteraction cover the new
+variant. Run the same flow with `-e BUTTON_STORY_ID=expo-ui-universal-button--glass-interaction`
+to exercise enabled/disabled glass actions. Native glass appearance and press
+bounds still require device verification; no simulator was booted for this change.
 JS adapter checks use mocked native controls and do not prove native geometry.
 
 Import public components from `@components/ui`; UI implementations import

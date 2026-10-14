@@ -2,9 +2,9 @@
 
 Export: `AuroraBackground`. Implementation: `aurora-background.tsx`.
 
-The root's default full-screen Skia background for all routed pages. An optional
+The full-screen Skia background used by the launch screen and dedicated previews. An optional
 `colorScheme` overrides its Host/device appearance; `animate` defaults to true.
-The production root enables motion on both platforms after the launch screen exits.
+Routed pages use opaque theme backgrounds to prevent text showing through transitions.
 Android advances the shader at 30 updates per second, preserving its motion speed
 while reducing full-screen redraws during navigation and scrolling. iOS follows
 the display refresh rate. Static mode remains available with `animate={false}`.

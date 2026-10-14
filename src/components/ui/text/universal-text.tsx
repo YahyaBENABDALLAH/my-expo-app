@@ -38,7 +38,7 @@ export function UniversalText({ colorScheme, ...props }: UniversalTextProps) {
 
 /** Native text for composition inside an existing Host. */
 export function UniversalTextContent({
-  variant = 'body',
+  variant,
   fontWeight,
   fontSize,
   lightColor,
@@ -49,16 +49,16 @@ export function UniversalTextContent({
 }: UniversalTextProps) {
   const activeColorScheme = useHostColorScheme(colorScheme);
   const colors = useThemeColors(activeColorScheme);
-  const preset = variants[variant];
-  const resolvedFontSize = fontSize ?? preset.fontSize;
+  const preset = variant === undefined ? undefined : variants[variant];
+  const size = fontSize ?? preset?.fontSize;
+  const weight = fontWeight ?? preset?.fontWeight;
 
   return (
     <Text
       {...textProps}
       textStyle={{
-        fontSize: resolvedFontSize,
-        fontWeight: fontWeight ?? preset.fontWeight,
-        lineHeight: Math.round(resolvedFontSize * 1.25),
+        ...(size === undefined ? {} : { fontSize: size }),
+        ...(weight === undefined ? {} : { fontWeight: weight }),
         color: (activeColorScheme === 'dark' ? darkColor : lightColor) ?? colors.text,
         ...textStyle,
       }}

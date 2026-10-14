@@ -1,5 +1,16 @@
 # Universal component feasibility audit
 
+2026-10-14: the native-default simplification is implemented. Switch, Checkbox,
+Slider and List now use small shared universal wrappers; Collapsible uses the
+root export. FieldGroup uses native sections with only an iOS explicit-background
+adapter. ListItem only adds the missing Android selector. Picker and segmented
+controls retain the necessary platform behavior with Host-derived appearance.
+iOS menu Picker triggers use native glass style on supported systems. See the
+[current control contract](control-theme.md) and
+[component catalog](../.agents/skills/expo-universal-component-library/references/components.md)
+for current paths, stories and verification. The dated audit below is historical;
+its adapter paths and exact per-control token mappings have been superseded.
+
 Reviewed 2026-10-11 against installed Expo `57.0.27`, React Native `0.86.3`, and
 `@expo/ui` `57.0.21`. The initial analysis is retained below; the implemented
 behavior-preserving follow-up is recorded at the end.

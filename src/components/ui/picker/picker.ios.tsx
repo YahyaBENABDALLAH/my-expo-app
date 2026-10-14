@@ -1,8 +1,6 @@
-import { useThemeColors } from '@/hooks/use-theme';
 import { Picker as UniversalPicker, type PickerItemValue, type PickerProps } from '@expo/ui';
 import { Picker as NativePicker, Text } from '@expo/ui/swift-ui';
-import { disabled, foregroundStyle, pickerStyle, tag, tint } from '@expo/ui/swift-ui/modifiers';
-import { useHostColorScheme } from '../host/universal-host';
+import { buttonStyle, disabled, pickerStyle, tag } from '@expo/ui/swift-ui/modifiers';
 import { pickerItems } from './picker-items';
 
 export function Picker<T extends PickerItemValue>({
@@ -13,7 +11,6 @@ export function Picker<T extends PickerItemValue>({
   children,
   testID,
 }: PickerProps<T>) {
-  const colors = useThemeColors(useHostColorScheme());
   return (
     <NativePicker
       selection={selectedValue}
@@ -24,8 +21,7 @@ export function Picker<T extends PickerItemValue>({
       modifiers={[
         pickerStyle(appearance),
         disabled(!enabled),
-        tint(colors.controlActive),
-        foregroundStyle(enabled ? colors.text : colors.controlDisabledContent),
+        ...(appearance === 'menu' ? [buttonStyle('glass')] : []),
       ]}
     >
       {pickerItems<T>(children).map((item) => (

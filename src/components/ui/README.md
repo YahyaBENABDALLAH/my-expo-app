@@ -37,6 +37,12 @@ For six-digit verification forms, see [OTP bottom sheet](otp-bottom-sheet/README
 - Stories and showcase wrappers stay in `.rnstorybook/`; production components
   must not import them.
 
+## Native appearance
+
+Universal controls inherit the shared Host scheme and theme tint. Expo owns their native colors, shape, padding, disabled treatment and interaction feedback. Small adapters supply only application behavior or missing native selectors. Explicit overrides remain available.
+
+Supported iOS controls retain the system's glass treatment. Menu picker triggers select native glass style on iOS 26+ with an automatic older-iOS fallback. Android retains Material controls. See [control themes](../../../docs/control-theme.md) for the full inventory and retained form behavior.
+
 ## Native composition
 
 Use `UniversalButtonContent`, `UniversalTextContent`, `LoadingContent` and
@@ -45,7 +51,8 @@ own a Host for React Native boundaries. Use Expo UI `Row`, `Column` and `Spacer`
 for ordinary layout; a Host supplies theme and hosting, not a content stack.
 
 Every button requires `variant`: `primary`, `secondary`, `link`, `success`,
-`warning` or `destructive`.
+`warning`, `destructive` or `glass`. Glass uses native iOS glass on iOS 26+,
+automatic style on older iOS, and an outlined button on Android.
 
 ```tsx
 import { PageScreen, UniversalButtonContent } from '@components/ui';

@@ -16,9 +16,9 @@ export function UniversalButtonContent({
   contentColor,
 }: UniversalButtonContentProps) {
   let NativeButton = Button;
-  if (variant === 'secondary') NativeButton = OutlinedButton;
+  if (variant === 'secondary' || variant === 'glass') NativeButton = OutlinedButton;
   if (variant === 'link') NativeButton = TextButton;
-  const filled = variant !== 'secondary' && variant !== 'link';
+  const filled = variant !== 'secondary' && variant !== 'link' && variant !== 'glass';
   return (
     <NativeButton
       onClick={disabled ? undefined : onPress}

@@ -1,14 +1,9 @@
 # Collapsible
 
-Export: `Collapsible`.
+This is the direct universal Expo UI export. The caller owns isOpen and onOpenChange; Expo owns disclosure layout, native animation, slot content and Host colors. There is no dedicated glass style for this control.
 
-The iOS/Android implementations keep disclosure behavior and native theme
-mapping together. `collapsible.d.ts` declares the common contract.
+Import from `@components/ui` and compose inside `UniversalHost`. The Host uses the shared light/dark scheme and theme tint; Host seedColor overrides remain available; use native modifiers only where exposed by the component API. No custom glass layer or Android glass imitation is added.
 
-Compose inside a Host and supply the header/content through the existing native
-API. Expansion state and disabled behavior remain native.
+Native story: [expo-ui/collapsible.stories.tsx](../../../../.rnstorybook/stories/expo-ui/collapsible.stories.tsx). Light/dark and interaction fixtures remain available. JS checks cover public behavior and native module resolution; device appearance, glass and touch behavior still need iOS/Android verification.
 
-Existing composition story: [collapsible.stories.tsx](../../../../.rnstorybook/stories/expo-ui/collapsible.stories.tsx).
-
-Import public components from `@components/ui`; UI implementations import
-concrete files directly. [Back to the UI guide](../README.md).
+See [native control themes](../../../../docs/control-theme.md) and [UI guide](../README.md).

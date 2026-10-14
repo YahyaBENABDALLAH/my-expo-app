@@ -1,19 +1,9 @@
 # Switch
 
-Exports: `Switch` and `SwitchProps`.
+`switch.tsx` uses the universal Expo UI control and guards disabled callbacks. The caller supplies value, label, callback, testID and optional modifiers. Colors and geometry inherit the Host; supported iOS toggles retain native glass feedback.
 
-The iOS/Android implementations and their shared contract stay together.
-Compose inside a Host; value, callback, label, disabled, testID and modifiers
-retain Expo UI's API.
+Import from `@components/ui` and compose inside `UniversalHost`. The Host uses the shared light/dark scheme and theme tint; Host seedColor overrides remain available; use native modifiers only where exposed by the component API. No custom glass layer or Android glass imitation is added.
 
-Android maps shared on/off track/thumb/border and disabled tokens.
-iOS applies the on-track tint; SwiftUI owns thumb, off-track and disabled
-appearance. Both adapters inherit the Host scheme and suppress disabled changes.
-Caller modifiers remain available as overrides.
+Native story: [expo-ui/switch.stories.tsx](../../../../.rnstorybook/stories/expo-ui/switch.stories.tsx). Light/dark and interaction fixtures remain available. JS checks cover public behavior and native module resolution; device appearance, glass and touch behavior still need iOS/Android verification.
 
-See [control theme coverage](../../../../docs/control-theme.md).
-
-Existing composition story: [switch.stories.tsx](../../../../.rnstorybook/stories/expo-ui/switch.stories.tsx).
-
-Import public components from `@components/ui`; UI implementations import
-concrete files directly. [Back to the UI guide](../README.md).
+See [native control themes](../../../../docs/control-theme.md) and [UI guide](../README.md).

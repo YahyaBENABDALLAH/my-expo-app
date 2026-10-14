@@ -4,6 +4,7 @@ import { Tabs } from 'expo-router';
 import { Platform } from 'react-native';
 
 import { TabActionsProvider } from '@/features/pages/tab-actions';
+import { useThemeColors } from '@/hooks/use-theme';
 
 export const unstable_settings = { initialRouteName: 'index' };
 
@@ -12,6 +13,7 @@ function renderTabBar(props: Parameters<typeof ReferenceTabBar>[0]) {
 }
 
 export default function TabLayout() {
+  const colors = useThemeColors();
   const { t } = useTranslation();
   return (
     <TabActionsProvider>
@@ -21,7 +23,7 @@ export default function TabLayout() {
           headerShown: false,
           animation: 'none',
           freezeOnBlur: Platform.OS === 'android',
-          sceneStyle: { backgroundColor: 'transparent' },
+          sceneStyle: { backgroundColor: colors.background },
         }}
       >
         <Tabs.Screen name="index" options={{ title: t('common.home') }} />

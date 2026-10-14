@@ -3,10 +3,12 @@ import { Platform } from 'react-native';
 import { useReducedMotion } from 'react-native-reanimated';
 import { stackMotionOptions } from '@/constants/navigation-motion';
 import { AuthFlowProvider } from '@/features/auth/auth-flow.context';
+import { useThemeColors } from '@/hooks/use-theme';
 
 export const unstable_settings = { initialRouteName: 'login' };
 
 export default function AuthLayout() {
+  const colors = useThemeColors();
   const reducedMotion = useReducedMotion();
   return (
     <AuthFlowProvider>
@@ -15,7 +17,7 @@ export default function AuthLayout() {
           ...stackMotionOptions(reducedMotion),
           headerShown: false,
           freezeOnBlur: Platform.OS === 'android',
-          contentStyle: { backgroundColor: 'transparent' },
+          contentStyle: { backgroundColor: colors.background },
         }}
       >
         <Stack.Screen name="login" />

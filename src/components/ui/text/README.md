@@ -5,7 +5,7 @@ Exports: `UniversalText`, `UniversalTextContent`, their public types and
 
 Implementation: `universal-text.tsx`. Use the standalone component at an RN
 boundary and content inside an existing Host. Supported semantic variants are
-`heading`, `title`, `body` and `caption`.
+`heading`, `title`, `body` and `caption`. Omit variant/font props to keep native typography; no line height is calculated. Text color still uses the shared theme, with explicit textStyle/lightColor/darkColor overrides.
 
 Content inherits its Host's scheme unless explicitly overridden. Keep labels
 translated by callers and shared typography/theme roles in the existing tokens.

@@ -9,7 +9,7 @@ env:
 - runFlow:
     file: ../helpers/open-story.yaml
     env:
-      STORY_ID: expo-ui-universal-button--interaction
+      STORY_ID: '${typeof BUTTON_STORY_ID === "undefined" ? "expo-ui-universal-button--interaction" : BUTTON_STORY_ID}'
       READY_ID: button-count
 - tapOn:
     id: button-count

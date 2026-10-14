@@ -1,6 +1,5 @@
 import {
   AuthText,
-  AuroraBackground,
   Column,
   ToastHost,
   UniversalHost as Host,
@@ -109,11 +108,6 @@ function RootLayoutContent() {
       style={{ flex: 1, backgroundColor: colors.background }}
     >
       <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
-      <AuroraBackground
-        animate={animatePageArtwork && onboardingCompleted}
-        colorScheme={colorScheme}
-        style={{ position: 'absolute', top: 0, right: 0, bottom: 0, left: 0 }}
-      />
       {ready || !showBrandScreen ? <RootLayoutNav /> : null}
       {onboardingCompleted && <PageMotionOverlay animate={animatePageArtwork} />}
       {showBrandScreen && (
@@ -186,7 +180,7 @@ function RootLayoutNav() {
         screenOptions={{
           ...stackMotionOptions(reducedMotion),
           freezeOnBlur: Platform.OS === 'android',
-          contentStyle: { backgroundColor: 'transparent', direction },
+          contentStyle: { backgroundColor: colors.background, direction },
           headerShown: false,
           headerShadowVisible: false,
         }}

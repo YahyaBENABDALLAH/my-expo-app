@@ -17,7 +17,7 @@ const meta = {
   argTypes: {
     testID: { control: 'text' },
     children: { control: 'text' },
-    variant: { control: 'select', options: ['heading', 'title', 'body', 'caption'] },
+    variant: { control: 'select', options: [undefined, 'heading', 'title', 'body', 'caption'] },
     fontWeight: {
       control: 'select',
       options: ['normal', 'bold', '100', '200', '300', '400', '500', '600', '700', '800', '900'],
@@ -71,4 +71,8 @@ export const DarkTheme: Story = {
 
 export const CustomWeightAndSize: Story = {
   args: { children: 'A lighter title', variant: 'title', fontWeight: '300', fontSize: 30 },
+};
+
+export const NativeDefault: Story = {
+  args: { variant: undefined, children: 'Native typography with the shared theme' },
 };

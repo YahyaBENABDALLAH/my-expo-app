@@ -2,6 +2,7 @@ import {
   Column,
   UniversalButton,
   UniversalButtonContent,
+  type UniversalButtonVariant,
   UniversalTextContent,
   UniversalHost,
 } from '@components/ui';
@@ -29,7 +30,7 @@ const meta = {
     label: { control: 'text' },
     variant: {
       control: 'select',
-      options: ['primary', 'secondary', 'link', 'success', 'warning', 'destructive'],
+      options: ['primary', 'secondary', 'link', 'success', 'warning', 'destructive', 'glass'],
     },
     fullWidth: { control: 'boolean' },
     borderRadius: { control: { type: 'number', min: 0 } },
@@ -67,6 +68,22 @@ export const Secondary: Story = {
 
 export const Link: Story = {
   args: { label: 'Skip for now', variant: 'link' },
+};
+
+export const Glass: Story = {
+  args: { label: 'Glass button', variant: 'glass', colorScheme: 'light' },
+};
+
+export const GlassDark: Story = {
+  args: { label: 'Glass button', variant: 'glass', colorScheme: 'dark' },
+};
+
+export const GlassDisabled: Story = {
+  args: { label: 'Unavailable', variant: 'glass', disabled: true, colorScheme: 'light' },
+};
+
+export const GlassFullWidth: Story = {
+  args: { label: 'Glass button', variant: 'glass', fullWidth: true, colorScheme: 'light' },
 };
 
 export const LightTheme: Story = {
@@ -132,23 +149,23 @@ export const CustomColorsDark: Story = {
 };
 export const CustomPadding: Story = { args: { contentPadding: 16, borderRadius: 12 } };
 
-function InteractionDemo() {
+function InteractionDemo({ variant = 'primary' }: { variant?: UniversalButtonVariant }) {
   const [presses, setPresses] = useState(0);
   return (
     <UniversalHost colorScheme="dark">
       <Column spacing={16}>
         <UniversalButtonContent
-          variant="primary"
+          variant={variant}
           label="Count press"
           testID="button-count"
           borderRadius={12}
           contentPadding={12}
-          color={Colors.dark.success}
-          contentColor={Colors.dark.onSuccess}
+          color={variant === 'glass' ? undefined : Colors.dark.success}
+          contentColor={variant === 'glass' ? undefined : Colors.dark.onSuccess}
           onPress={() => setPresses((value) => value + 1)}
         />
         <UniversalButtonContent
-          variant="secondary"
+          variant={variant === 'glass' ? 'glass' : 'secondary'}
           label="Disabled press"
           testID="button-disabled"
           borderRadius={0}
@@ -168,3 +185,5 @@ function InteractionDemo() {
 }
 
 export const Interaction: Story = { render: () => <InteractionDemo /> };
+
+export const GlassInteraction: Story = { render: () => <InteractionDemo variant="glass" /> };

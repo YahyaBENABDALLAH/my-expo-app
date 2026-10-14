@@ -42,7 +42,7 @@ function ThemePreview({ colorScheme, themeId }: { colorScheme: AppColorScheme; t
         <Column spacing={16} modifiers={nativeFillWidth}>
           <UniversalTextContent variant="heading">{`${themes[themeId].label} theme`}</UniversalTextContent>
           <UniversalTextContent>
-            Shared colors for every screen and native control.
+            Shared theme tint and appearance for native controls.
           </UniversalTextContent>
           {(['primary', 'secondary', 'link', 'success', 'warning', 'destructive'] as const).map(
             (variant) => (
@@ -86,11 +86,9 @@ function ThemePreview({ colorScheme, themeId }: { colorScheme: AppColorScheme; t
             <Picker.Item label="Favorites" value="favorites" />
           </Picker>
           <Collapsible label="Theme details" isOpen={expanded} onOpenChange={setExpanded}>
-            <UniversalTextContent>
-              Expanded content uses the shared surface and text colors.
-            </UniversalTextContent>
+            <UniversalTextContent>Native disclosure with themed text.</UniversalTextContent>
           </Collapsible>
-          <ListItem supportingText="Shared row and separator colors">Themed list row</ListItem>
+          <ListItem supportingText="Native row appearance">Themed list row</ListItem>
           <UniversalTextInputContent
             label="Search"
             placeholder="Search recipes"

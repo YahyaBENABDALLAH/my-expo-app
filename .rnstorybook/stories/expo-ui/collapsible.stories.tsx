@@ -86,3 +86,5 @@ export const CustomLabel: Story = {
 };
 export const LightTheme: Story = { args: { colorScheme: 'light' } };
 export const DarkTheme: Story = { args: { colorScheme: 'dark' } };
+
+export const NativeTheme: Story = { args: { seedColor: Colors.light.tint } };

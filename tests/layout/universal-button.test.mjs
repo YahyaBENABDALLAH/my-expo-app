@@ -194,13 +194,21 @@ for (const platform of ['ios', 'android']) {
 
   test(`${platform}: variants select native styles without a token lookup`, () => {
     const s = setup(platform);
-    for (const variant of ['primary', 'secondary', 'link', 'success', 'warning', 'destructive']) {
+    for (const variant of [
+      'glass',
+      'primary',
+      'secondary',
+      'link',
+      'success',
+      'warning',
+      'destructive',
+    ]) {
       s.render({ variant });
     }
     if (platform === 'android') {
       assert.deepEqual(
         s.buttons.map(({ kind }) => kind),
-        ['Button', 'OutlinedButton', 'TextButton', 'Button', 'Button', 'Button'],
+        ['OutlinedButton', 'Button', 'OutlinedButton', 'TextButton', 'Button', 'Button', 'Button'],
       );
       assert.ok(s.buttons.every(({ colors }) => colors === undefined));
     } else {
@@ -209,6 +217,7 @@ for (const platform of ['ios', 'android']) {
           (button) => button.modifiers.find(({ kind }) => kind === 'buttonStyle').args[0],
         ),
         [
+          'glass',
           'borderedProminent',
           'bordered',
           'plain',

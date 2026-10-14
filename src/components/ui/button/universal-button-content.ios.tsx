@@ -24,9 +24,10 @@ export function UniversalButtonContent({
   color,
   contentColor,
 }: UniversalButtonContentProps) {
-  let style: 'plain' | 'bordered' | 'borderedProminent' = 'borderedProminent';
+  let style: Parameters<typeof buttonStyle>[0] = 'borderedProminent';
   if (variant === 'secondary') style = 'bordered';
   if (variant === 'link') style = 'plain';
+  if (variant === 'glass') style = 'glass';
   const labelColor = contentColor ?? (style === 'borderedProminent' ? undefined : color);
   return (
     <Button

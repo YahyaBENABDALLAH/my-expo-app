@@ -1,5 +1,36 @@
 # Universal component catalog
 
+## Native defaults follow-up (2026-10-14)
+
+Universal controls now inherit `UniversalHost` appearance and theme tint. Switch,
+Checkbox and Slider have small shared `.tsx` wrappers that guard disabled
+callbacks; Expo owns their native color states, geometry and step behavior.
+Collapsible and Android FieldGroup use direct Expo exports. FieldGroup's small
+iOS adapter honors an explicit background, including transparent Settings forms;
+native sections own slots, grouping and separators. List uses a shared wrapper
+only to coordinate pending refreshes. ListItem retains its compound props and
+only adds the Android selector missing upstream. Picker and SegmentedControl
+retain the necessary platform selection APIs, disabled guards and selectors,
+with native Host colors instead of per-state token painting.
+
+iOS menu picker triggers select native `buttonStyle('glass')` on iOS 26+ and
+automatic style on older systems. SwiftUI sliders, toggles, segmented pickers,
+menus and sheets retain supported system glass appearance/interaction. Android
+keeps Material controls. There is no custom glass layer on ordinary text,
+forms, lists or layout. Text keeps shared text colors and explicit variants;
+omitting font/variant props preserves native typography without a calculated
+line height. TextInput retains the app's labels, status colors, focus guards,
+observable value, password actions and RTL/resize behavior.
+
+The existing native light/dark and interaction stories remain discoverable.
+Checkbox, Switch, Slider, Picker, Collapsible, List and FieldGroup add
+`NativeTheme` seed fixtures; Text adds `NativeDefault`; Theme Tokens documents
+the native appearance. Portable tests check live theme state retention,
+disabled suppression, slots, selectors, refresh coordination and native Metro
+resolution. Native iOS/Android rendering, glass and touch behavior are pending.
+See [control theme contract](../../../../docs/control-theme.md) for the current
+inventory; older dated notes below describe historical implementation.
+
 2026-10-11 header/navigation spacing follow-up: `PageHeader` keeps its existing
 props, title layout and title/text tokens. iOS vertical padding is 4 points;
 Android remains 8. `PageFrame` applies the status-bar inset once and the header
@@ -120,27 +151,27 @@ platform adapters, types and private helpers together. The root public barrel
 retains existing imports; implementations import concrete files directly.
 See the [folder guide](../../../../src/components/ui/README.md).
 
-| Component / official SDK 57 API                                                     | Local wrapper                                                                           | Existing story                                      | Scenarios to document and verify                                                                                    |
-| ----------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- | --------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
-| [Host](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/host/)               | `host/universal-host.tsx`                                                               | Used by stories; dedicated coverage pending         | Light/dark, seed color, intrinsic versus constrained sizing, direction, nested content visibility                   |
-| [Column](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/column/)           | Direct Expo UI export; Storybook showcase                                               | `column.stories.tsx`                                | Spacing/alignment, long text, nested rows, narrow screens                                                           |
-| [Row](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/row/)                 | Direct Expo UI export                                                                   | Dedicated coverage pending                          | Alignment/spacing, RTL, fitting text and controls without clipping                                                  |
-| [Text](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/text/)               | `text/universal-text.tsx`                                                               | `text.stories.tsx`                                  | Theme roles, long content, font scaling, supported typography                                                       |
-| [Button](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/button/)           | `button/universal-button.tsx`, `button/universal-button-content.<platform>.tsx`         | `button.stories.tsx`                                | Required intent variants, disabled suppresses actions, one press produces one action, full visible surface responds |
-| [ScrollView](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/scrollview/)   | Direct Expo UI export; `refreshable-scroll-view/refreshable-scroll-view.<platform>.tsx` | `scroll-view.stories.tsx`; Pages/Navigation shell   | Scrolling, keyboard, short/tall content; refresh completion, repeated gestures, errors and recovery                 |
-| [Switch](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/switch/)           | `switch/switch.<platform>.tsx`                                                          | `switch.stories.tsx`                                | On/off, disabled, callback updates visible state, reset                                                             |
-| [Slider](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/slider/)           | `slider/slider.<platform>.tsx`                                                          | `slider.stories.tsx`; TokenColors                   | Minimum/maximum, step, disabled, value updates, drag interaction; seed color does not override control tokens       |
-| [Checkbox](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/checkbox/)       | `checkbox/checkbox.<platform>.tsx`                                                      | `checkbox.stories.tsx`                              | Checked/unchecked, disabled, state change and reset                                                                 |
-| [BottomSheet](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/bottomsheet/) | `bottom-sheet/bottom-sheet.tsx`                                                         | `bottom-sheet.stories.tsx`                          | Native defaults, hidden iOS handle, light/dark appearance, open/close, dismissal, reopen, tall content              |
-| [Collapsible](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/collapsible/) | `collapsible/collapsible.<platform>.tsx`                                                | `collapsible.stories.tsx`                           | Expand/collapse reveals and hides content, long header/content                                                      |
-| [FieldGroup](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/fieldgroup/)   | `field-group/field-group.<platform>.tsx`                                                | `field-group.stories.tsx`                           | Labels/supporting text, grouped fields, empty/error composition, keyboard                                           |
-| [Icon](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/icon/)               | Direct Expo UI export; Storybook showcase                                               | `icon.stories.tsx`                                  | Valid symbols on both platforms, size/tint, meaning conveyed by adjacent text                                       |
-| [List](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/list/)               | `list/list.<platform>.tsx`                                                              | `list.stories.tsx`                                  | Empty/short groups, row selection, refresh if exposed, scroll behavior                                              |
-| [ListItem](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/list/)           | `list-item/list-item.tsx`; direct `UniversalListItem` alias                             | Within `list.stories.tsx`; focused coverage pending | Leading/supporting/trailing slots, press/disabled, long text, accessory alignment                                   |
-| [Picker](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/picker/)           | `picker/picker.<platform>.tsx`                                                          | `picker.stories.tsx`                                | Menu/wheel differences, selected value, disabled, value callback, long option labels                                |
-| [RNHostView](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/rnhostview/)   | Direct Expo UI export                                                                   | Dedicated coverage pending                          | Necessary RN infrastructure inside native trees, intrinsic sizing and interaction; no substitute RN controls        |
-| [Spacer](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/spacer/)           | Direct Expo UI export                                                                   | `spacer.stories.tsx`                                | Horizontal/vertical expansion in constrained layouts                                                                |
-| [TextInput](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/textinput/)     | `text-input/universal-text-input.tsx`                                                   | `text-input.stories.tsx`                            | Empty/type/clear/reset, controlled updates, password, editable/read-only, focus/blur, keyboard, multiline           |
+| Component / official SDK 57 API                                                     | Local wrapper                                                                           | Existing story                                      | Scenarios to document and verify                                                                                     |
+| ----------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- | --------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| [Host](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/host/)               | `host/universal-host.tsx`                                                               | Used by stories; dedicated coverage pending         | Light/dark, seed color, intrinsic versus constrained sizing, direction, nested content visibility                    |
+| [Column](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/column/)           | Direct Expo UI export; Storybook showcase                                               | `column.stories.tsx`                                | Spacing/alignment, long text, nested rows, narrow screens                                                            |
+| [Row](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/row/)                 | Direct Expo UI export                                                                   | Dedicated coverage pending                          | Alignment/spacing, RTL, fitting text and controls without clipping                                                   |
+| [Text](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/text/)               | `text/universal-text.tsx`                                                               | `text.stories.tsx`                                  | Theme roles, long content, font scaling, supported typography                                                        |
+| [Button](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/button/)           | `button/universal-button.tsx`, `button/universal-button-content.<platform>.tsx`         | `button.stories.tsx`                                | Required intent variants, disabled suppresses actions, one press produces one action, full visible surface responds  |
+| [ScrollView](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/scrollview/)   | Direct Expo UI export; `refreshable-scroll-view/refreshable-scroll-view.<platform>.tsx` | `scroll-view.stories.tsx`; Pages/Navigation shell   | Scrolling, keyboard, short/tall content; refresh completion, repeated gestures, errors and recovery                  |
+| [Switch](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/switch/)           | `switch/switch.tsx`                                                                     | `switch.stories.tsx`                                | On/off, disabled, callback updates visible state, reset                                                              |
+| [Slider](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/slider/)           | `slider/slider.tsx`                                                                     | `slider.stories.tsx`; NativeTheme                   | Minimum/maximum, step, disabled, value updates, drag interaction; native Host seed and glass feedback when supported |
+| [Checkbox](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/checkbox/)       | `checkbox/checkbox.tsx`                                                                 | `checkbox.stories.tsx`                              | Checked/unchecked, disabled, state change and reset                                                                  |
+| [BottomSheet](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/bottomsheet/) | `bottom-sheet/bottom-sheet.tsx`                                                         | `bottom-sheet.stories.tsx`                          | Native defaults, hidden iOS handle, light/dark appearance, open/close, dismissal, reopen, tall content               |
+| [Collapsible](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/collapsible/) | `collapsible/collapsible.tsx`                                                           | `collapsible.stories.tsx`                           | Expand/collapse reveals and hides content, long header/content                                                       |
+| [FieldGroup](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/fieldgroup/)   | `field-group/field-group.tsx` + iOS background adapter                                  | `field-group.stories.tsx`                           | Labels/supporting text, grouped fields, empty/error composition, keyboard                                            |
+| [Icon](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/icon/)               | Direct Expo UI export; Storybook showcase                                               | `icon.stories.tsx`                                  | Valid symbols on both platforms, size/tint, meaning conveyed by adjacent text                                        |
+| [List](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/list/)               | `list/list.tsx`                                                                         | `list.stories.tsx`                                  | Empty/short groups, row selection, refresh if exposed, scroll behavior                                               |
+| [ListItem](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/list/)           | `list-item/list-item.tsx`; direct `UniversalListItem` alias                             | Within `list.stories.tsx`; focused coverage pending | Leading/supporting/trailing slots, press/disabled, long text, accessory alignment                                    |
+| [Picker](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/picker/)           | `picker/picker.<platform>.tsx`                                                          | `picker.stories.tsx`                                | Menu/wheel differences, selected value, disabled, value callback, long option labels                                 |
+| [RNHostView](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/rnhostview/)   | Direct Expo UI export                                                                   | Dedicated coverage pending                          | Necessary RN infrastructure inside native trees, intrinsic sizing and interaction; no substitute RN controls         |
+| [Spacer](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/spacer/)           | Direct Expo UI export                                                                   | `spacer.stories.tsx`                                | Horizontal/vertical expansion in constrained layouts                                                                 |
+| [TextInput](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/textinput/)     | `text-input/universal-text-input.tsx`                                                   | `text-input.stories.tsx`                            | Empty/type/clear/reset, controlled updates, password, editable/read-only, focus/blur, keyboard, multiline            |
 
 ## Compound exports and helpers
 
@@ -538,6 +569,20 @@ On iOS 26+, the surface uses the installed Expo UI `glassEffect` modifier with r
 Composition stories `GlassAndTap` and `DarkGlassAndTap` cover the new surface and pulse; existing Static, Disabled, ContextSwitching, and safe-area fixtures remain applicable. The Maestro navigation flow checks repeated enabled activations. Offscreen production Skia drawings verify 112 resting/burst frames across both themes and all action palettes, including clipping, filled center/base, seamless periods, and visible burst changes. An interaction harness exercises production callbacks with installed Reanimated numeric animation algorithms, checking touch-down before action, continuation without restarting on release, growth/dip/settling, context updates, cancellation, single action delivery, and motion guards. Latest lint and typecheck pass. Native event delivery is mocked; native touch handling, material rendering, timing, haptics, cancellation on background/reduced-motion changes, and device performance remain unverified without a connected device. See [navbar verification](../../../../docs/navbar-wave-verification.md).
 
 ## Expo UI production conventions (2026-10-04)
+
+2026-10-14 button glass variant: `UniversalButton` and `UniversalButtonContent`
+accept `variant="glass"` with the existing optional colors, padding, radius, full
+width, custom children and disabled state. iOS uses Expo UI's native
+`buttonStyle('glass')` on iOS 26+; the installed native modifier falls back to
+automatic style on older iOS. Android maps glass to `OutlinedButton`, including
+outlined foreground-color overrides. Colors remain native defaults or direct
+caller overrides; no theme roles or dependencies are added.
+`button.stories.tsx` provides Glass, GlassDark, GlassDisabled, GlassFullWidth and
+GlassInteraction. The existing `.maestro/storybook/button.yaml` flow accepts
+`BUTTON_STORY_ID=expo-ui-universal-button--glass-interaction` for single/repeated
+actions, disabled suppression and reset. JS adapter checks cover the platform
+style contract; native appearance, feedback, accessibility and press bounds still
+require device verification.
 
 Button simplification (2026-10-14): `button-colors.ts` and all button theme hooks are removed. Native adapters use native colors by default and pass optional `color` and `contentColor` directly to native controls. Status actions supply their existing semantic colors explicitly at the call site. The Host button-palette context, palette hook, auth palette copies and fallback chains are removed. The standalone button uses a plain Expo UI Host with an optional light/dark override; content buttons inherit native Host appearance. The public controls retain required variant, optional native padding/radius and full-width native modifiers. No measurement, generated colors or dimension calculations are added. CustomColorsLight, CustomColorsDark, CustomPadding and Interaction cover the simpler contract; JS checks cover native defaults, direct overrides and enabled/disabled actions. iOS production language-button selection and sheet dismissal were inspected manually. The Storybook interaction fixture is blocked by duplicate RNCSafeAreaProvider registration; custom geometry and Android appearance remain unverified.
 

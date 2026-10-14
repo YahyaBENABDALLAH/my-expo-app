@@ -3,7 +3,7 @@
 Open **More → App Settings** (`/settings`) to choose WhatsApp, Facebook,
 Instagram or TikTok and switch between light and dark mode. Appearance also has a
 language row that opens a native bottom sheet with French, English and Arabic.
-The settings viewport and FieldGroup reveal the shared app Aurora background;
+The settings viewport and FieldGroup reveal the owning scene's opaque theme background;
 settings language and profile preference sheets use the app `background` token.
 Account, social notifications, account notifications and about sections follow
 the grouped reference layout; their unfinished options are visible placeholders.

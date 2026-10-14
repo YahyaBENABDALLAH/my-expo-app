@@ -1,15 +1,9 @@
 # Picker
 
-Export: `Picker`, including `Picker.Item`.
+The caller owns selectedValue and onValueChange and supplies Picker.Item children. Small platform adapters retain disabled selection guards, typed string/number values, fragment handling and Android anchor/option selectors. Android updates the selected label through native observable state and closes an open dropdown when disabled. Colors come from the Host. iOS menu triggers use native glass button style on iOS 26+ and automatic style on older versions; wheels retain their native style. Android always uses Material dropdowns.
 
-The iOS/Android files keep native selection and Host theme mapping together.
-`picker-items.ts` privately extracts compound items.
-`picker.d.ts` declares the generic shared contract.
+Import from `@components/ui` and compose inside `UniversalHost`. The Host uses the shared light/dark scheme and theme tint; Host seedColor overrides remain available; use native modifiers only where exposed by the component API. No custom glass layer or Android glass imitation is added.
 
-Compose inside a Host. The caller owns the selected value and updates it through
-the callback. Preserve native menu/wheel behavior and disabled selection.
+Native story: [expo-ui/picker.stories.tsx](../../../../.rnstorybook/stories/expo-ui/picker.stories.tsx). Light/dark and interaction fixtures remain available. JS checks cover public behavior and native module resolution; device appearance, glass and touch behavior still need iOS/Android verification.
 
-Existing composition story: [picker.stories.tsx](../../../../.rnstorybook/stories/expo-ui/picker.stories.tsx).
-
-Import public components from `@components/ui`; UI implementations import
-concrete files directly. [Back to the UI guide](../README.md).
+See [native control themes](../../../../docs/control-theme.md) and [UI guide](../README.md).

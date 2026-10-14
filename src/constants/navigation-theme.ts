@@ -8,8 +8,7 @@ export function navigationTheme(scheme: AppColorScheme, colors: ColorTokens = Co
     colors: {
       ...base.colors,
       primary: colors.tint,
-      // Root Skia artwork supplies the background for all navigation scenes.
-      background: 'transparent',
+      background: colors.background,
       card: colors.surfaceRaised,
       text: colors.text,
       border: colors.divider,

@@ -430,7 +430,6 @@ for (const [platform, authenticated, introductionRequired] of [
     s.mocks['@components/ui'] = {
       UniversalHost: s.UniversalHost,
       LaunchScreen: s.native('LaunchScreen'),
-      AuroraBackground: s.native('AuroraBackground'),
       PageMotionOverlay: s.native('PageMotionOverlay'),
       ToastHost: s.native('ToastHost'),
       PageFrame: s.native('RestorationPanel'),
@@ -496,10 +495,8 @@ for (const [platform, authenticated, introductionRequired] of [
     }
     const queryProvider = view.findAll('AppQueryProvider')[0];
     const authProvider = view.findAll('AuthProvider')[0];
-    const background = view.findAll('AuroraBackground')[0];
     let headerWave = view.findAll('PageMotionOverlay')[0];
     const launch = view.findAll('LaunchScreen')[0];
-    assert.equal(background.props.animate, false);
     assert.equal(headerWave?.props.animate, introductionRequired ? undefined : false);
     assert.equal(launch.props.exiting, false);
     // Time alone cannot release startup while required resources are unavailable.
@@ -531,8 +528,6 @@ for (const [platform, authenticated, introductionRequired] of [
     );
     view.flush(() => launch.props.onExitComplete());
     assert.equal(view.findAll('LaunchScreen').length, 0);
-    assert.equal(view.findAll('AuroraBackground')[0], background);
-    assert.equal(background.props.animate, !introductionRequired);
     assert.equal(view.findAll('PageMotionOverlay').length, introductionRequired ? 0 : 1);
     assert.equal(view.findAll('PageMotionOverlay')[0], headerWave);
     assert.equal(headerWave?.props.animate, introductionRequired ? undefined : true);
@@ -540,7 +535,15 @@ for (const [platform, authenticated, introductionRequired] of [
       view.findAll('View').some((node) => node.props.testID === 'app-ready'),
       true,
     );
-    assert.equal(stack.props.screenOptions.contentStyle.backgroundColor, 'transparent');
+    assert.equal(stack.props.screenOptions.contentStyle.backgroundColor, s.colors.light.background);
+    assert.equal(
+      view.findAll('ThemeProvider')[0].props.value.colors.background,
+      s.colors.light.background,
+    );
+    assert.equal(
+      stack.props.screenOptions.animation,
+      platform === 'android' ? 'slide_from_right' : 'simple_push',
+    );
     assert.equal(view.findAll('AuthProvider')[0], authProvider);
     assert.equal(view.findAll('AppQueryProvider')[0], queryProvider);
     assert.equal(view.findAll('Switch').length, 0);
@@ -562,7 +565,6 @@ for (const [platform, authenticated, introductionRequired] of [
       assert.equal(view.findAll('AuthProvider')[0], authProvider);
       headerWave = view.findAll('PageMotionOverlay')[0];
       assert.equal(headerWave.props.animate, true);
-      assert.equal(background.props.animate, true);
     }
     for (const direction of ['rtl', 'ltr']) {
       view.flush(() => directionSettings.setDirection(direction));
