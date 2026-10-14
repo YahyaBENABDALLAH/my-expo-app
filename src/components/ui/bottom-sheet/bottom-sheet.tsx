@@ -9,7 +9,7 @@ import {
 import { onSizeChanged } from '@expo/ui/jetpack-compose/modifiers';
 import { frame, onGeometryChange } from '@expo/ui/swift-ui/modifiers';
 import { createContext, useContext } from 'react';
-import { Platform, useWindowDimensions } from 'react-native';
+import { Platform } from 'react-native';
 import { UniversalHost, useHostColorScheme } from '../host/universal-host';
 import { nativeFillWidth } from '../native/native-fill-width';
 
@@ -39,15 +39,8 @@ export function BottomSheet({
 }: BottomSheetProps) {
   const scheme = useHostColorScheme();
   const colors = useThemeColors(scheme);
-  const { width: windowWidth } = useWindowDimensions();
   const [width, setWidth] = useMeasuredWidth();
 
-  const firstWidth =
-    initialContentWidth !== undefined &&
-    Number.isFinite(initialContentWidth) &&
-    initialContentWidth > 0
-      ? initialContentWidth
-      : Math.max(1, windowWidth);
   const measureWidth = ({ width: nextWidth }: { width: number }) => {
     if (Number.isFinite(nextWidth) && nextWidth > 0) setWidth(nextWidth);
   };
@@ -70,9 +63,9 @@ export function BottomSheet({
     >
       <Column alignment="start" modifiers={sizing}>
         <RNHostView matchContents>
-          <UniversalHost ignoreSafeArea="all" style={{ width: width || firstWidth }}>
-            <BottomSheetContentWidthContext.Provider value={width || firstWidth}>
-              <Column alignment="start" spacing={16} modifiers={nativeFillWidth}>
+          <UniversalHost ignoreSafeArea="all" style={{ width: width }}>
+            <BottomSheetContentWidthContext.Provider value={width}>
+              <Column alignment="start" modifiers={nativeFillWidth}>
                 {children}
               </Column>
             </BottomSheetContentWidthContext.Provider>
