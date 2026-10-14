@@ -1,21 +1,21 @@
-import { useState, type ReactNode } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useWindowDimensions } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { router } from 'expo-router';
+import { useThemeColors } from '@/hooks/use-theme';
 import {
   BottomSheet,
   Column,
   HomeCatalogCard,
   Row,
   ScrollView,
-  UniversalButtonContent,
   UniversalTextContent as Text,
+  UniversalButtonContent,
   nativeFillWidth,
   useHostColorScheme,
   type HomeCatalogItem,
 } from '@components/ui';
-import { useThemeColors } from '@/hooks/use-theme';
+import { router } from 'expo-router';
+import { useState, type ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useWindowDimensions } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { homeCatalogItems } from './home-catalog.data';
 
 const gutter = 16;
@@ -110,6 +110,7 @@ export function HomeCatalogSections({
             variant="primary"
             testID="home-search"
             fullWidth
+            borderRadius={1}
             onPress={() => router.navigate('/search')}
           />
         </Column>

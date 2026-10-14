@@ -30,17 +30,15 @@ export function UniversalButtonContent({
     scheme,
     useHostButtonPalette(palette, scheme),
   );
-  const filledStyle = variant === 'secondary' ? 'bordered' : 'borderedProminent';
-  const nativeStyle = variant === 'link' ? 'plain' : filledStyle;
   return (
     <Button
       testID={testID}
       onPress={disabled ? undefined : onPress}
       modifiers={[
-        buttonStyle(nativeStyle),
+        buttonStyle('glass'),
         tint(accent),
         nativeDisabled(Boolean(disabled)),
-        clipShape('roundedRectangle', borderRadius),
+        clipShape('rectangle', borderRadius),
       ]}
     >
       <VStack
