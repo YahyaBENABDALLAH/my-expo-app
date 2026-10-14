@@ -22,6 +22,17 @@ env:
     text: العربية
 - assertVisible:
     id: auth-login-language-close
+- swipe:
+    from:
+      id: auth-login-language-fr
+    direction: DOWN
+    duration: 600
+- assertNotVisible:
+    id: auth-login-language-en
+- tapOn:
+    id: auth-login-language
+- assertVisible:
+    id: auth-login-language-en
 - tapOn:
     id: auth-login-language-en
 - assertVisible:

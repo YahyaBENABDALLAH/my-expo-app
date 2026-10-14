@@ -14,6 +14,7 @@ function setup(isRTL = false, platform = 'android') {
   const mocks = {
     'react-native': {
       Platform: { OS: platform },
+      Appearance: { setColorScheme() {} },
       useWindowDimensions: () => ({ width: 390, height: 844, fontScale: 1 }),
       I18nManager: {
         isRTL,
@@ -118,7 +119,6 @@ for (const scheme of ['light', 'dark']) {
       createElement(s.LayoutDirectionProvider, null, createElement(Screen)),
     );
     const screenHost = view.findAll('Host')[0];
-    const sheetHost = view.findAll('Host')[1];
     const field = view.findAll('Field')[0];
     const sheet = view.findAll('BottomSheet')[0];
     view.flush(() => changeDraft('مسودة Draft 123'));
@@ -128,7 +128,6 @@ for (const scheme of ['light', 'dark']) {
       assert.equal(view.findAll('LocaleProvider')[0].props.direction, direction);
       assert.equal(view.findAll('View')[0].props.style.direction, direction);
       assert.equal(view.findAll('Host')[0], screenHost);
-      assert.equal(view.findAll('Host')[1], sheetHost);
       for (const host of view.findAll('Host')) {
         assert.equal(
           host.props.layoutDirection,
@@ -141,9 +140,9 @@ for (const scheme of ['light', 'dark']) {
       assert.equal(view.findAll('SheetDraft')[0].props.draft, 'مسودة Draft 123');
       assert.equal(view.findAll('BottomSheet')[0], sheet);
       assert.equal(sheet.props.isPresented, true);
-      assert.equal(sheet.props.containerColor, s.colors[scheme].surface);
-      assert.equal(sheet.props.contentColor, s.colors[scheme].text);
-      assert.equal(sheet.props.contentPadding, 24);
+      assert.equal(sheet.props.containerColor, undefined);
+      assert.equal(sheet.props.contentColor, undefined);
+      assert.equal(sheet.props.contentPadding, undefined);
       assert.equal(mounts, 1);
       assert.equal(unmounts, 0);
     }
@@ -206,107 +205,44 @@ test('direction switch starts checked on an RTL device and switches off to LTR',
   view.unmount();
 });
 
-test('sheet bridge preserves explicit chrome colors and dismissal callback', () => {
-  const s = setup();
-  let dismissed = 0;
-  const contentPadding = { top: 8, bottom: 32, left: 20, right: 12 };
-  const snapPoints = ['half', 'full'];
-  const view = renderFixture(
-    createElement(
-      s.LayoutDirectionProvider,
-      null,
-      createElement(
-        s.BottomSheet,
-        {
-          isPresented: true,
-          containerColor: '#123456',
-          contentColor: '#abcdef',
-          contentPadding,
-          snapPoints,
-          onDismiss: () => dismissed++,
-        },
-        createElement('SheetContent'),
-      ),
-    ),
-  );
-  const { props } = view.findAll('BottomSheet')[0];
-  assert.equal(props.containerColor, '#123456');
-  assert.equal(props.contentColor, '#abcdef');
-  assert.equal(props.contentPadding, contentPadding);
-  assert.equal(props.snapPoints, snapPoints);
-  props.onDismiss();
-  assert.equal(dismissed, 1);
-  view.unmount();
-});
-
 for (const platform of ['ios', 'android']) {
-  test(`${platform} sheet resizes its content to the presented width without losing local state`, () => {
+  test(`${platform}: native sheet keeps content state and forwards dismissal without a sizing bridge`, () => {
     const s = setup(false, platform);
-    let changeDraft;
+    let present, changeDraft;
     function Draft() {
       const [draft, setDraft] = useState('');
       changeDraft = setDraft;
       return createElement('SheetDraft', { draft });
     }
-    const view = renderFixture(
-      createElement(
-        s.UniversalHost,
-        { colorScheme: 'dark', layoutDirection: 'rightToLeft' },
-        createElement(s.BottomSheet, { isPresented: true, onDismiss() {} }, createElement(Draft)),
-      ),
-    );
+    function Demo() {
+      const [isPresented, setPresented] = useState(true);
+      present = setPresented;
+      return createElement(
+        s.BottomSheet,
+        { isPresented, onDismiss: () => setPresented(false), testID: 'native-sheet' },
+        createElement(Draft),
+      );
+    }
+    const view = renderFixture(createElement(Demo));
     try {
       const sheet = view.findAll('BottomSheet')[0];
-      const host = view.findAll('Host')[1];
       const draft = view.findAll('SheetDraft')[0];
-      const eventName = platform === 'ios' ? 'onGeometryChange' : 'onSizeChanged';
-      const reportSize = view.findAll('Column')[0].props.modifiers.find((mod) => mod[eventName])?.[
-        eventName
-      ];
-      assert.equal(
-        typeof reportSize,
-        'function',
-        'The native sheet must measure the bridge width.',
-      );
+      assert.equal(view.findAll('Host').length, 0);
+      assert.equal(view.findAll('RNHostView').length, 0);
+      assert.equal(view.findAll('Column').length, 0);
+      assert.equal(sheet.props.testID, 'native-sheet');
+      assert.equal(sheet.props.showDragIndicator, platform === 'ios' ? false : undefined);
       view.flush(() => changeDraft('مسودة Draft 123'));
-      for (const width of [342, 492, 300]) {
-        view.flush(() => reportSize({ x: 0, y: 0, width, height: 280 }));
-        assert.equal(view.findAll('Host')[1], host);
-        assert.equal(host.props.style.at(-1).width, width);
-        assert.deepEqual(host.props.matchContents, { vertical: true });
-        assert.equal(host.props.layoutDirection, 'rightToLeft');
-        assert.equal(host.props.colorScheme, 'dark');
-        assert.equal(view.findAll('BottomSheet')[0], sheet);
-        assert.equal(view.findAll('SheetDraft')[0], draft);
-        assert.equal(draft.props.draft, 'مسودة Draft 123');
-      }
-      for (const width of [0, -1, NaN, Infinity]) {
-        view.flush(() => reportSize({ x: 0, y: 0, width, height: 280 }));
-        assert.equal(host.props.style.at(-1).width, 300);
-      }
+      view.flush(() => sheet.props.onDismiss());
+      assert.equal(sheet.props.isPresented, false);
+      view.flush(() => present(true));
+      assert.equal(sheet.props.isPresented, true);
+      assert.equal(view.findAll('BottomSheet')[0], sheet);
+      assert.equal(view.findAll('SheetDraft')[0], draft);
+      assert.equal(draft.props.draft, 'مسودة Draft 123');
     } finally {
       view.unmount();
     }
-  });
-}
-
-for (const snapPoints of [undefined, [], ['half', 'full']]) {
-  test(`iOS sheet leaves height to Expo UI with snapPoints=${JSON.stringify(snapPoints)}`, () => {
-    const s = setup(false, 'ios');
-    const view = renderFixture(
-      createElement(
-        s.BottomSheet,
-        { isPresented: true, snapPoints, contentPadding: 0, onDismiss() {} },
-        createElement('SheetContent'),
-      ),
-    );
-    const { frame } = view.findAll('Column')[0].props.modifiers[0];
-    assert.equal(frame.alignment, 'topLeading');
-    assert.equal(frame.maxWidth, Infinity);
-    assert.equal(frame.maxHeight, undefined);
-    assert.equal(view.findAll('BottomSheet')[0].props.snapPoints, snapPoints);
-    assert.equal(view.findAll('BottomSheet')[0].props.contentPadding, 0);
-    view.unmount();
   });
 }
 
@@ -464,6 +400,10 @@ for (const [platform, authenticated, introductionRequired] of [
     t.mock.timers.enable({ apis: ['setTimeout'] });
     const s = setup(false, platform);
     let directionSettings;
+    let themeSettings;
+    const nativeAppearance = [];
+    s.mocks['react-native'].Appearance.setColorScheme = (value) => nativeAppearance.push(value);
+    const { useThemeSettings } = s.load('context/theme.context.tsx');
     let finishRestore;
     let finishLanguage;
     let finishOnboarding;
@@ -489,7 +429,6 @@ for (const [platform, authenticated, introductionRequired] of [
     });
     s.mocks['@components/ui'] = {
       UniversalHost: s.UniversalHost,
-      useAuthTheme: () => ({ buttonPalette: {} }),
       LaunchScreen: s.native('LaunchScreen'),
       AuroraBackground: s.native('AuroraBackground'),
       PageMotionOverlay: s.native('PageMotionOverlay'),
@@ -512,6 +451,7 @@ for (const [platform, authenticated, introductionRequired] of [
     s.mocks['@/context/query-provider'] = { AppQueryProvider: s.native('AppQueryProvider') };
     s.mocks['@/context/auth.context'] = {
       AuthProvider({ children }) {
+        themeSettings = useThemeSettings();
         const [restoring, setRestoring] = useState(true);
         finishRestore = () => setRestoring(false);
         return createElement(
@@ -549,6 +489,11 @@ for (const [platform, authenticated, introductionRequired] of [
     };
     const { default: RootLayout } = s.load('app/_layout.tsx');
     const view = renderFixture(createElement(RootLayout));
+    assert.equal(nativeAppearance.at(-1), 'unspecified');
+    for (const preference of ['dark', 'light', 'system']) {
+      view.flush(() => themeSettings.setColorScheme(preference));
+      assert.equal(nativeAppearance.at(-1), preference === 'system' ? 'unspecified' : preference);
+    }
     const queryProvider = view.findAll('AppQueryProvider')[0];
     const authProvider = view.findAll('AuthProvider')[0];
     const background = view.findAll('AuroraBackground')[0];
@@ -587,10 +532,10 @@ for (const [platform, authenticated, introductionRequired] of [
     view.flush(() => launch.props.onExitComplete());
     assert.equal(view.findAll('LaunchScreen').length, 0);
     assert.equal(view.findAll('AuroraBackground')[0], background);
-    assert.equal(background.props.animate, platform === 'ios' && !introductionRequired);
+    assert.equal(background.props.animate, !introductionRequired);
     assert.equal(view.findAll('PageMotionOverlay').length, introductionRequired ? 0 : 1);
     assert.equal(view.findAll('PageMotionOverlay')[0], headerWave);
-    assert.equal(headerWave?.props.animate, introductionRequired ? undefined : platform === 'ios');
+    assert.equal(headerWave?.props.animate, introductionRequired ? undefined : true);
     assert.equal(
       view.findAll('View').some((node) => node.props.testID === 'app-ready'),
       true,
@@ -616,8 +561,8 @@ for (const [platform, authenticated, introductionRequired] of [
       );
       assert.equal(view.findAll('AuthProvider')[0], authProvider);
       headerWave = view.findAll('PageMotionOverlay')[0];
-      assert.equal(headerWave.props.animate, platform === 'ios');
-      assert.equal(background.props.animate, platform === 'ios');
+      assert.equal(headerWave.props.animate, true);
+      assert.equal(background.props.animate, true);
     }
     for (const direction of ['rtl', 'ltr']) {
       view.flush(() => directionSettings.setDirection(direction));

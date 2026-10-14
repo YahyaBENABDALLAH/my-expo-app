@@ -9,6 +9,7 @@ import { createSourceLoader } from '../helpers/load-source.mjs';
 function setup(platform) {
   const buttons = [];
   const content = [];
+  const hosts = [];
   const children = ({ children }) => createElement('div', null, children);
   const nativeButton = (kind) => (props) => {
     buttons.push({ kind, ...props });
@@ -32,7 +33,12 @@ function setup(platform) {
     ].map((name) => [name, modifier(name)]),
   );
   const mocks = {
-    '@expo/ui': { Host: children },
+    '@expo/ui': {
+      Host: (props) => {
+        hosts.push(props);
+        return children(props);
+      },
+    },
     '@/hooks/use-color-scheme': { useColorScheme: (preferred) => preferred ?? 'light' },
     '@/context/layout-direction.context': { useLayoutDirection: () => 'ltr' },
     '@expo/ui/swift-ui': {
@@ -58,15 +64,14 @@ function setup(platform) {
   const { UniversalButtonContent } = load(
     `components/ui/button/universal-button-content.${platform}.tsx`,
   );
-  const { authButtonPalettes } = load('components/ui/auth/auth-theme.ts');
   mocks['@/components/ui/button/universal-button-content'] = { UniversalButtonContent };
   const { UniversalButton } = load('components/ui/button/universal-button.tsx');
   const colors = load('constants/colors.ts').default;
   return {
     buttons,
     content,
+    hosts,
     colors,
-    authButtonPalettes,
     render: (props, host = {}) =>
       renderToStaticMarkup(
         createElement(UniversalHost, host, createElement(UniversalButtonContent, props)),
@@ -152,73 +157,69 @@ for (const platform of ['ios', 'android']) {
       );
     }
   });
-  test(`${platform}: buttons inherit the owning Host scheme and auth palette`, () => {
-    const s = setup(platform);
-    s.render(
-      { variant: 'primary', label: 'Sign in' },
-      { colorScheme: 'dark', buttonPalette: s.authButtonPalettes.dark },
-    );
-    assert.equal(accent(s.buttons[0], platform), s.authButtonPalettes.dark.primary);
-    if (platform === 'android')
-      assert.equal(s.buttons[0].colors.contentColor, s.authButtonPalettes.dark.onAccent);
-    else
-      assert.equal(
-        s.content[0].modifiers.find(({ kind }) => kind === 'foregroundStyle').args[0],
-        s.authButtonPalettes.dark.onAccent,
-      );
-  });
-
-  test(`${platform}: explicit palette and scheme override inherited appearance`, () => {
-    const s = setup(platform);
-    s.render(
-      { variant: 'primary', palette: s.authButtonPalettes.light },
-      { colorScheme: 'dark', buttonPalette: s.authButtonPalettes.dark },
-    );
-    assert.equal(accent(s.buttons[0], platform), s.authButtonPalettes.light.primary);
-    s.render({ variant: 'primary', colorScheme: 'light' }, { colorScheme: 'dark' });
-    assert.equal(accent(s.buttons[1], platform), s.colors.light.primary);
-  });
-
   for (const scheme of ['light', 'dark']) {
-    test(`${platform}: each semantic intent uses its ${scheme} accent and foreground`, () => {
+    test(`${platform}: native color defaults are untouched in a ${scheme} Host`, () => {
       const s = setup(platform);
-      for (const [variant, role, foreground] of [
-        ['primary', 'primary', 'onPrimary'],
-        ['secondary', 'secondary', 'secondary'],
-        ['link', 'tint', 'tint'],
-        ['success', 'success', 'onSuccess'],
-        ['warning', 'warning', 'onWarning'],
-        ['destructive', 'error', 'onError'],
-      ]) {
-        s.render({ variant }, { colorScheme: scheme });
-        assert.equal(accent(s.buttons.at(-1), platform), s.colors[scheme][role]);
-        const contentColor =
-          platform === 'android'
-            ? s.buttons.at(-1).colors.contentColor
-            : s.content.at(-1).modifiers.find(({ kind }) => kind === 'foregroundStyle').args[0];
-        assert.equal(contentColor, s.colors[scheme][foreground]);
+      s.render({ variant: 'primary' }, { colorScheme: scheme });
+      assert.equal(s.hosts[0].colorScheme, scheme);
+      if (platform === 'android') assert.equal(s.buttons[0].colors, undefined);
+      else {
+        assert.equal(
+          s.buttons[0].modifiers.some(({ kind }) => kind === 'tint'),
+          false,
+        );
+        assert.equal(
+          s.content[0].modifiers.some(({ kind }) => kind === 'foregroundStyle'),
+          false,
+        );
       }
-      if (platform === 'android')
-        assert.deepEqual(
-          s.buttons.map(({ kind }) => kind),
-          ['Button', 'OutlinedButton', 'TextButton', 'Button', 'Button', 'Button'],
-        );
-      else
-        assert.deepEqual(
-          s.buttons.map(
-            (button) => button.modifiers.find(({ kind }) => kind === 'buttonStyle').args[0],
-          ),
-          [
-            'borderedProminent',
-            'bordered',
-            'plain',
-            'borderedProminent',
-            'borderedProminent',
-            'borderedProminent',
-          ],
-        );
+      s.standalone({ variant: 'primary', colorScheme: scheme });
+      assert.equal(s.hosts.at(-1).colorScheme, scheme);
+      assert.equal(s.hosts.at(-1).seedColor, undefined);
     });
   }
+
+  test(`${platform}: supplied colors reach the native control directly`, () => {
+    const s = setup(platform);
+    s.render({ variant: 'primary', color: '#123456', contentColor: '#fedcba' });
+    assert.equal(accent(s.buttons[0], platform), '#123456');
+    const contentColor =
+      platform === 'android'
+        ? s.buttons[0].colors.contentColor
+        : s.content[0].modifiers.find(({ kind }) => kind === 'foregroundStyle').args[0];
+    assert.equal(contentColor, '#fedcba');
+    s.render({ variant: 'link', color: '#123456' });
+    assert.equal(accent(s.buttons[1], platform), '#123456');
+  });
+
+  test(`${platform}: variants select native styles without a token lookup`, () => {
+    const s = setup(platform);
+    for (const variant of ['primary', 'secondary', 'link', 'success', 'warning', 'destructive']) {
+      s.render({ variant });
+    }
+    if (platform === 'android') {
+      assert.deepEqual(
+        s.buttons.map(({ kind }) => kind),
+        ['Button', 'OutlinedButton', 'TextButton', 'Button', 'Button', 'Button'],
+      );
+      assert.ok(s.buttons.every(({ colors }) => colors === undefined));
+    } else {
+      assert.deepEqual(
+        s.buttons.map(
+          (button) => button.modifiers.find(({ kind }) => kind === 'buttonStyle').args[0],
+        ),
+        [
+          'borderedProminent',
+          'bordered',
+          'plain',
+          'borderedProminent',
+          'borderedProminent',
+          'borderedProminent',
+        ],
+      );
+      assert.equal(s.buttons.at(-1).role, 'destructive');
+    }
+  });
 
   test(`${platform}: standalone and hosted controls forward one action and suppress disabled actions`, () => {
     const s = setup(platform);

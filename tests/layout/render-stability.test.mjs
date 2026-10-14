@@ -253,26 +253,27 @@ test('PageFrame preserves inset subscriptions across unrelated parent updates an
   }
 });
 
-test('auth button palette does not broadcast typing state but updates when appearance changes', () => {
+test('auth buttons consume stable theme tokens without a separate palette context', () => {
   const s = setup();
   const { ThemePreferencesProvider, useThemeSettings } = s.load('context/theme.context.tsx');
   const { useAuthTheme } = s.load('components/ui/auth/auth-theme.ts');
-  const { UniversalHost, useHostButtonPalette } = s.load('components/ui/host/universal-host.tsx');
+  const { UniversalHost, useHostColorScheme } = s.load('components/ui/host/universal-host.tsx');
+  const { useThemeColors } = s.load('hooks/use-theme.ts');
   let bump,
     settings,
     palette,
     renders = 0;
   const Consumer = memo(function Consumer() {
     renders++;
-    palette = useHostButtonPalette();
+    palette = useThemeColors(useHostColorScheme());
     return null;
   });
   function Content() {
     const [, update] = useState(0);
     bump = () => update((value) => value + 1);
     settings = useThemeSettings();
-    const { buttonPalette } = useAuthTheme();
-    return h(UniversalHost, { buttonPalette }, h(Consumer));
+    const { scheme } = useAuthTheme();
+    return h(UniversalHost, { colorScheme: scheme }, h(Consumer));
   }
   const view = renderFixture(h(ThemePreferencesProvider, null, h(Content)));
   try {
@@ -283,7 +284,7 @@ test('auth button palette does not broadcast typing state but updates when appea
     view.flush(() => settings.setColorScheme('dark'));
     assert.ok(renders > 1);
     assert.notEqual(palette, firstPalette);
-    assert.equal(palette.onAccent, palette.onPrimary);
+    assert.ok(palette.onPrimary);
   } finally {
     view.unmount();
   }

@@ -1,25 +1,9 @@
-import Colors from '@/constants/colors';
 import type { ReactNode } from 'react';
 
 export type UniversalButtonVariant =
   'primary' | 'secondary' | 'link' | 'success' | 'warning' | 'destructive';
 
-export type UniversalButtonPalette = {
-  tint: string;
-  background: string;
-  success: string;
-  warning: string;
-  error: string;
-  primary?: string;
-  secondary?: string;
-  onPrimary?: string;
-  onSuccess?: string;
-  onWarning?: string;
-  onError?: string;
-  onAccent?: string;
-};
-
-export type UniversalButtonProps = {
+export type UniversalButtonContentProps = {
   variant: UniversalButtonVariant;
   label?: string;
   children?: ReactNode;
@@ -31,32 +15,12 @@ export type UniversalButtonProps = {
   borderRadius?: number;
   /** Override label padding, for example 0 for a whole recipe card. */
   contentPadding?: number;
-  colorScheme?: 'light' | 'dark';
-  palette?: UniversalButtonPalette;
+  /** Override the variant's accent color. */
+  color?: string;
+  /** Override the native label color. */
+  contentColor?: string;
 };
 
-const buttonColorRoles = {
-  primary: ['primary', 'onPrimary'],
-  secondary: ['secondary', 'onPrimary'],
-  link: ['tint', 'onPrimary'],
-  success: ['success', 'onSuccess'],
-  warning: ['warning', 'onWarning'],
-  destructive: ['error', 'onError'],
-} as const;
-
-export function buttonAppearance(
-  variant: UniversalButtonVariant,
-  scheme: 'light' | 'dark',
-  palette?: UniversalButtonPalette,
-) {
-  const colors = palette ?? Colors[scheme];
-  const filled = variant !== 'secondary' && variant !== 'link';
-  const [accentRole, foregroundRole] = buttonColorRoles[variant];
-  const accent = colors[accentRole] ?? colors.tint;
-  const foreground = colors[foregroundRole];
-  return {
-    filled,
-    accent,
-    content: filled ? (foreground ?? palette?.onAccent ?? colors.background) : accent,
-  };
-}
+export type UniversalButtonProps = UniversalButtonContentProps & {
+  colorScheme?: 'light' | 'dark';
+};

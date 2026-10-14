@@ -5,9 +5,10 @@ import {
   UniversalTextContent as Text,
 } from '@components/ui';
 import type { Meta, StoryObj } from '@storybook/react-native';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { Appearance } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import { ThemePreferencesProvider } from '@/context/theme.context';
+import { ThemePreferencesProvider, useThemePreferences } from '@/context/theme.context';
 import { useLanguage } from '@/context/language.context';
 import { useLayoutDirection } from '@/context/layout-direction.context';
 import { useColorScheme } from '@/hooks/use-color-scheme';
@@ -16,6 +17,7 @@ function LoginDraft() {
   const { t } = useTranslation();
   const { language } = useLanguage();
   const scheme = useColorScheme();
+  useEffect(() => Appearance.setColorScheme(scheme), [scheme]);
   const direction = useLayoutDirection();
   const [draft, setDraft] = useState('');
   return (
@@ -38,6 +40,13 @@ function LoginDraft() {
 }
 
 function LoginPreferencesDemo({ colorScheme }: { colorScheme: 'light' | 'dark' }) {
+  const appAppearance = useThemePreferences()?.colorScheme ?? 'system';
+  useEffect(
+    () => () => {
+      Appearance.setColorScheme(appAppearance === 'system' ? 'unspecified' : appAppearance);
+    },
+    [appAppearance],
+  );
   return (
     <ThemePreferencesProvider key={colorScheme} initialColorScheme={colorScheme}>
       <LoginDraft />
@@ -50,7 +59,15 @@ const meta = {
   component: LoginPreferencesDemo,
   args: { colorScheme: 'light' },
   argTypes: { colorScheme: { control: 'select', options: ['light', 'dark'] } },
-  parameters: { layout: 'fullscreen' },
+  parameters: {
+    layout: 'fullscreen',
+    docs: {
+      description: {
+        component:
+          'The language selector uses Expo UI’s native sheet defaults, with the iOS drag indicator hidden. Open it with the globe to try selection, swipe dismissal, closing and reopening while preserving the login draft.',
+      },
+    },
+  },
 } satisfies Meta<typeof LoginPreferencesDemo>;
 export default meta;
 type Story = StoryObj<typeof meta>;

@@ -1,6 +1,7 @@
 import { Stack } from 'expo-router';
 import { Platform } from 'react-native';
 import { useReducedMotion } from 'react-native-reanimated';
+import { stackMotionOptions } from '@/constants/navigation-motion';
 import { useOnboarding } from '@/context/onboarding.context';
 
 export const unstable_settings = { initialRouteName: 'discover' };
@@ -13,7 +14,7 @@ export default function OnboardingLayout() {
       screenOptions={{
         headerShown: false,
         contentStyle: { backgroundColor: 'transparent' },
-        animation: reducedMotion ? 'fade' : 'default',
+        ...stackMotionOptions(reducedMotion),
         freezeOnBlur: Platform.OS === 'android',
         gestureEnabled: !saving,
       }}

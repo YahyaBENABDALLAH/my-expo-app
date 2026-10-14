@@ -2,47 +2,46 @@
 
 Exports: `UniversalButton`, `UniversalButtonContent` and their public types.
 
-`universal-button.tsx` owns a Host at a React Native boundary.
-Use `UniversalButtonContent` inside an existing Host. Its iOS/Android files keep
-native geometry, feedback and disabled behavior; `universal-button.types.ts`
-contains the shared contract and appearance mapping.
+Both use native Expo UI buttons: SwiftUI on iOS and Material on Android.
+`UniversalButton` owns a Host at a React Native boundary;
+`UniversalButtonContent` uses its existing Host.
 
-Every call requires `variant`: `primary`, `secondary`, `link`, `success`,
-`warning` or `destructive`. Pending actions use `disabled`.
+Keep the API small: required `variant`, `label` or `children`, `onPress`,
+`disabled`, `testID`, `fullWidth`, `color`, `contentColor`, `contentPadding`,
+`borderRadius` and `colorScheme`.
 
-Content inherits its Host scheme and optional `buttonPalette`. Explicit
-`colorScheme` or `palette` overrides inheritance. Theme roles supply fills and
-foregrounds. `borderRadius` and `contentPadding` optionally override native
-geometry for custom content; recipe cards pass zero to prevent pill clipping.
-Ordinary buttons retain the defaults.
+Buttons do not import theme hooks or look up tokens. Primary uses a native
+filled/prominent button, secondary uses outlined/bordered, and link uses
+text/plain. Status variants use the filled style; their callers pass the desired
+status colors explicitly. iOS also supplies the native destructive role.
+
+`color` and `contentColor` are optional direct overrides. Without them, the native
+control chooses its colors and contrast. `UniversalButton` uses a plain Expo UI
+Host with optional `colorScheme`; `UniversalButtonContent` inherits its native
+Host's appearance and has no color-scheme prop or React theme context bridge.
+There is no button color helper, lookup table, palette context, generated color,
+measurement or size calculation.
+
+Omit `contentPadding` and `borderRadius` to retain native defaults. Zero is
+supported for both. Full width uses native fill modifiers. iOS maps a supplied
+radius to native button border shape and clips custom content to that shape;
+Android supplies the native rounded shape and padding directly. Native feedback
+and disabled behavior remain platform-owned.
 
 ```tsx
-<UniversalButton variant="primary" label="Continue" borderRadius={12} onPress={onContinue} />
+<UniversalButton
+  variant="primary"
+  label="Continue"
+  borderRadius={12}
+  contentPadding={12}
+  onPress={onContinue}
+/>
 ```
 
-Use `borderRadius={0}` for square corners; omit it for the platform's default
-shape. The same prop works on `UniversalButtonContent`. Values are points on
-iOS and dp on Android.
-
-On iOS, `buttonBorderShape('roundedRectangle', borderRadius)` sets the shape
-SwiftUI draws. `clipShape` only masks the rendered result: it cannot replace an
-existing capsule surface with less-rounded corners. Filled variants therefore
-use `borderedProminent`, secondary uses `bordered`, and links use `plain`.
-The optional clip also rounds custom label content; link buttons have no filled
-surface to round. No shape or padding modifier is applied when its prop is omitted.
-See [Expo's button shape API](https://docs.expo.dev/versions/v57.0.0/sdk/ui/swift-ui/modifiers/#buttonbordershapeshape-cornerradius).
-
-Native adapter selection keeps secondary buttons outlined/bordered, links
-text/plain, and other variants filled/prominent. The selection uses separate
-decisions without changing native button types or modifier order.
-
-Appearance selects palette roles from a fixed variant table. Optional primary,
-secondary and foreground roles retain their existing tint/background fallbacks;
-`tests/layout/universal-button.test.mjs` verifies native adapter props and actions.
-
-Existing composition story: [button.stories.tsx](../../../../.rnstorybook/stories/expo-ui/button.stories.tsx).
-`CustomRadius` exposes the numeric radius control, `Square` covers zero, and
-`Interaction` exercises enabled/disabled custom-radius buttons.
+Native stories: [button.stories.tsx](../../../../.rnstorybook/stories/expo-ui/button.stories.tsx).
+They cover variants, themes, direct colors, padding, radius and observable enabled/
+disabled actions. `.maestro/storybook/button.yaml` checks counting and reset.
+JS adapter checks use mocked native controls and do not prove native geometry.
 
 Import public components from `@components/ui`; UI implementations import
 concrete files directly. [Back to the UI guide](../README.md).

@@ -1,7 +1,6 @@
 import { Button, OutlinedButton, Shape, Text, TextButton } from '@expo/ui/jetpack-compose';
 import { fillMaxWidth, testID as nativeTestID } from '@expo/ui/jetpack-compose/modifiers';
-import { useHostButtonPalette, useHostColorScheme } from '../host/universal-host';
-import { buttonAppearance, type UniversalButtonProps } from './universal-button.types';
+import type { UniversalButtonContentProps } from './universal-button.types';
 
 export function UniversalButtonContent({
   variant,
@@ -13,17 +12,13 @@ export function UniversalButtonContent({
   fullWidth,
   borderRadius,
   contentPadding,
-  colorScheme,
-  palette,
-}: UniversalButtonProps) {
-  const scheme = useHostColorScheme(colorScheme);
-  const { filled, accent, content } = buttonAppearance(
-    variant,
-    scheme,
-    useHostButtonPalette(palette, scheme),
-  );
-  const defaultButton = variant === 'link' ? TextButton : Button;
-  const NativeButton = variant === 'secondary' ? OutlinedButton : defaultButton;
+  color,
+  contentColor,
+}: UniversalButtonContentProps) {
+  let NativeButton = Button;
+  if (variant === 'secondary') NativeButton = OutlinedButton;
+  if (variant === 'link') NativeButton = TextButton;
+  const filled = variant !== 'secondary' && variant !== 'link';
   return (
     <NativeButton
       onClick={disabled ? undefined : onPress}
@@ -50,7 +45,14 @@ export function UniversalButtonContent({
               bottom: contentPadding,
             }
       }
-      colors={{ ...(filled ? { containerColor: accent } : {}), contentColor: content }}
+      colors={
+        color === undefined && contentColor === undefined
+          ? undefined
+          : {
+              containerColor: filled ? color : undefined,
+              contentColor: contentColor ?? (filled ? undefined : color),
+            }
+      }
       modifiers={[
         ...(fullWidth ? [fillMaxWidth()] : []),
         ...(testID ? [nativeTestID(testID)] : []),

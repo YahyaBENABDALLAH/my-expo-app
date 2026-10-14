@@ -1,5 +1,7 @@
 import Colors from '@/constants/colors';
 import {
+  BottomSheet,
+  type BottomSheetProps,
   Column,
   UniversalButtonContent,
   UniversalText,
@@ -7,18 +9,16 @@ import {
   UniversalButton,
   nativeFillWidth,
 } from '@components/ui';
-import {
-  UniversalBottomSheet,
-  type UniversalBottomSheetProps,
-} from '../../components/showcase/universal-bottom-sheet';
 import type { Meta, StoryObj } from '@storybook/react-native';
-import { useState } from 'react';
-import { View } from 'react-native';
+import { useEffect, useState } from 'react';
+import { Appearance, View } from 'react-native';
+import { useThemePreferences } from '@/context/theme.context';
 
 import { action } from 'storybook/actions';
-import { NativeStoryFrame, nativeThemeControls } from '../../components/native-story-frame';
+import { NativeStoryFrame } from '../../components/native-story-frame';
 
-type DemoProps = UniversalBottomSheetProps & {
+type DemoProps = BottomSheetProps & {
+  colorScheme: 'light' | 'dark';
   title: string;
   content: string;
   onOpen: () => void;
@@ -26,6 +26,12 @@ type DemoProps = UniversalBottomSheetProps & {
 };
 
 function BottomSheetDemo({ title, content, onOpen, onClose, ...args }: DemoProps) {
+  const appAppearance = useThemePreferences()?.colorScheme ?? 'system';
+  useEffect(() => {
+    Appearance.setColorScheme(args.colorScheme);
+    return () =>
+      Appearance.setColorScheme(appAppearance === 'system' ? 'unspecified' : appAppearance);
+  }, [args.colorScheme, appAppearance]);
   const [isPresented, setIsPresented] = useState(args.isPresented);
   const [controlledPresentation, setControlledPresentation] = useState(args.isPresented);
   if (controlledPresentation !== args.isPresented) {
@@ -53,10 +59,9 @@ function BottomSheetDemo({ title, content, onOpen, onClose, ...args }: DemoProps
         {`State: ${isPresented ? 'Open' : 'Closed'}. Swipe down or tap Close to dismiss.`}
       </UniversalText>
       <UniversalText colorScheme={args.colorScheme} textStyle={{ color: ink }}>
-        Android supports partial and expanded states; custom heights and fractions use the nearest
-        native state.
+        The sheet uses native light/dark appearance and dismissal. The iOS drag indicator is hidden.
       </UniversalText>
-      <UniversalBottomSheet
+      <BottomSheet
         {...args}
         isPresented={isPresented}
         onDismiss={() => {
@@ -88,7 +93,7 @@ function BottomSheetDemo({ title, content, onOpen, onClose, ...args }: DemoProps
             }}
           />
         </Column>
-      </UniversalBottomSheet>
+      </BottomSheet>
     </View>
   );
 }
@@ -100,37 +105,19 @@ const meta = {
     testID: 'expo-ui-bottom-sheet',
     isPresented: false,
     title: 'A native bottom sheet',
-    content: 'Drag the handle to resize this sheet, or close it and open it again.',
+    content: 'Swipe down to dismiss this sheet, or close it and open it again.',
     colorScheme: 'dark',
-    showDragIndicator: true,
-    contentPadding: 24,
-    shouldDismissOnBackPress: true,
-    shouldDismissOnClickOutside: true,
     onOpen: action('open button pressed'),
     onClose: action('close button pressed'),
     onDismiss: action('sheet dismissed'),
   },
   argTypes: {
-    ...nativeThemeControls,
+    testID: { control: 'text' },
+    colorScheme: { control: 'select', options: ['light', 'dark'] },
     isPresented: { control: 'boolean' },
     title: { control: 'text' },
     content: { control: 'text' },
-    showDragIndicator: { control: 'boolean' },
-    snapPoints: { control: 'object' },
-    contentPadding: { control: 'object' },
-    shouldDismissOnBackPress: { control: 'boolean', description: 'Android only.' },
-    shouldDismissOnClickOutside: {
-      control: 'boolean',
-      description: 'Android only; swipe dismissal remains available.',
-    },
-    scrimColor: { control: 'color', description: 'Android only.' },
-    containerColor: { control: 'color' },
-    contentColor: {
-      control: 'color',
-      description: 'Android only; explicit child colors take precedence.',
-    },
     children: { control: false },
-    modifiers: { control: false },
     onOpen: { control: false },
     onClose: { control: false },
     onDismiss: { control: false },
@@ -149,18 +136,6 @@ export const Closed: Story = {};
 export const Open: Story = { args: { isPresented: true } };
 export const AutoSized: Story = {
   args: { isPresented: true, content: 'A short sheet fitted to its content.' },
-};
-export const HalfAndFull: Story = { args: { snapPoints: ['half', 'full'] } };
-export const FullHeight: Story = { args: { snapPoints: ['full'] } };
-export const CustomFraction: Story = { args: { snapPoints: [{ fraction: 0.35 }, 'full'] } };
-export const FixedHeight: Story = { args: { snapPoints: [{ height: 320 }] } };
-export const WithoutDragIndicator: Story = { args: { showDragIndicator: false } };
-export const NoOutsideDismiss: Story = { args: { shouldDismissOnClickOutside: false } };
-export const NoBackDismiss: Story = { args: { shouldDismissOnBackPress: false } };
-export const CustomScrim: Story = { args: { scrimColor: Colors.dark.overlay } };
-export const CustomBackground: Story = { args: { containerColor: Colors.light.text } };
-export const EdgePadding: Story = {
-  args: { contentPadding: { top: 8, bottom: 32, left: 20, right: 20 } },
 };
 export const LightTheme: Story = { args: { colorScheme: 'light' } };
 export const DarkTheme: Story = { args: { colorScheme: 'dark' } };

@@ -184,14 +184,20 @@ for (const platform of ['ios', 'android']) {
           press(languageButton);
           const sheet = view.findAll('Sheet')[0];
           assert.equal(sheet.props.isPresented, true);
-          const eventName = platform === 'ios' ? 'onGeometryChange' : 'onSizeChanged';
-          const sizing = sheet.children[0].props.modifiers.find((modifier) => modifier[eventName]);
-          view.flush(() => sizing[eventName]({ width: 342, height: 280 }));
-          const sheetHost = view.findAll('RNHostView')[0].children[0];
-          assert.equal(sheetHost.props.style.at(-1).width, 342);
+          for (const prop of [
+            'containerColor',
+            'contentColor',
+            'contentPadding',
+            'modifiers',
+            'snapPoints',
+          ]) {
+            assert.equal(sheet.props[prop], undefined, `${prop} keeps Expo UI's native default.`);
+          }
+          assert.equal(sheet.props.showDragIndicator, platform === 'ios' ? false : undefined);
           assert.equal(
-            sheetHost.props.layoutDirection,
-            draft.props.language === 'ar' ? 'rightToLeft' : 'leftToRight',
+            view.findAll('Column').some(({ props }) => props.style?.height === 4),
+            false,
+            'The language sheet uses the system handle.',
           );
           const options = view
             .findAll('Button')

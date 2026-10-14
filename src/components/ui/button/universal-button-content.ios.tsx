@@ -9,8 +9,7 @@ import {
   padding,
   tint,
 } from '@expo/ui/swift-ui/modifiers';
-import { useHostButtonPalette, useHostColorScheme } from '../host/universal-host';
-import { buttonAppearance, type UniversalButtonProps } from './universal-button.types';
+import type { UniversalButtonContentProps } from './universal-button.types';
 
 export function UniversalButtonContent({
   variant,
@@ -22,24 +21,21 @@ export function UniversalButtonContent({
   fullWidth,
   borderRadius,
   contentPadding,
-  colorScheme,
-  palette,
-}: UniversalButtonProps) {
-  const scheme = useHostColorScheme(colorScheme);
-  const { filled, accent, content } = buttonAppearance(
-    variant,
-    scheme,
-    useHostButtonPalette(palette, scheme),
-  );
-  const unfilledStyle = variant === 'link' ? 'plain' : 'bordered';
+  color,
+  contentColor,
+}: UniversalButtonContentProps) {
+  let style: 'plain' | 'bordered' | 'borderedProminent' = 'borderedProminent';
+  if (variant === 'secondary') style = 'bordered';
+  if (variant === 'link') style = 'plain';
+  const labelColor = contentColor ?? (style === 'borderedProminent' ? undefined : color);
   return (
     <Button
       testID={testID}
+      role={variant === 'destructive' ? 'destructive' : undefined}
       onPress={disabled ? undefined : onPress}
       modifiers={[
-        buttonStyle(filled ? 'borderedProminent' : unfilledStyle),
-
-        tint(accent),
+        buttonStyle(style),
+        ...(color === undefined ? [] : [tint(color)]),
         nativeDisabled(Boolean(disabled)),
         ...(borderRadius === undefined
           ? []
@@ -52,7 +48,7 @@ export function UniversalButtonContent({
       <VStack
         modifiers={[
           ...(fullWidth ? [frame({ maxWidth: Infinity })] : []),
-          foregroundStyle(content),
+          ...(labelColor === undefined ? [] : [foregroundStyle(labelColor)]),
           ...(contentPadding === undefined ? [] : [padding({ all: contentPadding })]),
         ]}
       >

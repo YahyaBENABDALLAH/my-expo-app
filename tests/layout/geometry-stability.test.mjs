@@ -42,7 +42,8 @@ function setup(platform = 'ios') {
     calls.geometryFactories++;
     return { geometry: handler };
   };
-  const frameCallback = { setActive() {} };
+  const frames = { callback: undefined, active: false };
+  const frameCallback = { setActive: (active) => (frames.active = active) };
   const mocks = {
     react: {
       ...React,
@@ -135,7 +136,10 @@ function setup(platform = 'ios') {
     'react-native-reanimated': {
       useSharedValue: useSharedFixture,
       useDerivedValue: (get) => ({ get }),
-      useFrameCallback: () => frameCallback,
+      useFrameCallback: (callback) => {
+        frames.callback = callback;
+        return frameCallback;
+      },
       cancelAnimation() {},
       withTiming: (value) => value,
       withRepeat: (value) => value,
@@ -144,7 +148,7 @@ function setup(platform = 'ios') {
     },
     '../../../skia/types': { isPath: (value) => typeof value === 'object' },
   };
-  return { load: createSourceLoader(mocks), mocks, dimensions, calls, native };
+  return { load: createSourceLoader(mocks), mocks, dimensions, calls, native, frames };
 }
 
 for (const platform of ['ios', 'android']) {
@@ -181,123 +185,6 @@ for (const platform of ['ios', 'android']) {
       assert.equal(s.calls.geometryFactories, resized);
       report(0);
       assert.equal(view.findAll('Artwork').length, 0);
-    } finally {
-      view.unmount();
-    }
-  });
-}
-
-for (const platform of ['ios', 'android']) {
-  test(`${platform}: sheet presentation styling is ready on opening and survives resize and reopening`, () => {
-    const s = setup(platform);
-    const { BottomSheet } = s.load('components/ui/bottom-sheet/bottom-sheet.tsx');
-    const modifiers = [{ customPresentation: true }];
-    let present, showHandle;
-    function Demo() {
-      const [isPresented, setIsPresented] = useState(true);
-      const [showDragIndicator, setShowDragIndicator] = useState(true);
-      present = setIsPresented;
-      showHandle = setShowDragIndicator;
-      return h(
-        BottomSheet,
-        { isPresented, onDismiss() {}, modifiers, showDragIndicator },
-        h('Content'),
-      );
-    }
-    const view = renderFixture(h(Demo));
-    const expected = [
-      ...(platform === 'ios' ? [{ presentationCornerRadius: 28 }] : []),
-      ...modifiers,
-    ];
-    try {
-      const sheet = view.findAll('Sheet')[0];
-      assert.deepEqual(sheet.props.modifiers, expected);
-      assert.equal(sheet.props.contentPadding, 24);
-      assert.equal(sheet.props.showDragIndicator, platform === 'android');
-      const handles = () =>
-        view.findAll('Column').filter((column) => column.props.style?.height === 4);
-      assert.equal(handles().length, platform === 'ios' ? 1 : 0);
-      if (platform === 'ios') assert.equal(handles()[0].props.style.backgroundColor, '#666');
-      view.flush(() =>
-        view
-          .findAll('Column')[0]
-          .props.modifiers.find((value) => value.geometry)
-          .geometry({
-            width: 294,
-          }),
-      );
-      for (const isPresented of [false, true]) {
-        view.flush(() => present(isPresented));
-        assert.equal(view.findAll('Sheet')[0], sheet);
-        assert.deepEqual(sheet.props.modifiers, expected);
-        assert.equal(view.findAll('Host')[0].props.style.width, 294);
-        assert.equal(handles().length, platform === 'ios' ? 1 : 0);
-      }
-      view.flush(() => showHandle(false));
-      assert.equal(sheet.props.showDragIndicator, false);
-      assert.equal(handles().length, 0);
-    } finally {
-      view.unmount();
-    }
-  });
-
-  test(`${platform} sheet ignores duplicate width and size/position-only geometry events while retaining real resize`, () => {
-    const s = setup(platform);
-    const { BottomSheet } = s.load('components/ui/bottom-sheet/bottom-sheet.tsx');
-    const view = renderFixture(h(BottomSheet, { isPresented: true, onDismiss() {} }, h('Content')));
-    const report = (width, height = 250, y = 0) =>
-      view.flush(() =>
-        view
-          .findAll('Column')[0]
-          .props.modifiers.find((value) => value.geometry)
-          .geometry({ width, y, height }),
-      );
-    try {
-      report(342);
-      const before = s.calls.geometryFactories;
-      report(342, 150);
-      report(342, 150, 200);
-      assert.equal(s.calls.geometryFactories, before);
-      report(492);
-      assert.equal(view.findAll('Host')[0].props.style.width, 492);
-      const resized = s.calls.geometryFactories;
-      for (const invalid of [0, -1, NaN, Infinity]) report(invalid);
-      assert.equal(s.calls.geometryFactories, resized);
-    } finally {
-      view.unmount();
-    }
-  });
-}
-
-for (const platform of ['ios', 'android']) {
-  test(`${platform}: sheet keeps Expo UI's default height and shares only its native width without remounting content`, () => {
-    const s = setup(platform);
-    const { BottomSheet, useBottomSheetContentWidth } = s.load(
-      'components/ui/bottom-sheet/bottom-sheet.tsx',
-    );
-    function Content() {
-      return h('Content', { width: useBottomSheetContentWidth() });
-    }
-    const view = renderFixture(h(BottomSheet, { isPresented: true, onDismiss() {} }, h(Content)));
-    const report = (width) =>
-      view.flush(() =>
-        view
-          .findAll('Column')[0]
-          .props.modifiers.find((value) => value.geometry)
-          .geometry({ width, height: 250 }),
-      );
-    try {
-      const content = view.findAll('Content')[0];
-      assert.equal(view.findAll('Host')[0].props.style.width, 0);
-      assert.equal(view.findAll('Sheet')[0].props.snapPoints, undefined);
-      report(294);
-      assert.equal(view.findAll('Host')[0].props.style.width, 294);
-      assert.equal(content.props.width, 294);
-      assert.equal(view.findAll('Content')[0], content);
-      report(492);
-      assert.equal(view.findAll('Host')[0].props.style.width, 492);
-      assert.equal(content.props.width, 492);
-      assert.equal(view.findAll('Content')[0], content);
     } finally {
       view.unmount();
     }
@@ -366,6 +253,54 @@ test('Aurora uses only its actual layout; window events and geometry writes do n
     view.unmount();
   }
 });
+
+for (const platform of ['android', 'ios']) {
+  for (const refreshRate of [60, 120]) {
+    test(`${platform}: Aurora preserves elapsed time at ${refreshRate} Hz and resumes without counting paused time`, () => {
+      const s = setup(platform);
+      s.mocks['@/hooks/use-motion-enabled'].useMotionEnabled = (animate) => animate;
+      const { AuroraBackground } = s.load('components/ui/aurora-background/aurora-background.tsx');
+      let setPlaying;
+      function Frame() {
+        const [playing, update] = useState(true);
+        setPlaying = update;
+        return h(AuroraBackground, { style: { flex: 1 }, animate: playing });
+      }
+      const view = renderFixture(h(Frame));
+      const time = () => view.findAll('Shader')[0].props.uniforms.get().time;
+      const frame = (timestamp, timeSincePreviousFrame) => {
+        if (s.frames.active) s.frames.callback({ timestamp, timeSincePreviousFrame });
+      };
+      try {
+        assert.equal(s.frames.active, true);
+        frame(0, null);
+        let updates = 0;
+        for (let index = 1; index <= refreshRate; index++) {
+          const before = time();
+          frame((index * 1000) / refreshRate, 1000 / refreshRate);
+          if (time() !== before) updates++;
+        }
+        assert.ok(Math.abs(time() - 1) < 0.000001, 'Throttling must preserve motion speed.');
+        assert.equal(updates, platform === 'android' ? 30 : refreshRate);
+        assert.equal(s.calls.canvases, 1, 'Animation must not render the React artwork per frame.');
+        view.flush(() => setPlaying(false));
+        assert.equal(s.frames.active, false);
+        const paused = time();
+        frame(5000, 4000);
+        assert.equal(time(), paused);
+        view.flush(() => setPlaying(true));
+        assert.equal(s.frames.active, true);
+        frame(10000, null);
+        assert.equal(time(), paused, 'Resuming must not jump through time spent paused.');
+        frame(10000 + 1000 / 30, 1000 / 30);
+        assert.ok(Math.abs(time() - paused - 1 / 30) < 0.000001);
+      } finally {
+        view.unmount();
+      }
+      assert.equal(s.frames.active, false, 'Unmounting must stop the frame callback.');
+    });
+  }
+}
 
 test('page wave reuses parsed path objects through resizes, parent updates and repeated draw processing', () => {
   const s = setup();

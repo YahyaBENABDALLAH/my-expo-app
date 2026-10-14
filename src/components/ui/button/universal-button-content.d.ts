@@ -1,5 +1,5 @@
 import type { ReactElement } from 'react';
-import type { UniversalButtonProps } from './universal-button.types';
+import type { UniversalButtonContentProps } from './universal-button.types';
 
 /** Expo UI button content; must be composed inside an existing Host. */
-export declare function UniversalButtonContent(props: UniversalButtonProps): ReactElement;
+export declare function UniversalButtonContent(props: UniversalButtonContentProps): ReactElement;

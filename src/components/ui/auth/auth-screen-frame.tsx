@@ -43,7 +43,7 @@ function AuthScreenContent({
   const insets = useSafeAreaInsets();
   const { language } = useLanguage();
   const { t } = useTranslation();
-  const { colors, scheme, buttonPalette } = useAuthTheme(colorScheme);
+  const { colors, scheme } = useAuthTheme(colorScheme);
   const horizontalPadding = Math.max(24, insets.left + 16, insets.right + 16);
   const platformHeadingFont = Platform.OS === 'android' ? 'Inter-Black' : 'InterBlack';
   const headingFont = language === 'ar' ? undefined : platformHeadingFont;
@@ -61,7 +61,6 @@ function AuthScreenContent({
         style={{ flex: 1, width: '100%', maxWidth: 480 }}
         colorScheme={scheme}
         seedColor={colors.tint}
-        buttonPalette={buttonPalette}
         matchContents={false}
         ignoreSafeArea="all"
       >

@@ -11,7 +11,6 @@ import {
   PageMotionOverlay,
   Spacer,
   UniversalButtonContent,
-  useAuthTheme,
 } from '@components/ui';
 import { useFonts } from 'expo-font';
 import { Stack, ThemeProvider } from 'expo-router';
@@ -19,17 +18,18 @@ import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Platform, View } from 'react-native';
+import { Appearance, Platform, View } from 'react-native';
 import { useReducedMotion } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { navigationTheme } from '@/constants/navigation-theme';
+import { stackMotionOptions } from '@/constants/navigation-motion';
 import { AuthProvider, useAuthContext } from '@/context/auth.context';
 import { LanguageProvider, useLanguage } from '@/context/language.context';
 import { LayoutDirectionProvider, useLayoutDirection } from '@/context/layout-direction.context';
 import { OnboardingProvider, useOnboarding } from '@/context/onboarding.context';
 import { AppQueryProvider } from '@/context/query-provider';
-import { ThemePreferencesProvider } from '@/context/theme.context';
+import { ThemePreferencesProvider, useThemeSettings } from '@/context/theme.context';
 import { useAuthGuards } from '@/guards/auth-guards';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useThemeColors } from '@/hooks/use-theme';
@@ -81,6 +81,12 @@ export default function RootLayout() {
 }
 
 function RootLayoutContent() {
+  const { colorScheme: appearancePreference } = useThemeSettings();
+  useEffect(() => {
+    Appearance.setColorScheme(
+      appearancePreference === 'system' ? 'unspecified' : appearancePreference,
+    );
+  }, [appearancePreference]);
   const colorScheme = useColorScheme();
   const colors = useThemeColors(colorScheme);
   const [showBrandScreen, setShowBrandScreen] = useState(true);
@@ -88,8 +94,7 @@ function RootLayoutContent() {
   const { error } = useAuthContext();
   const { ready: languageReady } = useLanguage();
   const { ready: onboardingReady, completed: onboardingCompleted } = useOnboarding();
-  // Leave Android's frame budget for native screen transitions and scrolling.
-  const animatePageArtwork = Platform.OS !== 'android' && !showBrandScreen;
+  const animatePageArtwork = !showBrandScreen;
   // Restoration failures must expose their retry UI instead of keeping the launch overlay.
   const ready = languageReady && onboardingReady && (!restoring || Boolean(error));
   const finishBrandScreen = useCallback(() => setShowBrandScreen(false), []);
@@ -132,7 +137,6 @@ function RootLayoutNav() {
   const reducedMotion = useReducedMotion();
   const { requireAuth, requireNoAuth, restoring } = useAuthGuards();
   const { error, retryRestore } = useAuthContext();
-  const { buttonPalette } = useAuthTheme();
   const { completed } = useOnboarding();
 
   if (restoring)
@@ -152,7 +156,6 @@ function RootLayoutNav() {
             style={{ flex: 1 }}
             colorScheme={colorScheme}
             seedColor={colors.tint}
-            buttonPalette={buttonPalette}
             matchContents={false}
             ignoreSafeArea="all"
           >
@@ -181,8 +184,7 @@ function RootLayoutNav() {
     <ThemeProvider value={navigationTheme(colorScheme, colors)}>
       <Stack
         screenOptions={{
-          animation: reducedMotion ? 'fade' : 'default',
-          animationMatchesGesture: reducedMotion,
+          ...stackMotionOptions(reducedMotion),
           freezeOnBlur: Platform.OS === 'android',
           contentStyle: { backgroundColor: 'transparent', direction },
           headerShown: false,

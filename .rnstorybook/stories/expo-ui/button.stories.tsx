@@ -4,7 +4,6 @@ import {
   UniversalButtonContent,
   UniversalTextContent,
   UniversalHost,
-  authButtonPalettes,
 } from '@components/ui';
 import type { Meta, StoryObj } from '@storybook/react-native';
 import { View } from 'react-native';
@@ -34,6 +33,9 @@ const meta = {
     },
     fullWidth: { control: 'boolean' },
     borderRadius: { control: { type: 'number', min: 0 } },
+    contentPadding: { control: { type: 'number', min: 0 } },
+    color: { control: 'color' },
+    contentColor: { control: 'color' },
     colorScheme: { control: 'select', options: ['light', 'dark'] },
     disabled: { control: 'boolean' },
     onPress: { action: 'pressed' },
@@ -80,15 +82,30 @@ export const Disabled: Story = {
 };
 
 export const Success: Story = {
-  args: { label: 'Save changes', variant: 'success' },
+  args: {
+    label: 'Save changes',
+    variant: 'success',
+    color: Colors.dark.success,
+    contentColor: Colors.dark.onSuccess,
+  },
 };
 
 export const Warning: Story = {
-  args: { label: 'Review warning', variant: 'warning' },
+  args: {
+    label: 'Review warning',
+    variant: 'warning',
+    color: Colors.dark.warning,
+    contentColor: Colors.dark.onWarning,
+  },
 };
 
 export const Destructive: Story = {
-  args: { label: 'Delete item', variant: 'destructive' },
+  args: {
+    label: 'Delete item',
+    variant: 'destructive',
+    color: Colors.dark.error,
+    contentColor: Colors.dark.onError,
+  },
 };
 
 export const FullWidth: Story = { args: { fullWidth: true } };
@@ -97,12 +114,23 @@ export const CustomRadius: Story = { args: { borderRadius: 12, fullWidth: true }
 
 export const Square: Story = { args: { borderRadius: 0, fullWidth: true } };
 
-export const AuthLightPalette: Story = {
-  args: { colorScheme: 'light', palette: authButtonPalettes.light, fullWidth: true },
+export const CustomColorsLight: Story = {
+  args: {
+    colorScheme: 'light',
+    color: Colors.light.success,
+    contentColor: Colors.light.onSuccess,
+    fullWidth: true,
+  },
 };
-export const AuthDarkPalette: Story = {
-  args: { colorScheme: 'dark', palette: authButtonPalettes.dark, fullWidth: true },
+export const CustomColorsDark: Story = {
+  args: {
+    colorScheme: 'dark',
+    color: Colors.dark.success,
+    contentColor: Colors.dark.onSuccess,
+    fullWidth: true,
+  },
 };
+export const CustomPadding: Story = { args: { contentPadding: 16, borderRadius: 12 } };
 
 function InteractionDemo() {
   const [presses, setPresses] = useState(0);
@@ -114,6 +142,9 @@ function InteractionDemo() {
           label="Count press"
           testID="button-count"
           borderRadius={12}
+          contentPadding={12}
+          color={Colors.dark.success}
+          contentColor={Colors.dark.onSuccess}
           onPress={() => setPresses((value) => value + 1)}
         />
         <UniversalButtonContent

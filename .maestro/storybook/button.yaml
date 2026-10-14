@@ -1,6 +1,6 @@
 appId: com.hyrkul.likan
-name: Custom-radius buttons deliver and suppress presses
-# Interaction uses radius 12 for the enabled button and 0 for the disabled button.
+name: Native buttons with direct color, padding and radius deliver and suppress presses
+# Interaction uses direct colors, padding 12 and radius 12 for enabled; radius 0 for disabled.
 # These assertions cover activation; corner geometry still needs visual inspection.
 tags: [smoke, storybook]
 env:

@@ -8,7 +8,7 @@ form and its width constraint, below the frame's top safe area. `auth-theme.ts` 
 palette; `auth-input-icons.ts` holds native symbol choices.
 
 Compose `AuthText` and `UniversalButtonContent` inside the frame. `AuthText`
-aliases `UniversalTextContent`; buttons inherit the frame's auth palette and
+aliases `UniversalTextContent`; buttons use the shared theme tokens and
 still require an explicit `variant`.
 
 Keep session operations, validation and form state in the auth feature.
@@ -20,8 +20,11 @@ same frame.
 Login supplies `LoginPreferences` in the top bar: a globe icon on the physical
 left and a sun/moon button on the physical right. The top-bar Host explicitly
 uses LTR to preserve these positions in Arabic. The language sheet is outside
-that Host, so its content follows the app's language direction. Choosing French,
+that Host and uses Expo UI's own native hosting. Choosing French,
 English or Arabic updates the existing language provider and closes the sheet.
+The shared sheet uses Expo UI's native defaults with the iOS drag indicator
+hidden. Native light/dark appearance follows the app preference; the sheet adds
+no styling, sizing, padding, colors or content Host.
 The theme button uses the existing app color-scheme preference; moon selects
 dark mode and sun selects light mode. Brand selection stays in App Settings.
 

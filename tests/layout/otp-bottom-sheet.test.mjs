@@ -153,10 +153,11 @@ function setup(
   }
   const fixture = renderFixture(createElement(Harness));
   t.after(() => fixture.unmount());
-  // The native sheet reports its padded content width; this fixture mocks that boundary.
+  // OTP measures its own input section; this fixture mocks that native boundary.
   fixture.flush(() =>
     fixture
-      .findAll('Column')[0]
+      .findAll('Column')
+      .find(({ props }) => props.modifiers?.some((modifier) => modifier.geometry))
       .props.modifiers.find((modifier) => modifier.geometry)
       .geometry({ width: width - 48 }),
   );
@@ -174,7 +175,8 @@ function setup(
     measure: (width) =>
       fixture.flush(() =>
         fixture
-          .findAll('Column')[0]
+          .findAll('Column')
+          .find(({ props }) => props.modifiers?.some((modifier) => modifier.geometry))
           .props.modifiers.find((modifier) => modifier.geometry)
           .geometry({ width }),
       ),
@@ -187,11 +189,11 @@ function setup(
 }
 
 for (const platform of ['ios', 'android']) {
-  test(`${platform} OTP input shares the native sheet width and retains its value across resizing`, (t) => {
+  test(`${platform} OTP input measures its own section and retains its value across resizing`, (t) => {
     const fixture = setup(t, {}, { platform, width: 360, initiallyOpen: false });
     fixture.open();
-    assert.equal(fixture.findAll('Sheet')[0].props.containerColor, '#fafafa');
-    assert.equal(fixture.findAll('Sheet')[0].props.contentPadding, 24);
+    assert.equal(fixture.findAll('Sheet')[0].props.containerColor, undefined);
+    assert.equal(fixture.findAll('Sheet')[0].props.contentPadding, undefined);
     fixture.measure(312);
     const input = fixture.findAll('Input')[0];
     const slotsWidth = () =>

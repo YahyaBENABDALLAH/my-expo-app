@@ -12,6 +12,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { router, useLocalSearchParams } from 'expo-router';
 
 import { useScreenRefresh } from '@/hooks/use-screen-refresh';
+import { useThemeColors } from '@/hooks/use-theme';
 
 import { useAuthContext } from '@/context/auth.context';
 import { collectionOptions } from './collections';
@@ -133,6 +134,7 @@ export function SavedRecipesScreen() {
 
 export function HistoryScreen() {
   const { t } = useTranslation();
+  const colors = useThemeColors();
   const { user } = useAuthContext();
   const userUuid = user?.uuid ?? '';
   const client = useQueryClient();
@@ -157,6 +159,8 @@ export function HistoryScreen() {
       </QueryContent>
       <UniversalButtonContent
         variant="destructive"
+        color={colors.error}
+        contentColor={colors.onError}
         label={clear.isPending ? t('recipes.clearingHistory') : t('recipes.clearHistory')}
         disabled={!userUuid || clear.isPending}
         onPress={() => clear.mutate({})}

@@ -187,7 +187,6 @@ export function SettingsPage({
           <BottomSheet
             isPresented={languageOpen}
             onDismiss={() => setLanguageOpen(false)}
-            containerColor={colors.background}
             testID="app-settings-language-sheet"
           >
             <Column spacing={8} modifiers={nativeFillWidth}>

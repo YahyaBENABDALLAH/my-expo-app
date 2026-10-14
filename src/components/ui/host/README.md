@@ -1,6 +1,6 @@
 # Native Host and shared types
 
-Exports: `UniversalHost`, `useHostColorScheme`, `useHostButtonPalette`,
+Exports: `UniversalHost`, `useHostColorScheme`,
 `useHostLayoutDirection` and `UniversalThemeProps`.
 
 `universal-host.tsx` provides native hosting and inherited appearance/direction.

@@ -80,12 +80,6 @@ for (const scheme of ['light', 'dark']) {
     assert.equal(s.captured.hosts[0].seedColor, s.colors[scheme].tint);
     s.render(s.RefreshableScrollView, {}, { colorScheme: scheme, seedColor: '#987654' });
     assert.equal(s.captured.hosts[1].seedColor, '#987654');
-    s.render(
-      s.RefreshableScrollView,
-      {},
-      { colorScheme: scheme, buttonPalette: { tint: '#135790' } },
-    );
-    assert.equal(s.captured.hosts[2].seedColor, '#135790');
   });
 
   test(`field content inherits ${scheme} Host text, surface and semantic feedback`, () => {

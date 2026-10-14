@@ -15,6 +15,7 @@ import { router } from 'expo-router';
 import { lookupLabel } from './queries';
 
 import { useRecipeCreation } from './use-recipe-creation';
+import { useThemeColors } from '@/hooks/use-theme';
 
 function ChefRequirement({
   chef,
@@ -57,6 +58,7 @@ function ChefRequirement({
 
 export default function CreateScreen() {
   const { t } = useTranslation();
+  const colors = useThemeColors();
   const {
     focused,
     onRefresh,
@@ -236,6 +238,8 @@ export default function CreateScreen() {
               </QueryContent>
               <UniversalButtonContent
                 variant="destructive"
+                color={colors.error}
+                contentColor={colors.onError}
                 label={t('recipeForm.removeIngredient')}
                 onPress={() => removeIngredient(item.id)}
               />
@@ -262,6 +266,8 @@ export default function CreateScreen() {
               />
               <UniversalButtonContent
                 variant="destructive"
+                color={colors.error}
+                contentColor={colors.onError}
                 label={t('recipeForm.removeStep')}
                 onPress={() => removeStep(item.id)}
               />
@@ -283,6 +289,8 @@ export default function CreateScreen() {
       />
       <UniversalButtonContent
         variant={isFinalStep ? 'success' : 'primary'}
+        color={isFinalStep ? colors.success : undefined}
+        contentColor={isFinalStep ? colors.onSuccess : undefined}
         label={mutation.isPending ? t('recipeForm.publishing') : continueLabel}
         testID="recipe-continue"
         onPress={advance}

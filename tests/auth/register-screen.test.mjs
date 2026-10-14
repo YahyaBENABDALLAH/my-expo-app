@@ -50,7 +50,7 @@ function setup(language = 'fr') {
           error: fieldState.error?.message,
         });
       },
-      useAuthTheme: () => ({ colors: {}, scheme: 'light', buttonPalette: {} }),
+      useAuthTheme: () => ({ colors: {}, scheme: 'light' }),
       authInputIcons: {},
       nativeFillWidth: [],
       nativeFillSize: [],

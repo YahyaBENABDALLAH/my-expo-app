@@ -81,17 +81,15 @@ export default function MoreScreen() {
       />
       <UniversalButtonContent
         variant="destructive"
+        color={colors.error}
+        contentColor={colors.onError}
         label={logout.isPending ? t('account.signingOut') : signOutLabel}
         testID="more-sign-out"
         disabled={logout.isPending}
         onPress={() => logout.mutate()}
       />
       {logout.error ? <Text>{t('account.signOutFailed')}</Text> : null}
-      <BottomSheet
-        isPresented={profile}
-        onDismiss={() => setProfile(false)}
-        containerColor={colors.background}
-      >
+      <BottomSheet isPresented={profile} onDismiss={() => setProfile(false)}>
         <Column spacing={16} modifiers={nativeFillWidth}>
           <Text variant="title" testID="profile-preferences-title">
             {t('profile.title')}

@@ -1,6 +1,12 @@
 import { Canvas, Fill, Shader, Skia } from '@shopify/react-native-skia';
 import { useCallback, useEffect, useRef } from 'react';
-import { View, type LayoutChangeEvent, type StyleProp, type ViewStyle } from 'react-native';
+import {
+  Platform,
+  View,
+  type LayoutChangeEvent,
+  type StyleProp,
+  type ViewStyle,
+} from 'react-native';
 import {
   type SharedValue,
   useDerivedValue,
@@ -11,6 +17,9 @@ import { themes, themeIds } from '@/constants/themes/index';
 import { useAppTheme } from '@/hooks/use-theme';
 import { useMotionEnabled } from '@/hooks/use-motion-enabled';
 import { useHostColorScheme } from '../host/universal-host';
+
+// This slow-moving full-screen shader needs fewer redraws than interactive motion.
+const FRAME_INTERVAL_MS = Platform.OS === 'android' ? 1000 / 30 : 0;
 
 // Resolve color uniforms once; animated frames only update time and hue.
 const shaderPalettes = Object.fromEntries(
@@ -91,9 +100,18 @@ export function AuroraBackground({
     [resolution],
   );
   const clock = useSharedValue(0);
+  const lastDrawTimestamp = useSharedValue(0);
   const enabled = useMotionEnabled(animate);
-  const { setActive } = useFrameCallback(({ timeSincePreviousFrame }) => {
-    clock.set((time) => time + Math.min(timeSincePreviousFrame ?? 0, 64) / 1000);
+  const { setActive } = useFrameCallback(({ timestamp, timeSincePreviousFrame }) => {
+    // The first frame after resuming establishes a fresh origin, excluding paused time.
+    if (timeSincePreviousFrame === null) {
+      lastDrawTimestamp.set(timestamp);
+      return;
+    }
+    const elapsed = timestamp - lastDrawTimestamp.get();
+    if (elapsed < FRAME_INTERVAL_MS - 0.5) return;
+    lastDrawTimestamp.set(timestamp);
+    clock.set((time) => time + Math.min(elapsed, 64) / 1000);
   }, false);
   useEffect(() => {
     setActive(enabled);

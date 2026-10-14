@@ -24,7 +24,6 @@ export * from './auth/login-preferences';
 export * from './bottom-sheet/bottom-sheet';
 export * from './button/universal-button';
 export * from './button/universal-button-content';
-export type { UniversalButtonPalette } from './button/universal-button.types';
 export * from './checkbox/checkbox';
 export * from './collapsible/collapsible';
 export * from './error-toast/error-toast';

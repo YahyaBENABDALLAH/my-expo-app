@@ -72,7 +72,15 @@ const meta = {
     colorScheme: { control: 'select', options: ['light', 'dark'] },
     narrow: { control: 'boolean' },
   },
-  parameters: { layout: 'fullscreen' },
+  parameters: {
+    layout: 'fullscreen',
+    docs: {
+      description: {
+        component:
+          'Android limits the full-screen shader to 30 updates per second; iOS follows the display refresh rate. Pause/resume retains the current artwork without advancing through paused time. Both platforms respect app activity and Reduce Motion.',
+      },
+    },
+  },
 } satisfies Meta<typeof BackgroundDemo>;
 export default meta;
 type Story = StoryObj<typeof meta>;

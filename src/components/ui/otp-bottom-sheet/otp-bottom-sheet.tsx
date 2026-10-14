@@ -8,10 +8,13 @@ import {
   type TextInputRef,
 } from '@expo/ui';
 import { useLayoutEffect, useRef, useState } from 'react';
-import { AccessibilityInfo, useWindowDimensions } from 'react-native';
+import { AccessibilityInfo, Platform, useWindowDimensions } from 'react-native';
+import { onSizeChanged } from '@expo/ui/jetpack-compose/modifiers';
+import { onGeometryChange } from '@expo/ui/swift-ui/modifiers';
 import { useTranslation } from 'react-i18next';
 import { useThemeColors } from '@/hooks/use-theme';
-import { BottomSheet, useBottomSheetContentWidth } from '../bottom-sheet/bottom-sheet';
+import { useMeasuredWidth } from '@/hooks/use-measured-width';
+import { BottomSheet } from '../bottom-sheet/bottom-sheet';
 import { UniversalButtonContent } from '../button/universal-button-content';
 import { UniversalHost, useHostColorScheme } from '../host/universal-host';
 import { LoadingContent } from '../loading/loading-state';
@@ -66,7 +69,12 @@ function OtpForm({
   const { height, fontScale } = useWindowDimensions();
   const cooldown = Number.isFinite(resendCooldownSeconds) ? Math.max(0, resendCooldownSeconds) : 30;
   const value = useNativeState('');
-  const width = useBottomSheetContentWidth();
+  const [width, setWidth] = useMeasuredWidth();
+  const measureWidth = ({ width: nextWidth }: { width: number }) => {
+    if (nextWidth > 0) setWidth(nextWidth);
+  };
+  const inputSizing =
+    Platform.OS === 'ios' ? onGeometryChange(measureWidth) : onSizeChanged(measureWidth);
   // Intrinsic sheet Hosts measure with an unbounded height. Compose scrolling needs a limit.
   const viewportHeight = Math.min(620, height * 0.7);
   const inputHeight = Math.max(64, Math.ceil(35 * fontScale + 24));
@@ -219,7 +227,7 @@ function OtpForm({
           </Column>
         </Column>
         {!success && (
-          <Column spacing={12} modifiers={nativeFillWidth}>
+          <Column spacing={12} modifiers={[...nativeFillWidth, inputSizing]}>
             {/* An explicit-width direction bridge keeps OTP digits LTR inside Arabic sheets. */}
             {width > 0 && (
               <RNHostView matchContents>
@@ -319,6 +327,8 @@ function OtpForm({
         )}
         <UniversalButtonContent
           variant={success ? 'success' : 'primary'}
+          color={success ? colors.success : undefined}
+          contentColor={success ? colors.onSuccess : undefined}
           fullWidth
           contentPadding={12}
           borderRadius={16}

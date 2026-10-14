@@ -37,6 +37,9 @@ function setup(write = () => recipeFixture()) {
     '@/context/auth.context': {
       useAuthContext: () => ({ user: { uuid: 'alice', isChef: true, chefProfileUuid: uuid } }),
     },
+    '@/hooks/use-theme': {
+      useThemeColors: () => s.load('constants/colors.ts').default.light,
+    },
     '@/features/recipes/queries': {
       lookupLabel: (item) => item.name,
       lookupOptions: (kind, page = 1, search = '') => ({

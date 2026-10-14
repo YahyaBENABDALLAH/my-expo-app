@@ -4,9 +4,10 @@ Export: `AuroraBackground`. Implementation: `aurora-background.tsx`.
 
 The root's default full-screen Skia background for all routed pages. An optional
 `colorScheme` overrides its Host/device appearance; `animate` defaults to true.
-The production root passes `animate={false}` on Android to avoid a full-screen
-shader redraw on every frame during navigation and scrolling. The artwork and
-theme changes remain visible. iOS and the interactive Skia demo retain motion.
+The production root enables motion on both platforms after the launch screen exits.
+Android advances the shader at 30 updates per second, preserving its motion speed
+while reducing full-screen redraws during navigation and scrolling. iOS follows
+the display refresh rate. Static mode remains available with `animate={false}`.
 The shader consumes the selected theme's background, raised surface, primary
 and secondary tokens. Optional `hue` supports the interactive canvas page.
 
@@ -18,7 +19,8 @@ shared-value write, and invalid reports retain the last valid geometry.
 The UI-thread
 clock pauses for explicit static mode, inactive/background app state and live
 Reduce Motion changes. It freezes its current frame and resumes without a jump.
-Keep this specialized rendering boundary separate from ordinary Expo UI layout.
+The first frame after resuming resets the draw timestamp so paused time cannot
+advance the artwork. Keep this specialized rendering boundary separate from ordinary Expo UI layout.
 
 See [shared motion](../../../../docs/shared-skia-motion.md) for verification limits.
 

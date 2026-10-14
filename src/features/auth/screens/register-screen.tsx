@@ -37,7 +37,7 @@ export function RegisterScreen() {
   const { t } = useTranslation();
   const { language } = useLanguage();
   const [preferredLanguage, setPreferredLanguage] = useState<Language>(language);
-  const { colors, buttonPalette } = useAuthTheme();
+  const { colors } = useAuthTheme();
   const insets = useSafeAreaInsets();
   const { register } = useAuthFlow();
   const { form, submit, pending } = useAuthForm<RegisterFormValues>(
@@ -62,7 +62,6 @@ export function RegisterScreen() {
         <UniversalHost
           style={{ flex: 1, width: '100%', maxWidth: 480 }}
           seedColor={colors.tint}
-          buttonPalette={buttonPalette}
           matchContents={false}
           ignoreSafeArea="all"
         >
