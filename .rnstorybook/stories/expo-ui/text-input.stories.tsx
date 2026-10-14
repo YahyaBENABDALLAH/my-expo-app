@@ -153,7 +153,7 @@ const meta = {
   ],
   render: (args) => (
     <UniversalTextInput
-      key={`${args.defaultValue}-${args.autoFocus}-${args.secureTextEntry}-${args.multiline}`}
+      key={`${args.defaultValue}-${args.autoFocus}-${args.multiline}`}
       {...args}
     />
   ),
@@ -249,7 +249,10 @@ export const ReadOnlyIcons: Story = {
 };
 export const Filled: Story = { args: { defaultValue: 'Alex Morgan' } };
 export const Focused: Story = {
-  args: { autoFocus: true, helperText: 'The border responds to native focus and blur.' },
+  args: {
+    autoFocus: true,
+    helperText: 'Focus and blur use native events; the surface keeps its theme colors.',
+  },
 };
 export const Disabled: Story = {
   args: {
@@ -347,16 +350,50 @@ export const Password: Story = {
 function PasswordVisibilityDemo(args: UniversalTextInputProps) {
   const value = useNativeState(args.defaultValue ?? '');
   const [shown, setShown] = useState(false);
+  const [layout, setLayout] = useState({ first: 0, current: 0 });
+  const [toggles, setToggles] = useState(0);
+  const stable = layout.first > 0 && Math.abs(layout.current - layout.first) < 0.5;
   return (
-    <UniversalTextInput
-      {...args}
-      value={value}
-      secureTextEntry={!shown}
-      leftIcon={authInputIcons.password}
-      rightIcon={shown ? authInputIcons.hidePassword : authInputIcons.showPassword}
-      rightIconAccessibilityLabel={shown ? 'Hide password' : 'Show password'}
-      onRightIconPress={() => setShown((current) => !current)}
-    />
+    <View style={{ gap: 16 }}>
+      <View
+        onLayout={({ nativeEvent }) => {
+          const next = nativeEvent.layout.height;
+          if (next <= 0) return;
+          setLayout((previous) =>
+            previous.current === next ? previous : { first: previous.first || next, current: next },
+          );
+        }}
+      >
+        <UniversalTextInput
+          {...args}
+          value={value}
+          secureTextEntry={!shown}
+          leftIcon={authInputIcons.password}
+          rightIcon={shown ? authInputIcons.hidePassword : authInputIcons.showPassword}
+          rightIconAccessibilityLabel={shown ? 'Hide password' : 'Show password'}
+          onRightIconPress={() => {
+            setShown((current) => !current);
+            setToggles((count) => count + 1);
+          }}
+        />
+      </View>
+      <Host colorScheme={args.colorScheme}>
+        <Column spacing={8}>
+          <Text
+            testID="password-layout-state"
+            textStyle={{ color: Colors[args.colorScheme ?? 'dark'].text }}
+          >
+            {`Height ${stable ? 'stable' : 'changed'}: ${Math.round(layout.current)} points`}
+          </Text>
+          <Text
+            testID="password-visibility-state"
+            textStyle={{ color: Colors[args.colorScheme ?? 'dark'].text }}
+          >
+            {`Password ${shown ? 'shown' : 'hidden'} · Toggles: ${toggles}`}
+          </Text>
+        </Column>
+      </Host>
+    </View>
   );
 }
 
@@ -364,9 +401,15 @@ export const PasswordVisibility: Story = {
   ...Password,
   args: {
     ...Password.args,
-    helperText: 'Tap the eye icon to reveal or hide the password. Both icons use the same size.',
+    helperText:
+      'Tap the eye icon to reveal or hide the password. The field height stays stable in both modes.',
   },
-  render: (args) => <PasswordVisibilityDemo key={args.defaultValue} {...args} />,
+  render: (args) => (
+    <PasswordVisibilityDemo
+      key={JSON.stringify([args.defaultValue, args.textStyle, args.colorScheme])}
+      {...args}
+    />
+  ),
 };
 export const PasswordVisibilityLargeText: Story = {
   ...PasswordVisibility,
@@ -611,4 +654,17 @@ export const ControlledNativeState: Story = {
     helperText: 'Uses useNativeState and a worklet; no React render on each keystroke.',
   },
   render: (args) => <ControlledInputDemo key={args.defaultValue} {...args} />,
+};
+
+export const PasswordVisibilityEmpty: Story = {
+  ...PasswordVisibility,
+  args: { ...PasswordVisibility.args, defaultValue: '' },
+};
+export const PasswordVisibilityDisabled: Story = {
+  ...PasswordVisibility,
+  args: { ...PasswordVisibility.args, disabled: true },
+};
+export const PasswordVisibilityLight: Story = {
+  ...PasswordVisibility,
+  args: { ...PasswordVisibility.args, colorScheme: 'light' },
 };

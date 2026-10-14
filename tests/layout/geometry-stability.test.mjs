@@ -191,27 +191,26 @@ for (const platform of ['ios', 'android']) {
   });
 }
 
-test('RN input bridge skips duplicate rounded width updates and preserves the native field across resize', () => {
+test('RN input renders immediately in a constrained Host and retains its native value across width changes', () => {
   const s = setup();
   const { UniversalTextInput } = s.load('components/ui/text-input/universal-text-input.tsx');
-  const view = renderFixture(h(UniversalTextInput, { testID: 'input' }));
-  const report = (width) =>
-    view.flush(() =>
-      view.findAll('View')[0].props.onLayout({ nativeEvent: { layout: { width } } }),
-    );
+  const nativeValue = { value: 'Draft', get: () => 'Draft' };
+  let resize;
+  function Frame() {
+    const [width, setWidth] = useState(undefined);
+    resize = setWidth;
+    return h(UniversalTextInput, { testID: 'input', value: nativeValue, style: { width } });
+  }
+  const view = renderFixture(h(Frame));
   try {
-    report(320.1);
     const input = view.findAll('Input')[0];
-    const before = s.calls.stateHooks;
-    report(320.2);
-    report(320.1);
-    assert.equal(s.calls.stateHooks, before);
-    report(480);
+    assert.ok(input);
+    assert.equal(view.findAll('View')[0].props.onLayout, undefined);
+    assert.equal(input.props.value, nativeValue);
+    view.flush(() => resize(480));
     assert.equal(view.findAll('Input')[0], input);
     assert.equal(view.findAll('Row')[0].props.style.width, 480);
-    const resized = s.calls.stateHooks;
-    for (const invalid of [NaN, Infinity, -1]) report(invalid);
-    assert.equal(s.calls.stateHooks, resized);
+    assert.equal(input.props.value, nativeValue);
   } finally {
     view.unmount();
   }

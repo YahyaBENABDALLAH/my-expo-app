@@ -62,6 +62,9 @@ env:
     env:
       STORY_ID: expo-ui-universal-text-input--password-visibility
       READY_ID: expo-ui-text-input-right-icon
+- assertVisible:
+    id: password-layout-state
+    text: 'Height stable:.*'
 - tapOn:
     id: expo-ui-text-input-right-icon
 - assertVisible:
@@ -72,3 +75,59 @@ env:
 - assertNotVisible:
     id: expo-ui-text-input
     text: Example123!
+
+- assertVisible:
+    id: password-layout-state
+    text: 'Height stable:.*'
+- assertVisible:
+    id: password-visibility-state
+    text: 'Password hidden · Toggles: 2'
+- runFlow:
+    file: ../helpers/open-story.yaml
+    env:
+      STORY_ID: expo-ui-universal-text-input--password-visibility-large-text
+      READY_ID: expo-ui-text-input-right-icon
+- assertVisible:
+    id: password-layout-state
+    text: 'Height stable:.*'
+- tapOn:
+    id: expo-ui-text-input-right-icon
+- assertVisible:
+    id: expo-ui-text-input
+    text: Example123!
+- assertVisible:
+    id: password-layout-state
+    text: 'Height stable:.*'
+- tapOn:
+    id: expo-ui-text-input-right-icon
+- assertVisible:
+    id: password-layout-state
+    text: 'Height stable:.*'
+- runFlow:
+    file: ../helpers/open-story.yaml
+    env:
+      STORY_ID: expo-ui-universal-text-input--password-visibility-empty
+      READY_ID: expo-ui-text-input-right-icon
+- tapOn:
+    id: expo-ui-text-input-right-icon
+- assertVisible:
+    id: password-layout-state
+    text: 'Height stable:.*'
+- assertVisible:
+    id: password-visibility-state
+    text: 'Password shown · Toggles: 1'
+- tapOn:
+    id: expo-ui-text-input-right-icon
+- assertVisible:
+    id: password-layout-state
+    text: 'Height stable:.*'
+- runFlow:
+    file: ../helpers/open-story.yaml
+    env:
+      STORY_ID: expo-ui-universal-text-input--password-visibility-disabled
+      READY_ID: expo-ui-text-input-right-icon
+- tapOn:
+    id: expo-ui-text-input-right-icon
+- assertVisible:
+    id: password-visibility-state
+    text: 'Password hidden · Toggles: 0'

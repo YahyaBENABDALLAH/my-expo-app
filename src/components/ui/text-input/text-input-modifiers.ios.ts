@@ -1,27 +1,53 @@
 import type { RowProps } from '@expo/ui';
-import { accessibilityLabel, frame, strokeBorder } from '@expo/ui/swift-ui/modifiers';
+import {
+  accessibilityLabel,
+  background,
+  clipShape,
+  frame,
+  strokeBorder,
+  textFieldStyle,
+} from '@expo/ui/swift-ui/modifiers';
 
-export const inputRowFlex = [frame({ maxWidth: Infinity })];
+// Both SecureField and TextField use the same unpadded native style.
+export const inputRowFlex = [textFieldStyle('plain'), frame({ maxWidth: Infinity })];
 export const rightIconLabel = (label: string) => [accessibilityLabel(label)];
 
 export function inputFieldAppearance(
   style: NonNullable<RowProps['style']>,
 ): Pick<RowProps, 'style' | 'modifiers'> {
-  const { borderColor, borderWidth, ...surfaceStyle } = style;
+  const {
+    width,
+    height,
+    backgroundColor,
+    borderRadius,
+    borderColor,
+    borderWidth,
+    ...contentStyle
+  } = style;
   return {
-    // SDK 57's rectangular style border gets cut off by the rounded clip.
-    // Keep the surface clip and draw an inset stroke along the same shape.
-    style: surfaceStyle,
-    modifiers:
-      borderColor != null && borderWidth != null && borderWidth > 0
+    style: contentStyle,
+    modifiers: [
+      frame({
+        width: width as number | undefined,
+        height: height as number | undefined,
+        maxWidth: width === undefined ? Infinity : undefined,
+        minHeight: height === undefined ? 48 : undefined,
+      }),
+      ...(backgroundColor == null ? [] : [background(backgroundColor)]),
+      ...(borderRadius == null
+        ? []
+        : [clipShape('roundedRectangle', typeof borderRadius === 'number' ? borderRadius : 0)]),
+      // An inset stroke follows the same rounded shape as the surface.
+      ...(borderColor != null && borderWidth != null && borderWidth > 0
         ? [
             strokeBorder({
               content: borderColor,
               style: { lineWidth: borderWidth },
               shape: 'roundedRectangle',
-              cornerRadius: typeof style.borderRadius === 'number' ? style.borderRadius : 0,
+              cornerRadius: typeof borderRadius === 'number' ? borderRadius : 0,
             }),
           ]
-        : [],
+        : []),
+    ],
   };
 }

@@ -1,7 +1,6 @@
 import { useThemeColors } from '@/hooks/use-theme';
 import { Column, Icon, Row, Text, TextInput, type IconProps, type TextInputProps } from '@expo/ui';
-import { useRef, useState } from 'react';
-import { useMeasuredWidth } from '@/hooks/use-measured-width';
+import { useRef } from 'react';
 import { View } from 'react-native';
 import { UniversalHost, useHostColorScheme } from '../host/universal-host';
 import { nativeFillWidth } from '../native/native-fill-width';
@@ -38,75 +37,6 @@ export interface UniversalTextInputProps extends TextInputProps {
   onPress?: () => void;
 }
 
-type InputColors = NonNullable<UniversalTextInputProps['palette']>;
-
-function inputAppearance(
-  style: TextInputProps['style'],
-  colors: Pick<InputColors, 'surface' | 'tint' | 'border'>,
-  focused: boolean,
-  semanticColor: string | undefined,
-  hasIconAction: boolean,
-) {
-  const fieldStyle = {
-    paddingHorizontal: style?.paddingHorizontal ?? style?.padding ?? 14,
-    paddingVertical: style?.paddingVertical ?? style?.padding ?? 14,
-    // Expo UI maps paddingRight to native trailing/end, including in RTL.
-    ...(hasIconAction
-      ? { paddingRight: style?.paddingRight ?? style?.paddingHorizontal ?? style?.padding ?? 2 }
-      : {}),
-    backgroundColor: colors.surface,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: semanticColor ?? (focused ? colors.tint : colors.border),
-    ...style,
-  };
-  // Vertical spacing belongs on the text, outside the native icon tap target.
-  const inputPadding = {
-    paddingTop: fieldStyle.paddingTop ?? fieldStyle.paddingVertical,
-    paddingBottom: fieldStyle.paddingBottom ?? fieldStyle.paddingVertical,
-  };
-  const fieldAppearance = inputFieldAppearance({
-    ...fieldStyle,
-    paddingVertical: 0,
-    paddingTop: 0,
-    paddingBottom: 0,
-  });
-  return { fieldAppearance, inputPadding };
-}
-
-function trailingInputIcon({
-  rightIcon,
-  onRightIconPress,
-  rightIconAccessibilityLabel,
-  disabled,
-  testID,
-  colors,
-  iconStyle,
-}: Readonly<
-  Pick<
-    UniversalTextInputProps,
-    'rightIcon' | 'onRightIconPress' | 'rightIconAccessibilityLabel' | 'disabled' | 'testID'
-  > & { colors: Pick<InputColors, 'tint' | 'muted'>; iconStyle: IconProps['style'] }
->) {
-  if (rightIcon == null) return null;
-  const iconTestID = testID ? `${testID}-right-icon` : undefined;
-  if (!onRightIconPress) {
-    return (
-      <Icon name={rightIcon} size={20} color={colors.muted} style={iconStyle} testID={iconTestID} />
-    );
-  }
-  return (
-    <TextInputIconButton
-      disabled={disabled}
-      onPress={disabled ? undefined : onRightIconPress}
-      accessibilityLabel={rightIconAccessibilityLabel}
-      testID={iconTestID}
-    >
-      <Icon name={rightIcon} size={20} color={colors.tint} style={iconStyle} />
-    </TextInputIconButton>
-  );
-}
-
 /** Adapter for an input embedded in a React Native layout. */
 export function UniversalTextInput({
   colorScheme,
@@ -114,25 +44,16 @@ export function UniversalTextInput({
   onPress,
   ...props
 }: UniversalTextInputProps) {
-  const [containerWidth, setContainerWidth] = useMeasuredWidth();
   return (
     <View
       testID={props.testID ? `${props.testID}-container` : undefined}
       collapsable={false}
       pointerEvents={disabled ? 'none' : 'auto'}
       onTouchStart={disabled ? undefined : onPress}
-      onLayout={({ nativeEvent }) => setContainerWidth(Math.round(nativeEvent.layout.width))}
     >
-      {containerWidth > 0 ? (
-        <UniversalHost colorScheme={colorScheme}>
-          <UniversalTextInputContent
-            {...props}
-            colorScheme={colorScheme}
-            disabled={disabled}
-            style={{ width: containerWidth, ...props.style }}
-          />
-        </UniversalHost>
-      ) : null}
+      <UniversalHost colorScheme={colorScheme}>
+        <UniversalTextInputContent {...props} colorScheme={colorScheme} disabled={disabled} />
+      </UniversalHost>
     </View>
   );
 }
@@ -158,21 +79,20 @@ export function UniversalTextInputContent({
   ...inputProps
 }: Omit<UniversalTextInputProps, 'onPress'>) {
   const scheme = useHostColorScheme(colorScheme);
-  const [focused, setFocused] = useState(false);
   const focusedRef = useRef(false);
   const themeColors = useThemeColors(scheme);
   const colors = palette ?? themeColors;
   const semanticColor = status === 'default' ? undefined : colors[status];
-  const hasIconAction = rightIcon != null && !!onRightIconPress;
   const contentStyle = { opacity: disabled ? 0.5 : 1 };
   const iconStyle = { width: 20, height: 20, ...contentStyle };
-  const { fieldAppearance, inputPadding } = inputAppearance(
-    style,
-    colors,
-    focused,
-    semanticColor,
-    hasIconAction,
-  );
+  const fieldAppearance = inputFieldAppearance({
+    paddingHorizontal: style?.paddingHorizontal ?? style?.padding ?? 14,
+    backgroundColor: colors.surface,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: semanticColor ?? colors.border,
+    ...style,
+  });
   const input = (
     <TextInput
       {...inputProps}
@@ -180,24 +100,22 @@ export function UniversalTextInputContent({
       readOnly={readOnly}
       editable={disabled ? false : editable}
       placeholderTextColor={inputProps.placeholderTextColor ?? colors.muted}
-      cursorColor={inputProps.cursorColor ?? colors.tint}
-      selectionColor={inputProps.selectionColor ?? colors.selection ?? themeColors.selection}
-      selectionHandleColor={inputProps.selectionHandleColor ?? colors.tint}
+      cursorColor={inputProps.cursorColor ?? palette?.tint}
+      selectionColor={inputProps.selectionColor ?? palette?.selection}
+      selectionHandleColor={inputProps.selectionHandleColor ?? palette?.tint}
       onFocus={() => {
         if (focusedRef.current) return;
         focusedRef.current = true;
-        setFocused(true);
         onFocus?.();
       }}
       onBlur={() => {
         // Compose reports its initial unfocused state when the input mounts.
         if (!focusedRef.current) return;
         focusedRef.current = false;
-        setFocused(false);
         onBlur?.();
       }}
-      style={{ ...inputPadding, ...contentStyle }}
-      textStyle={{ fontSize: 16, color: colors.text, ...textStyle }}
+      style={contentStyle}
+      textStyle={{ color: colors.text, ...textStyle }}
     />
   );
 
@@ -210,7 +128,7 @@ export function UniversalTextInputContent({
       {label ? (
         <Text
           testID={inputProps.testID ? `${inputProps.testID}-label` : undefined}
-          textStyle={{ fontSize: 14, fontWeight: '600', color: colors.text }}
+          textStyle={{ color: colors.text }}
         >
           {label}
         </Text>
@@ -220,10 +138,7 @@ export function UniversalTextInputContent({
         alignment="center"
         spacing={8}
         style={fieldAppearance.style}
-        modifiers={[
-          ...(style?.width === undefined ? nativeFillWidth : []),
-          ...(fieldAppearance.modifiers ?? []),
-        ]}
+        modifiers={fieldAppearance.modifiers}
       >
         {leftIcon != null ? (
           <Icon
@@ -235,20 +150,31 @@ export function UniversalTextInputContent({
           />
         ) : null}
         {input}
-        {trailingInputIcon({
-          rightIcon,
-          onRightIconPress,
-          rightIconAccessibilityLabel,
-          disabled,
-          testID: inputProps.testID,
-          colors,
-          iconStyle,
-        })}
+        {rightIcon != null ? (
+          onRightIconPress ? (
+            <TextInputIconButton
+              disabled={disabled}
+              onPress={disabled ? undefined : onRightIconPress}
+              accessibilityLabel={rightIconAccessibilityLabel}
+              testID={inputProps.testID ? `${inputProps.testID}-right-icon` : undefined}
+            >
+              <Icon name={rightIcon} size={20} color={colors.tint} style={iconStyle} />
+            </TextInputIconButton>
+          ) : (
+            <Icon
+              name={rightIcon}
+              size={20}
+              color={colors.muted}
+              style={iconStyle}
+              testID={inputProps.testID ? `${inputProps.testID}-right-icon` : undefined}
+            />
+          )
+        ) : null}
       </Row>
       {helperText ? (
         <Text
           testID={inputProps.testID ? `${inputProps.testID}-helper` : undefined}
-          textStyle={{ fontSize: 13, color: semanticColor ?? colors.muted }}
+          textStyle={{ color: semanticColor ?? colors.muted }}
         >
           {helperText}
         </Text>

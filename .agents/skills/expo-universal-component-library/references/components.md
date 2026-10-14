@@ -1,5 +1,28 @@
 # Universal component catalog
 
+## Text input simplification (2026-10-14)
+
+`UniversalTextInput` and its content retain their universal props, labels,
+helper/status roles, explicit palette/native color overrides and accessible icon
+actions. Native hosting now supplies width immediately without onLayout state;
+focus uses only a duplicate-notification guard. Default typography/tint remain
+native, with shared text/surface/border/status colors. iOS secure/plain modes both
+use plain field styling, no editable-text vertical padding and a 48-point minimum
+surface matching the eye action. Native content can grow for larger fonts or
+multiline input; caller dimensions/padding remain supported. Observable values,
+refs, RTL slots and disabled actions remain intact.
+
+The text-input stories add empty, disabled and light password visibility fixtures;
+all visibility fixtures expose measured native layout status and toggle counts.
+The measurement is development-only. The input icon Maestro flow asserts stable
+height, visibility/value retention and disabled suppression. Portable tests cover
+field/value retention, native overrides, focus guards, immediate mounting,
+resizing and module resolution. Empty/filled registration toggles were manually
+checked on the iOS 27 iPhone 18 Pro simulator with unchanged visible surface
+height and retained filled values. Full Storybook/large-text execution is blocked
+by its installed duplicate RNCSafeAreaProvider; Android native checks are pending.
+See [the input guide](../../../../src/components/ui/text-input/README.md).
+
 ## Native defaults follow-up (2026-10-14)
 
 Universal controls now inherit `UniversalHost` appearance and theme tint. Switch,

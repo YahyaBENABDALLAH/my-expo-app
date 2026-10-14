@@ -90,9 +90,10 @@ for (const scheme of ['light', 'dark']) {
       { colorScheme: scheme },
     );
     assert.equal(s.captured.fields[0].textStyle.color, s.colors[scheme].text);
-    assert.equal(s.captured.fields[0].cursorColor, s.colors[scheme].tint);
-    assert.equal(s.captured.fields[0].selectionColor, s.colors[scheme].selection);
-    assert.equal(s.captured.fields[0].selectionHandleColor, s.colors[scheme].tint);
+    assert.equal(s.captured.fields[0].cursorColor, undefined);
+    assert.equal(s.captured.fields[0].selectionColor, undefined);
+    assert.equal(s.captured.fields[0].selectionHandleColor, undefined);
+    assert.equal(s.captured.hosts[0].seedColor, s.colors[scheme].tint);
     assert.equal(s.captured.rows[0].style.backgroundColor, s.colors[scheme].surface);
     assert.equal(s.captured.rows[0].style.borderColor, s.colors[scheme].error);
     assert.equal(s.captured.texts.at(-1).textStyle.color, s.colors[scheme].error);

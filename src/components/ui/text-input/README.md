@@ -1,38 +1,17 @@
 # Text input
 
-Exports: `UniversalTextInput`, `UniversalTextInputContent`, their props and
-`InputStatus`.
+`UniversalTextInput` hosts the field at an RN boundary; `UniversalTextInputContent` composes inside an existing Host. Both keep the universal Expo UI input props, label, helperText, status, optional palette, leading/trailing icons and accessible trailing action.
 
-`universal-text-input.tsx` owns native input composition.
-`text-input-modifiers.*` handles native row sizing, field appearance and labels.
-`text-input-icon-button.*` handles the private trailing action and its contract.
+The Host supplies native typography and tint. The wrapper adds the shared text, surface, border, muted and validation colors. Explicit native color props and palette overrides remain supported. Disabled content dims while the surface stays intact; read-only editing and a separate icon action remain independent.
 
-Use the standalone component at an RN boundary and content inside a Host.
-The native `value` uses Expo UI's supported observable API, including external
-resets and password toggles. Use `FormTextInput` or `NativeField` to bridge
-caller form/string state. Keep validation and submission in the feature.
+There is no width-measurement state, delayed first render, focus-border state, calculated text height or forced remount. Native layout handles width; focus guards only suppress duplicate/initial native notifications. Observable values and input refs retain external reset, selection and keyboard behavior.
 
-The RN boundary measures and rounds its container width only on layout events.
-It filters equal/invalid widths before updating React, so position-only or
-equivalent rounded reports do not rerun input composition. Actual resize keeps
-the same native field instance; hosted content needs no measurement state.
+On iOS, both SecureField and TextField use `textFieldStyle('plain')`. Vertical padding is no longer added to the editable text. The surface has a 48-point minimum height, matching the eye button’s 48 × 48 native tap area; content can grow for larger fonts or multiline text. Caller height, width, padding and rounded-border overrides remain available. The iOS adapter applies its sizing before surface paint and inset stroke so the whole native surface keeps the supplied dimensions. Android uses its native minimum-size modifier and field weight.
 
-Field appearance and trailing-icon composition use private pure helpers in the
-same file. The native TextInput stays in its existing position, with unchanged
-focus guards, padding overrides, icon selectors, and disabled-action handling.
+Icons retain 20 × 20 frames. Right actions require an accessibility label and suppress disabled actions. Password toggling changes the native display mode and icon while retaining the observable value and shared surface geometry.
 
-Read the installed APIs before changing platform appearance, focus, keyboard
-or icon behavior.
+[Native stories](../../../../.rnstorybook/stories/expo-ui/text-input.stories.tsx) cover editing, read-only/disabled, themes, custom geometry and passwords. PasswordVisibility, PasswordVisibilityLargeText, PasswordVisibilityEmpty, PasswordVisibilityDisabled and PasswordVisibilityLight expose native layout status and toggle counts. Their measurement exists only in the story fixture. The [Maestro flow](../../../../.maestro/storybook/text-input-icons.yaml) asserts stable height, value visibility and disabled suppression.
 
-Story exports `ErrorState` and `Numeric` keep the display names Error and Number.
-Their story IDs end in `--error-state` and `--numeric`.
+JS tests cover value/field retention, explicit overrides, focus guards, immediate rendering, resizing and native module resolution. On the iPhone 18 Pro simulator running iOS 27, registration inputs retained their visible surface height when hiding/showing empty and filled values, and the filled value survived repeated toggles. Full Storybook/large-text execution is blocked by the installed duplicate `react-native-safe-area-context` inside Storybook (RNCSafeAreaProvider registration error); Android native checks remain pending. These manual checks are not automated screenshot comparison.
 
-All input icons have a fixed 20 × 20 frame. Right icon buttons use a fixed
-48 × 48 tap target on both platforms, including password reveal/hide.
-`PasswordVisibility` and `PasswordVisibilityLargeText` stories exercise the toggle;
-the icon Maestro flow checks revealing and hiding the password.
-
-Existing composition story: [text-input.stories.tsx](../../../../.rnstorybook/stories/expo-ui/text-input.stories.tsx).
-
-Import public components from `@components/ui`; UI implementations import
-concrete files directly. [Back to the UI guide](../README.md).
+Context7 guidance was checked against [SDK 57 TextInput](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/textinput/) and installed Expo UI 57.0.21 native implementations.
