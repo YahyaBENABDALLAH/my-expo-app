@@ -114,7 +114,6 @@ test('Details opens the correct item and preserves the sheet/body through close,
   try {
     const sheet = view.findAll('Sheet')[0];
     assert.equal(sheet.props.isPresented, false);
-    assert.equal(sheet.props.initialContentWidth, 342);
     s.tap(view, 'home-card-hero-sample-1-open');
     const title = s.byId(view, 'Text', 'home-sample-preview-title');
     assert.equal(title.props.children, 'Avocado toast');
@@ -173,7 +172,6 @@ test('a compact window resize preserves the selected preview and keeps rails wit
   try {
     s.tap(view, 'home-card-inspiration-sample-3-open');
     view.flush(() => s.resize({ width: 320, height: 568 }));
-    assert.equal(view.findAll('Sheet')[0].props.initialContentWidth, 272);
     assert.equal(view.findAll('Sheet')[0].props.isPresented, true);
     assert.equal(s.byId(view, 'Text', 'home-sample-preview-title').props.children, 'Pesto pasta');
     assert.ok(

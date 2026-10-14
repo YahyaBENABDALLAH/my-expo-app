@@ -217,7 +217,6 @@ export function HomeCatalogSections({
       <BottomSheet
         isPresented={preview.isPresented}
         onDismiss={closePreview}
-        initialContentWidth={Math.max(1, viewportWidth - 48)}
         testID="home-sample-preview"
       >
         {selected ? (

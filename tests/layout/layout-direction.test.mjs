@@ -35,7 +35,11 @@ function setup(isRTL = false, platform = 'android') {
     },
     '@/hooks/use-color-scheme': { useColorScheme: (scheme) => scheme ?? 'light' },
     '@/components/ui/switch/switch': { Switch: native('Switch') },
-    '@/components/ui/native/native-fill-width': { nativeFillWidth: [], nativeRowWeight: [] },
+    '@/components/ui/native/native-fill-width': {
+      nativeFillWidth: [],
+      nativeFillWidthCenter: [],
+      nativeRowWeight: [],
+    },
     '@/components/ui/floating-action/floating-action': { FloatingAction: native('FloatingAction') },
     '@/components/ui/navigation/navigation-glass-surface': {
       NavigationGlassSurface: native('GlassSurface'),
@@ -44,6 +48,7 @@ function setup(isRTL = false, platform = 'android') {
     '@expo/ui/jetpack-compose': { Icon: native('Icon'), IconButton: native('IconButton') },
     '@expo/ui/swift-ui/modifiers': {
       frame: (config) => ({ frame: config }),
+      presentationCornerRadius: (value) => ({ presentationCornerRadius: value }),
       onGeometryChange: (handler) => ({ onGeometryChange: handler }),
     },
     '@expo/ui/jetpack-compose/modifiers': {
@@ -286,7 +291,7 @@ for (const platform of ['ios', 'android']) {
 }
 
 for (const snapPoints of [undefined, [], ['half', 'full']]) {
-  test(`iOS sheet ${snapPoints?.length ? 'anchors explicit detents to the top' : 'keeps auto-sized height'}`, () => {
+  test(`iOS sheet leaves height to Expo UI with snapPoints=${JSON.stringify(snapPoints)}`, () => {
     const s = setup(false, 'ios');
     const view = renderFixture(
       createElement(
@@ -298,7 +303,8 @@ for (const snapPoints of [undefined, [], ['half', 'full']]) {
     const { frame } = view.findAll('Column')[0].props.modifiers[0];
     assert.equal(frame.alignment, 'topLeading');
     assert.equal(frame.maxWidth, Infinity);
-    assert.equal(frame.maxHeight, snapPoints?.length ? Infinity : undefined);
+    assert.equal(frame.maxHeight, undefined);
+    assert.equal(view.findAll('BottomSheet')[0].props.snapPoints, snapPoints);
     assert.equal(view.findAll('BottomSheet')[0].props.contentPadding, 0);
     view.unmount();
   });

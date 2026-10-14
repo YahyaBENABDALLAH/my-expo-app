@@ -26,6 +26,7 @@ for (const platform of ['ios', 'android']) {
           I18nManager: { isRTL: false },
           Platform: { OS: platform },
           useColorScheme: () => initialScheme,
+          useWindowDimensions: () => ({ width: 390, height: 844 }),
         },
         'expo-router': { LocaleProvider: native('LocaleProvider') },
         'react-native-safe-area-context': {
@@ -50,6 +51,7 @@ for (const platform of ['ios', 'android']) {
           contentShape: (shape) => ({ shape }),
           disabled: (disabled) => ({ disabled }),
           frame: (frame) => ({ frame }),
+          presentationCornerRadius: (value) => ({ presentationCornerRadius: value }),
           onGeometryChange: (handler) => ({ onGeometryChange: handler }),
           shapes: { rectangle: () => 'rectangle' },
         },

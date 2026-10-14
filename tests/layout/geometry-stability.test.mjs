@@ -68,7 +68,7 @@ function setup(platform = 'ios') {
       useHostColorScheme: () => 'light',
       useHostLayoutDirection: () => 'leftToRight',
     },
-    '@/components/ui/native/native-fill-width': { nativeFillWidth: [] },
+    '@/components/ui/native/native-fill-width': { nativeFillWidth: [], nativeFillWidthCenter: [] },
     '@/components/ui/text-input/text-input-modifiers': {
       inputFieldAppearance: (style) => ({ style }),
       inputRowFlex: [],
@@ -92,6 +92,7 @@ function setup(platform = 'ios') {
     },
     '@expo/ui/swift-ui/modifiers': {
       frame: (value) => ({ frame: value }),
+      presentationCornerRadius: (value) => ({ presentationCornerRadius: value }),
       onGeometryChange: geometry,
       accessibilityElement: () => ({}),
       accessibilityLabel: () => ({}),
@@ -187,6 +188,59 @@ for (const platform of ['ios', 'android']) {
 }
 
 for (const platform of ['ios', 'android']) {
+  test(`${platform}: sheet presentation styling is ready on opening and survives resize and reopening`, () => {
+    const s = setup(platform);
+    const { BottomSheet } = s.load('components/ui/bottom-sheet/bottom-sheet.tsx');
+    const modifiers = [{ customPresentation: true }];
+    let present, showHandle;
+    function Demo() {
+      const [isPresented, setIsPresented] = useState(true);
+      const [showDragIndicator, setShowDragIndicator] = useState(true);
+      present = setIsPresented;
+      showHandle = setShowDragIndicator;
+      return h(
+        BottomSheet,
+        { isPresented, onDismiss() {}, modifiers, showDragIndicator },
+        h('Content'),
+      );
+    }
+    const view = renderFixture(h(Demo));
+    const expected = [
+      ...(platform === 'ios' ? [{ presentationCornerRadius: 28 }] : []),
+      ...modifiers,
+    ];
+    try {
+      const sheet = view.findAll('Sheet')[0];
+      assert.deepEqual(sheet.props.modifiers, expected);
+      assert.equal(sheet.props.contentPadding, 24);
+      assert.equal(sheet.props.showDragIndicator, platform === 'android');
+      const handles = () =>
+        view.findAll('Column').filter((column) => column.props.style?.height === 4);
+      assert.equal(handles().length, platform === 'ios' ? 1 : 0);
+      if (platform === 'ios') assert.equal(handles()[0].props.style.backgroundColor, '#666');
+      view.flush(() =>
+        view
+          .findAll('Column')[0]
+          .props.modifiers.find((value) => value.geometry)
+          .geometry({
+            width: 294,
+          }),
+      );
+      for (const isPresented of [false, true]) {
+        view.flush(() => present(isPresented));
+        assert.equal(view.findAll('Sheet')[0], sheet);
+        assert.deepEqual(sheet.props.modifiers, expected);
+        assert.equal(view.findAll('Host')[0].props.style.width, 294);
+        assert.equal(handles().length, platform === 'ios' ? 1 : 0);
+      }
+      view.flush(() => showHandle(false));
+      assert.equal(sheet.props.showDragIndicator, false);
+      assert.equal(handles().length, 0);
+    } finally {
+      view.unmount();
+    }
+  });
+
   test(`${platform} sheet ignores duplicate width and size/position-only geometry events while retaining real resize`, () => {
     const s = setup(platform);
     const { BottomSheet } = s.load('components/ui/bottom-sheet/bottom-sheet.tsx');
@@ -216,42 +270,15 @@ for (const platform of ['ios', 'android']) {
 }
 
 for (const platform of ['ios', 'android']) {
-  test(`${platform}: first sheet layout has usable padding-aware width without a caller seed`, () => {
-    for (const [props, expected] of [
-      [{}, 342],
-      [{ contentPadding: 0 }, 390],
-      [{ contentPadding: 16 }, 358],
-      [{ contentPadding: { top: 8, left: 20, right: 12 } }, 358],
-      [{ contentPadding: { top: 8 } }, 390],
-      [{ contentPadding: 300 }, 1],
-      ...[0, -1, NaN, Infinity].map((initialContentWidth) => [{ initialContentWidth }, 342]),
-    ]) {
-      const s = setup(platform);
-      const { BottomSheet, useBottomSheetContentWidth } = s.load(
-        'components/ui/bottom-sheet/bottom-sheet.tsx',
-      );
-      function Content() {
-        return h('Content', { width: useBottomSheetContentWidth() });
-      }
-      const view = renderFixture(
-        h(BottomSheet, { isPresented: true, onDismiss() {}, ...props }, h(Content)),
-      );
-      try {
-        assert.equal(view.findAll('Host')[0].props.style.width, expected);
-        assert.equal(view.findAll('Content')[0].props.width, expected);
-        assert.equal(view.findAll('Sheet')[0].props.snapPoints, undefined);
-      } finally {
-        view.unmount();
-      }
-    }
-  });
-
-  test(`${platform}: sheet starts at its supplied width, then native measurements take precedence without remounting content`, () => {
+  test(`${platform}: sheet keeps Expo UI's default height and shares only its native width without remounting content`, () => {
     const s = setup(platform);
-    const { BottomSheet } = s.load('components/ui/bottom-sheet/bottom-sheet.tsx');
-    const view = renderFixture(
-      h(BottomSheet, { isPresented: true, initialContentWidth: 342, onDismiss() {} }, h('Content')),
+    const { BottomSheet, useBottomSheetContentWidth } = s.load(
+      'components/ui/bottom-sheet/bottom-sheet.tsx',
     );
+    function Content() {
+      return h('Content', { width: useBottomSheetContentWidth() });
+    }
+    const view = renderFixture(h(BottomSheet, { isPresented: true, onDismiss() {} }, h(Content)));
     const report = (width) =>
       view.flush(() =>
         view
@@ -261,17 +288,15 @@ for (const platform of ['ios', 'android']) {
       );
     try {
       const content = view.findAll('Content')[0];
-      assert.equal(view.findAll('Host')[0].props.style.width, 342);
-      assert.equal(view.findAll('Sheet')[0].props.initialContentWidth, undefined);
-      report(0);
-      assert.equal(view.findAll('Host')[0].props.style.width, 342);
+      assert.equal(view.findAll('Host')[0].props.style.width, 0);
+      assert.equal(view.findAll('Sheet')[0].props.snapPoints, undefined);
       report(294);
       assert.equal(view.findAll('Host')[0].props.style.width, 294);
+      assert.equal(content.props.width, 294);
       assert.equal(view.findAll('Content')[0], content);
-      report(NaN);
-      assert.equal(view.findAll('Host')[0].props.style.width, 294);
       report(492);
       assert.equal(view.findAll('Host')[0].props.style.width, 492);
+      assert.equal(content.props.width, 492);
       assert.equal(view.findAll('Content')[0], content);
     } finally {
       view.unmount();

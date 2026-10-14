@@ -63,7 +63,9 @@ function setup(
     },
     '@expo/ui/jetpack-compose/modifiers': { onSizeChanged: (geometry) => ({ geometry }) },
     '@expo/material-symbols/lock.xml': 1,
-    '@/hooks/use-theme': { useThemeColors: () => ({}) },
+    '@/hooks/use-theme': {
+      useThemeColors: () => ({ surface: '#fafafa', surfaceRaised: '#eeeeee' }),
+    },
     '@/components/ui/host/universal-host': {
       UniversalHost: element('Host'),
       useHostColorScheme: () => 'light',
@@ -75,6 +77,7 @@ function setup(
     '@/components/ui/text/universal-text': { UniversalTextContent: element('Text') },
     '@/components/ui/native/native-fill-width': {
       nativeFillWidth: [{ $type: 'frame', maxWidth: Infinity }],
+      nativeFillWidthCenter: [{ $type: 'frame', maxWidth: Infinity, alignment: 'top' }],
       nativeRowWeight: [{ $type: 'frame', maxWidth: Infinity }],
     },
     '@/components/ui/otp-bottom-sheet/otp-feedback': { OtpFeedback: element('Feedback') },
@@ -150,6 +153,13 @@ function setup(
   }
   const fixture = renderFixture(createElement(Harness));
   t.after(() => fixture.unmount());
+  // The native sheet reports its padded content width; this fixture mocks that boundary.
+  fixture.flush(() =>
+    fixture
+      .findAll('Column')[0]
+      .props.modifiers.find((modifier) => modifier.geometry)
+      .geometry({ width: width - 48 }),
+  );
   const button = (suffix) =>
     fixture.findAll('Button').find(({ props }) => props.testID === `otp-sheet-${suffix}`).props;
   return {
@@ -177,16 +187,19 @@ function setup(
 }
 
 for (const platform of ['ios', 'android']) {
-  test(`${platform} OTP input renders before geometry arrives and shares the sheet's measured width`, (t) => {
+  test(`${platform} OTP input shares the native sheet width and retains its value across resizing`, (t) => {
     const fixture = setup(t, {}, { platform, width: 360, initiallyOpen: false });
     fixture.open();
+    assert.equal(fixture.findAll('Sheet')[0].props.containerColor, '#fafafa');
+    assert.equal(fixture.findAll('Sheet')[0].props.contentPadding, 24);
+    fixture.measure(312);
     const input = fixture.findAll('Input')[0];
     const slotsWidth = () =>
       fixture
         .findAll('Column')
         .filter(({ props }) => props.testID?.startsWith('otp-sheet-slot-'))
         .reduce((total, { props }) => total + props.style.width, 40);
-    assert.ok(input, 'the input must be present before a native geometry callback');
+    assert.ok(input);
     assert.equal(slotsWidth(), 312);
     fixture.type('٠١٢٣٤٥');
     fixture.measure(272);

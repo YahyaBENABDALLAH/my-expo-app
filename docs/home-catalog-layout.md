@@ -24,10 +24,9 @@ mount. Home loads remote photos without requesting recipe API data. The page Hos
 owns safe-area padding directly; the existing shared navigation shell is retained.
 
 The Details preview sheet stays mounted and toggles `isPresented`. Its selected
-content is retained while closing. `initialContentWidth` supplies a usable first
-frame before the native sheet reports its actual width, avoiding the previous
-zero-width content layout during presentation. Native flicker confirmation is
-pending; no animation delay or opacity workaround is used.
+content is retained while closing. The shared sheet uses its native content width
+and Expo UI's default height behavior; Home does not calculate a sheet width.
+Native flicker confirmation is pending.
 
 The existing theme and English, French, and Arabic translations are respected.
 `Recipes/Home catalog` has native light/dark stories using bundled images to stay

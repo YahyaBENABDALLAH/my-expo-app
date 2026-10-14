@@ -27,6 +27,11 @@ type DemoProps = UniversalBottomSheetProps & {
 
 function BottomSheetDemo({ title, content, onOpen, onClose, ...args }: DemoProps) {
   const [isPresented, setIsPresented] = useState(args.isPresented);
+  const [controlledPresentation, setControlledPresentation] = useState(args.isPresented);
+  if (controlledPresentation !== args.isPresented) {
+    setControlledPresentation(args.isPresented);
+    setIsPresented(args.isPresented);
+  }
   const ink = args.colorScheme === 'light' ? Colors.light.text : Colors.dark.text;
   return (
     <View style={{ gap: 20 }}>
@@ -132,10 +137,7 @@ const meta = {
   },
   render: (args) => (
     <NativeStoryFrame {...args}>
-      <BottomSheetDemo
-        key={`${args.isPresented}-${JSON.stringify(args.snapPoints)}-${args.colorScheme}`}
-        {...args}
-      />
+      <BottomSheetDemo {...args} />
     </NativeStoryFrame>
   ),
   parameters: { layout: 'fullscreen' },
@@ -145,7 +147,9 @@ type Story = StoryObj<typeof meta>;
 
 export const Closed: Story = {};
 export const Open: Story = { args: { isPresented: true } };
-export const AutoSized: Story = { args: { content: 'A short sheet fitted to its content.' } };
+export const AutoSized: Story = {
+  args: { isPresented: true, content: 'A short sheet fitted to its content.' },
+};
 export const HalfAndFull: Story = { args: { snapPoints: ['half', 'full'] } };
 export const FullHeight: Story = { args: { snapPoints: ['full'] } };
 export const CustomFraction: Story = { args: { snapPoints: [{ fraction: 0.35 }, 'full'] } };

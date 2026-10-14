@@ -22,8 +22,6 @@ import { OtpFeedback } from './otp-feedback';
 import { OtpInputLayout } from './otp-input-layout';
 import { OtpResendButton } from './otp-resend-button';
 
-const CONTENT_PADDING = { top: 12, bottom: 24, left: 24, right: 24 };
-
 export interface OtpBottomSheetProps {
   isPresented: boolean;
   onDismiss: () => void;
@@ -43,17 +41,9 @@ export function OtpBottomSheet({
   testID = 'otp-sheet',
   ...props
 }: OtpBottomSheetProps) {
-  const scheme = useHostColorScheme(colorScheme);
-  const colors = useThemeColors(scheme);
   return (
-    <UniversalHost colorScheme={scheme}>
-      <BottomSheet
-        isPresented={props.isPresented}
-        onDismiss={props.onDismiss}
-        testID={testID}
-        containerColor={colors.surfaceRaised}
-        contentPadding={CONTENT_PADDING}
-      >
+    <UniversalHost colorScheme={colorScheme}>
+      <BottomSheet isPresented={props.isPresented} onDismiss={props.onDismiss} testID={testID}>
         <OtpForm {...props} testID={testID} />
       </BottomSheet>
     </UniversalHost>

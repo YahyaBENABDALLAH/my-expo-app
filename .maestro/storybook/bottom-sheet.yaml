@@ -12,6 +12,7 @@ env:
 - assertVisible:
     id: expo-ui-bottom-sheet-state
     text: 'State: Closed.*'
+
 - tapOn:
     id: expo-ui-bottom-sheet-open
 - assertVisible:
@@ -24,6 +25,26 @@ env:
 - assertVisible:
     id: expo-ui-bottom-sheet-state
     text: 'State: Closed.*'
+
+- runFlow:
+    file: ../helpers/open-story.yaml
+    env:
+      STORY_ID: expo-ui-universal-bottom-sheet--open
+      READY_ID: expo-ui-bottom-sheet-title
+- assertVisible:
+    id: expo-ui-bottom-sheet-close
+- tapOn:
+    id: expo-ui-bottom-sheet-close
+- assertNotVisible:
+    id: expo-ui-bottom-sheet-title
+- tapOn:
+    id: expo-ui-bottom-sheet-open
+- assertVisible:
+    id: expo-ui-bottom-sheet-title
+- tapOn:
+    id: expo-ui-bottom-sheet-close
+- assertNotVisible:
+    id: expo-ui-bottom-sheet-title
 
 - tapOn:
     id: expo-ui-bottom-sheet-open
@@ -38,6 +59,21 @@ env:
 - assertVisible:
     id: expo-ui-bottom-sheet-state
     text: 'State: Closed.*'
+
+- runFlow:
+    file: ../helpers/open-story.yaml
+    env:
+      STORY_ID: expo-ui-universal-bottom-sheet--auto-sized
+      READY_ID: expo-ui-bottom-sheet-title
+- assertVisible:
+    id: expo-ui-bottom-sheet-description
+    text: A short sheet fitted to its content.
+- assertVisible:
+    id: expo-ui-bottom-sheet-close
+- tapOn:
+    id: expo-ui-bottom-sheet-close
+- assertNotVisible:
+    id: expo-ui-bottom-sheet-title
 
 - runFlow:
     file: ../helpers/open-story.yaml
