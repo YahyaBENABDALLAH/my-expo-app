@@ -1,5 +1,6 @@
 import { Button, Text, VStack } from '@expo/ui/swift-ui';
 import {
+  buttonBorderShape,
   buttonStyle,
   clipShape,
   foregroundStyle,
@@ -25,27 +26,34 @@ export function UniversalButtonContent({
   palette,
 }: UniversalButtonProps) {
   const scheme = useHostColorScheme(colorScheme);
-  const { accent, content } = buttonAppearance(
+  const { filled, accent, content } = buttonAppearance(
     variant,
     scheme,
     useHostButtonPalette(palette, scheme),
   );
+  const unfilledStyle = variant === 'link' ? 'plain' : 'bordered';
   return (
     <Button
       testID={testID}
       onPress={disabled ? undefined : onPress}
       modifiers={[
-        buttonStyle('glass'),
+        buttonStyle(filled ? 'borderedProminent' : unfilledStyle),
+
         tint(accent),
         nativeDisabled(Boolean(disabled)),
-        clipShape('rectangle', borderRadius),
+        ...(borderRadius === undefined
+          ? []
+          : [
+              buttonBorderShape('roundedRectangle', borderRadius),
+              clipShape('roundedRectangle', borderRadius),
+            ]),
       ]}
     >
       <VStack
         modifiers={[
           ...(fullWidth ? [frame({ maxWidth: Infinity })] : []),
           foregroundStyle(content),
-          padding({ all: contentPadding }),
+          ...(contentPadding === undefined ? [] : [padding({ all: contentPadding })]),
         ]}
       >
         {children ?? <Text>{label ?? ''}</Text>}

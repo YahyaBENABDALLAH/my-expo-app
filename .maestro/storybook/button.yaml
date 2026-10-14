@@ -1,5 +1,7 @@
 appId: com.hyrkul.likan
-name: Explicit button variants deliver and suppress presses
+name: Custom-radius buttons deliver and suppress presses
+# Interaction uses radius 12 for the enabled button and 0 for the disabled button.
+# These assertions cover activation; corner geometry still needs visual inspection.
 tags: [smoke, storybook]
 env:
   STORYBOOK_URL: myappexpo://storybook

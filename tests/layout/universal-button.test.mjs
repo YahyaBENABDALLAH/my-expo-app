@@ -20,6 +20,7 @@ function setup(platform) {
   const modifiers = Object.fromEntries(
     [
       'buttonStyle',
+      'buttonBorderShape',
       'clipShape',
       'padding',
       'disabled',
@@ -100,6 +101,10 @@ for (const platform of ['ios', 'android']) {
         'roundedRectangle',
         0,
       ]);
+      assert.deepEqual(
+        s.buttons[0].modifiers.find(({ kind }) => kind === 'buttonBorderShape').args,
+        ['roundedRectangle', 0],
+      );
       assert.deepEqual(s.content[0].modifiers.find(({ kind }) => kind === 'padding').args, [
         { all: 0 },
       ]);
@@ -108,8 +113,42 @@ for (const platform of ['ios', 'android']) {
         false,
       );
       assert.equal(
+        s.buttons[1].modifiers.some(({ kind }) => kind === 'buttonBorderShape'),
+        false,
+      );
+      assert.equal(
         s.content[1].modifiers.some(({ kind }) => kind === 'padding'),
         false,
+      );
+    }
+  });
+  test(`${platform}: standalone custom radius reaches the native button surface`, () => {
+    const s = setup(platform);
+    s.standalone({ variant: 'primary', borderRadius: 12 });
+    s.standalone({ variant: 'secondary', borderRadius: 4, disabled: true });
+    if (platform === 'android') {
+      assert.deepEqual(s.buttons[0].shape.cornerRadii, {
+        topStart: 12,
+        topEnd: 12,
+        bottomStart: 12,
+        bottomEnd: 12,
+      });
+      assert.equal(s.buttons[1].shape.cornerRadii.topStart, 4);
+    } else {
+      assert.deepEqual(
+        s.buttons.map(
+          (button) => button.modifiers.find(({ kind }) => kind === 'buttonBorderShape').args,
+        ),
+        [
+          ['roundedRectangle', 12],
+          ['roundedRectangle', 4],
+        ],
+      );
+      assert.deepEqual(
+        s.buttons.map(
+          (button) => button.modifiers.find(({ kind }) => kind === 'buttonStyle').args[0],
+        ),
+        ['borderedProminent', 'bordered'],
       );
     }
   });
@@ -163,6 +202,20 @@ for (const platform of ['ios', 'android']) {
         assert.deepEqual(
           s.buttons.map(({ kind }) => kind),
           ['Button', 'OutlinedButton', 'TextButton', 'Button', 'Button', 'Button'],
+        );
+      else
+        assert.deepEqual(
+          s.buttons.map(
+            (button) => button.modifiers.find(({ kind }) => kind === 'buttonStyle').args[0],
+          ),
+          [
+            'borderedProminent',
+            'bordered',
+            'plain',
+            'borderedProminent',
+            'borderedProminent',
+            'borderedProminent',
+          ],
         );
     });
   }

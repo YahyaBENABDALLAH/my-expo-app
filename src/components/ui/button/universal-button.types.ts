@@ -27,8 +27,9 @@ export type UniversalButtonProps = {
   disabled?: boolean;
   testID?: string;
   fullWidth?: boolean;
-  /** Override native button geometry for custom content such as whole recipe cards. */
+  /** Corner radius in iOS points / Android dp. Omit for native defaults; 0 is square. */
   borderRadius?: number;
+  /** Override label padding, for example 0 for a whole recipe card. */
   contentPadding?: number;
   colorScheme?: 'light' | 'dark';
   palette?: UniversalButtonPalette;

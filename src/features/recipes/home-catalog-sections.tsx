@@ -107,10 +107,11 @@ export function HomeCatalogSections({
         <Column modifiers={nativeFillWidth} style={{ paddingHorizontal: gutter }}>
           <UniversalButtonContent
             label={t('home.search')}
-            variant="primary"
+            variant="secondary"
             testID="home-search"
             fullWidth
-            borderRadius={1}
+            borderRadius={4}
+
             onPress={() => router.navigate('/search')}
           />
         </Column>

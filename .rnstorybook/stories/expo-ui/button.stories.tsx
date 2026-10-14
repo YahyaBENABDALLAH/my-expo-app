@@ -33,6 +33,7 @@ const meta = {
       options: ['primary', 'secondary', 'link', 'success', 'warning', 'destructive'],
     },
     fullWidth: { control: 'boolean' },
+    borderRadius: { control: { type: 'number', min: 0 } },
     colorScheme: { control: 'select', options: ['light', 'dark'] },
     disabled: { control: 'boolean' },
     onPress: { action: 'pressed' },
@@ -92,6 +93,10 @@ export const Destructive: Story = {
 
 export const FullWidth: Story = { args: { fullWidth: true } };
 
+export const CustomRadius: Story = { args: { borderRadius: 12, fullWidth: true } };
+
+export const Square: Story = { args: { borderRadius: 0, fullWidth: true } };
+
 export const AuthLightPalette: Story = {
   args: { colorScheme: 'light', palette: authButtonPalettes.light, fullWidth: true },
 };
@@ -108,12 +113,14 @@ function InteractionDemo() {
           variant="primary"
           label="Count press"
           testID="button-count"
+          borderRadius={12}
           onPress={() => setPresses((value) => value + 1)}
         />
         <UniversalButtonContent
           variant="secondary"
           label="Disabled press"
           testID="button-disabled"
+          borderRadius={0}
           disabled
           onPress={() => setPresses((value) => value + 1)}
         />
