@@ -6,7 +6,7 @@ import { createSourceLoader } from '../helpers/load-source.mjs';
 
 // Exercise real Host context and native adapters. Captured native props establish
 // the JS contract, not device colors, accessibility or touch geometry.
-function setup(platform) {
+function setup(platform, themeId = 'whatsapp') {
   const buttons = [];
   const content = [];
   const hosts = [];
@@ -66,17 +66,21 @@ function setup(platform) {
   );
   mocks['@/components/ui/button/universal-button-content'] = { UniversalButtonContent };
   const { UniversalButton } = load('components/ui/button/universal-button.tsx');
+  const { ThemePreferencesProvider } = load('context/theme.context.tsx');
+  const withTheme = (children) =>
+    createElement(ThemePreferencesProvider, { initialTheme: themeId }, children);
   const colors = load('constants/colors.ts').default;
   return {
     buttons,
     content,
     hosts,
     colors,
+    uxColors: load('constants/themes/index.ts').themes.ux.colors,
     render: (props, host = {}) =>
       renderToStaticMarkup(
-        createElement(UniversalHost, host, createElement(UniversalButtonContent, props)),
+        withTheme(createElement(UniversalHost, host, createElement(UniversalButtonContent, props))),
       ),
-    standalone: (props) => renderToStaticMarkup(createElement(UniversalButton, props)),
+    standalone: (props) => renderToStaticMarkup(withTheme(createElement(UniversalButton, props))),
   };
 }
 
@@ -87,6 +91,118 @@ function accent(button, platform) {
 }
 
 for (const platform of ['ios', 'android']) {
+  test(`${platform}: UX primary fills stay black with white labels in both appearances`, () => {
+    const s = setup(platform, 'ux');
+    for (const scheme of ['light', 'dark']) {
+      s.render({ variant: 'primary' }, { colorScheme: scheme });
+      const button = s.buttons.at(-1);
+      assert.equal(accent(button, platform), '#000000');
+      if (platform === 'android') assert.equal(button.colors.contentColor, '#FFFFFF');
+      else
+        assert.deepEqual(
+          s.content.at(-1).modifiers.find(({ kind }) => kind === 'foregroundStyle').args,
+          ['#FFFFFF'],
+        );
+    }
+  });
+
+  test(`${platform}: standalone UX controls respect an explicit scheme and keep caller overrides`, () => {
+    const s = setup(platform, 'ux');
+    s.standalone({ variant: 'success', colorScheme: 'dark' });
+    assert.equal(accent(s.buttons.at(-1), platform), s.uxColors.dark.success);
+    s.standalone({ variant: 'primary', colorScheme: 'dark' });
+    assert.equal(accent(s.buttons.at(-1), platform), '#000000');
+    s.render({ variant: 'primary', color: '#123456', contentColor: '#FEDCBA' });
+    assert.equal(accent(s.buttons.at(-1), platform), '#123456');
+    s.render({ variant: 'primary', contentColor: '#FEDCBA' });
+    if (platform === 'android') assert.equal(s.buttons.at(-1).colors.containerColor, undefined);
+    else
+      assert.equal(
+        s.buttons.at(-1).modifiers.some(({ kind }) => kind === 'tint'),
+        false,
+      );
+  });
+
+  test(`${platform}: UX controls keep neutral actions, semantic feedback pairs and disabled guards`, () => {
+    const s = setup(platform, 'ux');
+    let presses = 0;
+    const handler = platform === 'ios' ? 'onPress' : 'onClick';
+    for (const scheme of ['light', 'dark']) {
+      for (const variant of [
+        'primary',
+        'secondary',
+        'link',
+        'success',
+        'warning',
+        'destructive',
+        'glass',
+      ]) {
+        s.render({ variant, onPress: () => presses++ }, { colorScheme: scheme });
+        const button = s.buttons.at(-1);
+        const color = accent(button, platform);
+        const [, red, green, blue] = color.match(/^#(..)(..)(..)/);
+        const statusRole = { success: 'success', warning: 'warning', destructive: 'error' }[
+          variant
+        ];
+        if (statusRole) {
+          assert.equal(color, s.uxColors[scheme][statusRole]);
+          assert.ok(
+            red !== green || green !== blue,
+            `${scheme}/${variant} must have a status color`,
+          );
+          const label =
+            platform === 'android'
+              ? button.colors.contentColor
+              : s.content.at(-1).modifiers.find(({ kind }) => kind === 'foregroundStyle').args[0];
+          const foregroundRole = `on${statusRole[0].toUpperCase()}${statusRole.slice(1)}`;
+          assert.equal(label, s.uxColors[scheme][foregroundRole]);
+        } else {
+          assert.equal(red, green, `${scheme}/${variant} must stay grayscale`);
+          assert.equal(green, blue, `${scheme}/${variant} must stay grayscale`);
+        }
+        button[handler]();
+      }
+    }
+    assert.equal(presses, 14);
+    s.render({ variant: 'primary', disabled: true, onPress: () => presses++ });
+    assert.equal(s.buttons.at(-1)[handler], undefined);
+    assert.equal(presses, 14);
+  });
+
+  test(`${platform}: diagonal corners clip the existing Host and preserve native activation`, () => {
+    const s = setup(platform);
+    let presses = 0;
+    for (const cornerRadii of [
+      { topLeft: 24, bottomRight: 24 },
+      { topRight: 24, bottomLeft: 24 },
+    ]) {
+      s.standalone({
+        variant: 'primary',
+        fullWidth: true,
+        borderRadius: 12,
+        cornerRadii,
+        onPress: () => presses++,
+      });
+      const style = Object.assign({}, ...s.hosts.at(-1).style);
+      assert.equal(style.width, '100%');
+      assert.equal(style.overflow, 'hidden');
+      assert.equal(style.borderTopLeftRadius, cornerRadii.topLeft ?? 0);
+      assert.equal(style.borderTopRightRadius, cornerRadii.topRight ?? 0);
+      assert.equal(style.borderBottomLeftRadius, cornerRadii.bottomLeft ?? 0);
+      assert.equal(style.borderBottomRightRadius, cornerRadii.bottomRight ?? 0);
+      const button = s.buttons.at(-1);
+      if (platform === 'android') assert.equal(button.shape.cornerRadii.topStart, 0);
+      else
+        assert.deepEqual(button.modifiers.find(({ kind }) => kind === 'buttonBorderShape').args, [
+          'roundedRectangle',
+          0,
+        ]);
+      button[platform === 'ios' ? 'onPress' : 'onClick']();
+    }
+    assert.equal(presses, 2);
+    assert.equal(s.hosts.length, 2);
+  });
+
   test(`${platform}: card geometry accepts zero rounding and padding while ordinary buttons retain native defaults`, () => {
     const s = setup(platform);
     s.render({ variant: 'link', borderRadius: 0, contentPadding: 0 });
@@ -192,7 +308,7 @@ for (const platform of ['ios', 'android']) {
     assert.equal(accent(s.buttons[1], platform), '#123456');
   });
 
-  test(`${platform}: variants select native styles without a token lookup`, () => {
+  test(`${platform}: brand variants retain native styles and default colors`, () => {
     const s = setup(platform);
     for (const variant of [
       'glass',

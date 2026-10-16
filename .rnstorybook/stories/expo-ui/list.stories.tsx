@@ -144,19 +144,10 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {};
-export const SimpleRows: Story = {
-  args: { supportingText: false, showLeading: false, showTrailing: false },
-};
-export const WithoutLeading: Story = { args: { showLeading: false } };
-export const WithoutTrailing: Story = { args: { showTrailing: false } };
-export const SingleRow: Story = { args: { itemCount: 1 } };
 export const Empty: Story = { args: { itemCount: 0 } };
-export const ManyRows: Story = { args: { itemCount: 30 } };
 export const DisabledRows: Story = { args: { disabledRows: true } };
 export const PullToRefresh: Story = { args: { refreshable: true } };
-export const CompactViewport: Story = { args: { viewportHeight: 240 } };
 export const LightTheme: Story = { args: { colorScheme: 'light' } };
-export const DarkTheme: Story = { args: { colorScheme: 'dark' } };
 
 function CompoundSlotsDemo(args: DemoProps) {
   const [presses, setPresses] = useState(0);
@@ -196,9 +187,3 @@ export const CompoundSlots: Story = {
     </NativeStoryFrame>
   ),
 };
-export const CompoundSlotsLight: Story = {
-  ...CompoundSlots,
-  args: { colorScheme: 'light' },
-};
-
-export const NativeTheme: Story = { args: { seedColor: Colors.light.tint } };

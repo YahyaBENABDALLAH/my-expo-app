@@ -2,17 +2,40 @@ import {
   Column,
   UniversalButton,
   UniversalButtonContent,
-  type UniversalButtonVariant,
+  type UniversalButtonProps,
   UniversalTextContent,
+  UniversalText,
   UniversalHost,
 } from '@components/ui';
 import type { Meta, StoryObj } from '@storybook/react-native';
-import { View } from 'react-native';
 import { useState } from 'react';
-
 import { action } from 'storybook/actions';
 
-import Colors from '@/constants/colors';
+import { useAppTheme, useThemeColors } from '@/hooks/use-theme';
+import { ThemePreferencesProvider } from '@/context/theme.context';
+import { NativeStoryFrame } from '../../components/native-story-frame';
+import { semanticButtonColors } from '../../components/semantic-button-colors';
+
+function ButtonDemo(args: UniversalButtonProps) {
+  const colors = semanticButtonColors(args.variant, useThemeColors(args.colorScheme));
+  const [presses, setPresses] = useState(0);
+  return (
+    <NativeStoryFrame colorScheme={args.colorScheme}>
+      <UniversalButton
+        {...args}
+        color={args.color ?? colors.color}
+        contentColor={args.contentColor ?? colors.contentColor}
+        onPress={() => {
+          setPresses((value) => value + 1);
+          args.onPress?.();
+        }}
+      />
+      <UniversalText colorScheme={args.colorScheme} testID="expo-ui-button-presses">
+        {`Presses: ${presses}`}
+      </UniversalText>
+    </NativeStoryFrame>
+  );
+}
 
 const meta = {
   title: 'Expo UI/Universal Button',
@@ -26,7 +49,6 @@ const meta = {
     onPress: action('button pressed'),
   },
   argTypes: {
-    testID: { control: 'text' },
     label: { control: 'text' },
     variant: {
       control: 'select',
@@ -34,156 +56,111 @@ const meta = {
     },
     fullWidth: { control: 'boolean' },
     borderRadius: { control: { type: 'number', min: 0 } },
-    contentPadding: { control: { type: 'number', min: 0 } },
-    color: { control: 'color' },
-    contentColor: { control: 'color' },
+    cornerRadii: { control: 'object' },
     colorScheme: { control: 'select', options: ['light', 'dark'] },
     disabled: { control: 'boolean' },
-    onPress: { action: 'pressed' },
+    onPress: { action: 'pressed', control: false },
   },
-  render: (args) => (
-    <View
-      testID={`${args.testID}-canvas`}
-      style={{
-        flex: 1,
-        backgroundColor: Colors[args.colorScheme ?? 'dark'].background,
-        padding: 24,
-      }}
-    >
-      <UniversalButton {...args} />
-    </View>
-  ),
-  parameters: { layout: 'fullscreen' },
+  render: (args) => <ButtonDemo {...args} />,
+  parameters: {
+    layout: 'fullscreen',
+    controls: {
+      include: [
+        'label',
+        'variant',
+        'disabled',
+        'fullWidth',
+        'borderRadius',
+        'cornerRadii',
+        'colorScheme',
+      ],
+    },
+  },
 } satisfies Meta<typeof UniversalButton>;
 
 export default meta;
-
 type Story = StoryObj<typeof meta>;
 
 export const Primary: Story = {};
-
-export const Secondary: Story = {
-  args: { label: 'Learn more', variant: 'secondary' },
-};
-
-export const Link: Story = {
-  args: { label: 'Skip for now', variant: 'link' },
-};
-
-export const Glass: Story = {
-  args: { label: 'Glass button', variant: 'glass', colorScheme: 'light' },
-};
-
-export const GlassDark: Story = {
-  args: { label: 'Glass button', variant: 'glass', colorScheme: 'dark' },
-};
-
-export const GlassDisabled: Story = {
-  args: { label: 'Unavailable', variant: 'glass', disabled: true, colorScheme: 'light' },
-};
-
-export const GlassFullWidth: Story = {
-  args: { label: 'Glass button', variant: 'glass', fullWidth: true, colorScheme: 'light' },
-};
-
-export const LightTheme: Story = {
-  args: { label: 'Continue', colorScheme: 'light' },
-};
-
-export const DarkTheme: Story = {
-  args: { label: 'Continue', colorScheme: 'dark' },
-};
-
-export const Disabled: Story = {
-  args: { label: 'Unavailable', disabled: true },
-};
-
-export const Success: Story = {
+export const Secondary: Story = { args: { label: 'Learn more', variant: 'secondary' } };
+export const Link: Story = { args: { label: 'Skip for now', variant: 'link' } };
+export const Success: Story = { args: { label: 'Save changes', variant: 'success' } };
+export const Warning: Story = { args: { label: 'Review warning', variant: 'warning' } };
+export const Destructive: Story = { args: { label: 'Delete item', variant: 'destructive' } };
+export const Glass: Story = { args: { label: 'Glass button', variant: 'glass' } };
+export const LightTheme: Story = { args: { colorScheme: 'light' } };
+export const Disabled: Story = { args: { label: 'Unavailable', disabled: true } };
+export const Rounded: Story = { args: { borderRadius: 24, contentPadding: 12, fullWidth: true } };
+export const TopLeftBottomRight: Story = {
   args: {
-    label: 'Save changes',
-    variant: 'success',
-    color: Colors.dark.success,
-    contentColor: Colors.dark.onSuccess,
-  },
-};
-
-export const Warning: Story = {
-  args: {
-    label: 'Review warning',
-    variant: 'warning',
-    color: Colors.dark.warning,
-    contentColor: Colors.dark.onWarning,
-  },
-};
-
-export const Destructive: Story = {
-  args: {
-    label: 'Delete item',
-    variant: 'destructive',
-    color: Colors.dark.error,
-    contentColor: Colors.dark.onError,
-  },
-};
-
-export const FullWidth: Story = { args: { fullWidth: true } };
-
-export const CustomRadius: Story = { args: { borderRadius: 12, fullWidth: true } };
-
-export const Square: Story = { args: { borderRadius: 0, fullWidth: true } };
-
-export const CustomColorsLight: Story = {
-  args: {
-    colorScheme: 'light',
-    color: Colors.light.success,
-    contentColor: Colors.light.onSuccess,
+    label: 'Top left / bottom right',
+    cornerRadii: { topLeft: 24, bottomRight: 24 },
+    contentPadding: 12,
     fullWidth: true,
   },
 };
-export const CustomColorsDark: Story = {
+export const TopRightBottomLeft: Story = {
   args: {
-    colorScheme: 'dark',
-    color: Colors.dark.success,
-    contentColor: Colors.dark.onSuccess,
+    label: 'Top right / bottom left',
+    cornerRadii: { topRight: 24, bottomLeft: 24 },
+    contentPadding: 12,
     fullWidth: true,
   },
 };
-export const CustomPadding: Story = { args: { contentPadding: 16, borderRadius: 12 } };
 
-function InteractionDemo({ variant = 'primary' }: { variant?: UniversalButtonVariant }) {
+function InteractionDemo(args: UniversalButtonProps) {
   const [presses, setPresses] = useState(0);
+  const theme = useAppTheme(args.colorScheme);
+  const colors = theme.themeId === 'ux' ? {} : semanticButtonColors(args.variant, theme.colors);
   return (
-    <UniversalHost colorScheme="dark">
-      <Column spacing={16}>
-        <UniversalButtonContent
-          variant={variant}
-          label="Count press"
-          testID="button-count"
-          borderRadius={12}
-          contentPadding={12}
-          color={variant === 'glass' ? undefined : Colors.dark.success}
-          contentColor={variant === 'glass' ? undefined : Colors.dark.onSuccess}
-          onPress={() => setPresses((value) => value + 1)}
-        />
-        <UniversalButtonContent
-          variant={variant === 'glass' ? 'glass' : 'secondary'}
-          label="Disabled press"
-          testID="button-disabled"
-          borderRadius={0}
-          disabled
-          onPress={() => setPresses((value) => value + 1)}
-        />
-        <UniversalTextContent testID="button-press-count">{`Presses: ${presses}`}</UniversalTextContent>
-        <UniversalButtonContent
-          variant="link"
-          label="Reset count"
-          testID="button-reset"
-          onPress={() => setPresses(0)}
-        />
-      </Column>
-    </UniversalHost>
+    <NativeStoryFrame colorScheme={args.colorScheme}>
+      <UniversalHost colorScheme={args.colorScheme}>
+        <Column spacing={16}>
+          <UniversalButtonContent
+            {...colors}
+            variant={args.variant}
+            label="Count press"
+            testID="button-count"
+            borderRadius={12}
+            contentPadding={12}
+            onPress={() => setPresses((value) => value + 1)}
+          />
+          <UniversalButtonContent
+            variant="secondary"
+            label="Disabled press"
+            testID="button-disabled"
+            borderRadius={0}
+            disabled
+            onPress={() => setPresses((value) => value + 1)}
+          />
+          <UniversalTextContent testID="button-press-count">{`Presses: ${presses}`}</UniversalTextContent>
+          <UniversalButtonContent
+            variant="link"
+            label="Reset count"
+            testID="button-reset"
+            onPress={() => setPresses(0)}
+          />
+        </Column>
+      </UniversalHost>
+    </NativeStoryFrame>
   );
 }
 
-export const Interaction: Story = { render: () => <InteractionDemo /> };
+export const Interaction: Story = { render: (args) => <InteractionDemo {...args} /> };
 
-export const GlassInteraction: Story = { render: () => <InteractionDemo variant="glass" /> };
+export const WireframeLight: Story = {
+  args: { colorScheme: 'light' },
+  render: (args) => (
+    <ThemePreferencesProvider initialTheme="ux" initialColorScheme="light">
+      <InteractionDemo {...args} />
+    </ThemePreferencesProvider>
+  ),
+};
+export const WireframeDark: Story = {
+  args: { colorScheme: 'dark' },
+  render: (args) => (
+    <ThemePreferencesProvider initialTheme="ux" initialColorScheme="dark">
+      <InteractionDemo {...args} />
+    </ThemePreferencesProvider>
+  ),
+};

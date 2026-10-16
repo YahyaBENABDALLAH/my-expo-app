@@ -1,6 +1,7 @@
 import {
   AuroraBackground,
   Column,
+  FieldGroup,
   nativeFillWidth,
   AuthScreenFrame,
   FormSubmit,
@@ -21,11 +22,15 @@ function NativeFormDemo({
   icons = false,
   loginHelperText,
   colorScheme = 'dark',
+  grouped = false,
+  viewportHeight,
 }: {
   pending?: boolean;
   icons?: boolean;
   loginHelperText?: string;
   colorScheme?: 'light' | 'dark';
+  grouped?: boolean;
+  viewportHeight?: number;
 }) {
   const [submissions, setSubmissions] = useState(0);
   const form = useForm<LoginFormValues>({
@@ -34,47 +39,53 @@ function NativeFormDemo({
     mode: 'onBlur',
     reValidateMode: 'onChange',
   });
+  const fields = (
+    <Column spacing={20} modifiers={nativeFillWidth}>
+      <FormTextInput
+        control={form.control}
+        name="login"
+        label="Email or username"
+        helperText={loginHelperText}
+        leftIcon={icons ? authInputIcons.person : undefined}
+        testID="native-form-login"
+        disabled={pending}
+        autoCapitalize="none"
+        returnKeyType="next"
+        onSubmitEditing={() => form.setFocus('password')}
+        onEdited={() => {}}
+      />
+      <FormTextInput
+        control={form.control}
+        name="password"
+        label="Password"
+        leftIcon={icons ? authInputIcons.password : undefined}
+        passwordToggle={icons ? 'icon' : 'button'}
+        testID="native-form-password"
+        password
+        disabled={pending}
+        onEdited={() => {}}
+      />
+      <FormSubmit
+        testID="native-form-submit"
+        label="Test submit"
+        pending={pending}
+        notice={`Submissions: ${submissions}`}
+        onPress={() => void form.handleSubmit(() => setSubmissions((count) => count + 1))()}
+      />
+    </Column>
+  );
   return (
-    <AuthScreenFrame
-      testID="native-form"
-      colorScheme={colorScheme}
-      title="One native Host"
-      description="Fields reserve no empty message space. Errors and hints wrap below their input when present; validation provides error haptics."
-    >
-      <Column spacing={20} modifiers={nativeFillWidth}>
-        <FormTextInput
-          control={form.control}
-          name="login"
-          label="Email or username"
-          helperText={loginHelperText}
-          leftIcon={icons ? authInputIcons.person : undefined}
-          testID="native-form-login"
-          disabled={pending}
-          autoCapitalize="none"
-          returnKeyType="next"
-          onSubmitEditing={() => form.setFocus('password')}
-          onEdited={() => {}}
-        />
-        <FormTextInput
-          control={form.control}
-          name="password"
-          label="Password"
-          leftIcon={icons ? authInputIcons.password : undefined}
-          passwordToggle={icons ? 'icon' : 'button'}
-          testID="native-form-password"
-          password
-          disabled={pending}
-          onEdited={() => {}}
-        />
-        <FormSubmit
-          testID="native-form-submit"
-          label="Test submit"
-          pending={pending}
-          notice={`Submissions: ${submissions}`}
-          onPress={() => void form.handleSubmit(() => setSubmissions((count) => count + 1))()}
-        />
-      </Column>
-    </AuthScreenFrame>
+    <View style={viewportHeight === undefined ? { flex: 1 } : { height: viewportHeight }}>
+      <AuthScreenFrame
+        testID="native-form"
+        colorScheme={colorScheme}
+        grouped={grouped}
+        title="One native Host"
+        description="Fields reserve no empty message space. Errors and hints wrap below their input when present; validation provides error haptics."
+      >
+        {grouped ? <FieldGroup.Section title="Account">{fields}</FieldGroup.Section> : fields}
+      </AuthScreenFrame>
+    </View>
   );
 }
 
@@ -87,6 +98,8 @@ const meta = {
     icons: { control: 'boolean' },
     loginHelperText: { control: 'text' },
     colorScheme: { control: 'select', options: ['light', 'dark'] },
+    grouped: { control: 'boolean' },
+    viewportHeight: { control: 'number' },
   },
   parameters: { layout: 'fullscreen' },
   decorators: [
@@ -108,13 +121,13 @@ type Story = StoryObj<typeof meta>;
 
 export const SharedHost: Story = {};
 export const LightTheme: Story = { args: { colorScheme: 'light' } };
-export const DarkTheme: Story = { args: { colorScheme: 'dark' } };
 export const Pending: Story = { args: { pending: true } };
 export const PasswordIcons: Story = { args: { icons: true } };
-export const PendingPasswordIcons: Story = { args: { icons: true, pending: true } };
 export const LongHelperText: Story = {
   args: {
     loginHelperText:
       'Enter the email address or username you used to create your account. This hint should wrap naturally on narrow screens and with larger text. Submit the empty form to replace it with an error, then enter a username to restore the hint.',
   },
 };
+export const CompactViewport: Story = { args: { viewportHeight: 360 } };
+export const GroupedForm: Story = { args: { grouped: true } };

@@ -1,16 +1,30 @@
 import { Icon, RNHostView } from '@expo/ui';
-import { useEffect } from 'react';
-import Animated, {
-  cancelAnimation,
-  Easing,
-  useAnimatedStyle,
-  useSharedValue,
-  withSequence,
-  withTiming,
-} from 'react-native-reanimated';
+import type { ComponentProps } from 'react';
+import Animated, { cubicBezier } from 'react-native-reanimated';
 import { useMotionEnabled } from '@/hooks/use-motion-enabled';
 import { useThemeColors } from '@/hooks/use-theme';
 import { UniversalHost, useHostColorScheme } from '../host/universal-host';
+
+const fadeIn = {
+  animationName: {
+    from: { opacity: 0.4, transform: [{ scale: 0.92 }] },
+    to: { opacity: 1, transform: [{ scale: 1 }] },
+  },
+  animationDuration: 180,
+  animationTimingFunction: cubicBezier(0.23, 1, 0.32, 1),
+} satisfies ComponentProps<typeof Animated.View>['style'];
+
+const shake = {
+  animationName: {
+    from: { transform: [{ translateX: 0 }] },
+    '25%': { transform: [{ translateX: -6 }] },
+    '50%': { transform: [{ translateX: 6 }] },
+    '75%': { transform: [{ translateX: -3 }] },
+    to: { transform: [{ translateX: 0 }] },
+  },
+  animationDuration: 200,
+  animationTimingFunction: cubicBezier(0.77, 0, 0.175, 1),
+} satisfies ComponentProps<typeof Animated.View>['style'];
 
 export function OtpFeedback({
   status,
@@ -31,50 +45,13 @@ function AnimatedOtpFeedback({
   const scheme = useHostColorScheme();
   const colors = useThemeColors(scheme);
   const motion = useMotionEnabled(true);
-  const scale = useSharedValue(1);
-  const offset = useSharedValue(0);
-  const opacity = useSharedValue(1);
-  useEffect(() => {
-    cancelAnimation(scale);
-    cancelAnimation(offset);
-    cancelAnimation(opacity);
-    scale.set(1);
-    offset.set(0);
-    opacity.set(1);
-    if (!motion) return;
-    const timing = { duration: 180, easing: Easing.bezier(0.23, 1, 0.32, 1) };
-    if (status === 'error') {
-      const shake = { duration: 50, easing: Easing.bezier(0.77, 0, 0.175, 1) };
-      offset.set(
-        withSequence(
-          withTiming(-6, shake),
-          withTiming(6, shake),
-          withTiming(-3, shake),
-          withTiming(0, shake),
-        ),
-      );
-    } else {
-      scale.set(0.92);
-      opacity.set(0.4);
-      scale.set(withTiming(1, timing));
-      opacity.set(withTiming(1, timing));
-    }
-    return () => {
-      cancelAnimation(scale);
-      cancelAnimation(offset);
-      cancelAnimation(opacity);
-    };
-  }, [motion, status, scale, offset, opacity]);
-  const animatedStyle = useAnimatedStyle(() => ({
-    opacity: opacity.get(),
-    transform: [{ translateX: offset.get() }, { scale: scale.get() }],
-  }));
   const success = status === 'success';
   const error = status === 'error';
   return (
     // A fixed-size RN boundary is needed only to animate the native status artwork.
     <RNHostView matchContents>
       <Animated.View
+        key={status}
         pointerEvents="none"
         accessibilityElementsHidden
         importantForAccessibility="no-hide-descendants"
@@ -87,7 +64,7 @@ function AnimatedOtpFeedback({
             borderRadius: 26,
             backgroundColor: error ? colors.errorContainer : colors.successContainer,
           },
-          animatedStyle,
+          motion ? (error ? shake : fadeIn) : undefined,
         ]}
       >
         <UniversalHost inline colorScheme={scheme} ignoreSafeArea="all">

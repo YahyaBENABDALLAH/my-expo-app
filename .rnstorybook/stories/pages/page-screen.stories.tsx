@@ -76,15 +76,6 @@ export const TransparentHeader: Story = {
     </PageFrame>
   ),
 };
-export const LandscapeCutout: Story = {
-  decorators: [
-    (Story) => (
-      <SafeAreaInsetsContext.Provider value={{ top: 0, bottom: 21, left: 59, right: 0 }}>
-        <Story />
-      </SafeAreaInsetsContext.Provider>
-    ),
-  ],
-};
 function BackExample(props: Parameters<typeof PageScreen>[0]) {
   const [presses, setPresses] = useState(0);
   return (
@@ -106,14 +97,6 @@ export const HeaderWithBackArrow: Story = {
 export const DarkHeaderWithBackArrow: Story = {
   ...HeaderWithBackArrow,
   args: { ...HeaderWithBackArrow.args, colorScheme: 'dark' },
-};
-export const LongContent: Story = {
-  decorators: canvasInsets,
-  args: {
-    description: Array.from({ length: 30 }, (_, i) => `Section ${i + 1}: recipe information.`).join(
-      '\n\n',
-    ),
-  },
 };
 
 function RefreshExample({
@@ -181,10 +164,6 @@ function RefreshExample({
 export const PullToRefresh: Story = {
   decorators: canvasInsets,
   render: () => <RefreshExample />,
-};
-export const PullToRefreshDark: Story = {
-  decorators: canvasInsets,
-  render: () => <RefreshExample colorScheme="dark" />,
 };
 export const PullToRefreshLongContent: Story = {
   decorators: canvasInsets,

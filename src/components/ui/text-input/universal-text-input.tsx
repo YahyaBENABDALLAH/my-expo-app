@@ -1,6 +1,6 @@
 import { useThemeColors } from '@/hooks/use-theme';
 import { Column, Icon, Row, Text, TextInput, type IconProps, type TextInputProps } from '@expo/ui';
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { View } from 'react-native';
 import { UniversalHost, useHostColorScheme } from '../host/universal-host';
 import { nativeFillWidth } from '../native/native-fill-width';
@@ -80,6 +80,7 @@ export function UniversalTextInputContent({
 }: Omit<UniversalTextInputProps, 'onPress'>) {
   const scheme = useHostColorScheme(colorScheme);
   const focusedRef = useRef(false);
+  const [focused, setFocused] = useState(false);
   const themeColors = useThemeColors(scheme);
   const colors = palette ?? themeColors;
   const semanticColor = status === 'default' ? undefined : colors[status];
@@ -90,7 +91,7 @@ export function UniversalTextInputContent({
     backgroundColor: colors.surface,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: semanticColor ?? colors.border,
+    borderColor: semanticColor ?? (focused && !disabled ? colors.tint : colors.border),
     ...style,
   });
   const input = (
@@ -106,12 +107,14 @@ export function UniversalTextInputContent({
       onFocus={() => {
         if (focusedRef.current) return;
         focusedRef.current = true;
+        setFocused(true);
         onFocus?.();
       }}
       onBlur={() => {
         // Compose reports its initial unfocused state when the input mounts.
         if (!focusedRef.current) return;
         focusedRef.current = false;
+        setFocused(false);
         onBlur?.();
       }}
       style={contentStyle}

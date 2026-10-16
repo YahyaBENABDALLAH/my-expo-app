@@ -5,7 +5,6 @@ import {
   Text,
   UniversalButtonContent,
   type FloatingActionKind,
-  FloatingActionButton,
   type NavigationTabName,
   UniversalHost,
   ReferenceNavigationBar,
@@ -164,40 +163,9 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 export const Light: Story = {};
 export const Dark: Story = { args: { colorScheme: 'dark' } };
-export const Creating: Story = { args: { kind: 'continue' } };
-export const ActiveFilters: Story = { args: { kind: 'active-filters' } };
 export const Disabled: Story = { args: { disabled: true } };
 export const Static: Story = { args: { animate: false } };
 
-function NativeControlDemo({
-  colorScheme,
-  kind,
-  disabled,
-}: {
-  colorScheme: 'light' | 'dark';
-  kind: FloatingActionKind;
-  disabled: boolean;
-}) {
-  const [presses, setPresses] = useState(0);
-  return (
-    <UniversalHost colorScheme={colorScheme}>
-      <Column spacing={16}>
-        <Text testID="native-action-count">{`Native presses: ${presses}`}</Text>
-        <FloatingActionButton
-          kind={kind}
-          label={actionLabels[kind]}
-          disabled={disabled}
-          onPress={() => setPresses((value) => value + 1)}
-        />
-      </Column>
-    </UniversalHost>
-  );
-}
-
-export const NativeControl: Story = { render: (args) => <NativeControlDemo {...args} /> };
-export const Breathing: Story = {};
-export const GlassAndTap: Story = {};
-export const DarkGlassAndTap: Story = { args: { colorScheme: 'dark' } };
 export const ContextSwitching: Story = { args: { contextual: true } };
 export const DockFeedback: Story = {
   args: { animate: false, contextual: true },
@@ -231,9 +199,4 @@ export const SafeArea: Story = {
       },
     },
   },
-};
-export const SideCutouts: Story = { args: { leftInset: 44, rightInset: 20 } };
-export const NarrowPhone: Story = { args: { width: 320 } };
-export const CreationRoute: Story = {
-  args: { initialSelected: 'create-recipe', kind: 'continue' },
 };

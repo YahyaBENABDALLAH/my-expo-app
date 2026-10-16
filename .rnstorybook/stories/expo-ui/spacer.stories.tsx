@@ -87,15 +87,7 @@ type Story = StoryObj<typeof meta>;
 
 export const FixedVertical: Story = {};
 export const FixedHorizontal: Story = { args: { direction: 'horizontal' } };
-export const ZeroSize: Story = { args: { size: 0 } };
-export const LargeGap: Story = { args: { size: 80 } };
 export const FlexibleVertical: Story = { args: { flexible: true, size: undefined } };
 export const FlexibleHorizontal: Story = {
   args: { direction: 'horizontal', flexible: true, size: undefined },
 };
-export const HighlightedSpace: Story = {
-  args: { style: { backgroundColor: Colors.dark.primary } },
-};
-export const Hidden: Story = { args: { hidden: true } };
-export const LightTheme: Story = { args: { colorScheme: 'light' } };
-export const DarkTheme: Story = { args: { colorScheme: 'dark' } };

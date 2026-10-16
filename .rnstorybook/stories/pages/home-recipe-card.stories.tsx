@@ -61,7 +61,6 @@ type Story = StoryObj<typeof meta>;
 export const Popular: Story = {};
 export const PopularDark: Story = { args: { colorScheme: 'dark' } };
 export const Editorial: Story = { args: { variant: 'editorial' } };
-export const EditorialDark: Story = { args: { variant: 'editorial', colorScheme: 'dark' } };
 export const LongTitle: Story = { args: { longTitle: true } };
 export const HorizontalAndVertical: Story = {
   parameters: { controls: { include: ['colorScheme'] } },
@@ -74,10 +73,6 @@ export const HorizontalAndVertical: Story = {
       </ScrollView>
     </UniversalHost>
   ),
-};
-export const HorizontalAndVerticalDark: Story = {
-  ...HorizontalAndVertical,
-  args: { colorScheme: 'dark' },
 };
 
 export const HomeSections: Story = {
@@ -93,5 +88,3 @@ export const HomeSections: Story = {
     </UniversalHost>
   ),
 };
-
-export const HomeSectionsDark: Story = { ...HomeSections, args: { colorScheme: 'dark' } };

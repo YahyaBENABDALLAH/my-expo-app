@@ -10,6 +10,7 @@ import Animated, {
   useAnimatedStyle,
   useReducedMotion,
   useSharedValue,
+  withDelay,
   withTiming,
 } from 'react-native-reanimated';
 import { scheduleOnRN } from 'react-native-worklets';
@@ -24,7 +25,6 @@ import { UniversalTextContent } from '../text/universal-text';
 import { nativeFillSize } from '../native/native-fill-width';
 import { PageMotionOverlay, PAGE_WAVE_HEIGHT as WAVE_HEIGHT } from '../page/page-motion-overlay';
 
-const EXIT_DURATION_MS = 300;
 // LottieView accepts Metro's numeric asset ID on native, though its source type omits it.
 const bluePepeSource = bluePepe as unknown as string;
 
@@ -62,12 +62,15 @@ export function LaunchScreen({
     }
 
     offsetY.set(
-      withTiming(
-        -(height + WAVE_HEIGHT),
-        { duration: EXIT_DURATION_MS, easing: Easing.bezier(0.77, 0, 0.175, 1) },
-        (finished) => {
-          if (finished) scheduleOnRN(onExitComplete);
-        },
+      withDelay(
+        2_000,
+        withTiming(
+          -(height + WAVE_HEIGHT),
+          { duration: 2_000, easing: Easing.bezier(0.77, 0, 0.175, 1) },
+          (finished) => {
+            if (finished) scheduleOnRN(onExitComplete);
+          },
+        ),
       ),
     );
     return () => cancelAnimation(offsetY);
@@ -83,7 +86,7 @@ export function LaunchScreen({
       onLayout={onReady}
       accessible
       accessibilityLabel={t('launch.loading')}
-      pointerEvents={exiting ? 'none' : 'auto'}
+      pointerEvents="auto"
       style={[
         {
           position: 'absolute',

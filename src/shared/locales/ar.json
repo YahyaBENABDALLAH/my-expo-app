@@ -2,6 +2,8 @@
   "common": {
     "language": "اللغة",
     "theme": "المظهر",
+    "colorScheme": "وضع الألوان",
+    "systemMode": "النظام",
     "english": "الإنجليزية",
     "french": "الفرنسية",
     "arabic": "العربية",

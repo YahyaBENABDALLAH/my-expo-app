@@ -49,10 +49,6 @@ type Story = StoryObj<typeof meta>;
 
 export const Heading: Story = {};
 
-export const Title: Story = {
-  args: { children: 'A thoughtful title', variant: 'title' },
-};
-
 export const Body: Story = {
   args: { children: 'A clear sentence that is easy to read on any screen.', variant: 'body' },
 };
@@ -63,14 +59,6 @@ export const Caption: Story = {
 
 export const LightTheme: Story = {
   args: { children: 'Light appearance', colorScheme: 'light' },
-};
-
-export const DarkTheme: Story = {
-  args: { children: 'Dark appearance', colorScheme: 'dark' },
-};
-
-export const CustomWeightAndSize: Story = {
-  args: { children: 'A lighter title', variant: 'title', fontWeight: '300', fontSize: 30 },
 };
 
 export const NativeDefault: Story = {

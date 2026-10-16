@@ -69,22 +69,4 @@ type Story = StoryObj<typeof meta>;
 
 export const Collapsed: Story = {};
 export const Expanded: Story = { args: { isOpen: true } };
-export const LongContent: Story = {
-  args: {
-    isOpen: true,
-    content: Array.from(
-      { length: 6 },
-      (_, i) => `Detail ${i + 1}: Native content expands beneath the header.`,
-    ).join('\n\n'),
-  },
-};
-export const LongLabel: Story = {
-  args: { label: 'Frequently asked questions about your account and notification preferences' },
-};
-export const CustomLabel: Story = {
-  args: { labelStyle: { color: Colors.dark.primary, fontSize: 20, fontWeight: '700' } },
-};
 export const LightTheme: Story = { args: { colorScheme: 'light' } };
-export const DarkTheme: Story = { args: { colorScheme: 'dark' } };
-
-export const NativeTheme: Story = { args: { seedColor: Colors.light.tint } };

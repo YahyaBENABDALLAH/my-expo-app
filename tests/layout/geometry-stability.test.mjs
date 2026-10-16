@@ -253,6 +253,48 @@ test('Aurora uses only its actual layout; window events and geometry writes do n
   }
 });
 
+for (const scheme of ['light', 'dark']) {
+  test(`${scheme}: UX Template flattens Aurora and pauses animation without replacing the canvas`, () => {
+    const s = setup();
+    const { uxTheme } = s.load('constants/themes/ux.ts');
+    s.mocks['@/constants/themes/index'].themeIds.push('ux');
+    s.mocks['@/constants/themes/index'].themes.ux = { colors: uxTheme };
+    // Capture the forwarded palette without pretending to render Skia colors.
+    s.mocks['@shopify/react-native-skia'].Skia.Color = (color) => [color];
+    s.mocks['@/components/ui/host/universal-host'].useHostColorScheme = () => scheme;
+    s.mocks['@/hooks/use-motion-enabled'].useMotionEnabled = (animate) => animate;
+    let selectedTheme;
+    let setTheme;
+    s.mocks['@/hooks/use-theme'].useAppTheme = () => ({ themeId: selectedTheme });
+    const { AuroraBackground } = s.load('components/ui/aurora-background/aurora-background.tsx');
+    function Frame() {
+      const [theme, update] = useState('ux');
+      selectedTheme = theme;
+      setTheme = update;
+      return h(AuroraBackground, { style: { flex: 1 } });
+    }
+    const view = renderFixture(h(Frame));
+    try {
+      const canvas = view.findAll('Canvas')[0];
+      const uniforms = () => view.findAll('Shader')[0].props.uniforms.get();
+      assert.equal(s.frames.active, false);
+      assert.equal(uniforms().intensity, 0);
+      assert.deepEqual(uniforms().baseColor, uniforms().surfaceColor);
+      assert.notDeepEqual(uniforms().primaryColor, uniforms().secondaryColor);
+      view.flush(() => setTheme('test'));
+      assert.equal(s.frames.active, true);
+      assert.ok(uniforms().intensity > 0);
+      assert.equal(view.findAll('Canvas')[0], canvas);
+      view.flush(() => setTheme('ux'));
+      assert.equal(s.frames.active, false);
+      assert.equal(uniforms().intensity, 0);
+      assert.equal(view.findAll('Canvas')[0], canvas);
+    } finally {
+      view.unmount();
+    }
+  });
+}
+
 for (const platform of ['android', 'ios']) {
   for (const refreshRate of [60, 120]) {
     test(`${platform}: Aurora preserves elapsed time at ${refreshRate} Hz and resumes without counting paused time`, () => {

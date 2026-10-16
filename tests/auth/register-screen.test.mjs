@@ -32,6 +32,7 @@ function setup(language = 'fr') {
       }),
     },
     '@components/ui': {
+      AuthScreenFrame: native('AuthScreenFrame'),
       Column: native('Column'),
       FieldGroup,
       ListItem: native('ListItem'),

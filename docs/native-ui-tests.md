@@ -55,16 +55,23 @@ maestro test --format junit --output .maestro/results/report.xml .maestro
 | `list.yaml`                  | Pressing the second row changes the selected-row status                |
 | `recipe-card.yaml`           | Repeated card presses increment the count while remaining in Storybook |
 | `home-catalog.yaml`          | Details reopens, dismisses, and selects the recipe after a rail swipe  |
+| `direct-links.yaml`          | Direct links select their target through lazy loading and mode changes |
 
 ## Direct story links
 
-Tests open a story directly using Storybook's `STORYBOOK_STORY_ID` query parameter. The `mode=canvas` parameter hides Storybook controls and disables selection persistence during the test. Opening Storybook normally retains the browser and saved selection.
+Use `npm ci` to install the native Storybook `10.7.0` / core `10.6.2` dependency
+set. `npm run storybook` starts Metro with a cleared cache after dependency
+changes. The architecture checks verify that Storybook and Expo Router resolve
+the same React, React Native, safe-area, gesture-handler and Reanimated modules;
+duplicate native packages can crash the canvas before any story renders.
+
+Tests open a story directly using Storybook's `STORYBOOK_STORY_ID` query parameter. The `mode=canvas` parameter hides Storybook controls and disables selection persistence during the test. The custom canvas preserves individual native accessibility targets and uses the story's light/dark background. Opening Storybook normally retains the browser and saved selection.
 
 ```text
 myappexpo://storybook?STORYBOOK_STORY_ID=expo-ui-universal-text-input--empty&mode=canvas
 ```
 
-Each flow stops the app, connects to Metro, waits for the app and brand animation, and then opens its route. It preserves application data. Storybook flows open the canvas and wait for its initial Button story before selecting the target story, so the native link listener is ready. The shared helper allows two minutes for the initial lazy Storybook bundle and 60 seconds for the target story.
+Each flow stops the app, connects to Metro, waits for the app and brand animation, and then opens its route. It preserves application data. The shared Storybook helper opens the requested story directly and allows two minutes for the lazy Storybook bundle. The screen seeds its initial selection from the Router's `STORYBOOK_STORY_ID`, including when switching between browser and canvas mode; subsequent links in the same mode use Storybook's native listener. Ordinary renders retain the story's component state, and normal browser entry retains saved selection.
 
 To add coverage, create a flow under `.maestro/storybook/`, reuse `../helpers/open-story.yaml`, and pass the story ID and a visible `READY_ID`. Assert a resulting value or visible state after interaction. Root and helper files are excluded from test discovery by `.maestro/config.yaml`.
 
@@ -73,9 +80,28 @@ To add coverage, create a flow under `.maestro/storybook/`, reuse `../helpers/op
 The 2026-10-10 Android execution results are recorded in
 [the build verification report](build-verification.md). Home's 2026-10-13 Android
 execution is recorded in [Home catalog layout](home-catalog-layout.md). Remaining flows and all
-iOS interactions still need native execution. TypeScript, lint, YAML parsing, and
+iOS flows still need automated native execution. TypeScript, lint, YAML parsing, and
 native bundling cannot validate a device's accessibility hierarchy. If an ID is
 absent, inspect the hierarchy in Maestro Studio and use the fallback documented
 in the selector reference.
 
-Storybook is development-only in this app. Production/preview builds redirect this route to Skia, so these flows require a development build and Metro. CI will need a development client connected to Metro or a dedicated test build that includes Storybook; do not point these tests at the production build.
+On 2026-10-15, manual iOS 27 / iPhone 18 Pro checks verified Storybook startup,
+catalog search, Actions logging, live label controls, direct lazy story selection,
+Button repeat/disabled/reset behavior, and Checkbox selection. The custom canvas
+keeps individual native controls accessible. The shared story frame now supplies
+a measured, finite width to its RN bridge; previously percentage-width Hosts
+collapsed and hid labels and values. The portable frame test covers retaining
+control state through resizing. These checks are not a Maestro run or automated
+screenshot comparison; Android interaction checks remain pending.
+
+Storybook is enabled in development and in preview builds with `EXPO_PUBLIC_ENABLE_DEV_SCREENS=true`. Production builds without that opt-in redirect this route to Skia. The shared bootstrap connects a development client to Metro; a standalone preview build needs its own launch flow. Do not point these tests at the production build.
+
+The focused Storybook cleanup on 2026-10-15 retains 190 stories across 38 families.
+Manual iOS 27 / iPhone 18 Pro checks confirmed the top-left/bottom-right and
+top-right/bottom-left button shapes, with exactly one counter increment for each
+upper and lower edge tap. `.maestro/storybook/button-corners.yaml` records those
+checks for future automated execution. Skeleton playback now uses the standalone
+CSS placeholders; its existing flow targets their updated selectors. Portable
+checks cover native corner forwarding, feedback motion settings and all literal
+Maestro story links. Maestro is unavailable on this host; these flows, Android
+geometry and native OTP keyframe timing remain unverified.

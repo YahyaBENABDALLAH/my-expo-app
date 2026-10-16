@@ -91,10 +91,7 @@ type Story = StoryObj<typeof meta>;
 
 export const Menu: Story = {};
 export const Wheel: Story = { args: { appearance: 'wheel' } };
-export const SecondSelected: Story = { args: { selectedValue: 'rabat' } };
 export const Disabled: Story = { args: { enabled: false } };
-export const DisabledWheel: Story = { args: { enabled: false, appearance: 'wheel' } };
-export const SingleOption: Story = { args: { options: [cities[0]] } };
 export const NumericValues: Story = {
   args: {
     selectedValue: 2,
@@ -105,24 +102,4 @@ export const NumericValues: Story = {
     ],
   },
 };
-export const ManyOptions: Story = {
-  args: {
-    selectedValue: 'item-1',
-    options: Array.from({ length: 20 }, (_, i) => ({
-      label: `Option ${i + 1}`,
-      value: `item-${i + 1}`,
-    })),
-  },
-};
-export const LongLabels: Story = {
-  args: {
-    options: cities.map((city) => ({
-      ...city,
-      label: `${city.label} — a destination for your next journey`,
-    })),
-  },
-};
 export const LightTheme: Story = { args: { colorScheme: 'light' } };
-export const DarkTheme: Story = { args: { colorScheme: 'dark' } };
-
-export const NativeTheme: Story = { args: { seedColor: Colors.light.tint } };

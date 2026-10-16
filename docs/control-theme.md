@@ -1,5 +1,23 @@
 # Native control themes
 
+UX Template button exception (2026-10-16): when both button color props are omitted,
+the existing semantic pairs supply exact theme colors. Primary uses black
+with white labels in both appearances. This fixes a native white fill with an
+unreadable white label observed in the production Buttons page in dark mode.
+Explicit caller colors and brand-theme native defaults retain their behavior.
+Native geometry, disabled suppression and feedback remain platform-owned.
+At the user's request, the neutral UX foundations now pair with restrained red
+danger, green success and amber warning accents, plus matching light/dark
+containers. Only feedback accents are colored; primary remains black.
+The corrected Buttons page was manually checked on iOS 27 / iPhone 18 Pro:
+primary is black, feedback labels are readable, one press increments the action
+counter once, and the disabled button leaves the counter unchanged. Android
+adapter checks pass in JS; native Android visual verification remains pending.
+The `WireframeLight` and `WireframeDark` native fixtures were also checked on
+the same iPhone: upper/lower button-edge presses advanced the count to 1 then 2,
+the disabled press kept 2, and reset returned it to 0. Both showed a black primary
+surface and white label. These are manual checks; Maestro was not installed.
+
 All universal Expo UI controls compose within the existing UniversalHost. It selects the shared light/dark scheme and uses the active theme’s tint as the native seed. Explicit seedColor overrides remain available. Native controls own their shape, padding, typography, disabled colors and interaction feedback rather than receiving a second painted surface.
 
 | Component                                                     | Project behavior                                                                                  | Appearance / glass                                                                                                                                          |
@@ -22,10 +40,10 @@ TextInput retains its observable value/ref API, focus guards, password actions a
 
 Color/shape/state code duplicated from Expo has been removed. Caller modifiers and Android ListItem color overrides remain available. No package or native project changes are needed.
 
-Native Storybook light/dark, disabled, selection, disclosure, grouped-form and refresh fixtures reuse production exports. NativeTheme stories exercise Host seeds; picker Menu exercises native glass; text NativeDefault exercises native typography. Portable checks verify selection survives live scheme changes, disabled suppression, slots, selectors, refresh completion and Metro resolution. These mock native views and do not prove OS glass, visual geometry or hit areas. iOS/Android device inspection remains pending.
+Native Storybook light/dark, disabled, selection, disclosure, grouped-form and refresh fixtures reuse production exports. Native seedColor controls exercise Host seeds; picker Menu exercises native glass; text NativeDefault exercises native typography. Portable checks verify selection survives live scheme changes, disabled suppression, slots, selectors, refresh completion and Metro resolution. These mock native views and do not prove OS glass, visual geometry or hit areas. iOS/Android device inspection remains pending.
 
 Context7 was consulted for Host theme propagation and native glass styles. Its results reference latest documentation, so APIs and fallbacks were cross-checked against SDK 57 pages and installed Expo UI 57.0.21 source.
 
 References: [Expo SDK 57 universal UI](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/), [SwiftUI modifiers](https://docs.expo.dev/versions/v57.0.0/sdk/ui/swift-ui/modifiers/), [Apple’s native Liquid Glass adoption](https://developer.apple.com/documentation/technologyoverviews/adopting-liquid-glass).
 
-The text-input follow-up was manually checked in the iOS 27 iPhone 18 Pro simulator: empty/filled password toggles kept the same visible field height and retained the value. Its native Storybook height assertions are saved, but fixture execution is blocked by duplicate RNCSafeAreaProvider registration from mismatched installed Storybook dependencies. Android and full large-text native checks remain pending. See the [input guide](../src/components/ui/text-input/README.md).
+The text-input follow-up was manually checked in the iOS 27 iPhone 18 Pro simulator: empty/filled password toggles kept the same visible field height and retained the value. Its native Storybook height assertions are saved. The duplicate RNCSafeAreaProvider dependency was removed by the Storybook update; architecture checks now guard shared native module resolution. Android and full large-text native checks remain pending. See the [input guide](../src/components/ui/text-input/README.md).

@@ -1,5 +1,5 @@
 appId: com.hyrkul.likan
-name: Skeleton placeholders support native pause and resume
+name: Skeleton placeholders support CSS pause and resume
 tags: [storybook, motion]
 env:
   STORYBOOK_URL: myappexpo://storybook
@@ -8,11 +8,9 @@ env:
 ---
 - runFlow: ../helpers/open-story.yaml
 - assertVisible:
-    id: skeleton-reference-image
+    id: skeleton-css-fixed
 - assertVisible:
-    id: skeleton-reference-title
-- assertVisible:
-    id: skeleton-reference-full-width
+    id: skeleton-css-fill
 - assertVisible: Animation playing
 - tapOn:
     id: skeleton-toggle-animation

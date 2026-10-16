@@ -94,6 +94,3 @@ export const Dark: Story = {
 export const ResendCountdown: Story = { args: { resendCooldownSeconds: 30 } };
 export const RequestFailure: Story = { args: { requestFailure: true } };
 export const ResendFailure: Story = { args: { resendFailure: true } };
-export const LongRecipient: Story = {
-  args: { recipient: 'a.long.verification.address@example.com' },
-};

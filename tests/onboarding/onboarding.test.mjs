@@ -8,7 +8,7 @@ function setup(storage = {}, step) {
   const writes = [];
   const navigation = [];
   const native = (name) => (props) => h(name, props, props.children);
-  const gestures = [];
+  let hardwareBack;
   const publicUI = {};
   const load = createSourceLoader({
     '@react-native-async-storage/async-storage': {
@@ -46,42 +46,21 @@ function setup(storage = {}, step) {
     '@/components/ui/text/universal-text': { UniversalTextContent: native('Text') },
     '@/components/ui/loading/loading-state': { LoadingContent: native('Loading') },
     '@/components/ui/native/native-fill-width': { nativeFillWidth: [], nativeRowWeight: [] },
+    '@/components/ui/onboarding/onboarding-pager': { OnboardingPager: native('Pager') },
     '@/context/language.context': { useLanguage: () => ({ language: storage.language ?? 'en' }) },
     '@/context/layout-direction.context': { useLayoutDirection: () => storage.direction ?? 'ltr' },
     'react-native': {
+      BackHandler: {
+        addEventListener: (_event, handler) => {
+          hardwareBack = handler;
+          return { remove: () => {} };
+        },
+      },
       View: native('View'),
       Platform: { OS: storage.platform ?? 'android' },
       useWindowDimensions: () => storage.dimensions ?? { width: 390, height: 844, fontScale: 1 },
     },
-    'react-native-gesture-handler': {
-      GestureHandlerRootView: native('GestureRoot'),
-      GestureDetector: native('GestureDetector'),
-      Gesture: {
-        Pan: () => {
-          const gesture = {
-            enabled(value) {
-              this.isEnabled = value;
-              return this;
-            },
-            activeOffsetX() {
-              return this;
-            },
-            failOffsetY() {
-              return this;
-            },
-            runOnJS() {
-              return this;
-            },
-            onEnd(handler) {
-              this.end = handler;
-              return this;
-            },
-          };
-          gestures.push(gesture);
-          return gesture;
-        },
-      },
-    },
+    'react-native-reanimated': { useReducedMotion: () => storage.reducedMotion ?? false },
     'react-native-safe-area-context': {
       useSafeAreaInsets: () => ({ top: 59, bottom: 34, left: 0, right: 0 }),
     },
@@ -103,20 +82,27 @@ function setup(storage = {}, step) {
   let context;
   function Consumer() {
     context = useOnboarding();
-    return Screen ? h(Screen, { step }) : null;
+    return Screen ? h(Screen) : null;
   }
   const view = renderFixture(h(OnboardingProvider, null, h(Consumer)));
+  const button = (id) => view.findAll('Button').find(({ props }) => props.testID === id).props;
+  for (let index = 0; index < (step ?? 0); index++)
+    view.flush(() => button('onboarding-next').onPress());
   return {
     view,
     writes,
     navigation,
-    gestures,
+    hardwareBack: () => hardwareBack(),
     context: () => context,
     flushAsync: async () => {
       await new Promise(setImmediate);
       view.flush(() => {});
     },
-    button: (id) => view.findAll('Button').find(({ props }) => props.testID === id).props,
+    button,
+    pager: () => view.findAll('Pager')[0].props,
+    progress: () =>
+      view.findAll('Text').find(({ props }) => props.testID === 'onboarding-progress').children[0]
+        .text,
   };
 }
 
@@ -223,33 +209,26 @@ test('rapid skip/start taps save once and cannot finish before the write succeed
 });
 
 for (const step of [0, 1, 2]) {
-  test(`page ${step + 1} shows its progress, offers correct navigation, and can be skipped`, async () => {
+  test(`step ${step + 1} stays in the carousel, shows progress, and can be skipped`, async () => {
     const s = setup({}, step);
     try {
       await s.flushAsync();
-      assert.equal(
-        s.view.findAll('Text').find(({ props }) => props.testID === 'onboarding-progress')
-          .children[0].text,
-        `${step + 1} of 3`,
-      );
-      assert.equal(
-        s.view.findAll('Button').some(({ props }) => props.testID === 'onboarding-back'),
-        step > 0,
-      );
+      assert.equal(s.progress(), `${step + 1} of 3`);
+      assert.equal(s.button('onboarding-back').disabled, step === 0);
       if (step < 2) {
         assert.equal(s.button('onboarding-next').label, 'Next');
         s.view.flush(() => s.button('onboarding-next').onPress());
-        assert.deepEqual(s.navigation, [
-          ['navigate', step === 0 ? '/(onboarding)/cook' : '/(onboarding)/save'],
-        ]);
+        assert.equal(s.progress(), `${step + 2} of 3`);
         assert.equal(s.writes.length, 0);
       } else {
         assert.equal(s.button('onboarding-start').label, 'Let’s get started');
       }
       if (step > 0) {
+        const previousStep = s.pager().step;
         s.view.flush(() => s.button('onboarding-back').onPress());
-        assert.deepEqual(s.navigation.at(-1), ['back']);
+        assert.equal(s.pager().step, previousStep - 1);
       }
+      assert.deepEqual(s.navigation, [], 'Steps never navigate to another route.');
       s.view.flush(() => s.button('onboarding-skip').onPress());
       await s.flushAsync();
       assert.equal(s.context().completed, true);
@@ -260,75 +239,141 @@ for (const step of [0, 1, 2]) {
   });
 }
 
-test('direct entry to a later page has a safe previous-page fallback', async () => {
-  for (const step of [1, 2]) {
-    const s = setup({ canGoBack: false }, step);
-    try {
-      await s.flushAsync();
-      s.view.flush(() => s.button('onboarding-back').onPress());
-      assert.deepEqual(s.navigation, [
-        ['replace', step === 1 ? '/(onboarding)/discover' : '/(onboarding)/cook'],
-      ]);
-    } finally {
-      s.view.unmount();
+test('Next, Previous, and native swipes keep the screen, header, footer, and pager mounted', async () => {
+  const s = setup({}, 0);
+  try {
+    await s.flushAsync();
+    const screen = s.view.findAll('View')[0];
+    const header = s.view.findAll('Host').find(({ props }) => props.testID === 'onboarding-header');
+    const footer = s.view.findAll('Host').find(({ props }) => props.testID === 'onboarding-footer');
+    const pager = s.view.findAll('Pager')[0];
+    for (const [action, expected] of [
+      [() => s.button('onboarding-next').onPress(), 1],
+      [() => s.pager().onStepChange(2), 2],
+      [() => s.button('onboarding-back').onPress(), 1],
+      [() => s.pager().onStepChange(0), 0],
+    ]) {
+      s.view.flush(action);
+      assert.equal(s.pager().step, expected);
+      assert.equal(s.view.findAll('View')[0], screen);
+      assert.equal(
+        s.view.findAll('Host').find(({ props }) => props.testID === 'onboarding-header'),
+        header,
+      );
+      assert.equal(
+        s.view.findAll('Host').find(({ props }) => props.testID === 'onboarding-footer'),
+        footer,
+      );
+      assert.equal(s.view.findAll('Pager')[0], pager);
+      assert.equal(s.writes.length, 0);
     }
+    assert.deepEqual(s.navigation, []);
+  } finally {
+    s.view.unmount();
   }
 });
 
-test('all three pages display passive bundled photos without a network request', async () => {
-  for (const step of [0, 1, 2]) {
-    const s = setup({ platform: 'android' }, step);
-    try {
-      await s.flushAsync();
-      const photo = s.view.findAll('Image')[0].props;
-      assert.equal(photo.source, step + 1);
-      assert.equal(photo.pointerEvents, 'none');
-      assert.equal(photo.accessible, false);
-    } finally {
-      s.view.unmount();
+test('the native pager receives all three passive bundled photos together', async () => {
+  const s = setup({}, 0);
+  try {
+    await s.flushAsync();
+    const photos = s.view.findAll('Image');
+    assert.deepEqual(
+      photos.map(({ props }) => props.source),
+      [1, 2, 3],
+    );
+    for (const { props } of photos) {
+      assert.equal(props.pointerEvents, 'none');
+      assert.equal(props.accessible, false);
     }
+    assert.equal(s.view.findAll('View')[0].props.testID, 'onboarding-discover');
+  } finally {
+    s.view.unmount();
   }
 });
 
-for (const direction of ['ltr', 'rtl']) {
-  test(`${direction}: deliberate horizontal swipes navigate; small movements and swiping beyond the final page do not complete onboarding`, async () => {
-    const forward = direction === 'rtl' ? 120 : -120;
-    const s = setup({ direction }, 1);
-    try {
-      await s.flushAsync();
-      s.view.flush(() => s.gestures.at(-1).end({ translationX: forward / 4, velocityX: 0 }));
-      assert.equal(s.navigation.length, 0);
-      s.view.flush(() => s.gestures.at(-1).end({ translationX: forward, velocityX: 0 }));
-      assert.deepEqual(s.navigation.at(-1), ['navigate', '/(onboarding)/save']);
-      s.view.flush(() => s.gestures.at(-1).end({ translationX: -forward, velocityX: 0 }));
-      assert.deepEqual(s.navigation.at(-1), ['back']);
-    } finally {
-      s.view.unmount();
+test('swiping to the final slide does not complete onboarding; invalid selections are ignored', async () => {
+  const s = setup({}, 0);
+  try {
+    await s.flushAsync();
+    s.view.flush(() => s.pager().onStepChange(2));
+    assert.equal(s.progress(), '3 of 3');
+    assert.equal(s.context().completed, false);
+    assert.equal(s.writes.length, 0);
+    for (const invalid of [-1, 3, NaN, 0.5]) {
+      s.view.flush(() => s.pager().onStepChange(invalid));
+      assert.equal(s.pager().step, 2);
     }
-    const last = setup({ direction }, 2);
-    try {
-      await last.flushAsync();
-      last.view.flush(() => last.gestures.at(-1).end({ translationX: forward, velocityX: 0 }));
-      assert.equal(last.writes.length, 0);
-      assert.equal(last.context().completed, false);
-    } finally {
-      last.view.unmount();
-    }
-  });
-}
+    s.view.flush(() => s.button('onboarding-start').onPress());
+    await s.flushAsync();
+    assert.equal(s.context().completed, true);
+  } finally {
+    s.view.unmount();
+  }
+});
 
-test('compact screens and enlarged text keep the primary action outside the scrollable content', async () => {
-  const s = setup({ dimensions: { width: 360, height: 640, fontScale: 1.6 } }, 0);
+test('pending persistence disables the pager and ignores stale button, swipe, and hardware Back callbacks', async () => {
+  let finishWrite;
+  const s = setup(
+    {
+      setItem: () =>
+        new Promise((resolve) => {
+          finishWrite = resolve;
+        }),
+    },
+    2,
+  );
+  try {
+    await s.flushAsync();
+    s.view.flush(() => s.button('onboarding-start').onPress());
+    assert.equal(s.pager().disabled, true);
+    s.view.flush(() => {
+      s.pager().onStepChange(1);
+      s.button('onboarding-back').onPress();
+      s.button('onboarding-skip').onPress();
+      s.button('onboarding-start').onPress();
+      assert.equal(s.hardwareBack(), true);
+    });
+    assert.equal(s.pager().step, 2);
+    assert.equal(s.writes.length, 1);
+    finishWrite();
+    await s.flushAsync();
+    assert.equal(s.context().completed, true);
+  } finally {
+    s.view.unmount();
+  }
+});
+
+test('Android hardware Back moves to the previous slide before allowing exit from the first slide', async () => {
+  const s = setup({}, 2);
+  try {
+    await s.flushAsync();
+    for (const expected of [1, 0]) {
+      s.view.flush(() => assert.equal(s.hardwareBack(), true));
+      assert.equal(s.pager().step, expected);
+    }
+    assert.equal(s.hardwareBack(), false);
+    assert.deepEqual(s.navigation, []);
+  } finally {
+    s.view.unmount();
+  }
+});
+
+test('compact screens and enlarged text keep the primary action outside the swipeable content', async () => {
+  const s = setup(
+    { dimensions: { width: 360, height: 640, fontScale: 1.6 }, reducedMotion: true },
+    0,
+  );
   try {
     await s.flushAsync();
     const hosts = s.view.findAll('Host');
     assert.equal(hosts.length, 3);
-    assert.equal(s.view.findAll('Image')[0].props.style.height, 179);
     const contains = (node, testID) =>
       node.props?.testID === testID || node.children.some((child) => contains(child, testID));
     assert.equal(contains(hosts[1], 'onboarding-next'), false);
     assert.equal(contains(hosts[2], 'onboarding-next'), true);
     assert.equal(s.button('onboarding-next').fullWidth, true);
+    assert.equal(s.pager().reducedMotion, true);
   } finally {
     s.view.unmount();
   }

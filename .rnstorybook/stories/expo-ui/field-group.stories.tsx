@@ -178,17 +178,6 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Preferences: Story = {};
-export const SingleSection: Story = { args: { showSecondSection: false } };
-export const SingleRow: Story = { args: { singleRow: true, showSecondSection: false } };
-export const WithoutHeader: Story = { args: { title: '', showSecondSection: false } };
-export const WithoutFooter: Story = { args: { footer: '' } };
-export const UppercaseTitles: Story = { args: { titleUppercase: true } };
 export const CustomHeader: Story = { args: { customHeader: true } };
-export const EnabledValues: Story = { args: { notifications: true, accepted: true, volume: 100 } };
 export const Disabled: Story = { args: { disabled: true } };
-export const Hidden: Story = { args: { hidden: true } };
-export const CompactViewport: Story = { args: { viewportHeight: 260 } };
 export const LightTheme: Story = { args: { colorScheme: 'light' } };
-export const DarkTheme: Story = { args: { colorScheme: 'dark' } };
-
-export const NativeTheme: Story = { args: { seedColor: Colors.light.tint } };

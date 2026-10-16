@@ -87,4 +87,3 @@ type Story = StoryObj<typeof meta>;
 export const Light: Story = {};
 export const Dark: Story = { args: { colorScheme: 'dark' } };
 export const Static: Story = { args: { animate: false } };
-export const NarrowPhone: Story = { args: { narrow: true } };

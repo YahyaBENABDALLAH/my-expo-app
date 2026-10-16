@@ -28,7 +28,7 @@ function OnboardingFixture({
   colorScheme?: 'light' | 'dark';
 }) {
   const { t } = useTranslation();
-  const [step, setStep] = useState(initialStep);
+  const [startingStep, setStartingStep] = useState(initialStep);
   const [finished, setFinished] = useState(false);
   if (finished)
     return (
@@ -42,26 +42,27 @@ function OnboardingFixture({
             label="Replay introduction"
             testID="onboarding-story-reset"
             onPress={() => {
-              setStep(0);
+              setStartingStep(0);
               setFinished(false);
             }}
           />
         </Column>
       </UniversalHost>
     );
-  const name = names[step];
   return (
     <OnboardingPage
-      image={images[step]}
-      title={t(`onboarding.${name}.title`)}
-      description={t(`onboarding.${name}.subtitle`)}
-      category={t(`onboarding.${name}.category`)}
-      step={step}
+      pages={names.map((name, index) => ({
+        id: name,
+        image: images[index],
+        title: t(`onboarding.${name}.title`),
+        description: t(`onboarding.${name}.subtitle`),
+        category: t(`onboarding.${name}.category`),
+      }))}
+      initialStep={startingStep}
       saving={saving}
       saveError={saveError}
       colorScheme={colorScheme}
-      onNext={() => (step === 2 ? setFinished(true) : setStep((step + 1) as 1 | 2))}
-      onBack={step > 0 ? () => setStep((step - 1) as 0 | 1) : undefined}
+      onComplete={() => setFinished(true)}
       onSkip={() => setFinished(true)}
     />
   );
@@ -82,7 +83,6 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 export const Discover: Story = {};
-export const Cook: Story = { args: { initialStep: 1 } };
 export const Save: Story = { args: { initialStep: 2 } };
 export const Dark: Story = { args: { colorScheme: 'dark' } };
 export const Saving: Story = { args: { initialStep: 2, saving: true } };

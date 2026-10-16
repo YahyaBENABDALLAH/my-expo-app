@@ -6,3 +6,6 @@ export declare const nativeFillWidthEnd: NonNullable<ColumnProps['modifiers']>;
 export declare const nativeFillWidthCenter: NonNullable<ColumnProps['modifiers']>;
 export declare const nativeFillSize: NonNullable<ColumnProps['modifiers']>;
 export declare const nativeRowWeight: NonNullable<ColumnProps['modifiers']>;
+export declare function nativeCenteredMinHeight(
+  minHeight: number,
+): NonNullable<ColumnProps['modifiers']>;

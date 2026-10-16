@@ -1,12 +1,82 @@
 # Universal component catalog
 
+## Color UI theme (2026-10-15)
+
+The stable `ux` theme is now labeled UI: blue primary, violet secondary, shared
+colored success/warning/error/info roles, pale light surfaces and navy dark
+surfaces. It uses createBrandTheme; the theme ID and public token contract stay
+stable. Theme Tokens and App Settings preview it by default, with the other
+brands available in Controls. Aurora uses the same chromatic palette/motion rules
+as other themes. Token contrast and live scheme/theme retention remain covered
+by page-appearance tests; shader tests check palette forwarding and canvas reuse.
+Manual iOS checks confirmed green success and blue/violet navigation accents;
+Android appearance remains a native verification task.
+
+## Focused Storybook catalog (2026-10-15)
+
+The current catalog has 190 stories across 38 component/page families. Keep
+meaningful state and composition examples; use Controls for smaller prop, seed,
+brand, width and theme variations. Older dated story lists below describe earlier
+coverage and may include removed duplicate fixtures. Existing Maestro deep links
+are checked by `tests/architecture/storybook-links.test.mjs`.
+
+Buttons retain primary, secondary, link, success, warning, destructive and glass,
+plus disabled, light appearance, rounded, both diagonal corner shapes and observable
+interaction. Fixtures pass shared semantic tokens and paired foregrounds, resolved
+for the selected theme and scheme. Standalone `UniversalButton.cornerRadii` accepts
+physical topLeft/topRight/bottomLeft/bottomRight radii; omitted corners are square
+and this overrides uniform borderRadius. Its existing RN Host clips the square
+native surface because SwiftUI only exposes uniform native button rounding.
+`UniversalButtonContent` keeps its existing uniform radius contract. No theme roles
+or dependencies are added. See the [button guide](../../../../src/components/ui/button/README.md).
+Manual iOS 27 / iPhone 18 Pro checks verified both diagonals and upper/lower edge
+activation. Android geometry and automated Maestro execution remain pending.
+
+Skeleton AnimationControls uses the existing standalone CSS pulse; ReferenceCard
+keeps compound native content coverage. OTP feedback uses Reanimated CSS keyframes,
+without an animation effect or JS timer, and retains motion lifecycle guards.
+Portable tests cover hidden/reduced-motion feedback and native button forwarding;
+they do not prove native animation timing or geometry.
+
+## Adaptive auth frame (2026-10-15)
+
+`AuthScreenFrame` owns one Host that fills the available width with safe
+gutters, keyboard avoidance and a shared heading. Short forms center vertically
+using the Host's available height and native minimum-height modifiers; long
+content remains scrollable. `grouped` keeps registration in a single native
+`FieldGroup` with no enclosing scroll view. Existing text/tint/muted roles apply.
+`Expo UI/Auth Screen` adds `CompactViewport` and `GroupedForm` composition stories
+alongside light/dark, validation, pending and helper-text fixtures. Manual checks
+on the iPad Pro 13-inch / iPadOS 27 simulator verified centered Login and Register
+scrolling to its submit and Login actions. Full software-keyboard, narrow-window
+and Android checks remain pending; Node tests only verify contracts.
+
+## Storybook runtime and dependency repair (2026-10-15)
+
+Native Storybook and its on-device addons now use `10.7.0`, with core `10.6.2`.
+Use `npm ci` and the npm lockfile/overrides; the stale Yarn Classic lockfile
+installed incompatible Storybook UI packages and a duplicate safe-area module.
+The installed dependency graph now shares the app's `react-native-safe-area-context`
+`5.7.0`. Architecture tests guard shared native module resolution. Restart Metro
+with `npm run storybook` after installing. The earlier duplicate-provider blocker
+below is resolved. The Router seeds direct links before native listeners mount;
+the custom canvas preserves native targets, safe areas and story-theme backgrounds.
+The shared story frame supplies a measured, finite RN bridge width so native Host
+labels and values do not collapse. Button interaction fixtures honor theme controls.
+Manual iOS 27 checks cover startup, search, Actions/Controls, direct links, button
+activation/disabled/reset, checkbox state and empty-input editing. Android native
+interactions and the complete Maestro suite remain pending. See
+[the native verification notes](../../../../docs/native-ui-tests.md).
+
 ## Text input simplification (2026-10-14)
 
 `UniversalTextInput` and its content retain their universal props, labels,
 helper/status roles, explicit palette/native color overrides and accessible icon
 actions. Native hosting now supplies width immediately without onLayout state;
-focus uses only a duplicate-notification guard. Default typography/tint remain
-native, with shared text/surface/border/status colors. iOS secure/plain modes both
+focus updates the shared border to the theme/palette tint and guards duplicate
+notifications. Blur restores the border; validation colors and explicit style
+overrides retain priority, and disabled fields keep their resting border. Default
+typography/tint remain native, with shared text/surface/border/status colors. iOS secure/plain modes both
 use plain field styling, no editable-text vertical padding and a 48-point minimum
 surface matching the eye action. Native content can grow for larger fonts or
 multiline input; caller dimensions/padding remain supported. Observable values,
@@ -22,6 +92,14 @@ checked on the iOS 27 iPhone 18 Pro simulator with unchanged visible surface
 height and retained filled values. Full Storybook/large-text execution is blocked
 by its installed duplicate RNCSafeAreaProvider; Android native checks are pending.
 See [the input guide](../../../../src/components/ui/text-input/README.md).
+
+`Focused` and `FocusedLight` expose focus/blur actions and observable focus status.
+`.maestro/storybook/text-input-focus.yaml` exercises autofocus, typing, blur and
+refocus. Portable render checks verify border-color transitions and field retention
+on both platform adapters; they do not establish native appearance.
+Manual iOS 27 / iPhone 18 Pro registration checks confirmed the tinted focus
+border, focus transfer and the blurred required field's validation border.
+Android appearance and the Maestro focus flow remain pending.
 
 ## Native defaults follow-up (2026-10-14)
 
@@ -128,9 +206,9 @@ timing remain unverified in this pass. See
 
 2026-10-10 product cleanup: local recipe card fixtures and control examples are
 colocated under `src/features/ui-showcase/` and reachable through Recipe UI examples.
-LaunchScreen's Ready/Waiting stories follow resource readiness and a 300-ms exit,
-with immediate completion under reduced motion. Root fixtures verify readiness
-gates; native rendering and transitions require device checks.
+LaunchScreen's Ready/Waiting stories use one animation: a two-second delay after
+readiness, then a two-second upward slide. Reduced motion completes immediately.
+Root fixtures verify readiness gates; native rendering and timing require device checks.
 
 SDK/package versions refreshed 2026-10-10: Expo `~57.0.27` and installed `@expo/ui` `57.0.21` (exact manifest pin). Expo UI `57.0.22` crashes on Android numeric widths; the pin and scoped dependency-validation exclusion are documented in `docs/build-verification.md`. The component inventory uses [SDK 57 universal documentation](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/); resolve actual installed versions before future edits. Packages are installed without project patches.
 
@@ -192,24 +270,30 @@ See the [folder guide](../../../../src/components/ui/README.md).
 | [List](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/list/)               | `list/list.tsx`                                                                         | `list.stories.tsx`                                  | Empty/short groups, row selection, refresh if exposed, scroll behavior                                               |
 | [ListItem](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/list/)           | `list-item/list-item.tsx`; direct `UniversalListItem` alias                             | Within `list.stories.tsx`; focused coverage pending | Leading/supporting/trailing slots, press/disabled, long text, accessory alignment                                    |
 | [Picker](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/picker/)           | `picker/picker.<platform>.tsx`                                                          | `picker.stories.tsx`                                | Menu/wheel differences, selected value, disabled, value callback, long option labels                                 |
-| [RNHostView](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/rnhostview/)   | Direct Expo UI export                                                                   | Dedicated coverage pending                          | Necessary RN infrastructure inside native trees, intrinsic sizing and interaction; no substitute RN controls         |
+| [RNHostView](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/rnhostview/)   | Direct Expo UI export                                                                   | Shared story frame composition                      | Necessary RN infrastructure inside native trees, intrinsic sizing and interaction; no substitute RN controls         |
 | [Spacer](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/spacer/)           | Direct Expo UI export                                                                   | `spacer.stories.tsx`                                | Horizontal/vertical expansion in constrained layouts                                                                 |
 | [TextInput](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/textinput/)     | `text-input/universal-text-input.tsx`                                                   | `text-input.stories.tsx`                            | Empty/type/clear/reset, controlled updates, password, editable/read-only, focus/blur, keyboard, multiline            |
 
 ## Compound exports and helpers
 
-`OnboardingPage` (`onboarding/onboarding-page.tsx`) supplies photo-led introduction
-content with fixed native navigation and action Hosts, a scrollable body, safe
-areas, responsive image sizing, RTL-aware horizontal swipes, and persistence
-feedback. It accepts an image, category/title/description, step, Next/Previous/Skip
-callbacks, saving/error state, and an optional scheme. It uses shared background,
-text, muted, border and tint tokens. `Pages/Onboarding` covers all three steps,
-light/dark, saving and failure with interactive completion/replay. Behavioral tests
-cover swipe direction/thresholds, disabled suppression and persistence recovery.
-Android light/French rendering and interactions were checked with the production
-component in an isolated native preview, including enlarged text and action touch
-bounds. The updated first-launch Maestro flow was not executed because the full
-app's native build fails. Native iOS, RTL and dark rendering remain unverified.
+`OnboardingPage` (`onboarding/onboarding-page.tsx`) renders one persistent
+introduction screen with a native content carousel. It accepts ordered `pages`
+(id, photo, category/title/description), `initialStep`, completion/skip callbacks,
+saving/error state, and an optional scheme. Fixed header/footer Hosts retain the
+wordmark, progress and actions. SwiftUI TabView (iOS 16.4+) and Compose
+HorizontalPager slide only the middle content, inherit Host RTL, and honor reduced
+motion for programmatic changes. Each slide scrolls vertically for large text.
+Android hardware Back selects the previous slide. Shared background, text, muted,
+border and tint roles supply colors. `Pages/Onboarding` covers all three slides,
+light/dark, saving, failure and completion/replay. JS checks cover persistent
+screen/Host/pager identity, swipe selection, disabled input, Android Back and
+persistence recovery. The first-launch Maestro flow covers native paging and
+completion. iPhone 18 Pro / iOS 27 verification covered French/light, all slides,
+fixed chrome, Previous/Next (both primary-button vertical edges), readable final
+copy and completion returning to sign-in. Desktop gesture automation could not
+confirm native swiping. Android, RTL, dark mode and enlarged text remain unverified
+on device. Storybook has a duplicate RNCSafeAreaProvider registration error; the
+production first-launch route was used for these iOS checks.
 
 ### Settings and OTP layouts (2026-10-12)
 
@@ -217,8 +301,16 @@ app's native build fails. Native iOS, RTL and dark rendering remain unverified.
 with rounded outer corners and thin `divider` separators. It retains Host theme
 roles (`background`, `controlSurface`, `text`, `muted`, `divider`) and native iOS
 Form grouping. `Pages/App Settings` exercises the production groups in light,
-dark, RTL and brand fixtures, with isolated language choices. Theme controls
-retain their existing design; language opens a native sheet. Other sections are
+dark, RTL and brand fixtures, with isolated language choices. `ColorSchemeControl`
+uses the native menu Picker for System, Light Mode and Dark Mode, with the stored
+preference as its selected value. System is the app default and follows live
+device changes; explicit modes override it until System is selected again.
+The control inherits Host tint and appearance, adding no color tokens or native
+geometry. `Pages/App Settings/System` exercises automatic appearance; JS fixtures
+cover live changes, manual overrides, restoring System and draft preservation.
+The Maestro settings flow covers all three choices and reopening; native OS
+theme changes and picker geometry still require device verification.
+Language opens a native sheet. Other sections are
 placeholders. The settings viewport and FieldGroup reveal the shared app Aurora
 background; settings language and profile preference sheets use the app
 `background` token. The settings stories render the same static Aurora backdrop
@@ -267,17 +359,22 @@ for this cleanup; native visual/gesture/accessibility verification remains pendi
 See the [audit follow-up](../../../../docs/universal-components-audit.md#implemented-follow-up).
 
 `AuthScreenFrame` has an optional `topBar` ReactNode slot outside its scrolling
-form. Login uses `LoginPreferences` there: native 48-point icon controls for
-language (left) and light/dark mode (right), with translated accessibility
-labels, app preference providers and auth tint tokens. Its Host fixes physical
+form. Login uses `LoginPreferences` there: a native 48-point language icon (left)
+and the shared `ColorSchemeControl` menu picker (right), offering System, Light
+Mode and Dark Mode with translated labels. The picker accepts an optional
+`testID` (App Settings by default; Login uses `auth-login-color-scheme`). Existing
+app preference providers and Host/auth tint tokens supply appearance; no new
+palette or geometry is added. System follows live device changes and can be
+restored after a manual choice. Its Host fixes physical
 placement in RTL while the separate native language sheet uses Expo UI's own
 hosting. The shared sheet adds no styling, padding, dimensions, colors or
 theme/direction bridge. Its iOS drag indicator is hidden; native light/dark mode
 follows the app appearance preference.
 Private `auth-icon-button.<platform>.tsx` adapters preserve native
-feedback and disabled suppression. `Pages/Login preferences` has light/dark
+feedback and disabled suppression. `Pages/Login preferences` has System/light/dark
 draft fixtures; `tests/auth/login-preferences.test.mjs` checks readiness,
-provider updates, draft retention and dismissal. The native flow is
+provider updates, all three appearance choices, live system changes, translated
+options, draft retention and dismissal. The native flow is
 `.maestro/storybook/login-preferences.yaml`; native touch geometry, keyboard and
 accessibility remain unverified without a device.
 
@@ -330,12 +427,11 @@ content, native buttons, press counts and pause/resume. The corresponding Maestr
 flow is `aurora-background.yaml`; native execution remains pending.
 
 `LaunchScreen` now reports native layout with optional `onReady`. The root hides the
-native splash at that point and retains the animated screen for the user-requested
-three seconds, then exits once startup is also ready. Its two-second upward transition
-completes immediately under reduced motion. `launch-screen.stories.tsx` provides a
-replayable ThreeSeconds preview. Root JS fixtures exercise fast/slow restoration and
-the timing boundary. These statements supersede the readiness-only startup behavior
-recorded later in this catalog; actual native rendering and timing remain unverified.
+native splash at that point. When startup is ready, a single Reanimated animation
+waits two seconds and slides upward over two seconds. No timer or extra React state
+is used. Reduced motion completes immediately. `launch-screen.stories.tsx` provides
+replayable Ready/Waiting previews. Root fixtures cover readiness gates; actual native
+rendering and timing still require device verification.
 
 The following top-edge wave is mounted above root navigation alongside the full-screen
 aurora behind navigation. Both layers pause while the splash covers them. The aurora
@@ -615,7 +711,7 @@ UniversalHost provides its resolved scheme to content through useHostColorScheme
 
 LoadingIndicator is a host-free platform adapter using SwiftUI ProgressView or Compose CircularProgressIndicator. LoadingContent composes a native row with an indicator and text; LoadingScreen owns a full-screen Host for route/Suspense boundaries. loading-state.stories.tsx exercises fetching, disabled, offline, persistent error, successful empty, cached refresh and refresh failure, plus full-screen and light/dark compositions. .maestro/storybook/loading-state.yaml checks observable state transitions. JS render tests establish query state selection; native layout/interaction verification is recorded in docs/production-fixes-plan.md.
 
-Screen recovery, launch text, maps/Skia captions and controls now use Expo UI. RN boundaries remain for native maps, canvas/Lottie artwork, keyboard/safe areas, navigation and absolute overlays. Launch waits for actual font/session readiness, with a 300-ms exit and immediate completion under reduced motion. Native-only no-op loaders and unused web branches were removed. The selected redundancy cleanup on 2026-10-05 also removed the web CanvasKit copy script, WASM asset and favicon; the 2026-10-10 cleanup removes the remaining Expo UI postinstall patch.
+Screen recovery, launch text, maps/Skia captions and controls now use Expo UI. RN boundaries remain for native maps, canvas/Lottie artwork, keyboard/safe areas, navigation and absolute overlays. Launch waits for font/session readiness, then uses one animation with a two-second delay and two-second upward slide; reduced motion completes immediately. Native-only no-op loaders and unused web branches were removed. The selected redundancy cleanup on 2026-10-05 also removed the web CanvasKit copy script, WASM asset and favicon; the 2026-10-10 cleanup removes the remaining Expo UI postinstall patch.
 
 ### Floating-action native verification follow-up
 
@@ -628,3 +724,40 @@ ReferenceNavigationBar disables shadowOpacity and all three RN elevation layers 
 ### Navigation edge spacing (2026-10-11)
 
 `ReferenceNavigationBar` now renders a borderless rectangular dock flush with the screen edges. Its existing `leftInset` and `rightInset` protect only native destination controls; `bottomInset` extends the glass to the bottom edge beneath the system gesture area. The 84-point action touch frame has a negative 28-point top margin and transparent `box-none` handling, reserving only the 56-point dock plus the bottom inset while allowing page content and touches beside the raised action. Floating-action appearance and motion are unchanged. `PageOverlap` in `reference-navigation.stories.tsx` exposes a page press count beside the action; `.maestro/storybook/reference-navigation.yaml` exercises this page control and the action's upper edge. Native iOS/Android overlap, hit delivery, glass and safe-area appearance require device verification.
+
+## UX wireframe button colors (2026-10-16)
+
+The user's UX Template requirement overrides native button color defaults only
+for theme `ux`: omitted color/contentColor resolve to existing grayscale semantic
+pairs. Primary remains #000000 with #FFFFFF labels in light and dark. The shared
+private semantic helper is reused by Storybook; the private hook respects the
+owning Host scheme and standalone colorScheme. Supplying either color prop
+preserves direct override behavior. Other brand themes retain native defaults.
+No geometry, per-state palette, provider or dependency is added.
+
+`Expo UI/Universal Button/WireframeLight` and `WireframeDark` expose count,
+disabled and reset behavior without supplying button colors. The Theme Tokens
+light/dark stories also exercise UX defaults.
+`tests/layout/universal-button.test.mjs` covers both platform adapters, exact
+black/white primary pairs, feedback grayscale, scheme overrides, caller colors
+and disabled suppression. `.maestro/storybook/wireframe-buttons.yaml` reuses
+the existing button interaction flow in both appearances.
+
+Manual iOS 27 / iPhone 18 Pro checks confirmed grayscale light/dark rendering
+and production dark-mode button labels after fixing a white-on-white native
+fill. One enabled press incremented the production counter once; a disabled
+press left it unchanged. Native Android and Maestro execution remain pending.
+
+## UX semantic feedback refinement (2026-10-16)
+
+The user requested colored danger, success and warning within the neutral UX
+theme. `ux.ts` now defines brick red, forest green and amber feedback accents
+with matching light/dark containers and explicit label colors. Primary remains
+#000000/#FFFFFF; foundations, ordinary actions, navigation and info stay neutral.
+The existing button semantic mapping propagates these roles without new props
+or component changes. Theme Tokens light/dark stories preview the status buttons.
+
+Appearance tests preserve neutral-role and black-primary invariants, check red/
+green/amber identities and require 4.5:1 status contrast on page, surface and
+container backgrounds. Native button adapter tests verify semantic fill/label
+pairs on iOS/Android and retain disabled-action guards.

@@ -10,6 +10,7 @@ import {
   tint,
 } from '@expo/ui/swift-ui/modifiers';
 import type { UniversalButtonContentProps } from './universal-button.types';
+import { useWireframeButtonColors } from './use-wireframe-button-colors';
 
 export function UniversalButtonContent({
   variant,
@@ -21,9 +22,14 @@ export function UniversalButtonContent({
   fullWidth,
   borderRadius,
   contentPadding,
-  color,
-  contentColor,
+  color: colorOverride,
+  contentColor: contentColorOverride,
 }: UniversalButtonContentProps) {
+  const { color, contentColor } = useWireframeButtonColors({
+    variant,
+    color: colorOverride,
+    contentColor: contentColorOverride,
+  });
   let style: Parameters<typeof buttonStyle>[0] = 'borderedProminent';
   if (variant === 'secondary') style = 'bordered';
   if (variant === 'link') style = 'plain';

@@ -1,11 +1,18 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { createContext, createElement, useContext, useEffect, useState } from 'react';
+import {
+  createContext,
+  createElement,
+  useContext,
+  useEffect,
+  useState,
+  useSyncExternalStore,
+} from 'react';
 import { createSourceLoader } from '../helpers/load-source.mjs';
 import { renderFixture } from '../helpers/render-fixture.mjs';
 
 for (const platform of ['ios', 'android']) {
-  for (const initialScheme of ['light', 'dark']) {
+  for (const initialScheme of ['system', 'light', 'dark']) {
     test(`${platform}/${initialScheme}: Login corner controls change appearance and language without remounting drafts`, async () => {
       const native = (type) =>
         function NativeFixture(props) {
@@ -13,6 +20,15 @@ for (const platform of ['ios', 'android']) {
         };
       const Icon = native('Icon');
       Icon.select = (spec) => spec[platform];
+      const Picker = native('Picker');
+      Picker.Item = native('PickerItem');
+      let deviceScheme = 'light';
+      const appearanceListeners = new Set();
+      const subscribeAppearance = (listener) => {
+        appearanceListeners.add(listener);
+        return () => appearanceListeners.delete(listener);
+      };
+      const getDeviceScheme = () => deviceScheme;
       const safeArea = createContext({ top: 59, bottom: 34, left: 10, right: 18 });
       const writes = [];
       const mocks = {
@@ -25,7 +41,7 @@ for (const platform of ['ios', 'android']) {
           KeyboardAvoidingView: native('KeyboardAvoidingView'),
           I18nManager: { isRTL: false },
           Platform: { OS: platform },
-          useColorScheme: () => initialScheme,
+          useColorScheme: () => useSyncExternalStore(subscribeAppearance, getDeviceScheme),
           useWindowDimensions: () => ({ width: 390, height: 844 }),
         },
         'expo-router': { LocaleProvider: native('LocaleProvider') },
@@ -63,13 +79,15 @@ for (const platform of ['ios', 'android']) {
           testID: (testID) => ({ testID }),
         },
         '@expo/material-symbols/language.xml': 'language',
-        '@expo/material-symbols/light_mode.xml': 'sun',
-        '@expo/material-symbols/dark_mode.xml': 'moon',
+        '@/components/ui/picker/picker': { Picker },
         '@/components/ui/native/native-fill-width': {
+          nativeCenteredMinHeight: () => [],
+          nativeFillSize: [],
           nativeFillWidth: [],
           nativeFillWidthCenter: [],
           nativeRowWeight: [],
         },
+        '@/components/ui/field-group/field-group': { FieldGroup: native('FieldGroup') },
         '@/components/ui/page/page-back-button': { PageBackButton: native('BackButton') },
         '@/components/ui/refreshable-scroll-view/refreshable-scroll-view': {
           RefreshableScrollView: native('ScrollView'),
@@ -88,7 +106,7 @@ for (const platform of ['ios', 'android']) {
         'context/layout-direction.context.tsx',
       );
       const { LanguageProvider, useLanguage } = load('context/language.context.tsx');
-      const { ThemePreferencesProvider } = load('context/theme.context.tsx');
+      const { ThemePreferencesProvider, useThemeSettings } = load('context/theme.context.tsx');
       const { useColorScheme } = load('hooks/use-color-scheme.ts');
       const { default: i18n } = load('lib/i18n.ts');
       let edit;
@@ -98,6 +116,7 @@ for (const platform of ['ios', 'android']) {
         const t = i18n.getFixedT(language);
         const direction = useLayoutDirection();
         const scheme = useColorScheme();
+        const { colorScheme: preference } = useThemeSettings();
         const [draft, setDraft] = useState({ login: '', password: '' });
         edit = setDraft;
         useEffect(() => {
@@ -111,7 +130,7 @@ for (const platform of ['ios', 'android']) {
             description: t('auth.loginDescription'),
             topBar: createElement(LoginPreferences),
           },
-          createElement('Draft', { draft, language, direction, scheme }),
+          createElement('Draft', { draft, language, direction, scheme, preference }),
         );
       }
       const view = renderFixture(
@@ -123,7 +142,7 @@ for (const platform of ['ios', 'android']) {
             null,
             createElement(
               ThemePreferencesProvider,
-              { initialColorScheme: initialScheme },
+              initialScheme === 'system' ? null : { initialColorScheme: initialScheme },
               createElement(LoginDraft),
             ),
           ),
@@ -162,24 +181,41 @@ for (const platform of ['ios', 'android']) {
         assert.equal(contains(scroll, topBar), false);
         assert.deepEqual(
           topBar.children[0].children.map(({ type }) => type),
-          ['IconButton', 'Spacer', 'IconButton'],
+          ['IconButton', 'Spacer', 'Picker'],
         );
         assert.equal(topBar.children[0].props.style.paddingLeft, 26);
         assert.equal(topBar.children[0].props.style.paddingRight, 34);
-        view.flush(() => edit({ login: 'draft@example.com', password: 'secret draft' }));
-        press(iconButton('auth-login-color-scheme'));
-        const toggled = initialScheme === 'light' ? 'dark' : 'light';
-        assert.equal(draft.props.scheme, toggled);
-        assert.equal(
-          iconButton('auth-login-color-scheme').children[0].props.name,
-          platform === 'ios'
-            ? toggled === 'dark'
-              ? 'sun.max'
-              : 'moon'
-            : toggled === 'dark'
-              ? 'sun'
-              : 'moon',
+        const picker = view.findAll('Picker')[0];
+        assert.equal(picker.props.testID, 'auth-login-color-scheme');
+        assert.equal(picker.props.selectedValue, initialScheme);
+        assert.equal(draft.props.scheme, initialScheme === 'system' ? 'light' : initialScheme);
+        assert.deepEqual(
+          view.findAll('PickerItem').map(({ props }) => props.value),
+          ['system', 'light', 'dark'],
         );
+        view.flush(() => edit({ login: 'draft@example.com', password: 'secret draft' }));
+        for (const preference of ['system', 'dark', 'light', 'system']) {
+          view.flush(() => picker.props.onValueChange(preference));
+          for (const device of ['dark', 'light']) {
+            view.flush(() => {
+              deviceScheme = device;
+              appearanceListeners.forEach((listener) => listener());
+            });
+            const expected = preference === 'system' ? device : preference;
+            assert.equal(picker.props.selectedValue, preference);
+            assert.equal(draft.props.preference, preference);
+            assert.equal(draft.props.scheme, expected);
+            assert.equal(topBar.props.colorScheme, expected);
+            assert.equal(view.findAll('Picker')[0], picker);
+            assert.equal(view.findAll('Draft')[0], draft);
+            assert.deepEqual(draft.props.draft, {
+              login: 'draft@example.com',
+              password: 'secret draft',
+            });
+            assert.equal(mounts, 1);
+          }
+        }
+        view.flush(() => picker.props.onValueChange('dark'));
         for (const language of ['en', 'ar', 'fr']) {
           press(languageButton);
           const sheet = view.findAll('Sheet')[0];
@@ -215,6 +251,13 @@ for (const platform of ['ios', 'android']) {
           assert.equal(sheet.props.isPresented, false);
           assert.equal(view.findAll('Draft')[0], draft);
           assert.equal(draft.props.language, language);
+          assert.deepEqual(
+            view.findAll('PickerItem').map(({ props }) => props.label),
+            ['common.systemMode', 'common.lightMode', 'common.darkMode'].map((key) =>
+              i18n.getFixedT(language)(key),
+            ),
+          );
+          assert.equal(draft.props.scheme, 'dark');
           assert.equal(draft.props.direction, language === 'ar' ? 'rtl' : 'ltr');
           assert.deepEqual(draft.props.draft, {
             login: 'draft@example.com',
@@ -244,8 +287,9 @@ for (const platform of ['ios', 'android']) {
         press(languageButton);
         view.flush(() => view.findAll('Sheet')[0].props.onDismiss());
         assert.equal(view.findAll('Sheet')[0].props.isPresented, false);
-        press(iconButton('auth-login-color-scheme'));
-        assert.equal(draft.props.scheme, initialScheme);
+        view.flush(() => picker.props.onValueChange(initialScheme));
+        assert.equal(picker.props.selectedValue, initialScheme);
+        assert.equal(draft.props.scheme, initialScheme === 'system' ? 'light' : initialScheme);
       } finally {
         view.unmount();
       }

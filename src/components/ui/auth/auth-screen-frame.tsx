@@ -1,10 +1,15 @@
 import { useTranslation } from 'react-i18next';
 import { Column } from '@expo/ui';
-import type { PropsWithChildren, ReactNode } from 'react';
+import { useState, type PropsWithChildren, type ReactNode } from 'react';
 import { KeyboardAvoidingView, Platform } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuthTheme } from './auth-theme';
-import { nativeFillWidth, nativeFillWidthCenter } from '../native/native-fill-width';
+import {
+  nativeCenteredMinHeight,
+  nativeFillSize,
+  nativeFillWidth,
+} from '../native/native-fill-width';
+import { FieldGroup } from '../field-group/field-group';
 import { PageFrame } from '../page/page-frame';
 import { RefreshableScrollView } from '../refreshable-scroll-view/refreshable-scroll-view';
 import { UniversalHost } from '../host/universal-host';
@@ -30,6 +35,7 @@ function AuthScreenContent({
   title,
   description,
   tab = false,
+  grouped = false,
   onRefresh,
   colorScheme,
 }: PropsWithChildren<{
@@ -37,6 +43,8 @@ function AuthScreenContent({
   title: string;
   description: string;
   tab?: boolean;
+  /** Registration keeps its native grouped form as the only scroll container. */
+  grouped?: boolean;
   onRefresh?: () => Promise<void>;
   colorScheme?: 'light' | 'dark';
 }>) {
@@ -44,62 +52,66 @@ function AuthScreenContent({
   const { language } = useLanguage();
   const { t } = useTranslation();
   const { colors, scheme } = useAuthTheme(colorScheme);
+  const [viewportHeight, setViewportHeight] = useState(0);
   const horizontalPadding = Math.max(24, insets.left + 16, insets.right + 16);
   const platformHeadingFont = Platform.OS === 'android' ? 'Inter-Black' : 'InterBlack';
   const headingFont = language === 'ar' ? undefined : platformHeadingFont;
+  const heading = (
+    <Column spacing={12} modifiers={nativeFillWidth}>
+      <AuthText variant="caption" fontWeight="700" textStyle={{ color: colors.tint }}>
+        {t('brand.wordmark')}
+      </AuthText>
+      <AuthText
+        variant="heading"
+        textStyle={{ fontFamily: headingFont, fontSize: 32, lineHeight: 38 }}
+      >
+        {title}
+      </AuthText>
+      <AuthText textStyle={{ color: colors.muted, lineHeight: 24 }}>{description}</AuthText>
+    </Column>
+  );
   return (
     <KeyboardAvoidingView
       testID={testID}
       behavior="padding"
       style={{
         flex: 1,
-        alignItems: 'center',
         paddingHorizontal: horizontalPadding,
+        paddingBottom: tab ? 0 : insets.bottom,
       }}
     >
       <UniversalHost
-        style={{ flex: 1, width: '100%', maxWidth: 480 }}
+        style={{ flex: 1, width: '100%' }}
+        onLayout={({ nativeEvent: { layout } }) => setViewportHeight(layout.height)}
         colorScheme={scheme}
         seedColor={colors.tint}
         matchContents={false}
         ignoreSafeArea="all"
       >
-        <RefreshableScrollView
-          testID={`${testID}-scroll`}
-          showsIndicators={false}
-          onRefresh={onRefresh}
-        >
-          <Column
-            alignment="center"
-            modifiers={nativeFillWidthCenter}
-            style={{
-              paddingTop: insets.top + 24,
-              paddingBottom: (tab ? 0 : insets.bottom) + 32,
-            }}
+        {grouped ? (
+          <FieldGroup
+            testID={`${testID}-scroll`}
+            modifiers={nativeFillSize}
+            style={{ backgroundColor: 'transparent' }}
           >
-            <Column spacing={32} modifiers={nativeFillWidth}>
-              <Column spacing={12} modifiers={nativeFillWidth}>
-                <AuthText variant="caption" fontWeight="700" textStyle={{ color: colors.tint }}>
-                  {t('brand.wordmark')}
-                </AuthText>
-                <AuthText
-                  variant="heading"
-                  textStyle={{
-                    fontFamily: headingFont,
-                    fontSize: 32,
-                    lineHeight: 38,
-                  }}
-                >
-                  {title}
-                </AuthText>
-                <AuthText textStyle={{ color: colors.muted, lineHeight: 24 }}>
-                  {description}
-                </AuthText>
+            {heading}
+            {children}
+          </FieldGroup>
+        ) : (
+          <RefreshableScrollView
+            testID={`${testID}-scroll`}
+            modifiers={nativeFillSize}
+            showsIndicators={false}
+            onRefresh={onRefresh}
+          >
+            <Column modifiers={nativeCenteredMinHeight(viewportHeight)}>
+              <Column spacing={32} modifiers={nativeFillWidth} style={{ paddingVertical: 32 }}>
+                {heading}
+                {children}
               </Column>
-              {children}
             </Column>
-          </Column>
-        </RefreshableScrollView>
+          </RefreshableScrollView>
+        )}
       </UniversalHost>
     </KeyboardAvoidingView>
   );

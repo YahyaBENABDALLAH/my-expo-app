@@ -10,6 +10,8 @@ while reducing full-screen redraws during navigation and scrolling. iOS follows
 the display refresh rate. Static mode remains available with `animate={false}`.
 The shader consumes the selected theme's background, raised surface, primary
 and secondary tokens. Optional `hue` supports the interactive canvas page.
+UX Template uses a flat grayscale background in both appearances: accent
+intensity is zero and the animation clock stays paused.
 
 The decorative wrapper and canvas ignore touches and are hidden from accessibility.
 Resolution follows actual native layout, including narrow previews. A UI-thread
@@ -24,7 +26,7 @@ advance the artwork. Keep this specialized rendering boundary separate from ordi
 
 See [shared motion](../../../../docs/shared-skia-motion.md) for verification limits.
 
-`Pages/Skia background` provides Light, Dark, Static and NarrowPhone composition
+`Pages/Skia background` provides Light, Dark and Static composition
 stories with page content, native buttons, press counts and pause/resume.
 `.maestro/storybook/aurora-background.yaml` covers native touch delivery in light,
 dark and static compositions; it still requires a connected development build.

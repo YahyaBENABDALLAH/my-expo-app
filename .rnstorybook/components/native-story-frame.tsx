@@ -11,8 +11,10 @@ import type { PropsWithChildren } from 'react';
 import { View } from 'react-native';
 
 import { useThemeColors } from '@/hooks/use-theme';
+import { useMeasuredWidth } from '@/hooks/use-measured-width';
 
 export type NativeStoryTheme = UniversalThemeProps;
+const canvasPadding = 24;
 
 /** Shared on-device canvas for the Expo UI stories. */
 export function NativeStoryFrame({
@@ -21,20 +23,25 @@ export function NativeStoryFrame({
   testID,
 }: PropsWithChildren<NativeStoryTheme>) {
   const colors = useThemeColors(colorScheme);
+  const [width, setWidth] = useMeasuredWidth();
   return (
-    <UniversalHost
-      colorScheme={colorScheme}
-      matchContents={false}
+    <View
       style={{ flex: 1, backgroundColor: colors.background }}
+      onLayout={(event) => setWidth(event.nativeEvent.layout.width)}
     >
-      <ScrollView testID={testID ? `${testID}-canvas` : undefined}>
-        <Column modifiers={nativeFillWidth} style={{ padding: 24 }}>
-          <RNHostView matchContents>
-            <View>{children}</View>
-          </RNHostView>
-        </Column>
-      </ScrollView>
-    </UniversalHost>
+      <UniversalHost colorScheme={colorScheme} matchContents={false} style={{ flex: 1 }}>
+        <ScrollView testID={testID ? `${testID}-canvas` : undefined}>
+          <Column modifiers={nativeFillWidth} style={{ padding: canvasPadding }}>
+            {width > 0 && (
+              <RNHostView matchContents>
+                {/* Percentage widths collapse inside an intrinsically measured RN bridge. */}
+                <View style={{ width: Math.max(1, width - canvasPadding * 2) }}>{children}</View>
+              </RNHostView>
+            )}
+          </Column>
+        </ScrollView>
+      </UniversalHost>
+    </View>
   );
 }
 

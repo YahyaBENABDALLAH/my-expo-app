@@ -77,14 +77,6 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Continuous: Story = {};
-export const Minimum: Story = { args: { value: 0 } };
-export const Maximum: Story = { args: { value: 100 } };
 export const Stepped: Story = { args: { step: 10 } };
-export const FineSteps: Story = { args: { min: 0, max: 1, value: 0.5, step: 0.1 } };
-export const NegativeRange: Story = { args: { min: -50, max: 50, value: 0, step: 5 } };
 export const Disabled: Story = { args: { disabled: true } };
-export const DisabledMinimum: Story = { args: { disabled: true, value: 0 } };
-export const DisabledMaximum: Story = { args: { disabled: true, value: 100 } };
 export const LightTheme: Story = { args: { colorScheme: 'light' } };
-export const DarkTheme: Story = { args: { colorScheme: 'dark' } };
-export const NativeTheme: Story = { args: { value: 75, seedColor: Colors.light.tint } };

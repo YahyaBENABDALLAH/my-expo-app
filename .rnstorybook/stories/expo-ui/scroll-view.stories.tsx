@@ -87,11 +87,5 @@ type Story = StoryObj<typeof meta>;
 
 export const Vertical: Story = {};
 export const Horizontal: Story = { args: { direction: 'horizontal', viewportHeight: 140 } };
-export const WithoutIndicators: Story = { args: { showsIndicators: false } };
-export const ShortContent: Story = { args: { itemCount: 2 } };
 export const Empty: Story = { args: { itemCount: 0 } };
-export const ManyItems: Story = { args: { itemCount: 30 } };
-export const DisabledActions: Story = { args: { disabled: true } };
-export const Hidden: Story = { args: { hidden: true } };
 export const LightTheme: Story = { args: { colorScheme: 'light' } };
-export const DarkTheme: Story = { args: { colorScheme: 'dark' } };

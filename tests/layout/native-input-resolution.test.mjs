@@ -46,6 +46,7 @@ for (const platform of ['ios', 'android']) {
     'native/native-fill-width.ts',
     'navigation/navigation-glass-surface.tsx',
     'navigation/navigation-tab.tsx',
+    'onboarding/onboarding-pager.tsx',
     'page/page-back-button.tsx',
     'picker/picker.tsx',
     'recipe-stepper/recipe-stepper-layout.tsx',

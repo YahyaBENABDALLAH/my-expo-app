@@ -79,17 +79,10 @@ type Story = StoryObj<typeof meta>;
 
 export const StartAligned: Story = {};
 export const CenterAligned: Story = { args: { alignment: 'center' } };
-export const EndAligned: Story = { args: { alignment: 'end' } };
-export const NoSpacing: Story = { args: { spacing: 0 } };
-export const WideSpacing: Story = { args: { spacing: 32 } };
 export const Nested: Story = { args: { nested: true, itemCount: 1 } };
-export const Empty: Story = { args: { itemCount: 0 } };
-export const Disabled: Story = { args: { disabled: true } };
-export const Hidden: Story = { args: { hidden: true } };
 export const LightTheme: Story = {
   args: {
     colorScheme: 'light',
     style: { width: 260, padding: 16, backgroundColor: Colors.light.surface, borderRadius: 12 },
   },
 };
-export const DarkTheme: Story = { args: { colorScheme: 'dark' } };

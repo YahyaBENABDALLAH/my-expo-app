@@ -157,15 +157,31 @@ const meta = {
       {...args}
     />
   ),
-  parameters: { layout: 'fullscreen' },
+  parameters: {
+    layout: 'fullscreen',
+    controls: {
+      include: [
+        'label',
+        'placeholder',
+        'defaultValue',
+        'helperText',
+        'status',
+        'disabled',
+        'readOnly',
+        'autoFocus',
+        'multiline',
+        'secureTextEntry',
+        'keyboardType',
+        'colorScheme',
+      ],
+    },
+  },
 } satisfies Meta<typeof UniversalTextInput>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Empty: Story = {};
-export const LeftIcon: Story = { args: { leftIcon: searchIcon } };
-export const RightIcon: Story = { args: { rightIcon: clearIcon } };
 
 function IconInputDemo(args: UniversalTextInputProps) {
   const value = useNativeState(args.defaultValue ?? '');
@@ -219,26 +235,6 @@ export const ClickableRightIcon: Story = {
   },
   render: (args) => <IconInputDemo key={`${args.defaultValue}-${args.disabled}`} {...args} />,
 };
-export const ClickableRightIconLight: Story = {
-  ...ClickableRightIcon,
-  args: { ...ClickableRightIcon.args, colorScheme: 'light' },
-};
-export const DisabledIcons: Story = {
-  ...ClickableRightIcon,
-  args: {
-    ...ClickableRightIcon.args,
-    disabled: true,
-    helperText: 'Text and icons dim while disabled. The border and background keep their colors.',
-  },
-};
-export const CustomPaddingIcons: Story = {
-  ...ClickableRightIcon,
-  args: {
-    ...ClickableRightIcon.args,
-    style: { paddingVertical: 6, paddingHorizontal: 10, paddingRight: 2 },
-    helperText: 'Custom padding applies once. The icon retains its native tap target.',
-  },
-};
 export const ReadOnlyIcons: Story = {
   ...ClickableRightIcon,
   args: {
@@ -247,12 +243,16 @@ export const ReadOnlyIcons: Story = {
     helperText: 'Text editing is blocked; the separate clear action is still available.',
   },
 };
-export const Filled: Story = { args: { defaultValue: 'Alex Morgan' } };
 export const Focused: Story = {
   args: {
     autoFocus: true,
-    helperText: 'Focus and blur use native events; the surface keeps its theme colors.',
+    helperText: 'The border uses the theme tint while focused and resets on blur.',
   },
+  render: (args) => <InputActionsDemo {...args} />,
+};
+export const FocusedLight: Story = {
+  ...Focused,
+  args: { ...Focused.args, colorScheme: 'light' },
 };
 export const Disabled: Story = {
   args: {
@@ -269,7 +269,6 @@ export const ReadOnly: Story = {
     helperText: 'Editing is blocked. Native selection behavior varies by platform.',
   },
 };
-export const NotEditable: Story = { args: { defaultValue: 'Locked value', editable: false } };
 export const ErrorState: Story = {
   name: 'Error',
   args: {
@@ -289,21 +288,6 @@ export const Success: Story = {
 };
 export const Warning: Story = {
   args: { defaultValue: 'alex', status: 'warning', helperText: 'This name is already in use.' },
-};
-export const LightTheme: Story = { args: { colorScheme: 'light' } };
-export const DarkTheme: Story = { args: { colorScheme: 'dark' } };
-
-export const RoundedBorder: Story = {
-  args: {
-    label: 'Rounded border',
-    style: { borderWidth: 3, borderRadius: 24 },
-    status: 'error',
-    helperText: 'Check that the colored border follows all four corners without gaps.',
-  },
-};
-export const RoundedBorderLight: Story = {
-  ...RoundedBorder,
-  args: { ...RoundedBorder.args, colorScheme: 'light' },
 };
 
 function InheritedHostInputDemo(args: UniversalTextInputProps) {
@@ -425,126 +409,36 @@ export const Multiline: Story = {
     helperText: 'Grows naturally as you type.',
   },
 };
-export const FixedLines: Story = {
-  args: { label: 'Notes', multiline: true, numberOfLines: 4, helperText: 'Reserves four lines.' },
-};
-export const CharacterLimit: Story = {
-  args: {
-    label: 'Short name',
-    maxLength: 12,
-    defaultValue: 'Twelve chars',
-    helperText: 'Native limit: 12 characters. Try typing or pasting more.',
-  },
-};
-export const Email: Story = {
-  args: {
-    label: 'Email',
-    placeholder: 'you@example.com',
-    keyboardType: 'email-address',
-    autoComplete: 'email',
-    autoCapitalize: 'none',
-    autoCorrect: false,
-    returnKeyType: 'next',
-  },
-};
-export const Phone: Story = {
-  args: {
-    label: 'Phone',
-    placeholder: '+212 600 000 000',
-    keyboardType: 'phone-pad',
-    autoComplete: 'tel',
-  },
-};
-export const Numeric: Story = {
-  name: 'Number',
-  args: {
-    label: 'Quantity',
-    placeholder: '0',
-    keyboardType: 'number-pad',
-    helperText: 'Numeric keyboard; keyboard hints do not validate pasted text.',
-  },
-};
-export const Decimal: Story = {
-  args: { label: 'Amount', placeholder: '0.00', keyboardType: 'decimal-pad' },
-};
-export const URL: Story = {
-  args: {
-    label: 'Website',
-    placeholder: 'https://example.com',
-    keyboardType: 'url',
-    autoCapitalize: 'none',
-    autoCorrect: false,
-    returnKeyType: 'go',
-  },
-};
-export const Search: Story = {
-  args: {
-    label: 'Search',
-    placeholder: 'Search items',
-    returnKeyType: 'search',
-    autoCapitalize: 'none',
-    helperText: 'Submit from the keyboard to see the Actions event.',
-  },
-};
-export const OneTimeCode: Story = {
-  args: {
-    label: 'Verification code',
-    placeholder: '123456',
-    autoComplete: 'one-time-code',
-    keyboardType: 'number-pad',
-    maxLength: 6,
-  },
-};
-export const CapitalizeWords: Story = {
-  args: { autoCapitalize: 'words', helperText: 'Keyboard hint: capitalize each word.' },
-};
-export const NoAutocorrect: Story = {
-  args: { label: 'Username', autoCapitalize: 'none', autoCorrect: false, autoComplete: 'username' },
-};
-export const CenterAligned: Story = {
-  args: { defaultValue: 'Centered text', textAlign: 'center' },
-};
-export const RightAligned: Story = { args: { defaultValue: 'مرحبا بالعالم', textAlign: 'right' } };
-export const SelectAllOnFocus: Story = {
-  args: { defaultValue: 'Tap to select all', selectTextOnFocus: true, helperText: selectionNote },
-};
-export const HiddenCaret: Story = {
-  args: {
-    caretHidden: true,
-    defaultValue: 'Hidden cursor',
-    helperText: 'On iOS this also hides the selection highlight.',
-  },
-};
-export const CustomSelectionColors: Story = {
-  args: {
-    defaultValue: 'Long press to select',
-    selectionColor: Colors.dark.secondary,
-    cursorColor: Colors.dark.warning,
-    selectionHandleColor: Colors.dark.primary,
-    helperText: 'Handle color is Android-only. On iOS selection color also tints the cursor.',
-  },
-};
-export const KeyboardAliases: Story = {
-  args: {
-    label: 'Email',
-    inputMode: 'email',
-    enterKeyHint: 'send',
-    helperText: 'inputMode and enterKeyHint map to native keyboard options.',
-  },
-};
-export const WithoutLabel: Story = { args: { label: '', helperText: '' } };
 
 function InputActionsDemo(args: UniversalTextInputProps) {
   const ref = useRef<TextInputRef>(null);
+  const [focused, setFocused] = useState(false);
   return (
     <View style={{ gap: 20 }}>
-      <UniversalTextInput {...args} ref={ref} />
+      <UniversalTextInput
+        {...args}
+        ref={ref}
+        onFocus={() => {
+          setFocused(true);
+          args.onFocus?.();
+        }}
+        onBlur={() => {
+          setFocused(false);
+          args.onBlur?.();
+        }}
+      />
       <Host
         matchContents={{ vertical: true }}
         colorScheme={args.colorScheme}
         style={{ width: '100%' }}
       >
         <Column testID={`${args.testID}-actions`} spacing={10}>
+          <Text
+            testID={`${args.testID}-focus-state`}
+            textStyle={{ color: Colors[args.colorScheme ?? 'dark'].text }}
+          >
+            {focused ? 'Input focused' : 'Input blurred'}
+          </Text>
           <UniversalButtonContent
             variant="secondary"
             testID={`${args.testID}-focus`}
@@ -663,8 +557,4 @@ export const PasswordVisibilityEmpty: Story = {
 export const PasswordVisibilityDisabled: Story = {
   ...PasswordVisibility,
   args: { ...PasswordVisibility.args, disabled: true },
-};
-export const PasswordVisibilityLight: Story = {
-  ...PasswordVisibility,
-  args: { ...PasswordVisibility.args, colorScheme: 'light' },
 };

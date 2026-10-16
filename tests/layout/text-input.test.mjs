@@ -97,7 +97,7 @@ for (const platform of ['ios', 'android']) {
     view.unmount();
   });
 
-  test(`${platform}: explicit native colors and focus callbacks survive the simplified composition`, () => {
+  test(`${platform}: focus updates the border without remounting and preserves native colors and callbacks`, () => {
     const { UniversalTextInputContent } = setup(platform);
     let focused = 0,
       blurred = 0;
@@ -113,6 +113,14 @@ for (const platform of ['ios', 'android']) {
       }),
     );
     const field = view.findAll('TextInput')[0];
+    const surface = view.findAll('Row')[0];
+    const borderColor = () =>
+      platform === 'ios'
+        ? surface.props.modifiers.find((modifier) => modifier.$type === 'strokeBorder').args[0]
+            .content
+        : surface.props.style.borderColor;
+    const restingModifiers = surface.props.modifiers;
+    assert.equal(borderColor(), '#aaa');
     assert.equal(field.props.readOnly, true);
     assert.equal(field.props.cursorColor, '#123');
     assert.equal(field.props.selectionColor, '#456');
@@ -122,9 +130,15 @@ for (const platform of ['ios', 'android']) {
       field.props.onBlur();
       field.props.onFocus();
       field.props.onFocus();
+    });
+    assert.equal(borderColor(), '#080');
+    assert.equal(view.findAll('TextInput')[0], field);
+    view.flush(() => {
       field.props.onBlur();
       field.props.onBlur();
     });
+    assert.equal(borderColor(), '#aaa');
+    assert.deepEqual(surface.props.modifiers, restingModifiers);
     assert.equal(focused, 1);
     assert.equal(blurred, 1);
     view.unmount();

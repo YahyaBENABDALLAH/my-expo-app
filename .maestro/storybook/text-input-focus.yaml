@@ -1,0 +1,43 @@
+appId: com.hyrkul.likan
+name: Text input focus and blur in dark and light themes
+tags: [smoke, storybook, input]
+env:
+  STORYBOOK_URL: myappexpo://storybook
+---
+- runFlow:
+    file: ../helpers/open-story.yaml
+    env:
+      STORY_ID: expo-ui-universal-text-input--focused
+      READY_ID: expo-ui-text-input-focus-state
+- assertVisible:
+    id: expo-ui-text-input-focus-state
+    text: Input focused
+- inputText: Focused
+- tapOn:
+    id: expo-ui-text-input-blur
+- assertVisible:
+    id: expo-ui-text-input-focus-state
+    text: Input blurred
+- tapOn:
+    id: expo-ui-text-input
+- assertVisible:
+    id: expo-ui-text-input-focus-state
+    text: Input focused
+- assertVisible:
+    id: expo-ui-text-input
+    text: Focused
+- tapOn:
+    id: expo-ui-text-input-blur
+- runFlow:
+    file: ../helpers/open-story.yaml
+    env:
+      STORY_ID: expo-ui-universal-text-input--focused-light
+      READY_ID: expo-ui-text-input-focus-state
+- assertVisible:
+    id: expo-ui-text-input-focus-state
+    text: Input focused
+- tapOn:
+    id: expo-ui-text-input-blur
+- assertVisible:
+    id: expo-ui-text-input-focus-state
+    text: Input blurred

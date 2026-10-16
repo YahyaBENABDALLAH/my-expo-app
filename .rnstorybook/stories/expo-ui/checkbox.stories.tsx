@@ -71,12 +71,4 @@ export const Unchecked: Story = {};
 export const Checked: Story = { args: { value: true } };
 export const DisabledUnchecked: Story = { args: { disabled: true } };
 export const DisabledChecked: Story = { args: { disabled: true, value: true } };
-export const WithoutLabel: Story = { args: { label: undefined } };
-export const LongLabel: Story = {
-  args: { label: 'I agree to receive updates about my account, notifications, and new features' },
-};
-export const CustomTint: Story = { args: { seedColor: Colors.dark.primary, value: true } };
 export const LightTheme: Story = { args: { colorScheme: 'light' } };
-export const DarkTheme: Story = { args: { colorScheme: 'dark' } };
-
-export const NativeTheme: Story = { args: { seedColor: Colors.light.tint } };

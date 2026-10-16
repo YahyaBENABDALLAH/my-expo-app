@@ -1,31 +1,41 @@
 # Onboarding page
 
-`OnboardingPage` renders the shared first-launch presentation. The feature owns
-Expo Router navigation and persistence; this component receives the photo,
-category, title, description, step, action callbacks, and saving/error state.
+`OnboardingPage` renders a complete introduction carousel inside one screen. Pass
+an ordered `pages` array (`id`, photo, category, title, description), completion and
+skip callbacks, saving/error state, and an optional color scheme. `initialStep` is
+read on mount for deterministic stories. The feature supplies translated content
+and owns persistence; slides never navigate through Expo Router.
 
-Photos are bundled locally and passive. All text and controls use Expo UI. Three
-Host boundaries reserve a fixed header and bottom action while the middle content
-can scroll on smaller devices or with enlarged text. There are no RN content
-stacks inside a native Host. Safe-area padding is applied to the native header and
-footer content; the viewport boundaries own the tablet width limit.
+The wordmark/Skip header and progress/Previous/Next footer stay mounted in fixed
+native Hosts. Only the middle content slides. Each slide has an independent
+vertical Expo UI ScrollView for compact devices and enlarged text. Photos are
+bundled locally, passive, and bridged with RNHostView; all ordinary content and
+controls remain native Expo UI. Safe areas and a 480-point content width limit
+apply to the persistent screen.
 
-A horizontal swipe invokes the same Next/Previous callbacks, with RTL direction
-reversed. Swiping past the last page never completes onboarding. Vertical scrolling
-remains available; swipe and button input are disabled during persistence. Native
-Router transitions honor reduced motion.
+Private platform adapters use SwiftUI TabView with page style on iOS (including
+iOS 16.4) and Compose HorizontalPager on Android. Both inherit the Host's layout
+direction, including Arabic RTL. Next and Previous update local selection and
+animate the content; reduced motion removes programmatic paging animation.
+Android hardware Back returns to the previous slide before allowing exit from
+the first. Swiping to or beyond the last slide never completes onboarding.
 
-The component consumes shared `background`, `text`, `muted`, `border`, and `tint`
-roles. The primary action preserves native press feedback and has aligned native
-surface and touch bounds. Arabic keeps the platform font without letter spacing.
+During persistence, the pager cannot receive touches and all actions are disabled.
+Failed saves keep the final slide available for retry. Shared background, text,
+muted, border and tint roles supply colors. Native button surfaces and clickable
+bounds remain aligned. Arabic retains the platform font without letter spacing.
 
-`Pages/Onboarding` supplies discover/cook/save, light/dark, pending, and save-failure
-stories with interactive navigation and completion/replay.
+`Pages/Onboarding` reuses the production component with discover/cook/save,
+light/dark, saving, failure, completion and replay fixtures. JS checks verify
+persistent screen identity, local selection, completion, retry and disabled-input
+behavior. `.maestro/onboarding/first-launch.yaml` exercises native swipes, button
+navigation, hardware Back and completion. Native verification for this revision
+is recorded in the component catalog; mocked tests do not prove native geometry.
 
-Android verification used the production component in an isolated SDK 57 native
-preview at 411 × 914 dp, French, light theme, and font scales 1.0 and 1.5. All three
-pages rendered within the safe areas; Next presses at both vertical edges,
-Previous, photo swipes in both directions, and completion produced the expected
-state. The first-launch Maestro flow covers these navigation outcomes and
-persistence, but could not run against the full app because its current native
-build fails. iOS rendering, native RTL, and dark mode remain unverified on device.
+On iPhone 18 Pro / iOS 27, the French light-theme screen was checked for all three
+slides, a fully visible final description, fixed header/footer, Previous, Next at
+both vertical touch edges, and completion returning to sign-in. Native swipe
+gestures could not be confirmed through the available desktop automation.
+Android, RTL, dark mode and enlarged-text rendering remain unverified on device.
+Storybook itself currently fails with a duplicate RNCSafeAreaProvider registration;
+these checks used the production first-launch route directly.

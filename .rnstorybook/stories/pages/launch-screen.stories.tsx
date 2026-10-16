@@ -47,7 +47,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'Startup stays visible while resources are unavailable. Ready triggers a 300-ms transition; reduced motion finishes immediately. Toggle ready to exercise both states.',
+          'Ready starts a two-second delay followed by a two-second upward slide. Reduced motion completes immediately. Toggle ready and replay to exercise both states.',
       },
     },
   },

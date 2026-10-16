@@ -41,9 +41,10 @@ env:
 - tapOn:
     id: login-preferences-draft
 - inputText: draft@example.com
+- hideKeyboard
 - tapOn:
     id: auth-login-color-scheme
-- hideKeyboard
+- tapOn: Dark Mode
 - assertVisible:
     id: login-preferences-status
     text: en · dark · ltr
@@ -62,6 +63,7 @@ env:
     text: draft@example.com
 - tapOn:
     id: auth-login-color-scheme
+- tapOn: الوضع الفاتح
 - assertVisible:
     id: login-preferences-status
     text: ar · light · rtl
@@ -87,6 +89,18 @@ env:
 - assertVisible:
     id: login-preferences-status
     text: en · light · ltr
+- assertVisible:
+    id: login-preferences-draft-value
+    text: draft@example.com
+- tapOn:
+    id: auth-login-color-scheme
+- tapOn: System
+- assertVisible:
+    id: login-preferences-appearance
+    text: system
+- assertVisible:
+    id: login-preferences-status
+    text: 'en · (light|dark) · ltr'
 - assertVisible:
     id: login-preferences-draft-value
     text: draft@example.com

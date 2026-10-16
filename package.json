@@ -62,9 +62,9 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
-    "@storybook/addon-ondevice-actions": "10.4.0",
-    "@storybook/addon-ondevice-controls": "10.4.0",
-    "@storybook/react-native": "10.4.0",
+    "@storybook/addon-ondevice-actions": "10.7.0",
+    "@storybook/addon-ondevice-controls": "10.7.0",
+    "@storybook/react-native": "10.7.0",
     "@types/react": "~19.2.2",
     "eslint": "^9.0.0",
     "eslint-config-expo": "~57.0.2",
@@ -73,17 +73,17 @@
     "lint-staged": "16.4.0",
     "prettier": "3.9.9",
     "react-reconciler": "0.31.0",
-    "storybook": "10.4.0",
+    "storybook": "10.6.2",
     "typescript": "~6.0.3"
   },
   "overrides": {
     "@expo/ui": "$@expo/ui",
     "react-native-safe-area-context": "$react-native-safe-area-context",
-    "@storybook/react": "10.4.0",
-    "@storybook/react-native-ui": "10.4.0",
-    "@storybook/react-native-ui-common": "10.4.0",
-    "@storybook/react-native-theming": "10.4.0",
-    "@storybook/react-dom-shim": "10.4.0",
+    "@storybook/react": "10.6.2",
+    "@storybook/react-native-ui": "10.7.0",
+    "@storybook/react-native-ui-common": "10.7.0",
+    "@storybook/react-native-theming": "10.7.0",
+    "@storybook/react-dom-shim": "10.6.2",
     "@firebase/firestore": {
       "@grpc/grpc-js": "^1.14.5"
     },
@@ -99,6 +99,7 @@
     "start": "expo start",
     "android": "expo run:android",
     "ios": "expo run:ios",
+    "storybook": "expo start --dev-client --clear",
     "storybook:generate": "sb-rn-get-stories",
     "lint": "expo lint . --max-warnings=0",
     "lint:staged": "lint-staged",

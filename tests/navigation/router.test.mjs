@@ -58,17 +58,16 @@ for (const platform of ['android', 'ios']) {
       assert.equal(auth.children.find(({ route }) => route === name)?.type, 'route');
     assert.equal(root.children.find(({ route }) => route === '(tabs)')?.type, 'layout');
   });
-  test(`${platform}: the first-launch introduction has three routes and starts at discovery`, () => {
+  test(`${platform}: the first-launch introduction stays on one discovery route`, () => {
     const introduction = discoverRoutes(platform).children.find(
       ({ route }) => route === '(onboarding)',
     );
     assert.equal(introduction.type, 'layout');
     assert.equal(introduction.initialRouteName, 'discover');
-    assert.deepEqual(introduction.children.map(({ route }) => route).sort(), [
-      'cook',
-      'discover',
-      'save',
-    ]);
+    assert.deepEqual(
+      introduction.children.map(({ route }) => route),
+      ['discover'],
+    );
   });
 }
 
@@ -127,8 +126,6 @@ for (const platform of ['android', 'ios']) {
   for (const [path, name, params] of [
     ['/', 'index', {}],
     ['/discover', 'discover', {}],
-    ['/cook', 'cook', {}],
-    ['/save', 'save', {}],
     [
       '/recipe/00000000-0000-4000-8000-000000000001',
       'recipe/[uuid]',

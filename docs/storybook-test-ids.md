@@ -1,6 +1,6 @@
 # Expo UI Storybook selectors
 
-Open the on-device Storybook tab and select a story under **Expo UI** before targeting its IDs. IDs stay the same across states of a component; only one story canvas is rendered at a time. Each story's `testID` control can override its prefix. When rendering multiple component instances elsewhere in the app, supply a unique `testID` to each instance.
+Open the on-device Storybook tab and select a story under **Expo UI** before targeting its IDs. IDs stay the same across states of a component; only one story canvas is rendered at a time. Fixture prefixes stay fixed; test IDs and event callbacks are hidden from Controls. When rendering multiple component instances elsewhere in the app, supply a unique `testID` to each instance.
 
 | Story group            | Root test ID           |
 | ---------------------- | ---------------------- |
@@ -21,6 +21,15 @@ Open the on-device Storybook tab and select a story under **Expo UI** before tar
 | Universal List         | `expo-ui-list`         |
 
 The root ID is forwarded to the native component where its installed Expo UI implementation supports it. Standalone wrapper components also expose a React Native host selector with `-container`, and canvases use `-canvas`. Hidden components and closed sheets have no visible native target; use the canvas or relevant open control to reach their visible state.
+
+The button stories keep the semantic variants, disabled state, rounded shape,
+and both diagonal corner shapes. `TopLeftBottomRight` and `TopRightBottomLeft`
+use `expo-ui-button` with visible `expo-ui-button-presses` output. Their native
+flow is `.maestro/storybook/button-corners.yaml`.
+
+Skeleton `AnimationControls` uses the CSS-driven standalone placeholders with
+`skeleton-css-fixed` and `skeleton-css-fill`. The playback action and status use
+`skeleton-toggle-animation` and `skeleton-animation-state`.
 
 ## Interactive selectors
 

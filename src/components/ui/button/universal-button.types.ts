@@ -30,4 +30,11 @@ export type UniversalButtonContentProps = {
 
 export type UniversalButtonProps = UniversalButtonContentProps & {
   colorScheme?: 'light' | 'dark';
+  /** Physical corners of the standalone Host. Overrides borderRadius; omitted corners are square. */
+  cornerRadii?: {
+    topLeft?: number;
+    topRight?: number;
+    bottomLeft?: number;
+    bottomRight?: number;
+  };
 };

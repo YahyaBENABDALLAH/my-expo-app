@@ -75,7 +75,12 @@ export function SettingsPage({
   return (
     <PageFrame title={t('settings.title')} onBack={back}>
       <SettingsViewport>
-        <UniversalHost matchContents={false} ignoreSafeArea="all" style={{ flex: 1 }}>
+        <UniversalHost
+          matchContents={false}
+          ignoreSafeArea="all"
+          style={{ flex: 1 }}
+          testID="app-settings-content"
+        >
           <FieldGroup
             modifiers={nativeFillSize}
             style={{ backgroundColor: 'transparent' }}
@@ -119,7 +124,7 @@ export function SettingsPage({
               testID="app-settings-appearance"
             >
               <SettingsRow label={t('common.theme')} trailing={<ThemePicker />} />
-              <ColorSchemeControl />
+              <SettingsRow label={t('common.colorScheme')} trailing={<ColorSchemeControl />} />
               <SettingsRow
                 label={t('common.language')}
                 testID="app-settings-language"
@@ -184,6 +189,13 @@ export function SettingsPage({
               </FieldGroup.SectionFooter>
             </FieldGroup.Section>
           </FieldGroup>
+        </UniversalHost>
+        {/* A sheet owns a Host; isolate its presentation from the form's native hit-testing tree. */}
+        <UniversalHost
+          style={{ position: 'absolute' }}
+          pointerEvents="box-none"
+          testID="app-settings-language-presentation"
+        >
           <BottomSheet
             isPresented={languageOpen}
             onDismiss={() => setLanguageOpen(false)}
@@ -256,25 +268,44 @@ function SettingsRow({
   testID?: string;
 }) {
   const colors = useThemeColors();
-  return (
-    <Column modifiers={nativeFillWidth} onPress={onPress} disabled={disabled} testID={testID}>
-      <Row
-        alignment="center"
-        spacing={16}
-        modifiers={nativeFillWidth}
-        style={{ paddingVertical: 16 }}
+  const content = (
+    <Row
+      alignment="center"
+      spacing={16}
+      modifiers={nativeFillWidth}
+      style={{ paddingVertical: 16 }}
+    >
+      {leading}
+      <Column spacing={4} modifiers={nativeRowWeight}>
+        <Text>{label}</Text>
+        {detail ? (
+          <Text fontSize={14} textStyle={{ color: colors.muted }}>
+            {detail}
+          </Text>
+        ) : null}
+      </Column>
+      {trailing}
+    </Row>
+  );
+  if (onPress) {
+    return (
+      <UniversalButtonContent
+        variant="link"
+        fullWidth
+        contentPadding={0}
+        onPress={() => {
+          if (!disabled) onPress();
+        }}
+        disabled={disabled}
+        testID={testID}
       >
-        {leading}
-        <Column spacing={4} modifiers={nativeRowWeight}>
-          <Text>{label}</Text>
-          {detail ? (
-            <Text fontSize={14} textStyle={{ color: colors.muted }}>
-              {detail}
-            </Text>
-          ) : null}
-        </Column>
-        {trailing}
-      </Row>
+        {content}
+      </UniversalButtonContent>
+    );
+  }
+  return (
+    <Column modifiers={nativeFillWidth} disabled={disabled} testID={testID}>
+      {content}
     </Column>
   );
 }

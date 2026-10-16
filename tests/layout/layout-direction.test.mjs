@@ -517,11 +517,7 @@ for (const [platform, authenticated, introductionRequired] of [
     );
     view.flush(finishOnboarding);
     const stack = view.findAll('Stack')[0];
-    assert.equal(
-      launch.props.exiting,
-      true,
-      'Readiness must begin the exit without a branding delay.',
-    );
+    assert.equal(launch.props.exiting, true, 'Readiness requests the delayed splash exit.');
     assert.equal(
       view.findAll('View').some((node) => node.props.testID === 'app-ready'),
       false,

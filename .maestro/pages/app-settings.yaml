@@ -1,5 +1,5 @@
 appId: com.hyrkul.likan
-name: Theme, dark mode and language are changed in grouped App Settings
+name: Theme, system appearance and language are changed in grouped App Settings
 tags: [pages, theme, signed-in]
 ---
 - runFlow:
@@ -40,6 +40,20 @@ tags: [pages, theme, signed-in]
 - tapOn:
     id: app-settings-language
 - tapOn:
+    id: app-settings-language-ar
+- assertNotVisible:
+    id: app-settings-language-title
+- assertVisible: العربية
+- tapOn:
+    id: app-settings-language
+- tapOn:
+    id: app-settings-language-en
+- assertNotVisible:
+    id: app-settings-language-title
+- assertVisible: English
+- tapOn:
+    id: app-settings-language
+- tapOn:
     id: app-settings-language-close
 - assertNotVisible:
     id: app-settings-language-title
@@ -50,28 +64,24 @@ tags: [pages, theme, signed-in]
     id: app-settings-theme-picker
 - tapOn: Facebook
 - assertVisible: Facebook
-- runFlow:
-    when:
-      visible:
-        id: app-settings-color-scheme-switch
-        checked: true
-    commands:
-      - tapOn:
-          id: app-settings-color-scheme-switch
-- assertVisible:
-    id: app-settings-color-scheme-switch
-    checked: false
 - tapOn:
-    id: app-settings-color-scheme-switch
-- assertVisible:
-    id: app-settings-color-scheme-switch
-    checked: true
+    id: app-settings-theme-picker
+- tapOn: UX Template
+- assertVisible: UX Template
+- tapOn:
+    id: app-settings-color-scheme-picker
+- tapOn: Light Mode
+- assertVisible: Light Mode
+- tapOn:
+    id: app-settings-color-scheme-picker
+- tapOn: Dark Mode
+- assertVisible: Dark Mode
 - tapOn:
     id: page-back
 - assertNotVisible:
     id: app-settings-theme-picker
 - assertNotVisible:
-    id: app-settings-color-scheme-switch
+    id: app-settings-color-scheme-picker
 - scrollUntilVisible:
     element:
       id: page-action-app-settings
@@ -84,19 +94,31 @@ tags: [pages, theme, signed-in]
 - scrollUntilVisible:
     element:
       id: app-settings-theme-picker
-- assertVisible: Facebook
-- assertVisible:
-    id: app-settings-color-scheme-switch
-    checked: true
+- assertVisible: UX Template
+- assertVisible: Dark Mode
 - tapOn:
     id: app-settings-theme-picker
 - tapOn: WhatsApp
 - assertVisible: WhatsApp
 - tapOn:
-    id: app-settings-color-scheme-switch
-- assertVisible:
-    id: app-settings-color-scheme-switch
-    checked: false
+    id: app-settings-color-scheme-picker
+- tapOn: System
+- assertVisible: System
+- tapOn:
+    id: page-back
+- scrollUntilVisible:
+    element:
+      id: page-action-app-settings
+- tapOn:
+    id: page-action-app-settings
+- extendedWaitUntil:
+    visible:
+      id: app-settings-groups
+    timeout: 60000
+- scrollUntilVisible:
+    element:
+      id: app-settings-color-scheme-picker
+- assertVisible: System
 - scrollUntilVisible:
     element:
       id: app-settings-language

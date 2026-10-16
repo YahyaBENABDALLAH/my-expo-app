@@ -138,7 +138,6 @@ export const AutoSized: Story = {
   args: { isPresented: true, content: 'A short sheet fitted to its content.' },
 };
 export const LightTheme: Story = { args: { colorScheme: 'light' } };
-export const DarkTheme: Story = { args: { colorScheme: 'dark' } };
 export const LongContent: Story = {
   args: {
     title: 'A longer title that wraps onto multiple lines in a narrow sheet',

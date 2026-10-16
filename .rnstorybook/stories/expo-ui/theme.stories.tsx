@@ -21,6 +21,7 @@ import { themes, themeIds, type ThemeId } from '@/constants/themes/index';
 import { ThemePreferencesProvider } from '@/context/theme.context';
 import { useThemeColors } from '@/hooks/use-theme';
 import { NativeStoryFrame } from '../../components/native-story-frame';
+import { semanticButtonColors } from '../../components/semantic-button-colors';
 
 function ThemeDemo({ colorScheme, themeId }: { colorScheme: AppColorScheme; themeId: ThemeId }) {
   return (
@@ -46,7 +47,13 @@ function ThemePreview({ colorScheme, themeId }: { colorScheme: AppColorScheme; t
           </UniversalTextContent>
           {(['primary', 'secondary', 'link', 'success', 'warning', 'destructive'] as const).map(
             (variant) => (
-              <UniversalButtonContent key={variant} variant={variant} label={variant} fullWidth />
+              <UniversalButtonContent
+                key={variant}
+                variant={variant}
+                label={variant}
+                {...(themeId === 'ux' ? {} : semanticButtonColors(variant, colors))}
+                fullWidth
+              />
             ),
           )}
           <UniversalButtonContent variant="primary" label="Disabled action" disabled fullWidth />
@@ -121,7 +128,7 @@ function ThemePreview({ colorScheme, themeId }: { colorScheme: AppColorScheme; t
 const meta = {
   title: 'Expo UI/Theme Tokens',
   component: ThemeDemo,
-  args: { colorScheme: 'light', themeId: 'whatsapp' },
+  args: { colorScheme: 'light', themeId: 'ux' },
   argTypes: {
     colorScheme: { control: 'select', options: ['light', 'dark'] },
     themeId: { control: 'select', options: themeIds },
@@ -134,9 +141,3 @@ type Story = StoryObj<typeof meta>;
 
 export const Light: Story = {};
 export const Dark: Story = { args: { colorScheme: 'dark' } };
-export const FacebookLight: Story = { args: { themeId: 'facebook' } };
-export const FacebookDark: Story = { args: { themeId: 'facebook', colorScheme: 'dark' } };
-export const InstagramLight: Story = { args: { themeId: 'instagram' } };
-export const InstagramDark: Story = { args: { themeId: 'instagram', colorScheme: 'dark' } };
-export const TikTokLight: Story = { args: { themeId: 'tiktok' } };
-export const TikTokDark: Story = { args: { themeId: 'tiktok', colorScheme: 'dark' } };

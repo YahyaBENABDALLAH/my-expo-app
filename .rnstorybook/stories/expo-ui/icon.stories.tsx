@@ -1,4 +1,3 @@
-import Colors from '@/constants/colors';
 import { UniversalIcon } from '../../components/showcase/universal-icon';
 import type { Meta, StoryObj } from '@storybook/react-native';
 import { action } from 'storybook/actions';
@@ -47,16 +46,6 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Favorite: Story = {};
-export const Star: Story = { args: { icon: 'star', accessibilityLabel: 'Star' } };
-export const Settings: Story = { args: { icon: 'settings', accessibilityLabel: 'Settings' } };
-export const Notifications: Story = {
-  args: { icon: 'notifications', accessibilityLabel: 'Notifications' },
-};
-export const Home: Story = { args: { icon: 'home', accessibilityLabel: 'Home' } };
 export const SmallDecorative: Story = { args: { size: 20, onPress: undefined } };
-export const Large: Story = { args: { size: 80 } };
-export const CustomColor: Story = { args: { color: Colors.dark.warning } };
 export const Disabled: Story = { args: { disabled: true, style: { opacity: 0.5 } } };
-export const Hidden: Story = { args: { hidden: true } };
 export const LightTheme: Story = { args: { colorScheme: 'light' } };
-export const DarkTheme: Story = { args: { colorScheme: 'dark' } };

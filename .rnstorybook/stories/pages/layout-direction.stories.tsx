@@ -132,6 +132,4 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 export const Light: Story = {};
-export const Dark: Story = { args: { colorScheme: 'dark' } };
-export const RtlLight: Story = { args: { initialDirection: 'rtl' } };
 export const RtlDark: Story = { args: { colorScheme: 'dark', initialDirection: 'rtl' } };

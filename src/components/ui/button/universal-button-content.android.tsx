@@ -1,6 +1,7 @@
 import { Button, OutlinedButton, Shape, Text, TextButton } from '@expo/ui/jetpack-compose';
 import { fillMaxWidth, testID as nativeTestID } from '@expo/ui/jetpack-compose/modifiers';
 import type { UniversalButtonContentProps } from './universal-button.types';
+import { useWireframeButtonColors } from './use-wireframe-button-colors';
 
 export function UniversalButtonContent({
   variant,
@@ -12,9 +13,14 @@ export function UniversalButtonContent({
   fullWidth,
   borderRadius,
   contentPadding,
-  color,
-  contentColor,
+  color: colorOverride,
+  contentColor: contentColorOverride,
 }: UniversalButtonContentProps) {
+  const { color, contentColor } = useWireframeButtonColors({
+    variant,
+    color: colorOverride,
+    contentColor: contentColorOverride,
+  });
   let NativeButton = Button;
   if (variant === 'secondary' || variant === 'glass') NativeButton = OutlinedButton;
   if (variant === 'link') NativeButton = TextButton;

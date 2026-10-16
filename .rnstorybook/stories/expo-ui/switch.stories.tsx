@@ -77,12 +77,4 @@ export const Off: Story = {};
 export const On: Story = { args: { value: true } };
 export const DisabledOff: Story = { args: { disabled: true } };
 export const DisabledOn: Story = { args: { disabled: true, value: true } };
-export const WithoutLabel: Story = { args: { label: undefined } };
-export const LongLabel: Story = {
-  args: { label: 'Receive notifications about activity and updates to your account' },
-};
 export const LightTheme: Story = { args: { colorScheme: 'light' } };
-export const DarkTheme: Story = { args: { colorScheme: 'dark' } };
-export const NativeTheme: Story = {
-  args: { value: true, label: 'Native Host theme', seedColor: Colors.light.tint },
-};

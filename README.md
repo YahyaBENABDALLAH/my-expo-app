@@ -56,10 +56,11 @@ Français, English or العربية in the page footer or profile sheet. The sa
 restores on startup; Arabic uses RTL without reloading the app. See
 [localization](docs/localization.md) for conventions and verification.
 
-The first launch shows Discover, Cook, and Save introduction pages before sign-in.
-The pages use bundled food photography, large headings, and a bottom action that
-stays visible when content scrolls. Next, Previous and horizontal swipes navigate
-between them; swipe direction follows the selected language. Skip or Let’s get started saves
+The first launch shows one introduction screen with Discover, Cook, and Save
+slides before sign-in. The wordmark, progress and actions stay fixed while bundled
+food photography and text swipe horizontally in a native carousel. Next and
+Previous move through the same content; swipe direction follows the selected
+language. Each slide can scroll vertically for enlarged text. Skip or Let’s get started saves
 `onboardingCompleted` in AsyncStorage. Later launches and sign-outs keep that
 preference. Startup waits for the preference before choosing a route, and a failed
 save offers a retry without marking the introduction complete.
@@ -67,6 +68,9 @@ The `Pages/Onboarding` native Storybook stories preview every page, light/dark
 appearance, and persistence feedback without changing the saved preference.
 
 - `npm start` starts Metro.
+- If another project already uses port 8081, run `npm start -- --port 8082` and
+  open this app with `i` or `a` from that Metro terminal. Reopen the development
+  link after changing ports so the installed app connects to this project's server.
 - Use Node 22.18 or newer and `npm ci` to install the locked dependencies.
 - `npm run check` runs TypeScript, lint, formatting, and all unit/regression tests.
 - `npm run test:services` checks API contracts, pagination, cancellation and mutation cache behavior.
@@ -77,6 +81,7 @@ appearance, and persistence feedback without changing the saved preference.
 - `npm run test:e2e:onboarding` runs the native first-launch and skip flows on a connected test device; these flows clear the app’s data.
 - `npm run format` applies the shared formatting rules; `npm run format:check` checks them.
 - `npm run storybook:generate` regenerates story discovery after adding or moving stories.
+- `npm run storybook` starts a development-client Metro session with a fresh cache for native Storybook.
 
 `npm ci` also installs the Husky pre-commit hook. Each commit runs ESLint fixes
 followed by Prettier on staged JavaScript/TypeScript files, and Prettier on staged
@@ -93,6 +98,19 @@ See [local SonarQube analysis](docs/sonarqube.md) for the dashboard, scan scope,
 credentials, and repeat-scan commands.
 
 Open **Browse all pages** and select **Storybook** in a development or preview build to browse native stories. Signed-out testers can use **Browse all pages as guest (dev)** on Login. See [guest browsing and preview builds](docs/development-guest-mode.md) and [the test-ID reference](docs/storybook-test-ids.md) for selectors and SDK limitations.
+
+Native Storybook and its on-device addons use `10.7.0` with Storybook core
+`10.6.2`. Install with `npm ci`: `package-lock.json` and npm overrides keep the
+renderer versions aligned and share the app's SDK-compatible native modules.
+The obsolete Yarn lockfile was removed because Yarn Classic ignores those
+overrides and could install a second `react-native-safe-area-context`, crashing
+Storybook with duplicate `RNCSafeAreaProvider` registration. After updating
+dependencies, restart Metro with `npm run storybook`.
+
+Direct links such as
+`myappexpo://storybook?STORYBOOK_STORY_ID=expo-ui-universal-button--interaction&mode=canvas`
+open the requested fixture even on the first lazy load. Canvas mode hides the
+Storybook panels and disables selection persistence; normal entry keeps them.
 
 Run `npm run test:e2e` with Maestro installed and a development build connected to Metro. See [native UI testing](docs/native-ui-tests.md) for device setup, individual flows, and platform requirements.
 

@@ -31,7 +31,7 @@ const shaderPalettes = Object.fromEntries(
         surfaceColor: Array.from(Skia.Color(colors.surfaceRaised)).slice(0, 3),
         primaryColor: Array.from(Skia.Color(colors.primary)).slice(0, 3),
         secondaryColor: Array.from(Skia.Color(colors.secondary)).slice(0, 3),
-        intensity: scheme === 'dark' ? 0.28 : 0.1,
+        intensity: themeId === 'ux' ? 0 : scheme === 'dark' ? 0.28 : 0.1,
       },
     ]),
   ),
@@ -101,7 +101,7 @@ export function AuroraBackground({
   );
   const clock = useSharedValue(0);
   const lastDrawTimestamp = useSharedValue(0);
-  const enabled = useMotionEnabled(animate);
+  const enabled = useMotionEnabled(animate && themeId !== 'ux');
   const { setActive } = useFrameCallback(({ timestamp, timeSincePreviousFrame }) => {
     // The first frame after resuming establishes a fresh origin, excluding paused time.
     if (timeSincePreviousFrame === null) {

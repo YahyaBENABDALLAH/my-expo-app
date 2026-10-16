@@ -1,10 +1,24 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { Fragment, createContext, createElement, useContext, useEffect, useState } from 'react';
+import {
+  Fragment,
+  createContext,
+  createElement,
+  useContext,
+  useEffect,
+  useState,
+  useSyncExternalStore,
+} from 'react';
 import { createSourceLoader } from '../helpers/load-source.mjs';
 import { renderFixture } from '../helpers/render-fixture.mjs';
 
 function setup(deviceScheme = 'light') {
+  const appearanceListeners = new Set();
+  const subscribeAppearance = (listener) => {
+    appearanceListeners.add(listener);
+    return () => appearanceListeners.delete(listener);
+  };
+  const getDeviceScheme = () => deviceScheme;
   const native = (type) =>
     function NativeFixture(props) {
       return createElement(type, props, props.children);
@@ -24,7 +38,7 @@ function setup(deviceScheme = 'light') {
       Platform: { OS: 'ios' },
       useWindowDimensions: () => ({ width: 390, height: 844 }),
       I18nManager: { isRTL: false },
-      useColorScheme: () => deviceScheme,
+      useColorScheme: () => useSyncExternalStore(subscribeAppearance, getDeviceScheme),
     },
     'expo-router': {
       LocaleProvider: native('LocaleProvider'),
@@ -42,10 +56,13 @@ function setup(deviceScheme = 'light') {
       ScrollView: native('ScrollView'),
     },
     '@/components/ui/native/native-fill-width': {
+      nativeCenteredMinHeight: () => [],
+      nativeFillSize: [],
       nativeFillWidth: [],
       nativeRowWeight: [],
       nativeFillWidthCenter: [],
     },
+    '@/components/ui/field-group/field-group': { FieldGroup },
     '@/components/ui/refreshable-scroll-view/refreshable-scroll-view': {
       RefreshableScrollView: native('ScrollView'),
     },
@@ -92,7 +109,15 @@ function setup(deviceScheme = 'light') {
     ...load('components/ui/text/universal-text.tsx'),
   };
   const settings = load('features/settings/settings-screen.tsx');
-  return { ...exports, SettingsScreen: settings.default, SettingsPage: settings.SettingsPage };
+  return {
+    ...exports,
+    SettingsScreen: settings.default,
+    SettingsPage: settings.SettingsPage,
+    setDeviceScheme(value) {
+      deviceScheme = value;
+      appearanceListeners.forEach((listener) => listener());
+    },
+  };
 }
 
 test('the language sheet waits for readiness, selects each autonym, updates direction and dismisses without changing a selection', (t) => {
@@ -124,7 +149,7 @@ test('the language sheet waits for readiness, selects each autonym, updates dire
     ),
   );
   t.after(() => view.unmount());
-  const row = (id) => view.findAll('Column').find(({ props }) => props.testID === id).props;
+  const row = (id) => view.findAll('Button').find(({ props }) => props.testID === id).props;
   const sheet = () => view.findAll('Sheet')[0].props;
   const press = (id) => view.flush(() => row(id).onPress());
   assert.equal(row('app-settings-language').disabled, true);
@@ -137,7 +162,7 @@ test('the language sheet waits for readiness, selects each autonym, updates dire
     assert.deepEqual(
       ['fr', 'en', 'ar'].map((value) => {
         const node = view
-          .findAll('Column')
+          .findAll('Button')
           .find(({ props }) => props.testID === `app-settings-language-${value}`);
         return descendants(node, 'Text')[0].props.children;
       }),
@@ -195,22 +220,52 @@ for (const initialScheme of ['light', 'dark']) {
       ),
     );
     const header = view.findAll('Host')[0];
-    const settingsHost = view.findAll('Host').at(-1);
+    const settingsHost = view
+      .findAll('Host')
+      .find(({ props }) => props.testID === 'app-settings-content');
+    const presentationHost = view
+      .findAll('Host')
+      .find(({ props }) => props.testID === 'app-settings-language-presentation');
     const control = (id) => view.findAll('Switch').find((node) => node.props.testID === id);
     const draft = view.findAll('Draft')[0];
-    assert.equal(view.findAll('Host').length, 3);
+    assert.equal(view.findAll('Host').length, 4);
+    assert.equal(descendants(settingsHost, 'Sheet').length, 0);
+    assert.equal(descendants(presentationHost, 'FieldGroup').length, 0);
+    assert.equal(presentationHost.props.pointerEvents, 'box-none');
     assert.equal(descendants(header, 'Switch').length, 0);
     assert.equal(descendants(header, 'Picker').length, 0);
-    assert.equal(descendants(settingsHost, 'Switch').length, 4);
-    assert.equal(view.findAll('Switch').length, 4);
+    assert.equal(descendants(settingsHost, 'Switch').length, 3);
+    assert.equal(view.findAll('Switch').length, 3);
     for (const placeholder of ['chat', 'invitations', 'authentication']) {
       assert.equal(control(`app-settings-${placeholder}`).props.disabled, true);
     }
-    assert.equal(control('app-settings-color-scheme-switch').props.value, initialScheme === 'dark');
+    const schemePicker = () =>
+      view
+        .findAll('Picker')
+        .find((node) => node.props.testID === 'app-settings-color-scheme-picker');
+    assert.equal(schemePicker().props.selectedValue, 'system');
+    assert.equal(settingsHost.props.colorScheme, initialScheme);
+    assert.deepEqual(
+      descendants(schemePicker(), 'PickerItem').map(({ props: { label, value } }) => ({
+        label,
+        value,
+      })),
+      [
+        { label: 'System', value: 'system' },
+        { label: 'Light Mode', value: 'light' },
+        { label: 'Dark Mode', value: 'dark' },
+      ],
+    );
     const themePicker = () =>
       view.findAll('Picker').find((node) => node.props.testID === 'app-settings-theme-picker');
-    assert.equal(descendants(themePicker(), 'PickerItem').length, 4);
-    assert.equal(view.findAll('Picker').length, 1);
+    assert.deepEqual(
+      descendants(themePicker(), 'PickerItem').map(({ props: { label, value } }) => ({
+        label,
+        value,
+      })),
+      Object.entries(s.themes).map(([value, { label }]) => ({ label, value })),
+    );
+    assert.equal(view.findAll('Picker').length, 2);
     assert.equal(
       view.findAll('View').find((node) => node.props.testID === 'page-header-safe-area').props.style
         .paddingTop,
@@ -221,13 +276,16 @@ for (const initialScheme of ['light', 'dark']) {
     for (const themeId of Object.keys(s.themes)) {
       view.flush(() => themePicker().props.onValueChange(themeId));
       for (const scheme of ['dark', 'light']) {
-        view.flush(() =>
-          control('app-settings-color-scheme-switch').props.onValueChange(scheme === 'dark'),
-        );
+        view.flush(() => schemePicker().props.onValueChange(scheme));
         assert.equal(view.findAll('Host')[0], header);
-        assert.equal(view.findAll('Host').at(-1), settingsHost);
+        assert.equal(
+          view.findAll('Host').find(({ props }) => props.testID === 'app-settings-content'),
+          settingsHost,
+        );
         assert.equal(settingsHost.props.seedColor, s.themes[themeId].colors[scheme].tint);
         assert.equal(settingsHost.props.colorScheme, scheme);
+        assert.equal(presentationHost.props.seedColor, settingsHost.props.seedColor);
+        assert.equal(presentationHost.props.colorScheme, scheme);
         assert.equal(draft.props.draft, 'مسودة Draft 123');
         assert.equal(draft.props.colors, s.themes[themeId].colors[scheme]);
         assert.equal(mounts, 1);
@@ -239,14 +297,69 @@ for (const initialScheme of ['light', 'dark']) {
     assert.equal(view.findAll('Switch').length, 0);
     assert.equal(draft.props.draft, 'مسودة Draft 123');
     view.flush(() => navigate('Second page'));
-    assert.equal(view.findAll('Draft')[0].props.themeId, 'tiktok');
+    assert.equal(view.findAll('Draft')[0].props.themeId, 'ux');
     assert.equal(view.findAll('Draft')[0].props.scheme, 'light');
     view.flush(() => showSettings(true));
-    assert.equal(themePicker().props.selectedValue, 'tiktok');
-    assert.equal(control('app-settings-color-scheme-switch').props.value, false);
+    assert.equal(themePicker().props.selectedValue, 'ux');
+    assert.equal(schemePicker().props.selectedValue, 'light');
     view.unmount();
   });
 }
+
+test('System follows live device changes; manual modes stay fixed and returning to System resumes detection', (t) => {
+  const s = setup('light');
+  function Content() {
+    const [draft, setDraft] = useState('Unsaved recipe');
+    const { themeId, scheme, colors } = s.useAppTheme();
+    const override = s.useAppTheme('dark');
+    return createElement('Draft', { draft, setDraft, themeId, scheme, colors, override });
+  }
+  const view = renderFixture(
+    createElement(
+      s.LayoutDirectionProvider,
+      null,
+      createElement(
+        s.ThemePreferencesProvider,
+        null,
+        createElement(s.SettingsScreen),
+        createElement(Content),
+      ),
+    ),
+  );
+  t.after(() => view.unmount());
+  const picker = view
+    .findAll('Picker')
+    .find(({ props }) => props.testID === 'app-settings-color-scheme-picker');
+  const draft = view.findAll('Draft')[0];
+  const host = view.findAll('Host').find(({ props }) => props.testID === 'app-settings-content');
+  const expectScheme = (scheme, preference) => {
+    assert.equal(picker.props.selectedValue, preference);
+    assert.equal(host.props.colorScheme, scheme);
+    assert.equal(draft.props.scheme, scheme);
+    assert.equal(draft.props.colors, s.themes.whatsapp.colors[scheme]);
+    assert.equal(draft.props.override.scheme, 'dark', 'Explicit component overrides stay fixed.');
+    assert.equal(view.findAll('Draft')[0], draft);
+    assert.equal(draft.props.draft, 'Unsaved recipe');
+  };
+  expectScheme('light', 'system');
+  view.flush(() => s.setDeviceScheme('dark'));
+  expectScheme('dark', 'system');
+  view.flush(() => s.setDeviceScheme('light'));
+  expectScheme('light', 'system');
+  for (const manual of ['dark', 'light']) {
+    view.flush(() => picker.props.onValueChange(manual));
+    for (const device of ['dark', 'light']) {
+      view.flush(() => s.setDeviceScheme(device));
+      expectScheme(manual, manual);
+    }
+    view.flush(() => picker.props.onValueChange('system'));
+    expectScheme('light', 'system');
+    view.flush(() => s.setDeviceScheme('dark'));
+    expectScheme('dark', 'system');
+  }
+  view.flush(() => s.setDeviceScheme(null));
+  expectScheme('light', 'system');
+});
 
 function descendants(root, type) {
   return root.children.flatMap((child) => [
@@ -319,7 +432,7 @@ function luminance(hex) {
   return linear[0] * 0.2126 + linear[1] * 0.7152 + linear[2] * 0.0722;
 }
 
-test('all four light/dark palettes cover the same roles with readable foregrounds', () => {
+test('all light/dark palettes cover the same roles with readable foregrounds', () => {
   const { themes } = setup();
   const roles = Object.keys(themes.whatsapp.colors.light).sort();
   const pairs = [
@@ -348,6 +461,48 @@ test('all four light/dark palettes cover the same roles with readable foreground
         const second = luminance(colors[background]);
         const ratio = (Math.max(first, second) + 0.05) / (Math.min(first, second) + 0.05);
         assert.ok(ratio >= 4.5, `${id}/${scheme} ${foreground}/${background}: ${ratio.toFixed(2)}`);
+      }
+    }
+  }
+});
+
+test('UX Template keeps black primary actions and neutral foundations with distinct status colors', () => {
+  const { themes } = setup();
+  assert.equal(themes.ux.label, 'UX Template');
+  const statusRoles = ['error', 'success', 'warning'];
+  const coloredRoles = new Set(statusRoles.flatMap((role) => [role, `${role}Container`]));
+  for (const [scheme, colors] of Object.entries(themes.ux.colors)) {
+    assert.equal(colors.primary, '#000000', `${scheme}: primary stays black`);
+    assert.equal(colors.onPrimary, '#FFFFFF', `${scheme}: primary labels stay white`);
+    for (const [role, color] of Object.entries(colors)) {
+      if (coloredRoles.has(role)) continue;
+      const [, red, green, blue] = color.match(/^#(..)(..)(..)(?:..)?$/);
+      assert.equal(red, green, `${scheme}/${role} must have equal RGB channels`);
+      assert.equal(green, blue, `${scheme}/${role} must have equal RGB channels`);
+    }
+    const rgb = (role) =>
+      colors[role]
+        .slice(1)
+        .match(/../g)
+        .map((value) => parseInt(value, 16));
+    const [errorRed, errorGreen, errorBlue] = rgb('error');
+    assert.ok(errorRed > errorGreen && errorRed > errorBlue, `${scheme}: danger is red`);
+    const [successRed, successGreen, successBlue] = rgb('success');
+    assert.ok(
+      successGreen > successRed && successGreen > successBlue,
+      `${scheme}: success is green`,
+    );
+    const [warningRed, warningGreen, warningBlue] = rgb('warning');
+    assert.ok(
+      warningRed > warningGreen && warningGreen > warningBlue,
+      `${scheme}: warning is amber`,
+    );
+    for (const role of statusRoles) {
+      for (const background of ['background', 'surface', `${role}Container`]) {
+        const first = luminance(colors[role]);
+        const second = luminance(colors[background]);
+        const ratio = (Math.max(first, second) + 0.05) / (Math.min(first, second) + 0.05);
+        assert.ok(ratio >= 4.5, `${scheme} ${role}/${background}: ${ratio.toFixed(2)}`);
       }
     }
   }

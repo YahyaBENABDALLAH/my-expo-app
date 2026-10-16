@@ -3,8 +3,8 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useLanguage } from '@/context/language.context';
-import { useThemeSettings } from '@/context/theme.context';
 import i18n, { SUPPORTED_LANGUAGES } from '@/lib/i18n';
+import { ColorSchemeControl } from '../appearance/color-scheme-control';
 import { BottomSheet } from '../bottom-sheet/bottom-sheet';
 import { UniversalButtonContent } from '../button/universal-button-content';
 import { UniversalHost } from '../host/universal-host';
@@ -15,8 +15,6 @@ import { useAuthTheme } from './auth-theme';
 
 const icons = {
   language: Icon.select({ ios: 'globe', android: require('@expo/material-symbols/language.xml') }),
-  sun: Icon.select({ ios: 'sun.max', android: require('@expo/material-symbols/light_mode.xml') }),
-  moon: Icon.select({ ios: 'moon', android: require('@expo/material-symbols/dark_mode.xml') }),
 };
 const languageLabels = { fr: 'common.french', en: 'common.english', ar: 'common.arabic' } as const;
 
@@ -24,12 +22,10 @@ const languageLabels = { fr: 'common.french', en: 'common.english', ar: 'common.
 export function LoginPreferences() {
   const { t } = useTranslation();
   const { language, setLanguage, ready } = useLanguage();
-  const { setColorScheme } = useThemeSettings();
   const { scheme, colors } = useAuthTheme();
   const insets = useSafeAreaInsets();
   const [languageOpen, setLanguageOpen] = useState(false);
   const languageDisabled = !ready || !setLanguage;
-  const dark = scheme === 'dark';
 
   return (
     <>
@@ -57,13 +53,7 @@ export function LoginPreferences() {
             onPress={() => setLanguageOpen(true)}
           />
           <Spacer flexible />
-          <AuthIconButton
-            icon={dark ? icons.sun : icons.moon}
-            color={colors.tint}
-            accessibilityLabel={t(dark ? 'common.lightMode' : 'common.darkMode')}
-            testID="auth-login-color-scheme"
-            onPress={() => setColorScheme(dark ? 'light' : 'dark')}
-          />
+          <ColorSchemeControl testID="auth-login-color-scheme" />
         </Row>
       </UniversalHost>
       <BottomSheet

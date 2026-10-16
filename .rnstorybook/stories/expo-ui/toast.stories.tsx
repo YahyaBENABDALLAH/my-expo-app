@@ -85,27 +85,12 @@ export const Light: Story = { args: { colorScheme: 'light' } };
 export const Success: Story = {
   args: { variant: 'success', message: 'Your recipe has been saved.' },
 };
-export const SuccessLight: Story = {
-  args: { ...Success.args, colorScheme: 'light' },
-};
 export const Warning: Story = {
   args: { variant: 'warning', message: 'Your changes have not been saved yet.' },
-};
-export const WarningLight: Story = {
-  args: { ...Warning.args, colorScheme: 'light' },
-};
-export const CustomTitle: Story = {
-  args: { variant: 'success', title: 'Recipe saved', message: 'You can find it in My Creations.' },
 };
 export const ValidationMessages: Story = {
   args: {
     message: 'Title is required.\nChoose a difficulty.\nChoose a unit for every ingredient.',
-  },
-};
-export const LongMessage: Story = {
-  args: {
-    message:
-      'Your recipe could not be saved because the server is temporarily unavailable. Your draft is still here. Check your connection and try publishing again.',
   },
 };
 export const RightToLeft: Story = {

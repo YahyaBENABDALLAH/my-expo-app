@@ -49,6 +49,13 @@ env:
     duration: 400
 - assertVisible:
     id: onboarding-save
+- back
+- assertVisible:
+    id: onboarding-cook
+- tapOn:
+    id: onboarding-next
+- assertVisible:
+    id: onboarding-save
 - assertVisible:
     id: onboarding-start
 - swipe:
