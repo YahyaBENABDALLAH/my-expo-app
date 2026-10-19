@@ -173,7 +173,7 @@ function GeometryDemo({ colorScheme = 'light' }: { colorScheme?: 'light' | 'dark
   return (
     <NativeStoryFrame colorScheme={colorScheme}>
       <UniversalHost colorScheme={colorScheme}>
-        <Column spacing={16} modifiers={nativeFillWidth}>
+        <Column spacing={16} modifiers={nativeFillWidth} testID={`button-geometry-${colorScheme}`}>
           <UniversalButtonContent
             variant="primary"
             fullWidth

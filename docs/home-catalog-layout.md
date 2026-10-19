@@ -24,9 +24,12 @@ mount. Home loads remote photos without requesting recipe API data. The page Hos
 owns safe-area padding directly; the existing shared navigation shell is retained.
 
 The Details preview sheet stays mounted and toggles `isPresented`. Its selected
-content is retained while closing. The shared sheet uses its native content width
-and Expo UI's default height behavior; Home does not calculate a sheet width.
-Native flicker confirmation is pending.
+content is retained while closing. Home shares `min(420, screenHeight * 0.6)`
+between the sheet's native content Column (`contentHeight`) and its ScrollView.
+The native content height is available before presentation; it does not wait for
+an RN/Host measurement bridge. The sheet keeps native width, chrome and
+partial/expanded behavior, so this is not an outer 50% snap height.
+Native flicker confirmation is checked separately from the Maestro interaction flow.
 
 The existing theme and English, French, and Arabic translations are respected.
 `Recipes/Home catalog` has native light/dark stories using bundled images to stay
@@ -72,7 +75,7 @@ and current Metro source. The ignored report is
 Details presentation, closing, Android Back, horizontal rail selection and the
 last catalog item after vertical scrolling.
 
-iOS execution and frame-by-frame flicker comparison remain unverified. Maestro
+Those runs did not verify iOS execution or compare animation frames. Maestro
 checks visible state and interaction results, not animation frames.
 
 ## Picsum change verification (2026-10-13)
@@ -92,3 +95,24 @@ checks visible state and interaction results, not animation frames.
   These attempts do not establish an automated native regression pass. Reports
   are `.expo/picsum-home-native/report.xml` and
   `.expo/picsum-home-native-retry/report.xml`. iOS remains unverified.
+
+## Details sheet stability (2026-10-19)
+
+- The merged implementation supplies the known content height to a native Column
+  before presentation. The sheet and ScrollView share the same height, and the
+  selected recipe remains mounted during dismissal.
+- `npm run check` passes: typecheck, lint, formatting and all 519 Node checks.
+- The complete Home Maestro flow passes on the physical Android 13 phone
+  (`21091116AG`) against the merged source:
+  repeated opening/closing, Android Back, a different hero recipe after swiping,
+  and the final catalog recipe after vertical scrolling. The ignored run log is
+  `.expo/home-sheet-merged-native.log`.
+- A screen recording on that phone captured two Details openings. Frame
+  inspection showed the same resting height on both,
+  without the reported large downward jump and return. A small settling movement
+  of roughly 20 physical pixels remained near the end of the opening animation.
+  The ignored recording is `.expo/home-sheet-after.mp4`; the frame-position trace
+  is `.expo/home-sheet-after-motion.json` (5-pixel spatial resolution, sampled at
+  60 Hz from the recording). This is an observation of these two openings, not an
+  automated guarantee for every device or frame rate.
+- iOS animation remains unverified.

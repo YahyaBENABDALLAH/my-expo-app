@@ -1,10 +1,21 @@
 # Buttons
 
-The geometry-conflict resolution retains the current native variant, UX color,
-glass and asymmetric standalone-corner APIs. Optional radius/padding overrides
-remain independent and preserve explicit zero values. `GeometryLight` and
+Optional radius/padding overrides are independent and preserve explicit zero
+values alongside native variants, UX colors, glass and asymmetric standalone
+corners. `GeometryLight` and
 `GeometryDark` add default/rounded/square surface checks with press counts and
 disabled suppression; `.maestro/storybook/button-geometry.yaml` targets them.
+The flow defaults to light; pass
+`-e GEOMETRY_STORY=expo-ui-universal-button--geometry-dark` for dark. It waits for
+the requested appearance's ready target and the navigation animation, then
+asserts the initial count before interacting.
+
+On 2026-10-19, both geometry appearances passed on the physical Android 13 phone
+(`21091116AG`): default and rounded presses, square-surface upper/lower edge taps,
+disabled suppression and re-enabling. The ignored run logs are
+`.expo/button-geometry-merged-light-fixed.log` and
+`.expo/button-geometry-merged-dark-fixed.log`. These fixtures do not establish
+iOS geometry or Android asymmetric-corner behavior.
 
 Exports: `UniversalButton`, `UniversalButtonContent` and their public types.
 
@@ -89,7 +100,7 @@ Controls for other widths, radii and variants instead of duplicate stories.
 `.maestro/storybook/button.yaml` checks counting and reset;
 `button-corners.yaml` checks upper/lower edge activation on both diagonals.
 Manual iOS 27 / iPhone 18 Pro checks confirmed both diagonal shapes and one
-increment per upper/lower edge tap. Android appearance and the Maestro flows
+increment per upper/lower edge tap. Android diagonal corners and those two Maestro flows
 remain unverified. JS adapter checks establish forwarding and disabled guards,
 not native geometry.
 

@@ -3,13 +3,15 @@ name: Button geometry keeps the full surface clickable and suppresses disabled p
 tags: [smoke, storybook]
 env:
   STORYBOOK_URL: myappexpo://storybook
-  GEOMETRY_STORY: expo-ui-universal-button--geometry-light
+  GEOMETRY_STORY: ${GEOMETRY_STORY || 'expo-ui-universal-button--geometry-light'}
 ---
 - runFlow:
     file: ../helpers/open-story.yaml
     env:
       STORY_ID: '${GEOMETRY_STORY}'
-      READY_ID: button-geometry-default
+      READY_ID: ${GEOMETRY_STORY.replace('expo-ui-universal-button--', 'button-')}
+- waitForAnimationToEnd
+- assertVisible: 'Presses: 0'
 - tapOn:
     id: button-geometry-default
 - assertVisible: 'Presses: 1'

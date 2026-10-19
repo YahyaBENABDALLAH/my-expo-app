@@ -23,7 +23,8 @@ test('native interaction flows reference discoverable Storybook stories', () => 
   const flowRoot = resolve(root, '.maestro');
   let checked = 0;
   for (const file of readdirSync(flowRoot, { recursive: true })) {
-    if (!file.endsWith('.yaml')) continue;
+    // Generated results can retain old story IDs; validate maintained flows only.
+    if (!file.endsWith('.yaml') || file.replaceAll('\\', '/').startsWith('results/')) continue;
     const source = readFileSync(resolve(flowRoot, file), 'utf8');
     for (const [id] of source.matchAll(/\b(?:expo-ui|pages|recipes)-[a-z0-9-]+--[a-z0-9-]+\b/g)) {
       assert.ok(ids.has(id), `${file} references missing story ${id}`);

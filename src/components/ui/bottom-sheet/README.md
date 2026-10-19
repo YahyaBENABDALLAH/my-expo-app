@@ -6,8 +6,8 @@ A minimal adapter over the native Expo UI `BottomSheet`. Supported props are
 `children`, `isPresented`, `onDismiss`, `testID` and optional `contentHeight`. The iOS drag indicator is
 hidden; Android retains its native default.
 
-The adapter adds no styling, padding, color, corner radius, detents,
-measurement or nested Host. Expo UI supplies its own native defaults and owns
+Apart from the optional content height, the adapter adds no styling, padding,
+color, corner radius, detents, measurement or nested Host. Expo UI supplies its own native defaults and owns
 presentation/dismissal. Light/dark appearance follows the native app mode;
 the root layout synchronizes the existing appearance preference with React Native
 `Appearance.setColorScheme`, including system mode.
