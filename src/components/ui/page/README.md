@@ -12,13 +12,20 @@ and back button. The mask sits below those controls so they stay sharp.
 
 `PageMotionOverlay` wraps root navigation with `PageWaveContext`, sharing the same
 cached paths and UI-thread transforms between the visible artwork and the
-`@expo/ui/community/masked-view` blur mask. No second animation loop or per-frame
+platform blur mask. No second animation loop or per-frame
 React updates are needed. Outside the two wave silhouettes the header is clear.
 The optional `children` slot supplies this context to local previews; `visible`
 hides the artwork and mask without remounting navigation. Splash waves keep their
 existing opaque fills and do not supply a blur mask.
 
-The backdrop uses `extraLight` / `dark` tint at intensity 40, avoiding Android's
+On iOS, `page-wave-surface.ios.tsx` renders an Expo UI SwiftUI `ultraThin` material
+inside a native SwiftUI mask. An animated SVG uses the same wave path strings and
+transforms as the artwork. This avoids masking an ancestor of UIKit's
+`UIVisualEffectView`, which disables its blur, and keeps a Metal canvas out of the
+SwiftUI mask. The native mask has an explicit height and a bounded Host.
+
+Android retains Expo UI's `MaskedView` with a Skia mask and `expo-blur`.
+The Android backdrop uses `extraLight` / `dark` tint at intensity 40, avoiding its
 gray thin-material overlay and keeping more of the content visible. Android 12+
 uses native blur; older Android versions use a translucent fallback. iOS Reduce
 Transparency replaces the blur with the theme's `background` token. The backdrop
@@ -30,7 +37,9 @@ provide long, deterministic cards and a counted back action. The header Maestro 
 scrolling and back actions in both appearances. JS checks cover measured scroll
 padding, retained drafts during header resizing and live Reduce Transparency
 changes. Geometry checks confirm that mask and artwork share paths, drift and
-width, and that hiding waves removes the mask. Native blur appearance still
+width, and that hiding waves removes the mask. iOS checks also ensure the material
+is native SwiftUI, the mask is SVG, and Metro selects the platform surface adapter.
+Native blur appearance still
 requires a device.
 
 `page-screen.tsx` composes scrolling content and actions.

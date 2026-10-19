@@ -25,6 +25,7 @@ function setup() {
     'expo-router': { LocaleProvider: native('Locale'), router: { push() {} } },
     'expo-blur': { BlurTargetView: native('BlurTarget'), BlurView: native('BlurView') },
     '@expo/ui/community/masked-view': { MaskedView: native('MaskedView') },
+    '@/components/ui/page/page-wave-surface': { PageWaveSurface: native('WaveSurface') },
     '@react-native-async-storage/async-storage': {
       getItem: async () => 'en',
       setItem: async () => {},

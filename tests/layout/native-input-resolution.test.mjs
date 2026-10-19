@@ -48,6 +48,7 @@ for (const platform of ['ios', 'android']) {
     'navigation/navigation-tab.tsx',
     'onboarding/onboarding-pager.tsx',
     'page/page-back-button.tsx',
+    'page/page-wave-surface.tsx',
     'picker/picker.tsx',
     'recipe-stepper/recipe-stepper-layout.tsx',
     'refreshable-scroll-view/refreshable-scroll-view.tsx',

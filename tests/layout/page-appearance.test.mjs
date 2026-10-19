@@ -32,6 +32,8 @@ function setup(deviceScheme = 'light', transparencyRead = Promise.resolve(false)
   FieldGroup.SectionFooter = native('Footer');
   const Icon = native('Icon');
   Icon.select = ({ ios }) => ios;
+  const SwiftMask = native('SwiftMask');
+  SwiftMask.Content = native('SwiftMaskContent');
   const mocks = {
     'react-native': {
       View: native('View'),
@@ -63,11 +65,35 @@ function setup(deviceScheme = 'light', transparencyRead = Promise.resolve(false)
       Group: native('Group'),
       Path: native('Path'),
     },
+    '@expo/ui/swift-ui': {
+      Mask: SwiftMask,
+      Rectangle: native('MaterialSurface'),
+      RNHostView: native('RNHostView'),
+    },
+    '@expo/ui/swift-ui/modifiers': {
+      frame: (value) => ({ frame: value }),
+      foregroundStyle: (value) => ({ foregroundStyle: value }),
+      background: (value) => ({ background: value }),
+      shapes: { rectangle: () => ({ shape: 'rectangle' }) },
+    },
+    'react-native-svg': {
+      __esModule: true,
+      default: native('Svg'),
+      G: native('SvgGroup'),
+      Path: native('SvgPath'),
+    },
+    'react-native-reanimated': {
+      __esModule: true,
+      default: { createAnimatedComponent: (component) => component },
+      useAnimatedProps: (get) => ({ get }),
+    },
     '@/components/ui/page/page-wave-context': {
       PageWaveContext: createContext({
         overlayHeight: 144,
         frontWave: { id: 'front' },
         backWave: { id: 'back' },
+        frontSvg: 'M 0 0 H 1000 V 60 H 0 Z',
+        backSvg: 'M 0 0 H 1000 V 80 H 0 Z',
         fit: { get: () => [{ scaleX: 0.39 }, { translateY: 0 }] },
         frontDrift: { get: () => [{ translateX: 0 }, { translateY: 0 }] },
         backDrift: { get: () => [{ translateX: 0 }, { translateY: 0 }] },
@@ -106,6 +132,9 @@ function setup(deviceScheme = 'light', transparencyRead = Promise.resolve(false)
     '@expo/material-symbols/check.xml': 1,
   };
   const load = createSourceLoader(mocks);
+  mocks['@/components/ui/page/page-wave-surface'] = load(
+    'components/ui/page/page-wave-surface.ios.tsx',
+  );
   const exports = {
     ...load('context/theme.context.tsx'),
     ...load('context/layout-direction.context.tsx'),
@@ -184,10 +213,21 @@ for (const scheme of ['light', 'dark']) {
     view.flush(() => header.props.onLayout({ nativeEvent: { layout: { height: 115 } } }));
     assert.equal(content().props.style.paddingTop, 139);
     assert.equal(header.props.style.paddingTop, 59);
-    const blur = view.findAll('BlurView')[0];
-    assert.equal(blur.props.tint, scheme === 'dark' ? 'dark' : 'extraLight');
-    assert.equal(blur.props.pointerEvents, 'none');
-    assert.equal(blur.props.blurTarget.current, view.findAll('BlurTarget')[0]);
+    const surface = view.findAll('MaterialSurface')[0];
+    assert.deepEqual(surface.props.modifiers.find((modifier) => modifier.background).background, {
+      type: 'material',
+      material: 'ultraThin',
+    });
+    assert.equal(
+      view.findAll('BlurView').length,
+      0,
+      'UIKit blur must not be placed inside the iOS mask.',
+    );
+    const maskHost = view
+      .findAll('Host')
+      .find(({ props }) => props.testID === 'page-wave-blur-mask');
+    assert.equal(maskHost.props.pointerEvents, 'none');
+    assert.equal(maskHost.props.colorScheme, scheme);
     view.flush(() => setDraft('Updated draft'));
     view.flush(() => header.props.onLayout({ nativeEvent: { layout: { height: 163 } } }));
     assert.equal(content().props.style.paddingTop, 187);
@@ -210,19 +250,20 @@ test('Reduce Transparency changes replace the blur and take precedence over an o
     createElement(s.PageScreen, { title: 'Recipes', description: 'Content' }),
   );
   t.after(() => view.unmount());
-  assert.equal(view.findAll('BlurView').length, 1);
+  const surface = () => view.findAll('MaterialSurface')[0];
+  assert.equal(surface().props.testID, 'page-header-blur');
   view.flush(() => s.setReduceTransparency(true));
-  assert.equal(view.findAll('BlurView').length, 0);
+  assert.equal(surface().props.testID, 'page-header-solid-background');
   assert.equal(
-    view.findAll('View').some(({ props }) => props.testID === 'page-header-solid-background'),
-    true,
+    surface().props.modifiers.find((modifier) => modifier.background).background,
+    '#FFFFFF',
   );
   finishRead(false);
   await new Promise((resolve) => setImmediate(resolve));
   view.flush(() => {});
-  assert.equal(view.findAll('BlurView').length, 0);
+  assert.equal(surface().props.testID, 'page-header-solid-background');
   view.flush(() => s.setReduceTransparency(false));
-  assert.equal(view.findAll('BlurView').length, 1);
+  assert.equal(surface().props.testID, 'page-header-blur');
 });
 
 test('the language sheet waits for readiness, selects each autonym, updates direction and dismisses without changing a selection', (t) => {

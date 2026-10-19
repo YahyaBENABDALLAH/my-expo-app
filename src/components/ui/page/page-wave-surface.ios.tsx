@@ -1,0 +1,96 @@
+import { Mask, Rectangle, RNHostView } from '@expo/ui/swift-ui';
+import { background, foregroundStyle, frame, shapes } from '@expo/ui/swift-ui/modifiers';
+import { View } from 'react-native';
+import Animated, { useAnimatedProps } from 'react-native-reanimated';
+import Svg, { G, Path, type GProps } from 'react-native-svg';
+import { UniversalHost } from '../host/universal-host';
+import type { PageWaveSurfaceProps } from './page-wave-surface.types';
+
+const AnimatedGroup = Animated.createAnimatedComponent(G);
+
+// SVG exposes transform publicly but its native view receives a six-value matrix.
+function svgMatrixAdapter(props: Record<string, unknown>) {
+  'worklet';
+  if ('transform' in props) {
+    props.matrix = props.transform;
+    delete props.transform;
+  }
+}
+
+/** Keep both the material and its mask in SwiftUI; masking an ancestor of Expo Blur breaks UIKit blur. */
+export function PageWaveSurface({
+  wave,
+  colorScheme,
+  backgroundColor,
+  reduceTransparency,
+}: PageWaveSurfaceProps) {
+  const { fit, backDrift, frontDrift } = wave;
+  const fitProps = useAnimatedProps<GProps>(
+    () => {
+      const transform = fit.get();
+      return { transform: [transform[0].scaleX ?? 0, 0, 0, 1, 0, transform[1].translateY ?? 0] };
+    },
+    undefined,
+    svgMatrixAdapter,
+  );
+  const backProps = useAnimatedProps<GProps>(
+    () => {
+      const drift = backDrift.get();
+      return { transform: [1, 0, 0, 1, drift[0].translateX ?? 0, drift[1].translateY ?? 0] };
+    },
+    undefined,
+    svgMatrixAdapter,
+  );
+  const frontProps = useAnimatedProps<GProps>(
+    () => {
+      const drift = frontDrift.get();
+      return { transform: [1, 0, 0, 1, drift[0].translateX ?? 0, drift[1].translateY ?? 0] };
+    },
+    undefined,
+    svgMatrixAdapter,
+  );
+  const bounds = frame({ maxWidth: Infinity, height: wave.overlayHeight });
+
+  return (
+    <UniversalHost
+      colorScheme={colorScheme}
+      matchContents={false}
+      ignoreSafeArea="all"
+      pointerEvents="none"
+      accessible={false}
+      accessibilityElementsHidden
+      testID="page-wave-blur-mask"
+      style={{ position: 'absolute', top: 0, left: 0, right: 0, height: wave.overlayHeight }}
+    >
+      <Mask alignment="topLeading" modifiers={[bounds]}>
+        <Rectangle
+          testID={reduceTransparency ? 'page-header-solid-background' : 'page-header-blur'}
+          modifiers={[
+            bounds,
+            foregroundStyle('transparent'),
+            background(
+              reduceTransparency ? backgroundColor : { type: 'material', material: 'ultraThin' },
+              shapes.rectangle(),
+            ),
+          ]}
+        />
+        <Mask.Content>
+          <RNHostView>
+            <View style={{ width: '100%', height: wave.overlayHeight }} pointerEvents="none">
+              <Svg width="100%" height={wave.overlayHeight}>
+                <AnimatedGroup animatedProps={fitProps}>
+                  <AnimatedGroup animatedProps={backProps}>
+                    <Path d={wave.backSvg} fill="black" />
+                  </AnimatedGroup>
+                  <AnimatedGroup animatedProps={frontProps}>
+                    <Path d={wave.frontSvg} fill="black" />
+                  </AnimatedGroup>
+                </AnimatedGroup>
+              </Svg>
+            </View>
+          </RNHostView>
+        </Mask.Content>
+      </Mask>
+    </UniversalHost>
+  );
+}

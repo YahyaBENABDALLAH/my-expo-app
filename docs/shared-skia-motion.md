@@ -5,8 +5,11 @@ Navigation themes, root/authentication/onboarding stack content and tab scenes u
 `PageMotionOverlay` wraps navigation and draws its artwork above it and below the splash. Its two translucent Skia waves animate across the top 144 points of every page on a 10-second cycle. It ignores touches and accessibility, pauses while the splash covers it, and respects app lifecycle and live Reduce Motion changes.
 
 Its context shares cached paths and UI-thread transforms with the native blur mask
-in scrolling page frames. Expo UI's `MaskedView` clips `expo-blur` to the union of
-the two wave silhouettes. The rest of the header remains transparent. The blur
+in scrolling page frames. Android uses Expo UI's `MaskedView` to clip `expo-blur`
+to the union of the two wave silhouettes. iOS uses a SwiftUI `ultraThin` material
+and native SwiftUI mask with an animated SVG, keeping UIKit blur and a Metal canvas
+out of that mask's render tree. SVG paths come from the same source strings and
+use the same shared motion as the artwork. The rest of the header remains transparent. The blur
 samples each frame's content target and sits below its title/back controls, so
 those controls remain sharp. A single wave loop drives both artwork and mask;
 no snapshots or per-frame React updates are used. The existing reduced-motion

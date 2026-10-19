@@ -32,17 +32,16 @@ export function usePageWaveMotion({
   const { height } = useWindowDimensions();
   const expandedOffset = Math.max(0, height * 0.35 - PAGE_WAVE_HEIGHT / 2);
   const target = expanded && !splash ? expandedOffset : 0;
-  const [frontWave, backWave] = useMemo(
-    () => [
-      Skia.Path.MakeFromSVGString(
-        `M -500 ${-height} H 1500 V 62 C 1250 8 1120 112 820 72 S 330 16 80 58 S -240 118 -500 62 Z`,
-      )!,
-      Skia.Path.MakeFromSVGString(
-        `M -500 ${-height} H 1500 V 46 C 1280 98 1060 20 780 56 S 300 112 20 74 S -260 12 -500 48 Z`,
-      )!,
-    ],
-    [height],
-  );
+  const { frontWave, backWave, frontSvg, backSvg } = useMemo(() => {
+    const frontSvg = `M -500 ${-height} H 1500 V 62 C 1250 8 1120 112 820 72 S 330 16 80 58 S -240 118 -500 62 Z`;
+    const backSvg = `M -500 ${-height} H 1500 V 46 C 1280 98 1060 20 780 56 S 300 112 20 74 S -260 12 -500 48 Z`;
+    return {
+      frontSvg,
+      backSvg,
+      frontWave: Skia.Path.MakeFromSVGString(frontSvg)!,
+      backWave: Skia.Path.MakeFromSVGString(backSvg)!,
+    };
+  }, [height]);
   const phase = useSharedValue(0);
   const width = useSharedValue(0);
   const offset = useSharedValue(target);
@@ -107,6 +106,8 @@ export function usePageWaveMotion({
     () => ({
       frontWave,
       backWave,
+      frontSvg,
+      backSvg,
       fit,
       gradientStart,
       frontDrift,
@@ -114,6 +115,17 @@ export function usePageWaveMotion({
       width,
       overlayHeight: PAGE_WAVE_HEIGHT + expandedOffset,
     }),
-    [frontWave, backWave, fit, gradientStart, frontDrift, backDrift, width, expandedOffset],
+    [
+      frontWave,
+      backWave,
+      frontSvg,
+      backSvg,
+      fit,
+      gradientStart,
+      frontDrift,
+      backDrift,
+      width,
+      expandedOffset,
+    ],
   );
 }

@@ -44,6 +44,8 @@ function setup(platform = 'ios') {
   };
   const frames = { callback: undefined, active: false };
   const frameCallback = { setActive: (active) => (frames.active = active) };
+  const SwiftMask = native('SwiftMask');
+  SwiftMask.Content = native('SwiftMaskContent');
   const mocks = {
     react: {
       ...React,
@@ -97,11 +99,17 @@ function setup(platform = 'ios') {
         h('MaskedView', props, h('Mask', null, maskElement), children),
     },
     '@expo/ui/swift-ui': {
+      Mask: SwiftMask,
+      Rectangle: native('MaterialSurface'),
+      RNHostView: native('RNHostView'),
       HStack: native('Stack'),
       VStack: native('Column'),
       ZStack: native('Box'),
     },
     '@expo/ui/swift-ui/modifiers': {
+      background: (value) => ({ background: value }),
+      foregroundStyle: (value) => ({ foregroundStyle: value }),
+      shapes: { rectangle: () => ({ shape: 'rectangle' }) },
       frame: (value) => ({ frame: value }),
       presentationCornerRadius: (value) => ({ presentationCornerRadius: value }),
       onGeometryChange: geometry,
@@ -144,6 +152,15 @@ function setup(platform = 'ios') {
       },
     },
     'react-native-reanimated': {
+      __esModule: true,
+      default: { createAnimatedComponent: (component) => component },
+      useAnimatedProps: (read, _dependencies, adapter) => ({
+        get: () => {
+          const props = read();
+          adapter?.(props);
+          return props;
+        },
+      }),
       useSharedValue: useSharedFixture,
       useDerivedValue: (get) => ({ get }),
       useFrameCallback: (callback) => {
@@ -157,9 +174,19 @@ function setup(platform = 'ios') {
       ReduceMotion: { Never: 'never' },
     },
     'react-native-worklets': { scheduleOnRN: (callback) => callback() },
+    'react-native-svg': {
+      __esModule: true,
+      default: native('Svg'),
+      G: native('SvgGroup'),
+      Path: native('SvgPath'),
+    },
     '../../../skia/types': { isPath: (value) => typeof value === 'object' },
   };
-  return { load: createSourceLoader(mocks), mocks, dimensions, calls, native, frames };
+  const load = createSourceLoader(mocks);
+  mocks['@/components/ui/page/page-wave-surface'] = load(
+    `components/ui/page/page-wave-surface.${platform}.tsx`,
+  );
+  return { load, mocks, dimensions, calls, native, frames };
 }
 
 for (const platform of ['ios', 'android']) {
@@ -439,15 +466,60 @@ for (const platform of ['ios', 'android']) {
     }
     const view = renderFixture(h(Frame));
     t.after(() => view.unmount());
-    const mask = () => view.findAll('MaskedView')[0];
+    const mask = () =>
+      platform === 'ios'
+        ? view.findAll('Host').find(({ props }) => props.testID === 'page-wave-blur-mask')
+        : view.findAll('MaskedView')[0];
+    const surfaceType = platform === 'ios' ? 'MaterialSurface' : 'BlurView';
     const assertGeometry = () => {
-      const maskGroup = view.findAll('Mask')[0].props.children.props.children;
-      assert.equal(maskGroup.props.transform, geometry.fit);
-      const [back, front] = maskGroup.props.children;
-      assert.equal(back.props.transform, geometry.backDrift);
-      assert.equal(front.props.transform, geometry.frontDrift);
-      assert.equal(back.props.children.props.path, geometry.backWave);
-      assert.equal(front.props.children.props.path, geometry.frontWave);
+      if (platform === 'ios') {
+        assert.deepEqual(
+          view.findAll('SvgPath').map(({ props }) => props.d),
+          [geometry.backSvg, geometry.frontSvg],
+        );
+        const [fitGroup, back, front] = view.findAll('SvgGroup');
+        const fit = geometry.fit.get();
+        const backDrift = geometry.backDrift.get();
+        const frontDrift = geometry.frontDrift.get();
+        assert.deepEqual(fitGroup.props.animatedProps.get().matrix, [
+          fit[0].scaleX,
+          0,
+          0,
+          1,
+          0,
+          fit[1].translateY,
+        ]);
+        assert.deepEqual(back.props.animatedProps.get().matrix, [
+          1,
+          0,
+          0,
+          1,
+          backDrift[0].translateX,
+          backDrift[1].translateY,
+        ]);
+        assert.deepEqual(front.props.animatedProps.get().matrix, [
+          1,
+          0,
+          0,
+          1,
+          frontDrift[0].translateX,
+          frontDrift[1].translateY,
+        ]);
+        assert.equal(view.findAll('BlurView').length, 0);
+        assert.equal(
+          view.findAll('Canvas').length,
+          1,
+          'Only the visible artwork uses a Metal canvas on iOS.',
+        );
+      } else {
+        const maskGroup = view.findAll('Mask')[0].props.children.props.children;
+        assert.equal(maskGroup.props.transform, geometry.fit);
+        const [back, front] = maskGroup.props.children;
+        assert.equal(back.props.transform, geometry.backDrift);
+        assert.equal(front.props.transform, geometry.frontDrift);
+        assert.equal(back.props.children.props.path, geometry.backWave);
+        assert.equal(front.props.children.props.path, geometry.frontWave);
+      }
       assert.equal(mask().props.style.height, geometry.overlayHeight);
     };
     assertGeometry();
@@ -457,16 +529,17 @@ for (const platform of ['ios', 'android']) {
     view.flush(() => wave.props.onLayout({ nativeEvent: { layout: { width: 280 } } }));
     assert.equal(geometry.fit.get()[0].scaleX, 0.28);
     assertGeometry();
-    const surface = view.findAll('BlurView')[0];
+    const surface = view.findAll(surfaceType)[0];
     view.flush(() => toggle(false));
     assert.equal(view.findAll('MaskedView').length, 0);
+    assert.equal(view.findAll(surfaceType).length, 0);
     assert.equal(
       view.findAll('View').some(({ props }) => props.testID === 'page-motion-overlay'),
       false,
     );
     view.flush(() => toggle(true));
     assertGeometry();
-    assert.notEqual(view.findAll('BlurView')[0], surface);
+    assert.notEqual(view.findAll(surfaceType)[0], surface);
     assert.equal(s.calls.pathParses, 2);
   });
 }

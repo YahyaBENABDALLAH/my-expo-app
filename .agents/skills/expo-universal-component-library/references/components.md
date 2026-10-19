@@ -650,13 +650,19 @@ The custom Expo Router tab bar retains Expo UI segmented controls and adds the R
 `PageScreen` and Home use `PageFrame.headerBlur` to blur scrolling content only
 inside the two wave shapes, with the blur below the sharp title and back button.
 `PageMotionOverlay` wraps root navigation and supplies cached paths and shared
-UI-thread transforms through `PageWaveContext` to an Expo UI `MaskedView`; artwork
+UI-thread transforms through `PageWaveContext` to the platform mask; artwork
 and mask use one motion loop. Its `children` slot supports local compositions and
-`visible` hides the artwork/mask without remounting navigation. Splash waves keep
+`visible` hides the artwork/mask without remounting navigation. The iOS surface
+uses native SwiftUI `ultraThin` material and an SVG-backed SwiftUI mask, avoiding
+the UIKit visual-effect ancestor masking restriction and Metal mask compositing.
+Android retains Expo UI `MaskedView` with Skia and `expo-blur`. Private
+`page-wave-surface.ios.tsx` / `.android.tsx` adapters share the same props; Metro
+resolution and platform rendering contracts are checked by the layout tests.
+Splash waves keep
 their existing opaque treatment. `usePageHeaderInset()` reserves the measured header height
 inside the scroll, including the top safe area and dynamic text/back-button
 height. `BlurTargetView` supplies the Android source; Android 12+ uses native blur
-and older Android uses a translucent fallback. The `extraLight` / `dark` tinted
+and older Android uses a translucent fallback. The Android `extraLight` / `dark` tinted
 backdrop avoids Android's gray thin-material overlay, ignores touches, uses
 intensity 40, and follows Reduce Transparency with
 the theme's `background` token. Title and back button retain the `text` role and
