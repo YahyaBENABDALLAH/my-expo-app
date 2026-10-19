@@ -2,6 +2,10 @@ import {
   BottomSheet,
   type BottomSheetProps,
   Column,
+  Row,
+  Spacer,
+  LayoutDirectionControl,
+  UniversalHost,
   UniversalButtonContent,
   UniversalText,
   UniversalTextContent,
@@ -13,6 +17,7 @@ import { useState } from 'react';
 import { View } from 'react-native';
 import { action } from 'storybook/actions';
 import { NativeStoryFrame } from '../../components/native-story-frame';
+import { LayoutDirectionProvider } from '@/context/layout-direction.context';
 
 type DemoProps = BottomSheetProps & {
   colorScheme: 'light' | 'dark';
@@ -31,6 +36,9 @@ function BottomSheetDemo({ title, content, onOpen, onClose, ...args }: DemoProps
   }
   return (
     <View style={{ gap: 20 }}>
+      <UniversalHost colorScheme={args.colorScheme}>
+        <LayoutDirectionControl testIDPrefix="bottom-sheet-page-direction" />
+      </UniversalHost>
       <UniversalButton
         variant="secondary"
         testID={`${args.testID}-open`}
@@ -57,6 +65,12 @@ function BottomSheetDemo({ title, content, onOpen, onClose, ...args }: DemoProps
         }}
       >
         <Column testID={`${args.testID}-content`} spacing={16} modifiers={nativeFillWidth}>
+          <LayoutDirectionControl testIDPrefix="bottom-sheet-content-direction" />
+          <Row modifiers={nativeFillWidth}>
+            <UniversalTextContent>Start</UniversalTextContent>
+            <Spacer />
+            <UniversalTextContent>End</UniversalTextContent>
+          </Row>
           <UniversalTextContent
             testID={`${args.testID}-title`}
             textStyle={{ fontSize: 24, fontWeight: '700' }}
@@ -106,9 +120,11 @@ const meta = {
     onDismiss: { control: false },
   },
   render: (args) => (
-    <NativeStoryFrame {...args}>
-      <BottomSheetDemo {...args} />
-    </NativeStoryFrame>
+    <LayoutDirectionProvider initialDirection="ltr">
+      <NativeStoryFrame {...args}>
+        <BottomSheetDemo {...args} />
+      </NativeStoryFrame>
+    </LayoutDirectionProvider>
   ),
 } satisfies Meta<typeof BottomSheetDemo>;
 
