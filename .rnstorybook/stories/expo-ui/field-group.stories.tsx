@@ -1,5 +1,11 @@
-import Colors from '@/constants/colors';
-import { Checkbox, Column, FieldGroup, Slider, Switch, Text } from '@components/ui';
+import {
+  Checkbox,
+  Column,
+  FieldGroup,
+  Slider,
+  Switch,
+  UniversalTextContent as Text,
+} from '@components/ui';
 import {
   UniversalFieldGroup,
   type UniversalFieldGroupProps,
@@ -42,7 +48,6 @@ function FieldGroupDemo({
   const [notify, setNotify] = useState(notifications);
   const [checked, setChecked] = useState(accepted);
   const [level, setLevel] = useState(volume);
-  const ink = args.colorScheme === 'light' ? Colors.light.text : Colors.dark.text;
   return (
     <UniversalFieldGroup {...args}>
       <FieldGroup.Section
@@ -52,9 +57,7 @@ function FieldGroupDemo({
       >
         {customHeader ? (
           <FieldGroup.SectionHeader>
-            <Text textStyle={{ fontSize: 20, fontWeight: '700', color: ink }}>
-              Custom section header
-            </Text>
+            <Text textStyle={{ fontSize: 20, fontWeight: '700' }}>Custom section header</Text>
           </FieldGroup.SectionHeader>
         ) : null}
         <Switch
@@ -79,12 +82,12 @@ function FieldGroupDemo({
             }}
           />
         ) : null}
-        <Text testID={`${args.testID}-state`} textStyle={{ color: ink }}>
+        <Text testID={`${args.testID}-state`}>
           {`Notifications: ${notify ? 'On' : 'Off'} · Terms: ${checked ? 'Accepted' : 'Not accepted'}`}
         </Text>
         {footer ? (
           <FieldGroup.SectionFooter>
-            <Text textStyle={{ color: ink, fontSize: 13 }}>{footer}</Text>
+            <Text textStyle={{ fontSize: 13 }}>{footer}</Text>
           </FieldGroup.SectionFooter>
         ) : null}
       </FieldGroup.Section>
@@ -95,10 +98,7 @@ function FieldGroupDemo({
           titleUppercase={titleUppercase}
         >
           <Column spacing={8}>
-            <Text
-              testID={`${args.testID}-volume-value`}
-              textStyle={{ color: ink }}
-            >{`Volume: ${Math.round(level)}%`}</Text>
+            <Text testID={`${args.testID}-volume-value`}>{`Volume: ${Math.round(level)}%`}</Text>
             <Slider
               testID={`${args.testID}-volume`}
               value={level}
@@ -172,7 +172,6 @@ const meta = {
       <FieldGroupDemo key={`${args.notifications}-${args.accepted}-${args.volume}`} {...args} />
     </NativeStoryFrame>
   ),
-  parameters: { layout: 'fullscreen' },
 } satisfies Meta<typeof FieldGroupDemo>;
 export default meta;
 type Story = StoryObj<typeof meta>;

@@ -9,17 +9,20 @@ import type { Meta, StoryObj } from '@storybook/react-native';
 import { useState } from 'react';
 import { View } from 'react-native';
 
-import Colors from '@/constants/colors';
+import { useThemeColors } from '@/hooks/use-theme';
 
 function PageMotionDemo({
   animate,
   colorScheme,
   narrow = false,
+  login = false,
 }: {
   animate: boolean;
   colorScheme: 'light' | 'dark';
   narrow?: boolean;
+  login?: boolean;
 }) {
+  const colors = useThemeColors(colorScheme);
   const [paused, setPaused] = useState(false);
   const [presses, setPresses] = useState(0);
   return (
@@ -28,7 +31,7 @@ function PageMotionDemo({
         flex: 1,
         width: narrow ? 280 : '100%',
         alignSelf: 'center',
-        backgroundColor: Colors[colorScheme].background,
+        backgroundColor: colors.background,
       }}
     >
       <UniversalHost colorScheme={colorScheme}>
@@ -39,7 +42,7 @@ function PageMotionDemo({
           <Text colorScheme={colorScheme}>A gentle wave accompanies every page.</Text>
           <UniversalButtonContent
             variant="secondary"
-            label="Try the button under the wave"
+            label={login ? 'Simulate login / reset' : 'Try the button under the wave'}
             testID="page-motion-action"
             onPress={() => setPresses((value) => value + 1)}
           />
@@ -58,7 +61,11 @@ function PageMotionDemo({
           </Text>
         </Column>
       </UniversalHost>
-      <PageMotionOverlay animate={animate && !paused} colorScheme={colorScheme} />
+      <PageMotionOverlay
+        animate={animate && !paused}
+        colorScheme={colorScheme}
+        expanded={login && presses % 2 === 0}
+      />
     </View>
   );
 }
@@ -69,13 +76,12 @@ const meta = {
   args: { animate: true, colorScheme: 'light' },
   argTypes: {
     animate: { control: 'boolean' },
-    colorScheme: { control: 'select', options: ['light', 'dark'] },
     narrow: { control: 'boolean' },
   },
-  parameters: { layout: 'fullscreen' },
 } satisfies Meta<typeof PageMotionDemo>;
 export default meta;
 type Story = StoryObj<typeof meta>;
 export const Light: Story = {};
 export const Dark: Story = { args: { colorScheme: 'dark' } };
 export const Static: Story = { args: { animate: false } };
+export const Login: Story = { args: { login: true } };

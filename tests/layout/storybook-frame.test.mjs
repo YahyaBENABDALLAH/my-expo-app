@@ -7,7 +7,11 @@ import { renderFixture } from '../helpers/render-fixture.mjs';
 test('native stories receive a finite bridge width and retain their state during real resizing', () => {
   const native = (name) => (props) => h(name, props, props.children);
   const load = createSourceLoader({
-    'react-native': { View: native('View'), I18nManager: { isRTL: false } },
+    'react-native': {
+      View: native('View'),
+      I18nManager: { isRTL: false },
+      useColorScheme: () => 'light',
+    },
     '@react-native-async-storage/async-storage': {
       getItem: async () => null,
       setItem: async () => {},

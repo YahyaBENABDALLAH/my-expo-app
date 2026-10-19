@@ -5,28 +5,19 @@ import {
   UniversalTextContent as Text,
 } from '@components/ui';
 import type { Meta, StoryObj } from '@storybook/react-native';
-import { useEffect, useState } from 'react';
-import { Appearance } from 'react-native';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  ThemePreferencesProvider,
-  useThemePreferences,
-  useThemeSettings,
-  type ColorSchemePreference,
-} from '@/context/theme.context';
+import { useThemeSettings } from '@/context/theme.context';
 import { useLanguage } from '@/context/language.context';
 import { useLayoutDirection } from '@/context/layout-direction.context';
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import type { StoryThemeProps } from '../../components/story-theme';
 
-function LoginDraft() {
+function LoginPreferencesDemo() {
   const { t } = useTranslation();
   const { language } = useLanguage();
   const { colorScheme } = useThemeSettings();
   const scheme = useColorScheme();
-  useEffect(
-    () => Appearance.setColorScheme(colorScheme === 'system' ? 'unspecified' : colorScheme),
-    [colorScheme],
-  );
   const direction = useLayoutDirection();
   const [draft, setDraft] = useState('');
   return (
@@ -49,28 +40,12 @@ function LoginDraft() {
   );
 }
 
-function LoginPreferencesDemo({ colorScheme }: { colorScheme: ColorSchemePreference }) {
-  const appAppearance = useThemePreferences()?.colorScheme ?? 'system';
-  useEffect(
-    () => () => {
-      Appearance.setColorScheme(appAppearance === 'system' ? 'unspecified' : appAppearance);
-    },
-    [appAppearance],
-  );
-  return (
-    <ThemePreferencesProvider key={colorScheme} initialColorScheme={colorScheme}>
-      <LoginDraft />
-    </ThemePreferencesProvider>
-  );
-}
-
 const meta = {
   title: 'Pages/Login preferences',
   component: LoginPreferencesDemo,
   args: { colorScheme: 'light' },
   argTypes: { colorScheme: { control: 'select', options: ['system', 'light', 'dark'] } },
   parameters: {
-    layout: 'fullscreen',
     docs: {
       description: {
         component:
@@ -78,7 +53,7 @@ const meta = {
       },
     },
   },
-} satisfies Meta<typeof LoginPreferencesDemo>;
+} satisfies Meta<StoryThemeProps>;
 export default meta;
 type Story = StoryObj<typeof meta>;
 export const Light: Story = {};

@@ -4,8 +4,6 @@ import { ThemeProvider } from '@storybook/react-native-theming';
 import { useState } from 'react';
 import { View } from 'react-native';
 
-import { useThemeColors } from '@/hooks/use-theme';
-
 import { view } from './storybook.requires';
 
 const storage = {
@@ -17,12 +15,10 @@ function isStoryId(value?: string): value is Extract<InitialSelection, string> {
   return typeof value === 'string' && /^[a-z0-9-]+--[a-z0-9-]+$/.test(value);
 }
 
-const StorybookCanvas: NonNullable<Params['CustomUIComponent']> = ({ children, story, theme }) => {
-  const scheme = story?.args.colorScheme;
-  const colors = useThemeColors(scheme === 'light' || scheme === 'dark' ? scheme : undefined);
+const StorybookCanvas: NonNullable<Params['CustomUIComponent']> = ({ children, theme }) => {
   return (
     <ThemeProvider theme={theme}>
-      <View testID="storybook-canvas" style={{ flex: 1, backgroundColor: colors.background }}>
+      <View testID="storybook-canvas" style={{ flex: 1 }}>
         {children}
       </View>
     </ThemeProvider>

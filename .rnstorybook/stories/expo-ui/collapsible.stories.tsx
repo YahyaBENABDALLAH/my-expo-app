@@ -1,5 +1,4 @@
-import Colors from '@/constants/colors';
-import { Column, Text } from '@components/ui';
+import { Column, UniversalTextContent as Text } from '@components/ui';
 import {
   UniversalCollapsible,
   type UniversalCollapsibleProps,
@@ -27,7 +26,6 @@ function CollapsibleDemo({ content, ...args }: DemoProps) {
           testID={`${args.testID}-text`}
           textStyle={{
             fontSize: 16,
-            color: args.colorScheme === 'light' ? Colors.light.text : Colors.dark.text,
           }}
         >
           {content}
@@ -62,7 +60,6 @@ const meta = {
       <CollapsibleDemo key={String(args.isOpen)} {...args} />
     </NativeStoryFrame>
   ),
-  parameters: { layout: 'fullscreen' },
 } satisfies Meta<typeof CollapsibleDemo>;
 export default meta;
 type Story = StoryObj<typeof meta>;

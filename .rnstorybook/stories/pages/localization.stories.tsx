@@ -34,7 +34,6 @@ function LocalizationPreview() {
 const meta = {
   title: 'Pages/Localization',
   component: LocalizationPreview,
-  parameters: { layout: 'fullscreen' },
 } satisfies Meta<typeof LocalizationPreview>;
 export default meta;
 type Story = StoryObj<typeof meta>;

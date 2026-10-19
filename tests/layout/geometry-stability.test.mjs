@@ -143,9 +143,10 @@ function setup(platform = 'ios') {
       cancelAnimation() {},
       withTiming: (value) => value,
       withRepeat: (value) => value,
-      Easing: { linear() {} },
+      Easing: { linear() {}, cubic() {}, inOut: (easing) => easing },
       ReduceMotion: { Never: 'never' },
     },
+    'react-native-worklets': { scheduleOnRN: (callback) => callback() },
     '../../../skia/types': { isPath: (value) => typeof value === 'object' },
   };
   return { load: createSourceLoader(mocks), mocks, dimensions, calls, native, frames };
@@ -401,6 +402,61 @@ test('page wave reuses parsed path objects through resizes, parent updates and r
       view.findAll('View')[0].props.onLayout({ nativeEvent: { layout: { width: 260 } } }),
     );
     processDraws();
+    assert.equal(s.calls.pathParses, 2);
+  } finally {
+    view.unmount();
+  }
+});
+
+test('login wave fills to the top from 35% and returns to the header with reduced-motion support', () => {
+  const s = setup();
+  const timings = [];
+  let completions = 0;
+  let enabled = true;
+  s.mocks['@/hooks/use-motion-enabled'].useMotionEnabled = () => enabled;
+  s.mocks['react-native-reanimated'].withTiming = (target, config, callback) => {
+    timings.push({ target, config, callback });
+    return target;
+  };
+  const { PageMotionOverlay, PAGE_WAVE_HEIGHT } = s.load(
+    'components/ui/page/page-motion-overlay.tsx',
+  );
+  let change;
+  function Frame() {
+    const [expanded, setExpanded] = useState(true);
+    change = setExpanded;
+    return h(PageMotionOverlay, { expanded, onCollapseComplete: complete });
+  }
+  const complete = () => completions++;
+  const view = renderFixture(h(Frame));
+  const layer = view.findAll('View')[0];
+  const offset = () => view.findAll('Group')[0].props.transform.get()[1].translateY;
+  try {
+    const canvas = view.findAll('Canvas')[0];
+    assert.equal(offset() + PAGE_WAVE_HEIGHT / 2, 844 * 0.35);
+    assert.equal(layer.props.style.height, offset() + PAGE_WAVE_HEIGHT);
+    assert.ok(view.findAll('Path').every(({ props }) => props.path.svg.startsWith('M -500 -844')));
+    assert.equal(view.findAll('Gradient')[0].props.start.get().y, -offset());
+    assert.equal(layer.props.pointerEvents, 'none');
+    view.flush(() => change(false));
+    assert.equal(offset(), 0);
+    const collapse = timings.find(({ target, config }) => target === 0 && config.duration === 1000);
+    assert.ok(collapse);
+    assert.equal(completions, 0, 'Navigation waits for the animation callback.');
+    view.flush(() => collapse.callback(false));
+    assert.equal(completions, 0, 'Cancelled animations cannot release navigation.');
+    view.flush(() => collapse.callback(true));
+    assert.equal(completions, 1);
+    assert.equal(view.findAll('Canvas')[0], canvas);
+    const before = timings.length;
+    view.flush(() => {
+      enabled = false;
+      change(true);
+    });
+    assert.equal(offset() + PAGE_WAVE_HEIGHT / 2, 844 * 0.35);
+    assert.equal(timings.length, before);
+    view.flush(() => change(false));
+    assert.equal(completions, 2, 'Reduced motion releases navigation immediately.');
     assert.equal(s.calls.pathParses, 2);
   } finally {
     view.unmount();

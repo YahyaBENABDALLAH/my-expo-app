@@ -40,7 +40,6 @@ const meta = {
       <UniversalIcon {...args} />
     </NativeStoryFrame>
   ),
-  parameters: { layout: 'fullscreen' },
 } satisfies Meta<typeof UniversalIcon>;
 export default meta;
 type Story = StoryObj<typeof meta>;

@@ -10,7 +10,7 @@ import type { Meta, StoryObj } from '@storybook/react-native';
 import { useState } from 'react';
 import { View } from 'react-native';
 
-import Colors from '@/constants/colors';
+import { useThemeColors } from '@/hooks/use-theme';
 
 function ReferenceMotionDemo({
   animate,
@@ -19,10 +19,11 @@ function ReferenceMotionDemo({
   animate: boolean;
   colorScheme: 'light' | 'dark';
 }) {
+  const colors = useThemeColors(colorScheme);
   const [current, setCurrent] = useState(0);
   const [presses, setPresses] = useState(0);
   return (
-    <View style={{ flex: 1, padding: 16, backgroundColor: Colors[colorScheme].background }}>
+    <View style={{ flex: 1, padding: 16, backgroundColor: colors.background }}>
       <FloatingAction
         kind="create"
         label="Create recipe"
@@ -54,7 +55,6 @@ const meta = {
   args: { animate: true, colorScheme: 'light' },
   argTypes: {
     animate: { control: 'boolean' },
-    colorScheme: { control: 'select', options: ['light', 'dark'] },
   },
 } satisfies Meta<typeof ReferenceMotionDemo>;
 export default meta;

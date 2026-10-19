@@ -22,7 +22,7 @@ import {
   useLayoutDirection,
   type LayoutDirection,
 } from '@/context/layout-direction.context';
-import Colors from '@/constants/colors';
+import { useThemeColors } from '@/hooks/use-theme';
 
 const searchIcon = Icon.select({
   ios: 'magnifyingglass',
@@ -34,6 +34,7 @@ const clearIcon = Icon.select({
 });
 
 function DirectionPreview({ colorScheme }: { colorScheme: 'light' | 'dark' }) {
+  const colors = useThemeColors(colorScheme);
   const direction = useLayoutDirection();
   const [draft, setDraft] = useState('');
   const nativeDraft = useNativeState('');
@@ -42,7 +43,7 @@ function DirectionPreview({ colorScheme }: { colorScheme: 'light' | 'dark' }) {
     <UniversalHost
       colorScheme={colorScheme}
       matchContents={false}
-      style={{ flex: 1, backgroundColor: Colors[colorScheme].background }}
+      style={{ flex: 1, backgroundColor: colors.background }}
     >
       <ScrollView>
         <Column spacing={16} modifiers={nativeFillWidth}>
@@ -125,7 +126,6 @@ const meta = {
   component: LayoutDirectionDemo,
   args: { colorScheme: 'light', initialDirection: 'ltr' },
   argTypes: {
-    colorScheme: { control: 'select', options: ['light', 'dark'] },
     initialDirection: { control: false },
   },
 } satisfies Meta<typeof LayoutDirectionDemo>;

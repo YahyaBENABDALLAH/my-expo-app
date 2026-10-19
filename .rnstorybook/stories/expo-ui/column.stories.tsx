@@ -1,4 +1,4 @@
-import Colors from '@/constants/colors';
+import { useThemeColors } from '@/hooks/use-theme';
 import { Column, Text } from '@components/ui';
 import {
   UniversalColumn,
@@ -11,9 +11,9 @@ import { NativeStoryFrame, nativeThemeControls } from '../../components/native-s
 type DemoProps = UniversalColumnProps & { itemCount: number; nested: boolean };
 
 function ColumnDemo({ itemCount, nested, ...args }: DemoProps) {
-  const colors = Colors[args.colorScheme ?? 'dark'];
+  const colors = useThemeColors(args.colorScheme);
   return (
-    <UniversalColumn {...args}>
+    <UniversalColumn {...args} style={{ backgroundColor: colors.surface, ...args.style }}>
       {Array.from({ length: itemCount }, (_, i) => (
         <Text
           key={i}
@@ -46,7 +46,7 @@ const meta = {
     nested: false,
     disabled: false,
     hidden: false,
-    style: { width: 260, padding: 16, backgroundColor: Colors.dark.surface, borderRadius: 12 },
+    style: { width: 260, padding: 16, borderRadius: 12 },
     colorScheme: 'dark',
     onPress: action('column pressed'),
     onAppear: action('column appeared'),
@@ -72,7 +72,6 @@ const meta = {
       <ColumnDemo {...args} />
     </NativeStoryFrame>
   ),
-  parameters: { layout: 'fullscreen' },
 } satisfies Meta<typeof ColumnDemo>;
 export default meta;
 type Story = StoryObj<typeof meta>;
@@ -80,9 +79,4 @@ type Story = StoryObj<typeof meta>;
 export const StartAligned: Story = {};
 export const CenterAligned: Story = { args: { alignment: 'center' } };
 export const Nested: Story = { args: { nested: true, itemCount: 1 } };
-export const LightTheme: Story = {
-  args: {
-    colorScheme: 'light',
-    style: { width: 260, padding: 16, backgroundColor: Colors.light.surface, borderRadius: 12 },
-  },
-};
+export const LightTheme: Story = { args: { colorScheme: 'light' } };

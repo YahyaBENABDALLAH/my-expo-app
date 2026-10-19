@@ -66,7 +66,6 @@ const meta = {
     message: { control: 'text' },
     title: { control: 'text' },
     variant: { control: 'select', options: ['error', 'success', 'warning'] },
-    colorScheme: { control: 'select', options: ['light', 'dark'] },
     direction: { control: 'select', options: ['ltr', 'rtl'] },
   },
   render: (args) => (
@@ -75,7 +74,6 @@ const meta = {
       {...args}
     />
   ),
-  parameters: { layout: 'fullscreen' },
 } satisfies Meta<typeof ToastDemo>;
 export default meta;
 type Story = StoryObj<typeof meta>;

@@ -1,5 +1,11 @@
-import Colors from '@/constants/colors';
-import { Icon, ListItem, Text, UniversalText as RNText, UniversalListItem } from '@components/ui';
+import { useThemeColors } from '@/hooks/use-theme';
+import {
+  Icon,
+  ListItem,
+  UniversalTextContent as Text,
+  UniversalText as RNText,
+  UniversalListItem,
+} from '@components/ui';
 import { UniversalList, type UniversalListProps } from '../../components/showcase/universal-list';
 import type { Meta, StoryObj } from '@storybook/react-native';
 import { useState } from 'react';
@@ -34,12 +40,12 @@ function ListDemo({
   onRefreshRequested,
   ...args
 }: DemoProps) {
+  const colors = useThemeColors(args.colorScheme);
   const [selected, setSelected] = useState<number | null>(null);
   const [refreshCount, setRefreshCount] = useState(0);
-  const ink = args.colorScheme === 'light' ? Colors.light.text : Colors.dark.text;
   return (
     <View style={{ gap: 16 }}>
-      <RNText testID={`${args.testID}-status`} textStyle={{ color: ink }}>
+      <RNText testID={`${args.testID}-status`}>
         {`Selected row: ${selected ?? 'None'} · Refresh count: ${refreshCount}`}
       </RNText>
       <UniversalList
@@ -56,9 +62,7 @@ function ListDemo({
       >
         {itemCount === 0 ? (
           <UniversalListItem testID={`${args.testID}-empty`}>
-            <Text testID={`${args.testID}-empty-text`} textStyle={{ color: ink }}>
-              No items available
-            </Text>
+            <Text testID={`${args.testID}-empty-text`}>No items available</Text>
           </UniversalListItem>
         ) : null}
         {Array.from({ length: itemCount }, (_, i) => (
@@ -80,18 +84,15 @@ function ListDemo({
                 <Icon
                   name={leadingIcon}
                   size={24}
-                  color={ink}
+                  color={colors.text}
                   testID={`${args.testID}-row-${i + 1}-icon`}
                 />
               </ListItem.Leading>
             ) : null}
-            <Text
-              testID={`${args.testID}-row-${i + 1}-label`}
-              textStyle={{ color: ink }}
-            >{`Item ${i + 1}`}</Text>
+            <Text testID={`${args.testID}-row-${i + 1}-label`}>{`Item ${i + 1}`}</Text>
             {showTrailing ? (
               <ListItem.Trailing>
-                <Text testID={`${args.testID}-row-${i + 1}-trailing`} textStyle={{ color: ink }}>
+                <Text testID={`${args.testID}-row-${i + 1}-trailing`}>
                   {selected === i + 1 ? 'Selected' : 'Open'}
                 </Text>
               </ListItem.Trailing>
@@ -138,7 +139,6 @@ const meta = {
       <ListDemo key={String(args.refreshable)} {...args} />
     </NativeStoryFrame>
   ),
-  parameters: { layout: 'fullscreen' },
 } satisfies Meta<typeof ListDemo>;
 export default meta;
 type Story = StoryObj<typeof meta>;

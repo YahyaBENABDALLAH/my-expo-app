@@ -84,7 +84,6 @@ const meta = {
   component: CardStory,
   args: { colorScheme: 'light', withImage: false, longTitle: false },
   argTypes: {
-    colorScheme: { control: 'select', options: ['light', 'dark'] },
     withImage: { control: 'boolean' },
     longTitle: { control: 'boolean' },
   },

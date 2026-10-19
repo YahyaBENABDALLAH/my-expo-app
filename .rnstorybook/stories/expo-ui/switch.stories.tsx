@@ -1,4 +1,3 @@
-import Colors from '@/constants/colors';
 import { UniversalText as Text, UniversalButton } from '@components/ui';
 import {
   UniversalSwitch,
@@ -23,12 +22,7 @@ function SwitchDemo(args: UniversalSwitchProps) {
           args.onValueChange(next);
         }}
       />
-      <Text
-        testID={`${args.testID}-value`}
-        textStyle={{ color: args.colorScheme === 'light' ? Colors.light.text : Colors.dark.text }}
-      >
-        {`Value: ${value ? 'On' : 'Off'}`}
-      </Text>
+      <Text testID={`${args.testID}-value`}>{`Value: ${value ? 'On' : 'Off'}`}</Text>
       <UniversalButton
         variant="secondary"
         testID={`${args.testID}-reset`}
@@ -68,7 +62,6 @@ const meta = {
       <SwitchDemo key={String(args.value)} {...args} />
     </NativeStoryFrame>
   ),
-  parameters: { layout: 'fullscreen' },
 } satisfies Meta<typeof UniversalSwitch>;
 export default meta;
 type Story = StoryObj<typeof meta>;

@@ -69,11 +69,9 @@ const meta = {
   args: { animate: true, colorScheme: 'light' },
   argTypes: {
     animate: { control: 'boolean' },
-    colorScheme: { control: 'select', options: ['light', 'dark'] },
     narrow: { control: 'boolean' },
   },
   parameters: {
-    layout: 'fullscreen',
     docs: {
       description: {
         component:

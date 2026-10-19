@@ -43,7 +43,6 @@ const meta = {
   args: { ready: true },
   argTypes: { ready: { control: 'boolean' } },
   parameters: {
-    layout: 'fullscreen',
     docs: {
       description: {
         component:

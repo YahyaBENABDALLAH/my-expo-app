@@ -1,4 +1,3 @@
-import Colors from '@/constants/colors';
 import { UniversalText as Text, UniversalButton } from '@components/ui';
 import {
   UniversalPicker,
@@ -29,12 +28,7 @@ function PickerDemo(args: UniversalPickerProps) {
           args.onValueChange(next);
         }}
       />
-      <Text
-        testID={`${args.testID}-value`}
-        textStyle={{ color: args.colorScheme === 'light' ? Colors.light.text : Colors.dark.text }}
-      >
-        {`Selected: ${String(selectedValue)}`}
-      </Text>
+      <Text testID={`${args.testID}-value`}>{`Selected: ${String(selectedValue)}`}</Text>
       <UniversalButton
         variant="secondary"
         label="Reset selection"
@@ -44,11 +38,7 @@ function PickerDemo(args: UniversalPickerProps) {
         onPress={() => setSelectedValue(args.selectedValue)}
       />
       {args.appearance === 'wheel' ? (
-        <Text
-          textStyle={{
-            color: args.colorScheme === 'light' ? Colors.light.muted : Colors.dark.muted,
-          }}
-        >
+        <Text variant="caption">
           Wheel appearance is iOS-only. Android uses its native dropdown.
         </Text>
       ) : null}
@@ -84,7 +74,6 @@ const meta = {
       />
     </NativeStoryFrame>
   ),
-  parameters: { layout: 'fullscreen' },
 } satisfies Meta<typeof UniversalPicker>;
 export default meta;
 type Story = StoryObj<typeof meta>;

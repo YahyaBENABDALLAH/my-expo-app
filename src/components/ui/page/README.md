@@ -15,13 +15,22 @@ The existing title layout is preserved. iOS adds only 4 points of vertical
 header padding; Android retains 8. The status-bar inset is applied once by
 `PageFrame`, while the header Host ignores automatic native safe areas.
 `page-motion-overlay.tsx` contains the shared animated top-edge wave artwork.
-Its two fixed SVG paths are parsed once into immutable Skia objects and reused
-by every drawing instance. Animation updates transforms, with no path parsing
-or React state update per frame.
+Its two SVG paths are cached for the window height. Animation updates transforms,
+with no path parsing or React state update per frame.
 Its default `overlay` variant decorates headers; `variant="splash"` places the
 same moving paths in normal flow with opaque fills for the launch screen's bottom
 edge. Both use the exported `PAGE_WAVE_HEIGHT` and the same motion guards.
 The back wave resolves theme opacity first; the splash keeps full opacity.
+The wave drifts on a 10-second cycle. Header layers share the theme's tint with
+a gentle 20% gradient fade for a more consistent color across the filled area.
+`expanded` positions the wave at 35% of the window height and fills its background
+continuously to the top. Login uses it while signed out. Successful login raises
+the wave to the header over one second. Opening Register and returning to Login
+use the same slower transition. `onCollapseComplete` releases navigation only
+after a completed rise, so Home cannot interrupt the successful-login animation.
+Reduced motion snaps to the destination and releases navigation immediately;
+the splash keeps its usual position. `Pages/Shared Skia motion/Login` previews
+the transition with a repeatable button.
 The root mounts it above navigation and enables it on Android and iOS after the
 launch screen exits. It retains its activity and reduced-motion guards.
 Navigation themes, stack content and tab scenes use the active theme's opaque

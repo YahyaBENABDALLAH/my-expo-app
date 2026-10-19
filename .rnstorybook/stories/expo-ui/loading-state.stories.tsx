@@ -87,10 +87,8 @@ const meta = {
         'refresh-error',
       ],
     },
-    colorScheme: { control: 'select', options: ['light', 'dark'] },
   },
   render: (args) => <LoadingDemo key={args.state} {...args} />,
-  parameters: { layout: 'fullscreen' },
   decorators: [
     (Story, { args }) => (
       <View style={{ flex: 1 }}>

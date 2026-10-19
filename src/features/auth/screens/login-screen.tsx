@@ -17,22 +17,43 @@ import { useAuthFlow } from '../auth-flow.context';
 import { loginResolver } from '@/validation/resolvers/auth';
 import type { LoginFormValues } from '@/validation/schemas/auth';
 import { useAuthContext } from '@/context/auth.context';
+import { LoginTransitionContext } from '@/context/login-transition.context';
 import { appDevEnabled } from '@/constants/app-dev';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
+
+function isDevelopmentLogin(values: LoginFormValues) {
+  return appDevEnabled && values.login.trim() === 'admin' && values.password === 'admin';
+}
+
+const resolveLogin: typeof loginResolver = (values, context, options) =>
+  isDevelopmentLogin(values)
+    ? { values: { ...values, login: 'admin' }, errors: {} }
+    : loginResolver(values, context, options);
 
 export function LoginScreen() {
   const { t } = useTranslation();
   const { signIn } = useAuthFlow();
   const { developmentGuest, enterDevelopmentGuest } = useAuthContext();
-  const [openGuestPages, setOpenGuestPages] = useState(false);
-  useEffect(() => {
-    if (openGuestPages && developmentGuest) router.replace('/development-pages');
-  }, [openGuestPages, developmentGuest]);
-  const { form, submit, pending } = useAuthForm<LoginFormValues>(
-    loginResolver,
-    { login: '', password: '' },
-    signIn,
+  const transitioning = useContext(LoginTransitionContext);
+  const [guestDestination, setGuestDestination] = useState<'/development-pages' | '/(tabs)' | null>(
+    null,
   );
+  useEffect(() => {
+    if (guestDestination && developmentGuest && !transitioning) router.replace(guestDestination);
+  }, [guestDestination, developmentGuest, transitioning]);
+  const {
+    form,
+    submit,
+    pending: submitting,
+  } = useAuthForm<LoginFormValues>(resolveLogin, { login: '', password: '' }, async (values) => {
+    if (isDevelopmentLogin(values)) {
+      setGuestDestination('/(tabs)');
+      enterDevelopmentGuest();
+      return;
+    }
+    await signIn(values);
+  });
+  const pending = submitting || transitioning;
   return (
     <AuthScreenFrame
       testID="auth-login"
@@ -48,7 +69,7 @@ export function LoginScreen() {
           testID="auth-development-guest"
           disabled={pending}
           onPress={() => {
-            setOpenGuestPages(true);
+            setGuestDestination('/development-pages');
             enterDevelopmentGuest();
           }}
         />

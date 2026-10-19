@@ -16,27 +16,36 @@ import {
 } from '@components/ui';
 import type { Meta, StoryObj } from '@storybook/react-native';
 import { useState } from 'react';
-import type { AppColorScheme } from '@/constants/colors';
-import { themes, themeIds, type ThemeId } from '@/constants/themes/index';
-import { ThemePreferencesProvider } from '@/context/theme.context';
-import { useThemeColors } from '@/hooks/use-theme';
+import { themes } from '@/constants/themes/index';
+import type { ColorTokens } from '@/constants/themes/tokens';
+import { useAppTheme } from '@/hooks/use-theme';
 import { NativeStoryFrame } from '../../components/native-story-frame';
 import { semanticButtonColors } from '../../components/semantic-button-colors';
+import type { StoryThemeProps } from '../../components/story-theme';
 
-function ThemeDemo({ colorScheme, themeId }: { colorScheme: AppColorScheme; themeId: ThemeId }) {
-  return (
-    <ThemePreferencesProvider key={themeId} initialTheme={themeId} initialColorScheme={colorScheme}>
-      <ThemePreview colorScheme={colorScheme} themeId={themeId} />
-    </ThemePreferencesProvider>
-  );
-}
+// Show the roles people style with, rather than every derived compatibility alias.
+const previewRoles = [
+  'background',
+  'surface',
+  'surfaceRaised',
+  'text',
+  'muted',
+  'border',
+  'primary',
+  'secondary',
+  'tint',
+  'error',
+  'success',
+  'warning',
+  'info',
+] as const satisfies readonly (keyof ColorTokens)[];
 
-function ThemePreview({ colorScheme, themeId }: { colorScheme: AppColorScheme; themeId: ThemeId }) {
+function ThemeDemo() {
   const [enabled, setEnabled] = useState(false);
   const [amount, setAmount] = useState(50);
   const [selection, setSelection] = useState('recipes');
   const [expanded, setExpanded] = useState(false);
-  const colors = useThemeColors(colorScheme);
+  const { colors, themeId, scheme: colorScheme } = useAppTheme();
   return (
     <NativeStoryFrame colorScheme={colorScheme}>
       <UniversalHost colorScheme={colorScheme}>
@@ -101,13 +110,13 @@ function ThemePreview({ colorScheme, themeId }: { colorScheme: AppColorScheme; t
             placeholder="Search recipes"
             testID="theme-input"
           />
-          {Object.entries(colors).map(([role, color]) => (
+          {previewRoles.map((role) => (
             <Row key={role} spacing={12} alignment="center" modifiers={nativeFillWidth}>
               <Column
                 style={{
                   width: 28,
                   height: 28,
-                  backgroundColor: color,
+                  backgroundColor: colors[role],
                   borderWidth: 1,
                   borderColor: colors.border,
                   borderRadius: 6,
@@ -115,7 +124,7 @@ function ThemePreview({ colorScheme, themeId }: { colorScheme: AppColorScheme; t
               />
               <Column spacing={2}>
                 <UniversalTextContent>{role}</UniversalTextContent>
-                <UniversalTextContent variant="caption">{color}</UniversalTextContent>
+                <UniversalTextContent variant="caption">{colors[role]}</UniversalTextContent>
               </Column>
             </Row>
           ))}
@@ -129,12 +138,7 @@ const meta = {
   title: 'Expo UI/Theme Tokens',
   component: ThemeDemo,
   args: { colorScheme: 'light', themeId: 'ux' },
-  argTypes: {
-    colorScheme: { control: 'select', options: ['light', 'dark'] },
-    themeId: { control: 'select', options: themeIds },
-  },
-  parameters: { layout: 'fullscreen' },
-} satisfies Meta<typeof ThemeDemo>;
+} satisfies Meta<StoryThemeProps>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;

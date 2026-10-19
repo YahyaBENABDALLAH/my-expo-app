@@ -30,6 +30,7 @@ function setup(platform) {
       'buttonStyle',
       'refreshable',
       'scrollContentBackground',
+      'scrollIndicators',
       'tag',
       'testID',
       'tint',

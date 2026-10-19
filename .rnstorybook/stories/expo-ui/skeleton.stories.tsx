@@ -12,7 +12,7 @@ import {
 } from '@components/ui';
 import type { Meta, StoryObj } from '@storybook/react-native';
 import { useState } from 'react';
-import Colors from '@/constants/colors';
+import { useThemeColors } from '@/hooks/use-theme';
 import { NativeStoryFrame } from '../../components/native-story-frame';
 
 const meta = {
@@ -26,16 +26,13 @@ const meta = {
   },
   argTypes: {
     animate: { control: 'boolean' },
-    colorScheme: { control: 'select', options: ['light', 'dark'] },
     style: { control: 'object' },
-    testID: { control: 'text' },
   },
   render: (args) => (
     <NativeStoryFrame colorScheme={args.colorScheme}>
       <Skeleton {...args} />
     </NativeStoryFrame>
   ),
-  parameters: { layout: 'fullscreen' },
 } satisfies Meta<typeof Skeleton>;
 
 export default meta;
@@ -46,14 +43,8 @@ export const Static: Story = { args: { animate: false } };
 export const Light: Story = { args: { colorScheme: 'light' } };
 
 /** Reference's search-card arrangement, composed without nested Hosts or RN layout. */
-function ReferenceCardDemo({
-  colorScheme = 'dark',
-  animate = true,
-}: {
-  colorScheme?: 'light' | 'dark';
-  animate?: boolean;
-}) {
-  const colors = Colors[colorScheme];
+function ReferenceCardDemo({ colorScheme = 'dark' }: { colorScheme?: 'light' | 'dark' }) {
+  const colors = useThemeColors(colorScheme);
   return (
     <UniversalHost
       colorScheme={colorScheme}
@@ -72,38 +63,20 @@ function ReferenceCardDemo({
               style={{ backgroundColor: colors.surface, borderRadius: 14, padding: 8 }}
             >
               <SkeletonContent
-                animate={animate}
                 testID="skeleton-reference-image"
                 style={{ width: 96, height: 96, borderRadius: 14 }}
               />
               <Column spacing={8} modifiers={nativeRowWeight}>
-                <SkeletonContent
-                  animate={animate}
-                  style={{ width: 64, height: 12, borderRadius: 9999 }}
-                />
-                <SkeletonContent
-                  animate={animate}
-                  testID="skeleton-reference-title"
-                  style={{ height: 20 }}
-                />
-                <SkeletonContent
-                  animate={animate}
-                  style={{ width: 96, height: 20, borderRadius: 9999 }}
-                />
+                <SkeletonContent style={{ width: 64, height: 12, borderRadius: 9999 }} />
+                <SkeletonContent testID="skeleton-reference-title" style={{ height: 20 }} />
+                <SkeletonContent style={{ width: 96, height: 20, borderRadius: 9999 }} />
                 <Row spacing={12}>
-                  <SkeletonContent
-                    animate={animate}
-                    style={{ width: 64, height: 12, borderRadius: 9999 }}
-                  />
-                  <SkeletonContent
-                    animate={animate}
-                    style={{ width: 48, height: 12, borderRadius: 9999 }}
-                  />
+                  <SkeletonContent style={{ width: 64, height: 12, borderRadius: 9999 }} />
+                  <SkeletonContent style={{ width: 48, height: 12, borderRadius: 9999 }} />
                 </Row>
               </Column>
             </Row>
             <SkeletonContent
-              animate={animate}
               testID="skeleton-reference-full-width"
               style={{ width: '100%', height: 16 }}
             />
@@ -115,7 +88,8 @@ function ReferenceCardDemo({
 }
 
 export const ReferenceCard: Story = {
-  render: (args) => <ReferenceCardDemo animate={args.animate} colorScheme={args.colorScheme} />,
+  parameters: { controls: { include: ['themeId', 'colorScheme'] } },
+  render: (args) => <ReferenceCardDemo colorScheme={args.colorScheme} />,
 };
 
 /** Standalone Hosts exercise CSS playback without changing the native content stories. */
@@ -131,6 +105,11 @@ function AnimationControlsDemo({
     <NativeStoryFrame colorScheme={colorScheme}>
       <UniversalHost colorScheme={colorScheme}>
         <Column spacing={12}>
+          <SkeletonContent
+            testID="skeleton-static-content"
+            style={{ width: '100%', height: 16, opacity: 0.35 }}
+          />
+          <UniversalTextContent>Hosted content stays static</UniversalTextContent>
           <UniversalButtonContent
             variant="secondary"
             testID="skeleton-toggle-animation"

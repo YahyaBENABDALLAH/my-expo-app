@@ -1,5 +1,5 @@
 import { Icon, type IconProps } from '@expo/ui';
-import Colors from '@/constants/colors';
+import { useThemeColors } from '@/hooks/use-theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { UniversalHost, type UniversalThemeProps } from '@components/ui';
 
@@ -33,6 +33,7 @@ export function UniversalIcon({
   ...props
 }: UniversalIconProps) {
   const scheme = useColorScheme(colorScheme);
+  const colors = useThemeColors(scheme);
   return (
     <UniversalHost
       testID={props.testID ? `${props.testID}-container` : undefined}
@@ -43,7 +44,7 @@ export function UniversalIcon({
       <Icon
         {...props}
         name={icons[icon]}
-        color={color ?? Colors[scheme].text}
+        color={color ?? colors.text}
         disabled={disabled}
         onPress={disabled ? undefined : onPress}
       />

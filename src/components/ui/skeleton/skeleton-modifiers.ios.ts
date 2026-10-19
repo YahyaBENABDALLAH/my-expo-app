@@ -1,7 +1,5 @@
 import {
   accessibilityHidden,
-  Animation,
-  animation,
   background,
   clipShape,
   frame,
@@ -17,14 +15,6 @@ export function skeletonModifiers(style: SkeletonShapeStyle) {
     background(style.backgroundColor),
     clipShape('roundedRectangle', style.borderRadius),
     opacity(style.opacity),
-    ...(style.animationDuration === undefined
-      ? []
-      : [
-          animation(
-            Animation.easeInOut({ duration: style.animationDuration / 1000 }),
-            style.opacity,
-          ),
-        ]),
     accessibilityHidden(true),
   ];
 }

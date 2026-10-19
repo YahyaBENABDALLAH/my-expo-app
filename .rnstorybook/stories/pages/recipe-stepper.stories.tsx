@@ -10,7 +10,7 @@ import type { Meta, StoryObj } from '@storybook/react-native';
 import { useState } from 'react';
 import { View } from 'react-native';
 
-import Colors from '@/constants/colors';
+import { useThemeColors } from '@/hooks/use-theme';
 
 function RecipeStepperDemo({
   initialStep = 0,
@@ -25,6 +25,7 @@ function RecipeStepperDemo({
   colorScheme?: 'light' | 'dark';
   width?: number;
 }) {
+  const colors = useThemeColors(colorScheme);
   const [current, setCurrent] = useState(initialStep);
   const [valid, setValid] = useState(initiallyValid);
   const changeStep = (step: number) => {
@@ -32,7 +33,7 @@ function RecipeStepperDemo({
     setValid(false);
   };
   return (
-    <View style={{ flex: 1, padding: 24, backgroundColor: Colors[colorScheme].background }}>
+    <View style={{ flex: 1, padding: 24, backgroundColor: colors.background }}>
       <View style={{ width: width ?? '100%', maxWidth: '100%' }}>
         <UniversalHost colorScheme={colorScheme}>
           <Column spacing={16} modifiers={nativeFillWidth}>
@@ -86,7 +87,6 @@ const meta = {
     initialStep: { control: false },
     initiallyValid: { control: false },
     animate: { control: 'boolean' },
-    colorScheme: { control: 'select', options: ['light', 'dark'] },
   },
 } satisfies Meta<typeof RecipeStepperDemo>;
 export default meta;

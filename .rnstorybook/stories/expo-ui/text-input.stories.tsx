@@ -2,7 +2,7 @@ import {
   Column,
   UniversalHost as Host,
   Icon,
-  Text,
+  UniversalTextContent as Text,
   useNativeState,
   type TextInputRef,
   UniversalButtonContent,
@@ -12,11 +12,10 @@ import {
 } from '@components/ui';
 import type { Meta, StoryObj } from '@storybook/react-native';
 import { useCallback, useRef, useState } from 'react';
-import { Platform, View } from 'react-native';
+import { View } from 'react-native';
 import { scheduleOnRN } from 'react-native-worklets';
 import { action } from 'storybook/actions';
 
-import Colors from '@/constants/colors';
 import { authInputIcons } from '@/components/ui/auth/auth-input-icons';
 
 const searchIcon = Icon.select({
@@ -58,7 +57,6 @@ const meta = {
     onContentSizeChange: action('size changed'),
   },
   argTypes: {
-    testID: { control: 'text' },
     label: { control: 'text' },
     placeholder: { control: 'text' },
     defaultValue: {
@@ -67,7 +65,6 @@ const meta = {
     },
     helperText: { control: 'text' },
     status: { control: 'select', options: ['default', 'error', 'success', 'warning'] },
-    colorScheme: { control: 'select', options: ['light', 'dark'] },
     disabled: { control: 'boolean' },
     readOnly: { control: 'boolean' },
     editable: { control: 'boolean', description: 'Overrides readOnly when explicitly set.' },
@@ -131,25 +128,11 @@ const meta = {
     onContentSizeChange: { action: 'size changed' },
   },
   decorators: [
-    (Story, context) => {
-      // These stories are for the on-device iOS/Android Storybook only.
-      if (Platform.OS !== 'ios' && Platform.OS !== 'android') return <></>;
-      return (
-        <View
-          testID={`${context.args.testID}-canvas`}
-          style={{
-            flex: 1,
-            padding: 24,
-            backgroundColor:
-              context.args.colorScheme === 'light'
-                ? Colors.light.background
-                : Colors.dark.background,
-          }}
-        >
-          <Story />
-        </View>
-      );
-    },
+    (Story, context) => (
+      <View testID={`${context.args.testID}-canvas`} style={{ flex: 1, padding: 24 }}>
+        <Story />
+      </View>
+    ),
   ],
   render: (args) => (
     <UniversalTextInput
@@ -158,7 +141,6 @@ const meta = {
     />
   ),
   parameters: {
-    layout: 'fullscreen',
     controls: {
       include: [
         'label',
@@ -173,6 +155,7 @@ const meta = {
         'secureTextEntry',
         'keyboardType',
         'colorScheme',
+        'themeId',
       ],
     },
   },
@@ -205,12 +188,7 @@ function IconInputDemo(args: UniversalTextInputProps) {
         style={{ width: '100%' }}
       >
         <Column spacing={10}>
-          <Text
-            testID={`${args.testID}-press-count`}
-            textStyle={{ color: Colors[args.colorScheme ?? 'dark'].text }}
-          >
-            {`Right icon presses: ${pressCount}`}
-          </Text>
+          <Text testID={`${args.testID}-press-count`}>{`Right icon presses: ${pressCount}`}</Text>
           <UniversalButtonContent
             variant="secondary"
             testID={`${args.testID}-toggle-disabled`}
@@ -363,16 +341,10 @@ function PasswordVisibilityDemo(args: UniversalTextInputProps) {
       </View>
       <Host colorScheme={args.colorScheme}>
         <Column spacing={8}>
-          <Text
-            testID="password-layout-state"
-            textStyle={{ color: Colors[args.colorScheme ?? 'dark'].text }}
-          >
+          <Text testID="password-layout-state">
             {`Height ${stable ? 'stable' : 'changed'}: ${Math.round(layout.current)} points`}
           </Text>
-          <Text
-            testID="password-visibility-state"
-            textStyle={{ color: Colors[args.colorScheme ?? 'dark'].text }}
-          >
+          <Text testID="password-visibility-state">
             {`Password ${shown ? 'shown' : 'hidden'} · Toggles: ${toggles}`}
           </Text>
         </Column>
@@ -433,10 +405,7 @@ function InputActionsDemo(args: UniversalTextInputProps) {
         style={{ width: '100%' }}
       >
         <Column testID={`${args.testID}-actions`} spacing={10}>
-          <Text
-            testID={`${args.testID}-focus-state`}
-            textStyle={{ color: Colors[args.colorScheme ?? 'dark'].text }}
-          >
+          <Text testID={`${args.testID}-focus-state`}>
             {focused ? 'Input focused' : 'Input blurred'}
           </Text>
           <UniversalButtonContent
@@ -508,14 +477,7 @@ function ControlledInputDemo(args: UniversalTextInputProps) {
         style={{ width: '100%' }}
       >
         <Column testID={`${args.testID}-actions`} spacing={10}>
-          <Text
-            testID={`${args.testID}-description`}
-            textStyle={{
-              color: args.colorScheme === 'light' ? Colors.light.text : Colors.dark.text,
-            }}
-          >
-            Edits are uppercased on the UI thread.
-          </Text>
+          <Text testID={`${args.testID}-description`}>Edits are uppercased on the UI thread.</Text>
           <UniversalButtonContent
             variant="secondary"
             testID={`${args.testID}-set-value`}

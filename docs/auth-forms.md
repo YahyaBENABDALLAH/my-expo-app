@@ -14,6 +14,14 @@ Auth buttons use native SwiftUI/Compose controls with colors from `authButtonTok
 
 ## Configuration
 
+Development builds accept `admin` / `admin` on Login to simulate success and open
+Home using the existing temporary guest mode. No API request or token storage is
+involved. Other credentials use normal validation and authentication.
+
+After successful login, the form stays disabled while the wave rises for one
+second. Navigation opens Home when the animation completes. Reduced motion skips
+the transition and opens Home immediately.
+
 Set `EXPO_PUBLIC_API_URL` to the HTTPS Identity API origin in `.env.local`, without a trailing `/api`. Restart Metro after changing it. `.env.local` is ignored by Git. The server must be reachable from the device.
 
 ## Routes and state

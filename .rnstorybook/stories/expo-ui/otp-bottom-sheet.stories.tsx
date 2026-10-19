@@ -69,7 +69,6 @@ const meta = {
   component: OtpDemo,
   args: { colorScheme: 'light', resendCooldownSeconds: 0 },
   argTypes: {
-    colorScheme: { control: 'select', options: ['light', 'dark'] },
     resendCooldownSeconds: { control: 'number' },
     requestFailure: { control: 'boolean' },
     resendFailure: { control: 'boolean' },

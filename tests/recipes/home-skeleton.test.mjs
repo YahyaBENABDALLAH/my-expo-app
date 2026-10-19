@@ -4,7 +4,7 @@ import { createElement as h, Fragment, useState } from 'react';
 import { createSourceLoader } from '../helpers/load-source.mjs';
 import { renderFixture } from '../helpers/render-fixture.mjs';
 
-// Real screen, placeholder and pulse hooks; native views and API transport are boundaries.
+// Real screen and placeholders; native views and API transport are boundaries.
 // These fixtures verify lifecycle and React work, not Android drawing or FPS.
 function setup(recipeQuery) {
   const native = (name) => (props) => h(name, props, props.children);
@@ -224,41 +224,37 @@ test('leaving the showcase cancels its pending preview timeout', (t) => {
 
 // The former live-query Home cases are covered by the placeholder catalog suite now.
 
-test('animated skeletons retain one shared pulse clock and pausing releases it', (t) => {
+test('hosted skeleton content stays static without timers, motion subscriptions, or nested Hosts', (t) => {
   t.mock.timers.enable({ apis: ['setTimeout', 'setInterval'] });
   const intervals = t.mock.method(globalThis, 'setInterval');
-  const clear = t.mock.method(globalThis, 'clearInterval');
+  const timeouts = t.mock.method(globalThis, 'setTimeout');
   const s = setup();
-  let setAnimate;
-  function Preview() {
-    const [animate, update] = useState(undefined);
-    setAnimate = update;
-    return h(
+  const opacities = [0, 0.5, 1];
+  const view = renderFixture(
+    h(
       Fragment,
       null,
-      [0, 1].map((key) => h(s.SkeletonContent, { key, animate, style: { opacity: 0.5 } })),
-    );
-  }
-  const view = renderFixture(h(Preview));
+      opacities.map((opacity) =>
+        h(s.SkeletonContent, { key: opacity, style: { width: '100%', opacity } }),
+      ),
+    ),
+  );
   try {
-    assert.equal(intervals.mock.calls.length, 1);
     const opacity = () => s.placeholders(view).map((node) => node.props.modifiers[0].opacity);
-    assert.deepEqual(opacity(), [0.5, 0.5]);
+    const renders = s.shapeRenders();
+    assert.deepEqual(opacity(), opacities);
+    assert.equal(s.motionReads(), 0);
+    assert.equal(view.findAll('Host').length, 0);
+    assert.ok(s.placeholders(view).every((node) => node.props.modifiers[0].width === undefined));
     view.flush(() => t.mock.timers.tick(900));
-    assert.deepEqual(opacity(), [0.225, 0.225]);
-    view.flush(() => setAnimate(false));
-    const pausedMotionReads = s.motionReads();
-    assert.deepEqual(opacity(), [0.5, 0.5]);
-    assert.equal(clear.mock.calls.length, 1);
-    view.flush(() => t.mock.timers.tick(2_700));
-    assert.deepEqual(opacity(), [0.5, 0.5]);
-    assert.equal(s.motionReads(), pausedMotionReads);
-    view.flush(() => setAnimate(true));
-    assert.equal(intervals.mock.calls.length, 2);
-    view.flush(() => t.mock.timers.tick(900));
-    assert.deepEqual(opacity(), [0.225, 0.225]);
+    assert.deepEqual(opacity(), opacities);
+    view.flush(() => t.mock.timers.tick(9_000));
+    assert.deepEqual(opacity(), opacities);
+    assert.equal(s.shapeRenders(), renders);
+    assert.equal(intervals.mock.calls.length, 0);
+    assert.equal(timeouts.mock.calls.length, 0);
+    assert.equal(s.motionReads(), 0);
   } finally {
     view.unmount();
   }
-  assert.equal(clear.mock.calls.length, 2);
 });

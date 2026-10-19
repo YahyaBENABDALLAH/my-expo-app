@@ -50,13 +50,12 @@ function HomeSkeletonPreview() {
       </Text>
       <Row spacing={12} alignment="center" modifiers={nativeFillWidth}>
         <SkeletonContent
-          animate={false}
           testID="home-skeleton-avatar"
           style={{ width: 48, height: 48, borderRadius: 9999 }}
         />
         <Column spacing={8} modifiers={nativeRowWeight}>
-          <SkeletonContent animate={false} testID="home-skeleton-heading" style={{ height: 20 }} />
-          <SkeletonContent animate={false} style={{ width: 120, height: 12, borderRadius: 9999 }} />
+          <SkeletonContent testID="home-skeleton-heading" style={{ height: 20 }} />
+          <SkeletonContent style={{ width: 120, height: 12, borderRadius: 9999 }} />
         </Column>
       </Row>
       <Row
@@ -65,27 +64,20 @@ function HomeSkeletonPreview() {
         style={{ backgroundColor: colors.surface, borderRadius: 14, padding: 8 }}
       >
         <SkeletonContent
-          animate={false}
           testID="home-skeleton-image"
           style={{ width: 96, height: 96, borderRadius: 14 }}
         />
         <Column spacing={8} modifiers={nativeRowWeight}>
-          <SkeletonContent animate={false} style={{ width: 64, height: 12, borderRadius: 9999 }} />
-          <SkeletonContent animate={false} style={{ height: 20 }} />
-          <SkeletonContent animate={false} style={{ width: 96, height: 20, borderRadius: 9999 }} />
+          <SkeletonContent style={{ width: 64, height: 12, borderRadius: 9999 }} />
+          <SkeletonContent style={{ height: 20 }} />
+          <SkeletonContent style={{ width: 96, height: 20, borderRadius: 9999 }} />
           <Row spacing={12}>
-            <SkeletonContent
-              animate={false}
-              style={{ width: 64, height: 12, borderRadius: 9999 }}
-            />
-            <SkeletonContent
-              animate={false}
-              style={{ width: 48, height: 12, borderRadius: 9999 }}
-            />
+            <SkeletonContent style={{ width: 64, height: 12, borderRadius: 9999 }} />
+            <SkeletonContent style={{ width: 48, height: 12, borderRadius: 9999 }} />
           </Row>
         </Column>
       </Row>
-      <SkeletonContent animate={false} testID="home-skeleton-full-width" style={{ height: 16 }} />
+      <SkeletonContent testID="home-skeleton-full-width" style={{ height: 16 }} />
     </Column>
   );
 }

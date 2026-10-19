@@ -22,7 +22,6 @@ const meta = {
     actions: [],
     colorScheme: 'light',
   },
-  parameters: { layout: 'fullscreen' },
   decorators: [
     (Story, { args }) => (
       <View style={{ flex: 1 }}>
@@ -35,7 +34,6 @@ const meta = {
       </View>
     ),
   ],
-  argTypes: { colorScheme: { control: 'select', options: ['light', 'dark'] } },
 } satisfies Meta<typeof PageScreen>;
 export default meta;
 type Story = StoryObj<typeof meta>;
@@ -163,11 +161,11 @@ function RefreshExample({
 
 export const PullToRefresh: Story = {
   decorators: canvasInsets,
-  render: () => <RefreshExample />,
+  render: ({ colorScheme }) => <RefreshExample colorScheme={colorScheme} />,
 };
 export const PullToRefreshLongContent: Story = {
   decorators: canvasInsets,
-  render: () => <RefreshExample long />,
+  render: ({ colorScheme }) => <RefreshExample colorScheme={colorScheme} long />,
 };
 
 function KeyboardExample() {

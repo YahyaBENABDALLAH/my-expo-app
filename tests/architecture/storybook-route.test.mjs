@@ -80,7 +80,9 @@ test('a direct canvas link starts at the requested story before native URL liste
     assert.equal(root.props.hasStoryWrapper, false);
     assert.equal(root.props.shouldPersistSelection, false);
     const canvas = s.view.findAll('View')[0];
-    assert.equal(canvas.props.style.backgroundColor, '#000000');
+    // The shared preview decorator owns the themed background in both modes.
+    assert.equal(canvas.props.testID, 'storybook-canvas');
+    assert.equal(canvas.props.style.flex, 1);
     assert.equal(canvas.props.accessible, undefined);
   } finally {
     s.view.unmount();

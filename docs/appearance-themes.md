@@ -92,8 +92,9 @@ contrast on filled actions, page surfaces and matching feedback containers;
 
 `Pages/App Settings` renders the production settings screen in System, light, dark
 and RTL fixtures. `Expo UI/Theme Tokens` displays semantic buttons, native controls
-and every color role in light/dark fixtures. Both default to UX Template; use themeId Controls
-to preview the other brands. JS fixture tests exercise live changes,
+and 13 core semantic color roles in light/dark fixtures. Both default to UX Template;
+all native stories now share themeId and colorScheme Controls through one isolated
+preview provider. See [native Storybook](../.rnstorybook/README.md). JS fixture tests exercise live changes,
 draft preservation, preferences across pages, safe-area ownership and text/action
 contrast. The Maestro `pages/app-settings.yaml` flow checks theme selection,
 including UX Template retained across navigation,

@@ -131,3 +131,4 @@ export const LongHelperText: Story = {
 };
 export const CompactViewport: Story = { args: { viewportHeight: 360 } };
 export const GroupedForm: Story = { args: { grouped: true } };
+export const GroupedFormLight: Story = { args: { grouped: true, colorScheme: 'light' } };

@@ -2,9 +2,10 @@
 
 Exports: `Skeleton`, `SkeletonContent` and their types through the existing
 `index.ts`. `skeleton.tsx` owns presentation; `skeleton-modifiers.*` owns
-native shapes; `use-skeleton-pulse.ts` shares one pulse clock for native content.
+native shapes. There is no JavaScript pulse clock.
 
-Use `Skeleton` at an RN boundary and `SkeletonContent` inside a Host.
+Use `Skeleton` at an RN boundary and static `SkeletonContent` inside a Host.
+`SkeletonProps` includes `animate`; `SkeletonContentProps` intentionally does not.
 Shapes have no children or press handlers. Keep loading/error announcements in
 the owning query composition.
 
@@ -20,27 +21,28 @@ loop runs on the UI runtime without a JS timer, extra view, or periodic React re
 The shape itself stays in Expo UI. This uses native CSS-style animation properties,
 not a browser stylesheet.
 
-`SkeletonContent` is part of its owning SwiftUI/Compose tree. Reanimated CSS cannot
-target that native modifier tree directly. It retains native interpolation and
-one shared 900-ms endpoint timer, avoiding an additional RN bridge and nested Host
-per shape. All visible motion consumers now share native lifecycle/accessibility
-subscriptions and one initial setting read.
+`SkeletonContent` stays static in its owning SwiftUI/Compose tree. Reanimated CSS
+cannot target that native modifier tree directly, and the installed Expo UI
+adapters do not expose an infinite pulse on both platforms. Content allocates no
+animation timers, motion subscriptions, or nested Hosts and retains the configured
+opacity. Use the standalone CSS `Skeleton` where animated placeholders are needed
+at an RN boundary.
 
-Set `animate={false}` for a static shape that bypasses motion subscriptions;
-pass focus state to pause offscreen. Reduced motion/backgrounding restore the
+For standalone `Skeleton`, set `animate={false}` to bypass motion subscriptions;
+pass focus state to pause offscreen. Reduced motion/backgrounding restore its
 static appearance.
 
 The development Home examples' static preview disappears ten seconds after mounting. That isolated
 timeout stays with the Home feature and does not restart on refresh/focus.
 
 Existing composition story: [skeleton.stories.tsx](../../../../.rnstorybook/stories/expo-ui/skeleton.stories.tsx).
-`CSSAnimationControls` exercises standalone pause/resume, custom opacity and fill
-width; `AnimationControls` exercises native content. Device rendering and timing
-must be checked on iOS and Android.
+`AnimationControls` exercises standalone CSS pause/resume, custom opacity and fill
+width alongside static hosted content. `ReferenceCard` composes static native
+placeholders. The render regressions verify zero timers and time-driven renders;
+device rendering and timing must also be checked on iOS and Android.
 
-Home uses `SkeletonContent` inside its page Host for two cards during the initial
-uncached recipe fetch. Shapes unmount when Home blurs or data arrives; cached
-refreshes, idle queries and offline pauses retain the existing query presentation.
+The Home recipe-card composition story uses `HomeRecipeSkeletons` for two static
+cards inside its existing Host. Current product Home renders a sample catalog.
 
 Import public components from `@components/ui`; UI implementations import
 concrete files directly. [Back to the UI guide](../README.md).

@@ -15,7 +15,7 @@ import type { Meta, StoryObj } from '@storybook/react-native';
 import { useState } from 'react';
 import { View } from 'react-native';
 
-import Colors from '@/constants/colors';
+import { useThemeColors } from '@/hooks/use-theme';
 
 const contextKinds: Record<NavigationTabName | 'create-recipe', FloatingActionKind> = {
   index: 'create',
@@ -59,6 +59,7 @@ function NavigationDemo({
   width?: number;
   pageContent: boolean;
 }) {
+  const colors = useThemeColors(colorScheme);
   const [selected, setSelected] = useState(initialSelected);
   const [presses, setPresses] = useState(0);
   const [pagePresses, setPagePresses] = useState(0);
@@ -68,7 +69,7 @@ function NavigationDemo({
       style={{
         flex: 1,
         justifyContent: 'flex-end',
-        backgroundColor: Colors[colorScheme].background,
+        backgroundColor: colors.background,
         width,
         alignSelf: width ? 'center' : 'stretch',
       }}
@@ -78,7 +79,7 @@ function NavigationDemo({
         style={{
           flex: 1,
           justifyContent: 'flex-end',
-          backgroundColor: pageContent ? Colors[colorScheme].surfaceRaised : undefined,
+          backgroundColor: pageContent ? colors.surfaceRaised : undefined,
         }}
       >
         <UniversalHost colorScheme={colorScheme} style={{ marginBottom: 40 }}>
@@ -148,7 +149,6 @@ const meta = {
   },
   argTypes: {
     animate: { control: 'boolean' },
-    colorScheme: { control: 'select', options: ['light', 'dark'] },
     initialSelected: {
       control: 'select',
       options: ['index', 'search', 'recipes', 'more', 'create-recipe'],

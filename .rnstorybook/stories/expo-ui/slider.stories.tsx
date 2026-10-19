@@ -1,4 +1,3 @@
-import Colors from '@/constants/colors';
 import { UniversalText as Text, UniversalButton } from '@components/ui';
 import {
   UniversalSlider,
@@ -15,10 +14,7 @@ function SliderDemo(args: UniversalSliderProps) {
   const [value, setValue] = useState(args.value);
   return (
     <View style={{ gap: 16 }}>
-      <Text
-        testID={`${args.testID}-value`}
-        textStyle={{ color: args.colorScheme === 'light' ? Colors.light.text : Colors.dark.text }}
-      >
+      <Text testID={`${args.testID}-value`}>
         {`Value: ${Number(value.toFixed(2))} · Range: ${args.min}–${args.max}`}
       </Text>
       <UniversalSlider
@@ -71,7 +67,6 @@ const meta = {
       <SliderDemo key={`${args.value}-${args.min}-${args.max}-${args.step}`} {...args} />
     </NativeStoryFrame>
   ),
-  parameters: { layout: 'fullscreen' },
 } satisfies Meta<typeof UniversalSlider>;
 export default meta;
 type Story = StoryObj<typeof meta>;

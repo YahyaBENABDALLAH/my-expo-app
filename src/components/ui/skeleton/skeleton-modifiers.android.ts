@@ -5,7 +5,6 @@ import {
   height,
   Shapes,
   size,
-  tween,
 } from '@expo/ui/jetpack-compose/modifiers';
 import { processColor } from 'react-native';
 import type { SkeletonShapeStyle } from './skeleton-modifiers';
@@ -26,11 +25,6 @@ export function skeletonModifiers(style: SkeletonShapeStyle) {
       ? [fillMaxWidth(), height(style.height)]
       : [size(style.width, style.height)]),
     clip(Shapes.RoundedCorner(style.borderRadius)),
-    background(
-      fill,
-      style.animationDuration === undefined
-        ? undefined
-        : { animationSpec: tween({ durationMillis: style.animationDuration, easing: 'ease' }) },
-    ),
+    background(fill),
   ];
 }

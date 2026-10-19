@@ -11,12 +11,18 @@ env:
     id: skeleton-css-fixed
 - assertVisible:
     id: skeleton-css-fill
+- assertVisible:
+    id: skeleton-static-content
 - assertVisible: Animation playing
 - tapOn:
     id: skeleton-toggle-animation
     waitToSettleTimeoutMs: 1000
 - assertVisible: Animation paused
+- assertVisible:
+    id: skeleton-static-content
 - tapOn:
     id: skeleton-toggle-animation
     waitToSettleTimeoutMs: 1000
 - assertVisible: Animation playing
+- assertVisible:
+    id: skeleton-static-content

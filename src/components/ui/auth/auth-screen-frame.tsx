@@ -53,7 +53,9 @@ function AuthScreenContent({
   const { t } = useTranslation();
   const { colors, scheme } = useAuthTheme(colorScheme);
   const [viewportHeight, setViewportHeight] = useState(0);
-  const horizontalPadding = Math.max(24, insets.left + 16, insets.right + 16);
+  const horizontalPadding = grouped
+    ? Math.max(insets.left, insets.right)
+    : Math.max(24, insets.left + 16, insets.right + 16);
   const platformHeadingFont = Platform.OS === 'android' ? 'Inter-Black' : 'InterBlack';
   const headingFont = language === 'ar' ? undefined : platformHeadingFont;
   const heading = (

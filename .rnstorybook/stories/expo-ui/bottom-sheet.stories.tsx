@@ -1,4 +1,3 @@
-import Colors from '@/constants/colors';
 import {
   BottomSheet,
   type BottomSheetProps,
@@ -10,9 +9,8 @@ import {
   nativeFillWidth,
 } from '@components/ui';
 import type { Meta, StoryObj } from '@storybook/react-native';
-import { useEffect, useState } from 'react';
-import { Appearance, View } from 'react-native';
-import { useThemePreferences } from '@/context/theme.context';
+import { useState } from 'react';
+import { View } from 'react-native';
 
 import { action } from 'storybook/actions';
 import { NativeStoryFrame } from '../../components/native-story-frame';
@@ -26,19 +24,12 @@ type DemoProps = BottomSheetProps & {
 };
 
 function BottomSheetDemo({ title, content, onOpen, onClose, ...args }: DemoProps) {
-  const appAppearance = useThemePreferences()?.colorScheme ?? 'system';
-  useEffect(() => {
-    Appearance.setColorScheme(args.colorScheme);
-    return () =>
-      Appearance.setColorScheme(appAppearance === 'system' ? 'unspecified' : appAppearance);
-  }, [args.colorScheme, appAppearance]);
   const [isPresented, setIsPresented] = useState(args.isPresented);
   const [controlledPresentation, setControlledPresentation] = useState(args.isPresented);
   if (controlledPresentation !== args.isPresented) {
     setControlledPresentation(args.isPresented);
     setIsPresented(args.isPresented);
   }
-  const ink = args.colorScheme === 'light' ? Colors.light.text : Colors.dark.text;
   return (
     <View style={{ gap: 20 }}>
       <UniversalButton
@@ -51,14 +42,10 @@ function BottomSheetDemo({ title, content, onOpen, onClose, ...args }: DemoProps
           onOpen();
         }}
       />
-      <UniversalText
-        testID={`${args.testID}-state`}
-        colorScheme={args.colorScheme}
-        textStyle={{ color: ink }}
-      >
+      <UniversalText testID={`${args.testID}-state`} colorScheme={args.colorScheme}>
         {`State: ${isPresented ? 'Open' : 'Closed'}. Swipe down or tap Close to dismiss.`}
       </UniversalText>
-      <UniversalText colorScheme={args.colorScheme} textStyle={{ color: ink }}>
+      <UniversalText colorScheme={args.colorScheme}>
         The sheet uses native light/dark appearance and dismissal. The iOS drag indicator is hidden.
       </UniversalText>
       <BottomSheet
@@ -72,14 +59,11 @@ function BottomSheetDemo({ title, content, onOpen, onClose, ...args }: DemoProps
         <Column testID={`${args.testID}-content`} spacing={16} modifiers={nativeFillWidth}>
           <UniversalTextContent
             testID={`${args.testID}-title`}
-            textStyle={{ fontSize: 24, fontWeight: '700', color: ink }}
+            textStyle={{ fontSize: 24, fontWeight: '700' }}
           >
             {title}
           </UniversalTextContent>
-          <UniversalTextContent
-            testID={`${args.testID}-description`}
-            textStyle={{ fontSize: 16, color: ink }}
-          >
+          <UniversalTextContent testID={`${args.testID}-description`} textStyle={{ fontSize: 16 }}>
             {content}
           </UniversalTextContent>
           <UniversalButtonContent
@@ -112,8 +96,6 @@ const meta = {
     onDismiss: action('sheet dismissed'),
   },
   argTypes: {
-    testID: { control: 'text' },
-    colorScheme: { control: 'select', options: ['light', 'dark'] },
     isPresented: { control: 'boolean' },
     title: { control: 'text' },
     content: { control: 'text' },
@@ -128,7 +110,6 @@ const meta = {
       <BottomSheetDemo {...args} />
     </NativeStoryFrame>
   ),
-  parameters: { layout: 'fullscreen' },
 } satisfies Meta<typeof BottomSheetDemo>;
 export default meta;
 type Story = StoryObj<typeof meta>;

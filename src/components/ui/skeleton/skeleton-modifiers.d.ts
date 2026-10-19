@@ -6,7 +6,6 @@ export type SkeletonShapeStyle = {
   borderRadius: number;
   backgroundColor: string;
   opacity: number;
-  animationDuration?: number;
 };
 
 /** Native sizing must precede the placeholder's background and clipping. */

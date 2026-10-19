@@ -32,7 +32,6 @@ const meta = {
   title: 'Pages/Segmented navigation',
   component: SegmentedNavigationDemo,
   args: { colorScheme: 'light' },
-  argTypes: { colorScheme: { control: 'select', options: ['light', 'dark'] } },
 } satisfies Meta<typeof SegmentedNavigationDemo>;
 export default meta;
 type Story = StoryObj<typeof meta>;

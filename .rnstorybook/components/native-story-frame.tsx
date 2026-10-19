@@ -11,6 +11,7 @@ import type { PropsWithChildren } from 'react';
 import { View } from 'react-native';
 
 import { useThemeColors } from '@/hooks/use-theme';
+import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useMeasuredWidth } from '@/hooks/use-measured-width';
 
 export type NativeStoryTheme = UniversalThemeProps;
@@ -19,17 +20,24 @@ const canvasPadding = 24;
 /** Shared on-device canvas for the Expo UI stories. */
 export function NativeStoryFrame({
   children,
-  colorScheme = 'dark',
+  colorScheme,
+  seedColor,
   testID,
 }: PropsWithChildren<NativeStoryTheme>) {
-  const colors = useThemeColors(colorScheme);
+  const scheme = useColorScheme(colorScheme);
+  const colors = useThemeColors(scheme);
   const [width, setWidth] = useMeasuredWidth();
   return (
     <View
       style={{ flex: 1, backgroundColor: colors.background }}
       onLayout={(event) => setWidth(event.nativeEvent.layout.width)}
     >
-      <UniversalHost colorScheme={colorScheme} matchContents={false} style={{ flex: 1 }}>
+      <UniversalHost
+        colorScheme={scheme}
+        seedColor={seedColor}
+        matchContents={false}
+        style={{ flex: 1 }}
+      >
         <ScrollView testID={testID ? `${testID}-canvas` : undefined}>
           <Column modifiers={nativeFillWidth} style={{ padding: canvasPadding }}>
             {width > 0 && (
@@ -46,7 +54,5 @@ export function NativeStoryFrame({
 }
 
 export const nativeThemeControls = {
-  testID: { control: 'text' as const },
-  colorScheme: { control: 'select' as const, options: ['light', 'dark'] },
   seedColor: { control: 'color' as const },
 };

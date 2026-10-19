@@ -28,7 +28,6 @@ const meta = {
   title: 'Recipes/Home catalog',
   component: HomeCatalogStory,
   args: { colorScheme: 'light' },
-  argTypes: { colorScheme: { control: 'select', options: ['light', 'dark'] } },
 } satisfies Meta<typeof HomeCatalogStory>;
 export default meta;
 type Story = StoryObj<typeof meta>;

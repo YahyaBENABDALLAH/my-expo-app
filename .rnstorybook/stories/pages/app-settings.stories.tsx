@@ -4,38 +4,23 @@ import { I18nextProvider } from 'react-i18next';
 import { View } from 'react-native';
 import { AuroraBackground } from '@components/ui';
 import { SafeAreaInsetsContext } from 'react-native-safe-area-context';
-import { ThemePreferencesProvider, type ColorSchemePreference } from '@/context/theme.context';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import {
   LayoutDirectionProvider,
   useLayoutDirectionSettings,
   type LayoutDirection,
 } from '@/context/layout-direction.context';
-import { themes, type ThemeId } from '@/constants/themes/index';
+import type { StoryThemeProps } from '../../components/story-theme';
 import { SettingsPage } from '@/features/settings/settings-screen';
 import i18n, { type Language } from '@/lib/i18n';
 
 const zeroInsets = { top: 0, bottom: 0, left: 0, right: 0 };
 
-function SettingsDemo({
-  colorScheme,
-  themeId,
-  direction,
-}: {
-  colorScheme: ColorSchemePreference;
-  themeId: ThemeId;
-  direction: LayoutDirection;
-}) {
+function SettingsDemo({ direction }: StoryThemeProps & { direction: LayoutDirection }) {
   return (
     <SafeAreaInsetsContext.Provider value={zeroInsets}>
       <LayoutDirectionProvider key={direction} initialDirection={direction}>
-        <ThemePreferencesProvider
-          key={`${themeId}-${colorScheme}`}
-          initialTheme={themeId}
-          initialColorScheme={colorScheme}
-        >
-          <SettingsPreview key={direction} initialLanguage={direction === 'rtl' ? 'ar' : 'fr'} />
-        </ThemePreferencesProvider>
+        <SettingsPreview key={direction} initialLanguage={direction === 'rtl' ? 'ar' : 'fr'} />
       </LayoutDirectionProvider>
     </SafeAreaInsetsContext.Provider>
   );
@@ -75,11 +60,9 @@ const meta = {
   args: { colorScheme: 'light', themeId: 'ux', direction: 'ltr' },
   argTypes: {
     colorScheme: { control: 'select', options: ['system', 'light', 'dark'] },
-    themeId: { control: 'select', options: Object.keys(themes) },
     direction: { control: 'select', options: ['ltr', 'rtl'] },
   },
-  parameters: { layout: 'fullscreen' },
-} satisfies Meta<typeof SettingsDemo>;
+} satisfies Meta<StoryThemeProps & { direction: LayoutDirection }>;
 export default meta;
 type Story = StoryObj<typeof meta>;
 export const Light: Story = {};

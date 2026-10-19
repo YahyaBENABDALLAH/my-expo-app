@@ -1,4 +1,4 @@
-import Colors from '@/constants/colors';
+import { useThemeColors } from '@/hooks/use-theme';
 import { Column, UniversalHost as Host, Row, Spacer, Text, type SpacerProps } from '@components/ui';
 import type { Meta, StoryObj } from '@storybook/react-native';
 import { action } from 'storybook/actions';
@@ -11,7 +11,7 @@ import {
 type DemoProps = SpacerProps & NativeStoryTheme & { direction: 'vertical' | 'horizontal' };
 
 function SpacerDemo({ colorScheme, seedColor, direction, ...args }: DemoProps) {
-  const colors = Colors[colorScheme ?? 'dark'];
+  const colors = useThemeColors(colorScheme);
   const Container = direction === 'horizontal' ? Row : Column;
   return (
     <Host
@@ -27,7 +27,7 @@ function SpacerDemo({ colorScheme, seedColor, direction, ...args }: DemoProps) {
           width: 260,
           height: 240,
           padding: 16,
-          backgroundColor: colorScheme === 'light' ? Colors.light.surface : Colors.dark.surface,
+          backgroundColor: colors.surface,
           borderRadius: 12,
         }}
       >
@@ -80,7 +80,6 @@ const meta = {
       <SpacerDemo {...args} />
     </NativeStoryFrame>
   ),
-  parameters: { layout: 'fullscreen' },
 } satisfies Meta<typeof SpacerDemo>;
 export default meta;
 type Story = StoryObj<typeof meta>;

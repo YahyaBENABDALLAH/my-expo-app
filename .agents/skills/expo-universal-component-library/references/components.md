@@ -534,7 +534,7 @@ results and native verification limits; JS fixtures do not prove absence of flic
 `Skeleton` / `SkeletonContent` (`src/components/ui/skeleton/skeleton.tsx`) adapt Reference's
 placeholder using universal Expo UI `Column`. The standalone component owns
 a Host at an RN boundary; content inherits the owning Host's scheme with an optional
-`colorScheme` override. Props: `animate` (default true), `testID`, `colorScheme`, and `style` with numeric width/
+`colorScheme` override. Both accept `testID`, `colorScheme`, and `style` with numeric width/
 height, borderRadius, backgroundColor and opacity. Omitted width or `'100%'` fills a
 constrained parent. Defaults: height 16, radius 12, opacity 0.72, semantic `border`
 fill. No interaction, children, flex styles, style arrays or arbitrary
@@ -543,25 +543,26 @@ adapters; SwiftUI requires separate fixed-height and flexible-width frames. Andr
 applies opacity to the fill color itself, preserving an existing color alpha and
 avoiding a separate compositing layer for each placeholder.
 
-The pulse fades between the requested opacity and 45% of it in 900 ms per direction.
+Only standalone `Skeleton` accepts `animate` (default true). `SkeletonContentProps`
+omits animation: hosted content is always static.
+The standalone pulse fades between the requested opacity and 45% of it in 900 ms per direction.
 Standalone `Skeleton` uses Reanimated CSS keyframes on its existing RN Host, with no
 endpoint timer, additional view layer, or periodic React renders. Its shape stays
-in Expo UI. `SkeletonContent` retains one shared endpoint timer in
-`src/components/ui/skeleton/use-skeleton-pulse.ts`; SwiftUI opacity and Compose
-background-color modifiers interpolate frames natively. CSS cannot directly target
-those native modifier trees; adding RN bridges and Hosts per shape would increase
-view overhead. Content's next endpoint can still be delayed by JS congestion.
-All visible animation consumers share lifecycle/accessibility subscriptions through
+in Expo UI. `SkeletonContent` stays static at its configured opacity, with no
+animation timer, motion subscriptions, or nested Host. CSS cannot directly target
+its SwiftUI/Compose modifier tree; the installed native adapters do not expose an
+infinite pulse on both platforms. The old shared endpoint clock was removed.
+Standalone animation consumers share lifecycle/accessibility subscriptions through
 `useMotionEnabled`. No frame-by-frame React renders, layout measurements, or dependencies.
-`animate={false}`, live reduced motion, and inactive app state stop motion
-and restore the configured opacity. Static shapes bypass the pulse hook entirely,
-creating no pulse timer or motion lifecycle subscriptions. The development Home
+For standalone `Skeleton`, `animate={false}`, live reduced motion, and inactive app
+state stop motion and restore the configured opacity. Static shapes bypass motion
+subscriptions entirely. The development Home
 examples use this static path and unmount the complete preview ten seconds after mounting;
 refreshing or switching tabs does not restart that preview.
 
 `.rnstorybook/stories/expo-ui/skeleton.stories.tsx` covers Light/Dark, image, circle,
-pill, custom appearance, static mode, StaticReferenceCard, native pause/resume,
-CSSAnimationControls, opacity 0/0.35/1 and Reference search-card compositions with inherited
+pill, custom appearance, static mode, standalone CSS pause/resume in
+AnimationControls, opacity 0/0.35/1 and static Reference search-card compositions with inherited
 scheme and narrow/full-width layout. Verify native size/fill, clipping, Host theme
 inheritance, explicit overrides and screen-reader traversal on both platforms.
 Android Maestro preview flows passed for reference cards in dark, light and narrow
@@ -774,3 +775,14 @@ Appearance tests preserve neutral-role and black-primary invariants, check red/
 green/amber identities and require 4.5:1 status contrast on page, surface and
 container backgrounds. Native button adapter tests verify semantic fill/label
 pairs on iOS/Android and retain disabled-action guards.
+
+## Registration grouped-form spacing (2026-10-16)
+
+Grouped AuthScreenFrame leaves horizontal gutters to native FieldGroup, retaining
+only side safe-area insets and a transparent form canvas for the page background.
+The iOS adapter hides scroll indicators and gives section rows the owning Host
+surface token; caller modifiers can override it. No new props or dependencies.
+`GroupedFormLight` previews light-mode groups. Manual iPhone checks confirmed
+gray UX light section cards on the original white page, reduced side padding
+and scrolling without an indicator.
+The existing auth/layout tests pass; native Android inspection remains pending.

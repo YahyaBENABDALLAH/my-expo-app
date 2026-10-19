@@ -5,11 +5,9 @@ import { forwardRef, type ComponentProps, type ComponentRef } from 'react';
 import { createAnimatedComponent, cubicBezier } from 'react-native-reanimated';
 import { skeletonModifiers } from './skeleton-modifiers';
 import { UniversalHost, useHostColorScheme } from '../host/universal-host';
-import {
-  SKELETON_DIMMED_OPACITY,
-  SKELETON_PULSE_DURATION_MS,
-  useSkeletonPulse,
-} from './use-skeleton-pulse';
+
+const SKELETON_PULSE_DURATION_MS = 900;
+const SKELETON_DIMMED_OPACITY = 0.45;
 
 // Animate the existing RN Host, keeping the painted shape in Expo UI and avoiding
 // another view or a React update at every pulse endpoint.
@@ -46,12 +44,15 @@ export type SkeletonProps = {
   testID?: string;
 };
 
+/** Content stays in its owning native tree; CSS playback belongs to Skeleton's RN Host. */
+export type SkeletonContentProps = Omit<SkeletonProps, 'animate'>;
+
 /** Hosted placeholder at an RN boundary. Use SkeletonContent inside an existing Host. */
 export function Skeleton({ animate = true, ...props }: SkeletonProps) {
   return animate ? <AnimatedSkeleton {...props} /> : <HostedSkeleton {...props} />;
 }
 
-function AnimatedSkeleton(props: Omit<SkeletonProps, 'animate'>) {
+function AnimatedSkeleton(props: SkeletonContentProps) {
   const enabled = useMotionEnabled();
   return <HostedSkeleton {...props} pulse={enabled} animated />;
 }
@@ -62,7 +63,7 @@ function HostedSkeleton({
   style,
   pulse = false,
   animated = false,
-}: Omit<SkeletonProps, 'animate'> & { pulse?: boolean; animated?: boolean }) {
+}: SkeletonContentProps & { pulse?: boolean; animated?: boolean }) {
   const hostProps: ComponentProps<typeof UniversalHost> = {
     colorScheme,
     inline: typeof style?.width === 'number',
@@ -71,7 +72,7 @@ function HostedSkeleton({
     accessible: false,
     accessibilityElementsHidden: true,
     importantForAccessibility: 'no-hide-descendants',
-    children: <SkeletonShape colorScheme={colorScheme} testID={testID} style={style} />,
+    children: <SkeletonContent colorScheme={colorScheme} testID={testID} style={style} />,
   };
   return animated ? (
     <AnimatedSkeletonHost {...hostProps} style={pulse ? pulseStyle : { opacity: 1 }} />
@@ -80,30 +81,8 @@ function HostedSkeleton({
   );
 }
 
-/** Static placeholders skip the pulse clock and motion lifecycle subscriptions entirely. */
-export function SkeletonContent({ animate = true, ...props }: SkeletonProps) {
-  return animate ? <PulsingSkeletonContent {...props} /> : <SkeletonShape {...props} />;
-}
-
-function PulsingSkeletonContent(props: Omit<SkeletonProps, 'animate'>) {
-  const pulse = useSkeletonPulse(true);
-  return (
-    <SkeletonShape
-      {...props}
-      dimmed={pulse.dimmed}
-      animationDuration={pulse.enabled ? SKELETON_PULSE_DURATION_MS : undefined}
-    />
-  );
-}
-
-/** Native placeholder that inherits the owning Host's light/dark scheme. */
-function SkeletonShape({
-  colorScheme,
-  testID,
-  style = {},
-  dimmed = false,
-  animationDuration,
-}: Omit<SkeletonProps, 'animate'> & { dimmed?: boolean; animationDuration?: number }) {
+/** Static native placeholder: no animation timers, subscriptions, or nested Hosts. */
+export function SkeletonContent({ colorScheme, testID, style = {} }: SkeletonContentProps) {
   const colors = useThemeColors(useHostColorScheme(colorScheme));
   return (
     <Column
@@ -113,8 +92,7 @@ function SkeletonShape({
         height: style.height ?? 16,
         borderRadius: style.borderRadius ?? 12,
         backgroundColor: style.backgroundColor ?? colors.border,
-        opacity: (style.opacity ?? 0.72) * (dimmed ? SKELETON_DIMMED_OPACITY : 1),
-        animationDuration,
+        opacity: style.opacity ?? 0.72,
       })}
     />
   );

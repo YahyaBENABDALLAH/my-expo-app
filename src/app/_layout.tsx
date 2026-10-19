@@ -12,7 +12,7 @@ import {
   UniversalButtonContent,
 } from '@components/ui';
 import { useFonts } from 'expo-font';
-import { Stack, ThemeProvider } from 'expo-router';
+import { Stack, ThemeProvider, usePathname } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useCallback, useEffect, useState } from 'react';
@@ -25,6 +25,7 @@ import { navigationTheme } from '@/constants/navigation-theme';
 import { stackMotionOptions } from '@/constants/navigation-motion';
 import { AuthProvider, useAuthContext } from '@/context/auth.context';
 import { LanguageProvider, useLanguage } from '@/context/language.context';
+import { LoginTransitionContext } from '@/context/login-transition.context';
 import { LayoutDirectionProvider, useLayoutDirection } from '@/context/layout-direction.context';
 import { OnboardingProvider, useOnboarding } from '@/context/onboarding.context';
 import { AppQueryProvider } from '@/context/query-provider';
@@ -89,7 +90,13 @@ function RootLayoutContent() {
   const colorScheme = useColorScheme();
   const colors = useThemeColors(colorScheme);
   const [showBrandScreen, setShowBrandScreen] = useState(true);
-  const { restoring } = useAuthGuards();
+  const { restoring, requireAuth } = useAuthGuards();
+  const pathname = usePathname();
+  const expanded = pathname === '/login' && !requireAuth;
+  const [loginWaveComplete, setLoginWaveComplete] = useState(true);
+  if (expanded && !showBrandScreen && loginWaveComplete) setLoginWaveComplete(false);
+  const holdLogin = !showBrandScreen && pathname === '/login' && requireAuth && !loginWaveComplete;
+  const finishLoginWave = useCallback(() => setLoginWaveComplete(true), []);
   const { error } = useAuthContext();
   const { ready: languageReady } = useLanguage();
   const { ready: onboardingReady, completed: onboardingCompleted } = useOnboarding();
@@ -102,27 +109,35 @@ function RootLayoutContent() {
   }, []);
 
   return (
-    <View
-      testID={ready && !showBrandScreen ? 'app-ready' : undefined}
-      collapsable={false}
-      style={{ flex: 1, backgroundColor: colors.background }}
-    >
-      <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
-      {ready || !showBrandScreen ? <RootLayoutNav /> : null}
-      {onboardingCompleted && <PageMotionOverlay animate={animatePageArtwork} />}
-      {showBrandScreen && (
-        <LaunchScreen
-          exiting={ready}
-          onReady={revealBrandScreen}
-          onExitComplete={finishBrandScreen}
-        />
-      )}
-      {!showBrandScreen && <ToastHost />}
-    </View>
+    <LoginTransitionContext.Provider value={holdLogin}>
+      <View
+        testID={ready && !showBrandScreen ? 'app-ready' : undefined}
+        collapsable={false}
+        style={{ flex: 1, backgroundColor: colors.background }}
+      >
+        <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
+        {ready || !showBrandScreen ? <RootLayoutNav holdLogin={holdLogin} /> : null}
+        {onboardingCompleted && (
+          <PageMotionOverlay
+            animate={animatePageArtwork}
+            expanded={expanded}
+            onCollapseComplete={finishLoginWave}
+          />
+        )}
+        {showBrandScreen && (
+          <LaunchScreen
+            exiting={ready}
+            onReady={revealBrandScreen}
+            onExitComplete={finishBrandScreen}
+          />
+        )}
+        {!showBrandScreen && <ToastHost />}
+      </View>
+    </LoginTransitionContext.Provider>
   );
 }
 
-function RootLayoutNav() {
+function RootLayoutNav({ holdLogin }: { holdLogin: boolean }) {
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const colorScheme = useColorScheme();
@@ -188,10 +203,10 @@ function RootLayoutNav() {
         <Stack.Protected guard={!completed}>
           <Stack.Screen name="(onboarding)" options={{ headerShown: false }} />
         </Stack.Protected>
-        <Stack.Protected guard={completed && requireNoAuth}>
+        <Stack.Protected guard={completed && (requireNoAuth || holdLogin)}>
           <Stack.Screen name="(auth)" options={{ headerShown: false }} />
         </Stack.Protected>
-        <Stack.Protected guard={completed && requireAuth}>
+        <Stack.Protected guard={completed && requireAuth && !holdLogin}>
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
           <Stack.Screen name="recipe/[uuid]" options={{ title: t('common.recipeLabel') }} />
           <Stack.Screen name="category/[uuid]" options={{ title: t('common.category') }} />

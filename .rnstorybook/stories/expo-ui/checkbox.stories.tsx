@@ -1,4 +1,3 @@
-import Colors from '@/constants/colors';
 import { UniversalText as RNText } from '@components/ui';
 import {
   UniversalCheckbox,
@@ -23,15 +22,8 @@ function CheckboxDemo(args: UniversalCheckboxProps) {
           args.onValueChange(next);
         }}
       />
-      <RNText
-        testID={`${args.testID}-value`}
-        textStyle={{ color: args.colorScheme === 'light' ? Colors.light.text : Colors.dark.text }}
-      >
-        {`Value: ${value ? 'Checked' : 'Unchecked'}`}
-      </RNText>
-      <RNText
-        textStyle={{ color: args.colorScheme === 'light' ? Colors.light.muted : Colors.dark.muted }}
-      >
+      <RNText testID={`${args.testID}-value`}>{`Value: ${value ? 'Checked' : 'Unchecked'}`}</RNText>
+      <RNText variant="caption">
         Android uses a checkbox. iOS uses its native toggle appearance.
       </RNText>
     </View>
@@ -62,7 +54,6 @@ const meta = {
       <CheckboxDemo key={String(args.value)} {...args} />
     </NativeStoryFrame>
   ),
-  parameters: { layout: 'fullscreen' },
 } satisfies Meta<typeof UniversalCheckbox>;
 export default meta;
 type Story = StoryObj<typeof meta>;

@@ -13,9 +13,9 @@ import { useState } from 'react';
 import { action } from 'storybook/actions';
 
 import { useAppTheme, useThemeColors } from '@/hooks/use-theme';
-import { ThemePreferencesProvider } from '@/context/theme.context';
 import { NativeStoryFrame } from '../../components/native-story-frame';
 import { semanticButtonColors } from '../../components/semantic-button-colors';
+import type { StoryThemeProps } from '../../components/story-theme';
 
 function ButtonDemo(args: UniversalButtonProps) {
   const colors = semanticButtonColors(args.variant, useThemeColors(args.colorScheme));
@@ -58,13 +58,11 @@ const meta = {
     fullWidth: { control: 'boolean' },
     borderRadius: { control: { type: 'number', min: 0 } },
     cornerRadii: { control: 'object' },
-    colorScheme: { control: 'select', options: ['light', 'dark'] },
     disabled: { control: 'boolean' },
     onPress: { action: 'pressed', control: false },
   },
   render: (args) => <ButtonDemo {...args} />,
   parameters: {
-    layout: 'fullscreen',
     controls: {
       include: [
         'label',
@@ -74,10 +72,11 @@ const meta = {
         'borderRadius',
         'cornerRadii',
         'colorScheme',
+        'themeId',
       ],
     },
   },
-} satisfies Meta<typeof UniversalButton>;
+} satisfies Meta<UniversalButtonProps & StoryThemeProps>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
@@ -150,20 +149,12 @@ function InteractionDemo(args: UniversalButtonProps) {
 export const Interaction: Story = { render: (args) => <InteractionDemo {...args} /> };
 
 export const WireframeLight: Story = {
-  args: { colorScheme: 'light' },
-  render: (args) => (
-    <ThemePreferencesProvider initialTheme="ux" initialColorScheme="light">
-      <InteractionDemo {...args} />
-    </ThemePreferencesProvider>
-  ),
+  args: { themeId: 'ux', colorScheme: 'light' },
+  render: (args) => <InteractionDemo {...args} />,
 };
 export const WireframeDark: Story = {
-  args: { colorScheme: 'dark' },
-  render: (args) => (
-    <ThemePreferencesProvider initialTheme="ux" initialColorScheme="dark">
-      <InteractionDemo {...args} />
-    </ThemePreferencesProvider>
-  ),
+  args: { themeId: 'ux', colorScheme: 'dark' },
+  render: (args) => <InteractionDemo {...args} />,
 };
 
 function GeometryDemo({ colorScheme = 'light' }: { colorScheme?: 'light' | 'dark' }) {

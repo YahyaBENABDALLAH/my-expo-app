@@ -52,7 +52,6 @@ const meta = {
   args: { variant: 'popular', colorScheme: 'light', longTitle: false },
   argTypes: {
     variant: { control: 'select', options: ['popular', 'editorial'] },
-    colorScheme: { control: 'select', options: ['light', 'dark'] },
     longTitle: { control: 'boolean' },
   },
 } satisfies Meta<typeof CardStory>;
@@ -63,7 +62,7 @@ export const PopularDark: Story = { args: { colorScheme: 'dark' } };
 export const Editorial: Story = { args: { variant: 'editorial' } };
 export const LongTitle: Story = { args: { longTitle: true } };
 export const HorizontalAndVertical: Story = {
-  parameters: { controls: { include: ['colorScheme'] } },
+  parameters: { controls: { include: ['themeId', 'colorScheme'] } },
   render: ({ colorScheme }) => (
     <UniversalHost colorScheme={colorScheme} matchContents={false} style={{ flex: 1 }}>
       <ScrollView>
@@ -76,13 +75,13 @@ export const HorizontalAndVertical: Story = {
 };
 
 export const HomeSections: Story = {
-  parameters: { controls: { include: ['colorScheme'] } },
+  parameters: { controls: { include: ['themeId', 'colorScheme'] } },
   render: ({ colorScheme }) => (
     <UniversalHost colorScheme={colorScheme} matchContents={false} style={{ flex: 1 }}>
       <ScrollView>
         <Column spacing={20} style={{ padding: 24 }}>
           <HomeCardExamples editorialScroll={false} />
-          <HomeRecipeSkeletons animate />
+          <HomeRecipeSkeletons />
         </Column>
       </ScrollView>
     </UniversalHost>

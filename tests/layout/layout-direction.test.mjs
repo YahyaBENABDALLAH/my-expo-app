@@ -408,7 +408,9 @@ for (const [platform, authenticated, introductionRequired] of [
     let finishLanguage;
     let finishOnboarding;
     let completeIntroduction;
+    let signIn;
     const RestorationContext = createContext(true);
+    const SignedInContext = createContext(authenticated);
     const LanguageContext = createContext({ ready: false });
     const OnboardingContext = createContext({ ready: false, completed: !introductionRequired });
     const NativeAuthProvider = s.native('AuthProvider');
@@ -422,6 +424,7 @@ for (const [platform, authenticated, introductionRequired] of [
     };
     Stack.Screen = s.native('Screen');
     Object.assign(s.mocks['expo-router'], {
+      usePathname: () => '/login',
       Stack,
       ThemeProvider: s.native('ThemeProvider'),
       DarkTheme: { colors: {} },
@@ -452,11 +455,17 @@ for (const [platform, authenticated, introductionRequired] of [
       AuthProvider({ children }) {
         themeSettings = useThemeSettings();
         const [restoring, setRestoring] = useState(true);
+        const [signedIn, setSignedIn] = useState(authenticated);
+        signIn = () => setSignedIn(true);
         finishRestore = () => setRestoring(false);
         return createElement(
           RestorationContext.Provider,
           { value: restoring },
-          createElement(NativeAuthProvider, null, children),
+          createElement(
+            SignedInContext.Provider,
+            { value: signedIn },
+            createElement(NativeAuthProvider, null, children),
+          ),
         );
       },
       useAuthContext: () => ({ error: null }),
@@ -471,8 +480,8 @@ for (const [platform, authenticated, introductionRequired] of [
     };
     s.mocks['@/guards/auth-guards'] = {
       useAuthGuards: () => ({
-        requireNoAuth: !authenticated,
-        requireAuth: authenticated,
+        requireNoAuth: !useContext(SignedInContext),
+        requireAuth: useContext(SignedInContext),
         restoring: useContext(RestorationContext),
       }),
     };
@@ -498,6 +507,7 @@ for (const [platform, authenticated, introductionRequired] of [
     let headerWave = view.findAll('PageMotionOverlay')[0];
     const launch = view.findAll('LaunchScreen')[0];
     assert.equal(headerWave?.props.animate, introductionRequired ? undefined : false);
+    assert.equal(headerWave?.props.expanded, introductionRequired ? undefined : !authenticated);
     assert.equal(launch.props.exiting, false);
     // Time alone cannot release startup while required resources are unavailable.
     view.flush(() => t.mock.timers.tick(5_000));
@@ -570,6 +580,18 @@ for (const [platform, authenticated, introductionRequired] of [
       assert.equal(view.findAll('AppQueryProvider')[0], queryProvider);
       assert.equal(view.findAll('AuthProvider')[0], authProvider);
       assert.equal(view.findAll('PageMotionOverlay')[0], headerWave);
+    }
+    if (!authenticated) {
+      view.flush(signIn);
+      assert.equal(headerWave.props.expanded, false);
+      assert.equal(view.findAll('PageMotionOverlay')[0], headerWave);
+      assert.equal(view.findAll('Screen')[0].props.name, '(auth)');
+      assert.equal(
+        view.findAll('Screen').some(({ props }) => props.name === '(tabs)'),
+        false,
+      );
+      view.flush(() => headerWave.props.onCollapseComplete());
+      assert.equal(view.findAll('Screen')[0].props.name, '(tabs)');
     }
     view.unmount();
   });

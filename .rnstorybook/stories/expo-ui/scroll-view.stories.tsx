@@ -1,4 +1,4 @@
-import Colors from '@/constants/colors';
+import { useThemeColors } from '@/hooks/use-theme';
 import { Column, Row, Text } from '@components/ui';
 import {
   UniversalScrollView,
@@ -14,7 +14,7 @@ type DemoProps = UniversalScrollViewProps & {
 };
 
 function ScrollViewDemo({ itemCount, onItemPress, ...args }: DemoProps) {
-  const colors = Colors[args.colorScheme ?? 'dark'];
+  const colors = useThemeColors(args.colorScheme);
   const Container = args.direction === 'horizontal' ? Row : Column;
   return (
     <UniversalScrollView {...args}>
@@ -80,7 +80,6 @@ const meta = {
       <ScrollViewDemo {...args} />
     </NativeStoryFrame>
   ),
-  parameters: { layout: 'fullscreen' },
 } satisfies Meta<typeof ScrollViewDemo>;
 export default meta;
 type Story = StoryObj<typeof meta>;

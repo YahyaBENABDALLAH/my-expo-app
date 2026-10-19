@@ -74,9 +74,7 @@ const meta = {
   args: { initialStep: 0, saving: false, saveError: false, colorScheme: 'light' },
   argTypes: {
     initialStep: { control: 'select', options: [0, 1, 2] },
-    colorScheme: { control: 'select', options: ['light', 'dark'] },
   },
-  parameters: { layout: 'fullscreen' },
   render: (args) => <OnboardingFixture key={args.initialStep} {...args} />,
 } satisfies Meta<typeof OnboardingFixture>;
 
