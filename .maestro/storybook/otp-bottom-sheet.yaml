@@ -29,6 +29,10 @@ env:
 - tapOn:
     id: otp-sheet-input
 - inputText: '000000'
+- assertVisible:
+    id: otp-sheet-verify
+    enabled: true
+- hideKeyboard
 - tapOn:
     id: otp-sheet-verify
 - assertVisible:
@@ -38,6 +42,10 @@ env:
     id: otp-sheet-input
 - eraseText: 6
 - inputText: '123456'
+- assertVisible:
+    id: otp-sheet-verify
+    enabled: true
+- hideKeyboard
 - tapOn:
     id: otp-sheet-verify
 - assertVisible:

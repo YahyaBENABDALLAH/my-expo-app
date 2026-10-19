@@ -57,6 +57,7 @@ export function HomeCatalogSections({
   const heroWidth = Math.min(520, Math.max(1, viewportWidth - 48));
   const landscapeWidth = Math.min(460, Math.max(1, viewportWidth * 0.78));
   const fullWidth = Math.max(1, viewportWidth - gutter * 2);
+  const previewHeight = Math.min(420, height * 0.6);
   // Keep photos stable across saves, previews, resizing and translation changes.
   const [imageSeed] = useState(() => `${Date.now()}-${Math.random().toString(36).slice(2)}`);
   const items = homeCatalogItems(t, imageSeed, images);
@@ -217,10 +218,11 @@ export function HomeCatalogSections({
       <BottomSheet
         isPresented={preview.isPresented}
         onDismiss={closePreview}
+        contentHeight={previewHeight}
         testID="home-sample-preview"
       >
         {selected ? (
-          <ScrollView style={{ height: Math.min(420, height * 0.6) }}>
+          <ScrollView style={{ height: previewHeight }}>
             <Column spacing={16} modifiers={nativeFillWidth}>
               <Text variant="caption">{t('home.cards.samplePreview')}</Text>
               <Text variant="title" testID="home-sample-preview-title">

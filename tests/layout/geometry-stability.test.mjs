@@ -152,6 +152,35 @@ function setup(platform = 'ios') {
 }
 
 for (const platform of ['ios', 'android']) {
+  test(`${platform}: known sheet height is native before measurement and survives presentation changes`, () => {
+    const s = setup(platform);
+    const { BottomSheet } = s.load('components/ui/bottom-sheet/bottom-sheet.tsx');
+    let update;
+    function Fixture() {
+      const [state, setState] = useState({ isPresented: false, contentHeight: 420 });
+      update = setState;
+      return h(BottomSheet, { ...state, onDismiss() {} }, h('Content'));
+    }
+    const view = renderFixture(h(Fixture));
+    try {
+      const sheet = view.findAll('Sheet')[0];
+      const content = view.findAll('Content')[0];
+      assert.equal(view.findAll('Column')[0].props.style.height, 420);
+      assert.equal(view.findAll('RNHostView').length, 0);
+      assert.equal(sheet.props.contentHeight, undefined);
+      for (const isPresented of [true, false, true]) {
+        view.flush(() => update({ isPresented, contentHeight: 320 }));
+        assert.equal(view.findAll('Sheet')[0], sheet);
+        assert.equal(view.findAll('Content')[0], content);
+        assert.equal(view.findAll('Column')[0].props.style.height, 320);
+      }
+    } finally {
+      view.unmount();
+    }
+  });
+}
+
+for (const platform of ['ios', 'android']) {
   test(`${platform}: repeated stepper geometry does not re-run layout composition and real width changes still resize`, () => {
     const s = setup(platform);
     const { RecipeStepperLayout } = s.load(

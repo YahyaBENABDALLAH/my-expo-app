@@ -117,6 +117,7 @@ const meta = {
     isPresented: { control: 'boolean' },
     title: { control: 'text' },
     content: { control: 'text' },
+    contentHeight: { control: { type: 'number', min: 1 } },
     children: { control: false },
     onOpen: { control: false },
     onClose: { control: false },
@@ -138,6 +139,7 @@ export const AutoSized: Story = {
   args: { isPresented: true, content: 'A short sheet fitted to its content.' },
 };
 export const LightTheme: Story = { args: { colorScheme: 'light' } };
+export const FixedContentHeight: Story = { args: { contentHeight: 320 } };
 export const LongContent: Story = {
   args: {
     title: 'A longer title that wraps onto multiple lines in a narrow sheet',

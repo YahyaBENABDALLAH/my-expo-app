@@ -91,6 +91,33 @@ function accent(button, platform) {
 }
 
 for (const platform of ['ios', 'android']) {
+  test(`${platform}: rounding and padding can be overridden independently`, () => {
+    const s = setup(platform);
+    s.render({ variant: 'secondary', borderRadius: 12 });
+    s.render({ variant: 'link', contentPadding: 8 });
+    if (platform === 'android') {
+      assert.equal(s.buttons[0].shape.cornerRadii.topStart, 12);
+      assert.equal(s.buttons[0].contentPadding, undefined);
+      assert.equal(s.buttons[1].shape, undefined);
+      assert.deepEqual(s.buttons[1].contentPadding, { start: 8, end: 8, top: 8, bottom: 8 });
+    } else {
+      assert.deepEqual(
+        s.buttons[0].modifiers.find(({ kind }) => kind === 'buttonBorderShape').args,
+        ['roundedRectangle', 12],
+      );
+      assert.equal(
+        s.content[0].modifiers.some(({ kind }) => kind === 'padding'),
+        false,
+      );
+      assert.equal(
+        s.buttons[1].modifiers.some(({ kind }) => kind === 'clipShape'),
+        false,
+      );
+      assert.deepEqual(s.content[1].modifiers.find(({ kind }) => kind === 'padding').args, [
+        { all: 8 },
+      ]);
+    }
+  });
   test(`${platform}: UX primary fills stay black with white labels in both appearances`, () => {
     const s = setup(platform, 'ux');
     for (const scheme of ['light', 'dark']) {

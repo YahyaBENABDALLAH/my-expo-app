@@ -1,5 +1,11 @@
 # Buttons
 
+The geometry-conflict resolution retains the current native variant, UX color,
+glass and asymmetric standalone-corner APIs. Optional radius/padding overrides
+remain independent and preserve explicit zero values. `GeometryLight` and
+`GeometryDark` add default/rounded/square surface checks with press counts and
+disabled suppression; `.maestro/storybook/button-geometry.yaml` targets them.
+
 Exports: `UniversalButton`, `UniversalButtonContent` and their public types.
 
 Both use native Expo UI buttons: SwiftUI on iOS and Material on Android.

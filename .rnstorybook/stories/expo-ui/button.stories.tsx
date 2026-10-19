@@ -1,5 +1,6 @@
 import {
   Column,
+  nativeFillWidth,
   UniversalButton,
   UniversalButtonContent,
   type UniversalButtonProps,
@@ -163,4 +164,67 @@ export const WireframeDark: Story = {
       <InteractionDemo {...args} />
     </ThemePreferencesProvider>
   ),
+};
+
+function GeometryDemo({ colorScheme = 'light' }: { colorScheme?: 'light' | 'dark' }) {
+  const [presses, setPresses] = useState(0);
+  const [disabled, setDisabled] = useState(false);
+  const press = () => setPresses((count) => count + 1);
+  return (
+    <NativeStoryFrame colorScheme={colorScheme}>
+      <UniversalHost colorScheme={colorScheme}>
+        <Column spacing={16} modifiers={nativeFillWidth}>
+          <UniversalButtonContent
+            variant="primary"
+            fullWidth
+            label="Native geometry"
+            testID="button-geometry-default"
+            onPress={press}
+          />
+          <UniversalButtonContent
+            variant="secondary"
+            fullWidth
+            borderRadius={12}
+            contentPadding={16}
+            label="Rounded geometry"
+            testID="button-geometry-rounded"
+            disabled={disabled}
+            onPress={press}
+          />
+          <UniversalButtonContent
+            variant="primary"
+            fullWidth
+            borderRadius={0}
+            contentPadding={0}
+            testID="button-geometry-square"
+            disabled={disabled}
+            onPress={press}
+          >
+            <Column spacing={8} modifiers={nativeFillWidth} style={{ padding: 16 }}>
+              <UniversalTextContent>Square card action</UniversalTextContent>
+              <UniversalTextContent variant="caption">
+                Tap near either vertical edge.
+              </UniversalTextContent>
+            </Column>
+          </UniversalButtonContent>
+          <UniversalTextContent testID="button-geometry-count">{`Presses: ${presses}`}</UniversalTextContent>
+          <UniversalButtonContent
+            variant="link"
+            label={disabled ? 'Enable custom buttons' : 'Disable custom buttons'}
+            testID="button-geometry-toggle"
+            onPress={() => setDisabled((value) => !value)}
+          />
+        </Column>
+      </UniversalHost>
+    </NativeStoryFrame>
+  );
+}
+
+export const GeometryLight: Story = {
+  args: { colorScheme: 'light' },
+  render: (args) => <GeometryDemo colorScheme={args.colorScheme} />,
+};
+export const GeometryDark: Story = {
+  args: { colorScheme: 'dark' },
+  render: (args) => <GeometryDemo colorScheme={args.colorScheme} />,
 };

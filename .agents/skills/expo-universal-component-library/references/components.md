@@ -1,5 +1,18 @@
 # Universal component catalog
 
+## Native sheet height and geometry merge (2026-10-19)
+
+The stash-conflict resolution preserves the current minimal native BottomSheet
+and button APIs, including glass, UX colors and standalone corner shapes. It does
+not restore the obsolete sheet width context or RN/Host measurement bridge.
+Optional `BottomSheet.contentHeight` bounds a caller's known viewport in a native
+Column before presentation; Home shares its existing `min(420, screenHeight * 0.6)`
+value with the inner ScrollView. Outer sheet height and detents remain native.
+`FixedContentHeight` covers this in the bottom-sheet stories. `GeometryLight` and
+`GeometryDark` retain native/default, rounded, square and disabled button checks.
+Portable checks verify independent radius/padding overrides and first-render
+height through reopen/resize. Device frame timing must be checked separately.
+
 ## Color UI theme (2026-10-15)
 
 The stable `ux` theme is now labeled UI: blue primary, violet secondary, shared
