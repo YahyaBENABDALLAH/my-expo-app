@@ -1,74 +1,45 @@
 # Buttons
 
-Optional radius/padding overrides are independent and preserve explicit zero
-values alongside native variants, UX colors, glass and asymmetric standalone
-corners. `GeometryLight` and
-`GeometryDark` add default/rounded/square surface checks with press counts and
-disabled suppression; `.maestro/storybook/button-geometry.yaml` targets them.
-The flow defaults to light; pass
-`-e GEOMETRY_STORY=expo-ui-universal-button--geometry-dark` for dark. It waits for
-the requested appearance's ready target and the navigation animation, then
-asserts the initial count before interacting.
+Import `UniversalButton`, `UniversalButtonContent` and their types from
+`@components/ui`. Both render native Expo UI controls. `UniversalButton` owns a
+Host at a React Native boundary; use `UniversalButtonContent` inside an existing
+Host. Each resolves theme colors once before passing props to the same native
+renderer.
 
-On 2026-10-19, both geometry appearances passed on the physical Android 13 phone
-(`21091116AG`): default and rounded presses, square-surface upper/lower edge taps,
-disabled suppression and re-enabling. The ignored run logs are
-`.expo/button-geometry-merged-light-fixed.log` and
-`.expo/button-geometry-merged-dark-fixed.log`. These fixtures do not establish
-iOS geometry or Android asymmetric-corner behavior.
+```tsx
+<UniversalButton variant="primary" label="Continue" fullWidth onPress={onContinue} />
+```
 
-Exports: `UniversalButton`, `UniversalButtonContent` and their public types.
+`variant` is required. The remaining props are optional:
 
-Both use native Expo UI buttons: SwiftUI on iOS and Material on Android.
-`UniversalButton` owns a Host at a React Native boundary;
-`UniversalButtonContent` uses its existing Host.
+| Prop                             | Behavior                                                                                                                               |
+| -------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| `label`, `children`              | Native content; children take priority over the label.                                                                                 |
+| `onPress`, `disabled`, `testID`  | Native action, disabled state and test selector; disabled actions are suppressed.                                                      |
+| `fullWidth`                      | Fills the native surface and content together.                                                                                         |
+| `color`, `contentColor`          | Direct native accent and label overrides.                                                                                              |
+| `borderRadius`, `contentPadding` | Independent geometry overrides; omitted values retain native defaults, and zero is supported.                                          |
+| `colorScheme`                    | Standalone Host appearance. Hosted content inherits its owning Host.                                                                   |
+| `cornerRadii`                    | Standalone physical corners: `topLeft`, `topRight`, `bottomLeft`, `bottomRight`. Overrides `borderRadius`; omitted corners are square. |
 
-Keep the API small: required `variant`, `label` or `children`, `onPress`,
-`disabled`, `testID`, `fullWidth`, `color`, `contentColor`, `contentPadding`,
-`borderRadius` and `colorScheme`. Standalone buttons also accept `cornerRadii`.
+`primary`, `success`, `warning` and `destructive` use filled/prominent buttons.
+`secondary` uses outlined/bordered and `link` uses text/plain. Destructive also
+sets the native iOS role. `glass` uses
+[`buttonStyle('glass')`](https://docs.expo.dev/versions/v57.0.0/sdk/ui/swift-ui/button/)
+on iOS 26+, automatic native styling on older iOS, and outlined Material on Android.
 
-Primary uses a native filled/prominent button, secondary uses outlined/bordered,
-and link uses text/plain. Status variants use the filled style. iOS also supplies
-the native destructive role. Brand themes retain native colors unless callers
-pass explicit colors.
+Brand themes retain native colors unless callers supply overrides. UX Template
+uses existing semantic token pairs when both color props are omitted: black/white
+primary, neutral secondary/link/glass, and paired status colors. Supplying either
+color prop skips those defaults. Hosted content follows `useHostColorScheme`;
+standalone controls use their explicit scheme. `semantic-button-colors.ts` shares
+the token mapping with previews. Native controls own feedback and disabled styling.
 
-UX Template is the intentional exception: `use-wireframe-button-colors.ts` maps
-the existing semantic pairs when both color props are omitted. Primary stays
-black with white labels in both appearances. Links and glass stay neutral;
-feedback uses the UX danger red, success green and warning amber pairs.
-Disabled treatment and native geometry remain platform-owned.
-Hosted content inherits its owning Host scheme; standalone controls respect
-their explicit `colorScheme`. Supplying either color prop preserves the caller's
-complete override behavior. `semantic-button-colors.ts` is shared with previews.
-`Expo UI/Universal Button/WireframeLight` and `WireframeDark` exercise these
-defaults with observable press counts, disabled suppression and reset.
-`.maestro/storybook/wireframe-buttons.yaml` reuses the existing interaction flow
-for both appearances. Native Android execution remains pending.
-
-Use `variant="glass"` for a native glass button on iOS 26+, through Expo UI's
-[`buttonStyle('glass')`](https://docs.expo.dev/versions/v57.0.0/sdk/ui/swift-ui/button/).
-Expo UI falls back to the automatic native style on older iOS. Android uses an
-outlined Material button. The same color, geometry and disabled props apply;
-no additional dependency or decorative overlay is needed.
-
-`color` and `contentColor` are optional direct overrides. Without them, brand themes
-use native colors and UX Template uses its explicit semantic pairs. `UniversalButton` uses a plain Expo UI
-Host with optional `colorScheme`; `UniversalButtonContent` inherits its native
-Host's appearance and has no color-scheme prop. The UX mapping adds no provider,
-generated palette, measurement or size calculation.
-
-Omit `contentPadding` and `borderRadius` to retain native defaults. Zero is
-supported for both. Full width uses native fill modifiers. iOS maps a supplied
-radius to native button border shape and clips custom content to that shape;
-Android supplies the native rounded shape and padding directly. Native feedback
-and disabled behavior remain platform-owned.
-
-For asymmetric standalone buttons, pass physical `cornerRadii` keys: `topLeft`,
-`topRight`, `bottomLeft`, and `bottomRight`. Omitted corners are square, and this
-option overrides `borderRadius`. The existing RN Host clips a square native button
-on both platforms; SwiftUI's installed button API only exposes uniform rounding.
-There is no extra Host, painted background, or custom press control. Inside an
-existing Expo UI Host, `UniversalButtonContent` continues to use a uniform radius.
+Platform adapters are needed because the installed universal Expo Button lacks
+native color, content-padding, shape and destructive-role props. iOS uses native
+button-border rounding plus content clipping; Android passes shape and padding
+directly. Asymmetric corners clip the existing standalone Host around a square
+native button, without adding a surface or Host.
 
 ```tsx
 <UniversalButton
@@ -81,28 +52,22 @@ existing Expo UI Host, `UniversalButtonContent` continues to use a uniform radiu
 />
 ```
 
-```tsx
-<UniversalButton
-  variant="primary"
-  label="Continue"
-  borderRadius={12}
-  contentPadding={12}
-  onPress={onContinue}
-/>
-```
+[Native stories](../../../../.rnstorybook/stories/expo-ui/button.stories.tsx)
+cover variants, appearance, disabled actions, rounding, diagonal corners and
+observable press counts. Controls expose width, radius, padding and colors.
+UX stories exercise component defaults; other theme previews pass semantic pairs
+unless the caller overrides either color. Glass previews keep native defaults.
 
-Native stories: [button.stories.tsx](../../../../.rnstorybook/stories/expo-ui/button.stories.tsx).
-They cover semantic variants, light/dark appearance, disabled actions, rounding,
-both diagonal corner combinations and an interactive count/reset fixture. Story
-callers supply the current theme's semantic colors, so changing appearance keeps
-status colors and their foregrounds paired. Glass retains native colors. Use
-Controls for other widths, radii and variants instead of duplicate stories.
-`.maestro/storybook/button.yaml` checks counting and reset;
-`button-corners.yaml` checks upper/lower edge activation on both diagonals.
-Manual iOS 27 / iPhone 18 Pro checks confirmed both diagonal shapes and one
-increment per upper/lower edge tap. Android diagonal corners and those two Maestro flows
-remain unverified. JS adapter checks establish forwarding and disabled guards,
-not native geometry.
+`tests/layout/universal-button.test.mjs` checks props, colors, disabled guards and
+geometry forwarding for both adapters. Maestro flows in `.maestro/storybook/`
+cover count/reset (`button.yaml`), UX light/dark (`wireframe-buttons.yaml`),
+diagonal edge taps (`button-corners.yaml`) and native/rounded/square surfaces
+(`button-geometry.yaml`). The geometry flow defaults to light; select dark with
+`-e GEOMETRY_STORY=expo-ui-universal-button--geometry-dark`.
 
-Import public components from `@components/ui`; UI implementations import
-concrete files directly. [Back to the UI guide](../README.md).
+Before this refactor, geometry light/dark passed on physical Android 13 on
+2026-10-19; manual iOS 27 checks covered both diagonal shapes and edge activation.
+These historical checks do not verify the current refactor. Rerun native flows
+on both platforms; JS checks cannot establish touch geometry or visual behavior.
+
+[Back to the UI guide](../README.md).

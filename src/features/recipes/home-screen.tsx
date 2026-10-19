@@ -17,7 +17,7 @@ export default function HomeScreen() {
   const { t } = useTranslation();
   const scheme = useColorScheme();
   return (
-    <PageFrame title={t('common.home')} colorScheme={scheme} headerBlur>
+    <PageFrame title={t('common.home')} colorScheme={scheme} scrollsBehindHeader>
       <HomeContent colorScheme={scheme} />
     </PageFrame>
   );

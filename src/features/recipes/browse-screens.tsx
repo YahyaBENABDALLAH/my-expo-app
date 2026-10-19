@@ -3,7 +3,7 @@ import {
   UniversalButtonContent,
   PageScreen,
   UniversalTextContent as Text,
-  NativeField,
+  TextInput,
   QueryContent,
   RecipeCard,
 } from '@components/ui';
@@ -61,11 +61,11 @@ export function IngredientsScreen() {
       description={t('recipes.ingredientDescription')}
       onRefresh={onRefresh}
     >
-      <NativeField
+      <TextInput
         label={t('recipes.searchIngredients')}
         testID="ingredients-search"
         value={search}
-        onChange={(value) => {
+        onChangeText={(value) => {
           setSearch(value);
           setPage(1);
         }}

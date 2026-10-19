@@ -1,5 +1,5 @@
 import { Host } from '@expo/ui';
-import { UniversalButtonContent } from './universal-button-content';
+import { NativeButtonContent } from './universal-button-content';
 import type { UniversalButtonProps } from './universal-button.types';
 import { useWireframeButtonColors } from './use-wireframe-button-colors';
 
@@ -30,7 +30,7 @@ export function UniversalButton({ colorScheme, cornerRadii, ...props }: Universa
       ]}
       colorScheme={colorScheme}
     >
-      <UniversalButtonContent
+      <NativeButtonContent
         {...props}
         {...colors}
         borderRadius={cornerRadii ? 0 : props.borderRadius}

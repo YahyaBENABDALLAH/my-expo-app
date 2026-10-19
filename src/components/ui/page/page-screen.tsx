@@ -34,7 +34,12 @@ export function PageScreen({
   const scheme = useColorScheme(colorScheme);
   const goBack = onBack ?? (() => (router.canGoBack() ? router.back() : router.replace('/')));
   return (
-    <PageFrame title={title} onBack={tab ? undefined : goBack} colorScheme={scheme} headerBlur>
+    <PageFrame
+      title={title}
+      onBack={tab ? undefined : goBack}
+      colorScheme={scheme}
+      scrollsBehindHeader
+    >
       <PageContent
         description={description}
         actions={actions}

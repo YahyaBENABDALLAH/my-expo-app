@@ -8,7 +8,7 @@ import {
   UniversalButtonContent,
   PageScreen,
   UniversalTextContent as Text,
-  NativeField,
+  TextInput,
   QueryContent,
   RecipeCard,
   nativeFillWidth,
@@ -107,11 +107,11 @@ function SearchContent({ params }: { params: SearchParams }) {
       description={t('search.description')}
       tab
     >
-      <NativeField
+      <TextInput
         label={t('search.recipes')}
         testID="recipe-search-input"
         value={text}
-        onChange={setText}
+        onChangeText={setText}
       />
       <UniversalButtonContent
         variant="secondary"

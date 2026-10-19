@@ -1,7 +1,6 @@
 import type { ColorTokens } from '@/constants/colors';
 import type { UniversalButtonVariant } from './universal-button.types';
 
-/** Explicit semantic pairs for app compositions and native previews. */
 export function semanticButtonColors(variant: UniversalButtonVariant, colors: ColorTokens) {
   switch (variant) {
     case 'primary':

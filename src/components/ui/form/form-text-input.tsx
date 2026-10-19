@@ -1,6 +1,6 @@
 import { translateValidationMessage } from '@/lib/i18n';
 import { useTranslation } from 'react-i18next';
-import { Column, useNativeState } from '@expo/ui';
+import { Column } from '@expo/ui';
 import { nativeFillWidth, nativeFillWidthEnd } from '../native/native-fill-width';
 import { useEffect, useRef, useState } from 'react';
 import { useController, type Control, type FieldPath, type FieldValues } from 'react-hook-form';
@@ -8,16 +8,13 @@ import { useController, type Control, type FieldPath, type FieldValues } from 'r
 import { UniversalButtonContent } from '../button/universal-button-content';
 import { UniversalTextContent as AuthText } from '../text/universal-text';
 import { authInputIcons } from '../auth/auth-input-icons';
-import {
-  UniversalTextInputContent,
-  type UniversalTextInputProps,
-} from '../text-input/universal-text-input';
+import { TextInput, type TextInputProps } from '../text-input/text-input';
 import { useAuthTheme } from '../auth/auth-theme';
 import { notifyValidationError } from '@/lib/validation-feedback';
 
 type Props<T extends FieldValues> = Omit<
-  UniversalTextInputProps,
-  'value' | 'defaultValue' | 'ref' | 'onChangeText' | 'onBlur' | 'status' | 'onPress'
+  TextInputProps,
+  'value' | 'defaultValue' | 'ref' | 'onChangeText' | 'onBlur' | 'status'
 > & {
   control: Control<T>;
   name: FieldPath<T>;
@@ -32,7 +29,7 @@ function passwordInputOverrides(
   toggle: 'button' | 'icon',
   onToggle: () => void,
   actionLabel: string,
-): Partial<UniversalTextInputProps> {
+): Partial<TextInputProps> {
   if (!password) return {};
   const secureTextEntry = !shown;
   if (toggle === 'button') return { secureTextEntry };
@@ -57,7 +54,6 @@ export function FormTextInput<T extends FieldValues>({
   const { t } = useTranslation();
   const { field, fieldState } = useController({ control, name });
   const value = typeof field.value === 'string' ? field.value : '';
-  const nativeValue = useNativeState(value);
   const [showPassword, setShowPassword] = useState(false);
   const { colors } = useAuthTheme();
   const invalid = Boolean(fieldState.error);
@@ -72,14 +68,9 @@ export function FormTextInput<T extends FieldValues>({
     wasInvalid.current = invalid;
   }, [invalid]);
 
-  useEffect(() => {
-    // Keep external form resets in sync without remounting the native input.
-    if (nativeValue.get() !== value) nativeValue.set(value);
-  }, [nativeValue, value]);
-
   return (
     <Column spacing={8} modifiers={nativeFillWidth}>
-      <UniversalTextInputContent
+      <TextInput
         {...props}
         {...passwordInputOverrides(
           password,
@@ -90,7 +81,7 @@ export function FormTextInput<T extends FieldValues>({
         )}
         testID={testID}
         ref={(input) => field.ref(input)}
-        value={nativeValue}
+        value={value}
         palette={colors}
         onBlur={() => field.onBlur()}
         onChangeText={(text) => {

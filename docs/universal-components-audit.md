@@ -2,8 +2,8 @@
 
 2026-10-14: the native-default simplification is implemented. Switch, Checkbox,
 Slider and List now use small shared universal wrappers; Collapsible uses the
-root export. FieldGroup uses native sections with only an iOS explicit-background
-adapter. ListItem only adds the missing Android selector. Picker and segmented
+root export. FieldGroup directly re-exports the universal component on both
+platforms as of 2026-10-19. ListItem only adds the missing Android selector. Picker and segmented
 controls retain the necessary platform behavior with Host-derived appearance.
 iOS menu Picker triggers use native glass style on supported systems. See the
 [current control contract](control-theme.md) and

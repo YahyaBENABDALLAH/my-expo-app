@@ -12,7 +12,13 @@ import {
 import type { UniversalButtonContentProps } from './universal-button.types';
 import { useWireframeButtonColors } from './use-wireframe-button-colors';
 
-export function UniversalButtonContent({
+export function UniversalButtonContent(props: UniversalButtonContentProps) {
+  const colors = useWireframeButtonColors(props);
+  return <NativeButtonContent {...props} {...colors} />;
+}
+
+/** Internal renderer; callers resolve theme colors before reaching the native control. */
+export function NativeButtonContent({
   variant,
   label,
   children,
@@ -22,14 +28,9 @@ export function UniversalButtonContent({
   fullWidth,
   borderRadius,
   contentPadding,
-  color: colorOverride,
-  contentColor: contentColorOverride,
+  color,
+  contentColor,
 }: UniversalButtonContentProps) {
-  const { color, contentColor } = useWireframeButtonColors({
-    variant,
-    color: colorOverride,
-    contentColor: contentColorOverride,
-  });
   let style: Parameters<typeof buttonStyle>[0] = 'borderedProminent';
   if (variant === 'secondary') style = 'bordered';
   if (variant === 'link') style = 'plain';

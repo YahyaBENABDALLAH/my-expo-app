@@ -9,6 +9,11 @@ README with its purpose, usage constraints and available story coverage.
 
 For six-digit verification forms, see [OTP bottom sheet](otp-bottom-sheet/README.md).
 
+For text fields, choose `TextInput` with a string `value`/`onChangeText`, or
+`FormTextInput` with React Hook Form `control`/`name`. Both reuse the existing
+Host and the same input implementation. At an RN boundary, supply a
+`UniversalHost` explicitly.
+
 | Need                    | Folder guides                                                                                                                                                              |
 | ----------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Buttons and actions     | [button](button/README.md), [floating-action](floating-action/README.md)                                                                                                   |

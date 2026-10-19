@@ -9,13 +9,24 @@ import "@storybook/addon-ondevice-controls/register";
 const normalizedStories = [
   {
     titlePrefix: "",
-    directory: "./.rnstorybook/stories",
-    files: "**/*.stories.?(ts|tsx|js|jsx)",
-    importPathMatcher: /^\.(?:(?:^|[\\/]|(?:(?:(?!(?:^|[\\/])\.).)*?)[\\/])(?!\.)(?=.)[^\\/]*?\.stories\.(?:ts|tsx|js|jsx)?)$/,
+    directory: "./.rnstorybook/stories/components",
+    files: "*.stories.?(ts|tsx|js|jsx)",
+    importPathMatcher: /^\.[\\/](?:(?!\.)(?=.)[^\\/]*?\.stories\.(?:ts|tsx|js|jsx)?)$/,
     req: require.context(
-      './stories',
-      true,
-      /^\.(?:(?:^|[\\/]|(?:(?:(?!(?:^|[\\/])\.).)*?)[\\/])(?!\.)(?=.)[^\\/]*?\.stories\.(?:ts|tsx|js|jsx)?)$/
+      '../.rnstorybook/stories/components',
+      false,
+      /^\.[\\/](?:(?!\.)(?=.)[^\\/]*?\.stories\.(?:ts|tsx|js|jsx)?)$/
+    ),
+  },
+  {
+    titlePrefix: "",
+    directory: "./.rnstorybook/stories/forms",
+    files: "*.stories.?(ts|tsx|js|jsx)",
+    importPathMatcher: /^\.[\\/](?:(?!\.)(?=.)[^\\/]*?\.stories\.(?:ts|tsx|js|jsx)?)$/,
+    req: require.context(
+      '../.rnstorybook/stories/forms',
+      false,
+      /^\.[\\/](?:(?!\.)(?=.)[^\\/]*?\.stories\.(?:ts|tsx|js|jsx)?)$/
     ),
   }
 ];

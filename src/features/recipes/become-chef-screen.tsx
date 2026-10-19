@@ -4,7 +4,7 @@ import {
   UniversalButtonContent,
   PageScreen,
   UniversalTextContent as Text,
-  NativeField,
+  TextInput,
 } from '@components/ui';
 import { router } from 'expo-router';
 import { useState } from 'react';
@@ -29,24 +29,24 @@ export default function BecomeChefScreen() {
         <Text>{t('chef.ready')}</Text>
       ) : (
         <>
-          <NativeField
+          <TextInput
             label={t('chefProfile.displayName')}
             testID="chef-display-name"
             value={name}
-            onChange={setName}
+            onChangeText={setName}
           />
-          <NativeField
+          <TextInput
             label={t('chefProfile.bio')}
             multiline
             testID="chef-bio"
             value={bio}
-            onChange={setBio}
+            onChangeText={setBio}
           />
-          <NativeField
+          <TextInput
             label={t('chefProfile.specialty')}
             testID="chef-specialty"
             value={specialty}
-            onChange={setSpecialty}
+            onChangeText={setSpecialty}
           />
           {validation ? <Text>{translateValidationMessage(validation)}</Text> : null}
           {!user?.uuid ? <Text>{t('chef.login')}</Text> : null}

@@ -31,8 +31,8 @@ src/
 .rnstorybook/
   components/          Storybook-only helpers and canvases
   stories/
-    expo-ui/           Native Expo UI stories
-    typography/        Typography stories
+    components/        Reusable component stories
+    forms/             Login form, field group and OTP stories
   main.ts              Story discovery and addons
   preview.tsx          Shared preview configuration
   index.tsx            On-device Storybook entry
@@ -40,9 +40,8 @@ src/
 assets/                Fonts, images, and animations
 docs/                  Selector reference and project notes
 .maestro/              Shared native Android/iOS UI test flows
-tests/validation/      Zod schema tests
-tests/navigation/      Native route discovery and guarded navigation tests
-tests/auth/            Session lifecycle and API interceptor regression tests
+tests/components/      Component behavior and Storybook checks
+tests/forms/           Form validation and interaction checks
 ```
 
 Import app source with `@/`, assets with `@assets/`, and the Storybook entry with `@storybook`. Reusable UI components must not import Storybook helpers or stories. Keep non-route code outside `src/app/`. Platform-specific implementations stay next to their shared component.
@@ -64,21 +63,19 @@ language. Each slide can scroll vertically for enlarged text. Skip or Let’s ge
 `onboardingCompleted` in AsyncStorage. Later launches and sign-outs keep that
 preference. Startup waits for the preference before choosing a route, and a failed
 save offers a retry without marking the introduction complete.
-The `Pages/Onboarding` native Storybook stories preview every page, light/dark
-appearance, and persistence feedback without changing the saved preference.
+Storybook is limited to **Components** and **Forms**, with focused stories.
+Use Controls to explore themes, disabled states and other prop variations.
 
 - `npm start` starts Metro.
 - If another project already uses port 8081, run `npm start -- --port 8082` and
   open this app with `i` or `a` from that Metro terminal. Reopen the development
   link after changing ports so the installed app connects to this project's server.
 - Use Node 22.18 or newer and `npm ci` to install the locked dependencies.
-- `npm run check` runs TypeScript, lint, formatting, and all unit/regression tests.
-- `npm run test:services` checks API contracts, pagination, cancellation and mutation cache behavior.
+- `npm run check` runs TypeScript, lint, formatting, and component/form tests.
+- `npm test` runs both suites; `npm run test:components` or `npm run test:forms` runs one.
 - `npm run lint` checks app source, Storybook source, and project scripts/configuration with zero warnings allowed.
 - `npm run typecheck` checks app source, platform implementations, and Storybook stories with strict TypeScript.
-- `npm run test:architecture` checks import boundaries with real ESLint probes.
-- `npm run test:onboarding` checks first-launch persistence, navigation and save recovery.
-- `npm run test:e2e:onboarding` runs the native first-launch and skip flows on a connected test device; these flows clear the app’s data.
+- `npm run test:e2e` runs native component/form flows on a connected development build.
 - `npm run format` applies the shared formatting rules; `npm run format:check` checks them.
 - `npm run storybook:generate` regenerates story discovery after adding or moving stories.
 - `npm run storybook` starts a development-client Metro session with a fresh cache for native Storybook.
@@ -108,13 +105,13 @@ Storybook with duplicate `RNCSafeAreaProvider` registration. After updating
 dependencies, restart Metro with `npm run storybook`.
 
 Direct links such as
-`myappexpo://storybook?STORYBOOK_STORY_ID=expo-ui-universal-button--interaction&mode=canvas`
+`myappexpo://storybook?STORYBOOK_STORY_ID=components-button--interaction&mode=canvas`
 open the requested fixture even on the first lazy load. Canvas mode hides the
 Storybook panels and disables selection persistence; normal entry keeps them.
 
 Run `npm run test:e2e` with Maestro installed and a development build connected to Metro. See [native UI testing](docs/native-ui-tests.md) for device setup, individual flows, and platform requirements.
 
-Signed-out users start at **Login**, with registration, email verification, and password recovery in one native auth stack. The **Account** tab shows the signed-in identity and logout. Set `EXPO_PUBLIC_API_URL` in `.env.local` and restart Metro after changing it. See [auth forms](docs/auth-forms.md) for the backend contract and test IDs. Run `npm test` to check schemas, navigation, session races, and API interceptors.
+Signed-out users start at **Login**, with registration, email verification, and password recovery in one native auth stack. The **Account** tab shows the signed-in identity and logout. Set `EXPO_PUBLIC_API_URL` in `.env.local` and restart Metro after changing it. See [auth forms](docs/auth-forms.md) for the backend contract and test IDs. See [tests](tests/README.md) for the focused component/form suite.
 
 See [the cleanup report](docs/project-cleanup.md) for review findings, dependency decisions, and the remaining upstream dependency advisory.
 

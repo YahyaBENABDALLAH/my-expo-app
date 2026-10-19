@@ -10,7 +10,6 @@ export type BottomSheetProps = Pick<
   NativeBottomSheetProps,
   'children' | 'isPresented' | 'onDismiss' | 'testID'
 > & {
-  /** Known scroll viewport height, applied before native presentation starts. */
   contentHeight?: number;
 };
 

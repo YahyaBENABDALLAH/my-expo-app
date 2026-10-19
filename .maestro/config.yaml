@@ -1,4 +1,3 @@
 flows:
-  - storybook/*
-  - auth/*
-  - onboarding/*
+  - components/*
+  - forms/*

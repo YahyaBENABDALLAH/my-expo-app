@@ -25,7 +25,7 @@ Android uses Expo UI's native Compose `SnackbarHost`; iOS uses a SwiftUI text/bu
 
 Screens retain drafts, client-side field validation, cached content, and retry controls. `QueryContent` keeps persistent failure context beside Retry after a toast disappears, with separate initial-load and saved-content messages. Avoid reporting the same error again in consumer callbacks. When an imperative operation runs outside the shared query client, catch it with `reportErrorToast(error)`; do not add notification effects to entity transport methods. Local collection failures handled by the shared cache also use toasts.
 
-`tests/services/error-toasts.test.mjs` exercises real Axios/TanStack behavior with mocked I/O: display text, coalescing, queue dismissal, retry success/exhaustion, shared observers, mutation callbacks, cancellation/session changes, and imperative auth failures. Native stories cover light/dark, long, and multiline notifications; `.maestro/storybook/error-toast.yaml` covers dismissal and reopening when a native device is available.
+The Components/Toast story exposes notification props through Controls; `.maestro/components/error-toast.yaml` covers dismissal and reopening when a native device is available. The maintained JS suite is limited to components and forms.
 
 ## Module responsibilities
 
@@ -236,15 +236,4 @@ The chef-by-user helper scans documented profile list pages because the backend 
 
 ## Verification
 
-`npm run test:services` exercises real Axios interceptors and TanStack Query caches
-with an in-memory network adapter. It checks endpoint contracts, normalization,
-pagination, cancellation, scoped invalidation, callback ordering, screen refresh,
-offline behavior, malformed response rejection and session races. Transport error
-tests also verify actual retry counts, timeout durations, safe feedback and
-preflight storage failures. The suite is included in `npm test`. Complete fixtures
-live in `tests/helpers/api-fixtures.mjs`; the adapter does not repair malformed
-payloads.
-
-Screen-refresh tests cover exact filters/pages, inactive/disabled queries, request reuse, completion ordering, cached content after errors, and offline local collections. Native short/tall composition stories are in Pages/Navigation shell. Run `maestro test .maestro/storybook/pull-to-refresh.yaml` against a connected development build with Metro running for gesture, pending-duplicate, failure and recovery checks. Device execution is still required to verify native interaction and indicator geometry on iOS and Android.
-
-The DTOs and endpoints come from the repository's reference contracts. Live backend and device behavior require separate integration verification. Implementation patterns were checked through Context7 and installed packages against TanStack Query v5 documentation: [query options](https://tanstack.com/query/v5/docs/framework/react/guides/query-options), [infinite queries](https://tanstack.com/query/v5/docs/framework/react/guides/infinite-queries), [cancellation](https://tanstack.com/query/v5/docs/framework/react/guides/query-cancellation), and [mutation invalidation](https://tanstack.com/query/v5/docs/framework/react/guides/invalidations-from-mutations). Axios normalization follows its [error handling](https://axios-http.com/docs/handling_errors) and [cancellation](https://axios-http.com/docs/cancellation) contracts.
+The service-specific test suite was removed during the component/form cleanup. Run `npm test` for the maintained suites; service integration and backend behavior need separate verification.

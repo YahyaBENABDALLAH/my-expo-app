@@ -1,0 +1,31 @@
+appId: com.hyrkul.likan
+name: Controlled string input edits, updates and resets
+tags: [smoke, storybook, input]
+env:
+  STORYBOOK_URL: myappexpo://storybook
+---
+- runFlow:
+    file: ../helpers/open-story.yaml
+    env:
+      STORY_ID: components-text-input--controlled
+      READY_ID: expo-ui-text-input-set-value
+- tapOn:
+    id: expo-ui-text-input-set-value
+- assertVisible:
+    id: expo-ui-text-input
+    text: UPDATED
+- tapOn:
+    id: expo-ui-text-input-reset
+- assertNotVisible:
+    id: expo-ui-text-input
+    text: UPDATED
+- tapOn:
+    id: expo-ui-text-input
+- inputText: native
+- assertVisible:
+    id: expo-ui-text-input
+    text: native
+- assertVisible:
+    id: expo-ui-text-input-description
+    text: 'Controlled value: native'
+- hideKeyboard

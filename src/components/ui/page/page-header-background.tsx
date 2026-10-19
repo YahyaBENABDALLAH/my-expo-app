@@ -1,5 +1,6 @@
 import { useContext, useEffect, useState, type RefObject } from 'react';
-import { AccessibilityInfo, Platform, type View } from 'react-native';
+import { BlurView } from 'expo-blur';
+import { AccessibilityInfo, Platform, View } from 'react-native';
 import { useThemeColors } from '@/hooks/use-theme';
 import { useHostColorScheme } from '../host/universal-host';
 import { PageWaveContext } from './page-wave-context';
@@ -9,9 +10,11 @@ import { PageWaveSurface } from './page-wave-surface';
 export function PageHeaderBackground({
   blurTarget,
   colorScheme,
+  height = 0,
 }: {
   blurTarget: RefObject<View | null>;
   colorScheme?: 'light' | 'dark';
+  height?: number;
 }) {
   const scheme = useHostColorScheme(colorScheme);
   const colors = useThemeColors(scheme);
@@ -38,7 +41,32 @@ export function PageHeaderBackground({
     };
   }, []);
 
-  if (!wave) return null;
+  if (!wave) {
+    const style = { position: 'absolute' as const, top: 0, left: 0, right: 0, height };
+    return reduceTransparency ? (
+      <View
+        testID="page-header-solid-background"
+        pointerEvents="none"
+        accessible={false}
+        accessibilityElementsHidden
+        importantForAccessibility="no-hide-descendants"
+        style={{ ...style, backgroundColor: colors.background }}
+      />
+    ) : (
+      <BlurView
+        testID="page-header-blur"
+        pointerEvents="none"
+        accessible={false}
+        accessibilityElementsHidden
+        importantForAccessibility="no-hide-descendants"
+        blurTarget={blurTarget}
+        blurMethod="dimezisBlurViewSdk31Plus"
+        tint={scheme === 'dark' ? 'dark' : 'extraLight'}
+        intensity={40}
+        style={style}
+      />
+    );
+  }
 
   return (
     <PageWaveSurface

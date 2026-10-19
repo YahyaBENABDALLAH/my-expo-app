@@ -7,7 +7,7 @@ import {
   UniversalTextContent as Text,
   RecipeStepper,
   PageScreen,
-  NativeField,
+  TextInput,
   QueryContent,
 } from '@components/ui';
 import { router } from 'expo-router';
@@ -109,17 +109,17 @@ export default function CreateScreen() {
       {error ? <Text testID="recipe-form-error">{translateValidationMessage(error)}</Text> : null}
       {step === 0 ? (
         <>
-          <NativeField
+          <TextInput
             label={t('recipeForm.title')}
             testID="recipe-title"
             value={draft.title}
-            onChange={(value) => setField('title', value)}
+            onChangeText={(value) => setField('title', value)}
           />
-          <NativeField
+          <TextInput
             label={t('recipeForm.summary')}
             testID="recipe-summary"
             value={draft.summary}
-            onChange={(value) => setField('summary', value)}
+            onChangeText={(value) => setField('summary', value)}
             multiline
           />
         </>
@@ -154,24 +154,24 @@ export default function CreateScreen() {
               ['servings', 'recipeForm.servings'],
             ] as const
           ).map(([key, label]) => (
-            <NativeField
+            <TextInput
               key={key}
               label={t(label)}
               testID={`recipe-${key}`}
               value={draft[key]}
-              numeric
-              onChange={(value) => setField(key, value)}
+              keyboardType="decimal-pad"
+              onChangeText={(value) => setField(key, value)}
             />
           ))}
         </>
       ) : null}
       {step === 2 ? (
         <>
-          <NativeField
+          <TextInput
             label={t('recipeForm.findIngredients')}
             testID="ingredient-search"
             value={ingredientSearch}
-            onChange={searchIngredients}
+            onChangeText={searchIngredients}
           />
           <QueryContent query={ingredients}>
             <Text>
@@ -214,12 +214,12 @@ export default function CreateScreen() {
                   <Picker.Item key={option.uuid} value={option.uuid} label={lookupLabel(option)} />
                 ))}
               </Picker>
-              <NativeField
+              <TextInput
                 label={t('recipeForm.quantity')}
-                numeric
+                keyboardType="decimal-pad"
                 testID={`ingredient-${item.id}-quantity`}
                 value={item.quantity}
-                onChange={(value) => updateIngredient(item.id, { quantity: value })}
+                onChangeText={(value) => updateIngredient(item.id, { quantity: value })}
               />
               <QueryContent query={units}>
                 <Picker
@@ -257,12 +257,12 @@ export default function CreateScreen() {
         <>
           {draft.steps.map((item, index) => (
             <Column key={item.id} spacing={8}>
-              <NativeField
+              <TextInput
                 label={t('recipeForm.stepNumber', { index: index + 1 })}
                 multiline
                 testID={`recipe-instruction-${item.id}`}
                 value={item.instruction}
-                onChange={(value) => updateStep(item.id, value)}
+                onChangeText={(value) => updateStep(item.id, value)}
               />
               <UniversalButtonContent
                 variant="destructive"

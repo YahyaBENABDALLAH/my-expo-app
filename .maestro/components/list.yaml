@@ -1,0 +1,37 @@
+appId: com.hyrkul.likan
+name: List row press updates selected row
+tags: [smoke, storybook]
+env:
+  STORYBOOK_URL: myappexpo://storybook
+---
+- runFlow:
+    file: ../helpers/open-story.yaml
+    env:
+      STORY_ID: components-list--default
+      READY_ID: expo-ui-list-row-2
+- assertVisible:
+    id: expo-ui-list-status
+    text: 'Selected row: None.*'
+- tapOn:
+    id: expo-ui-list-row-2
+- assertVisible:
+    id: expo-ui-list-status
+    text: 'Selected row: 2.*'
+- runFlow:
+    file: ../helpers/open-story.yaml
+    env:
+      STORY_ID: components-list--compound-slots
+      READY_ID: list-compound-row
+- assertVisible:
+    id: list-compound-status
+    text: 'Row presses: 0'
+- tapOn:
+    id: list-compound-row
+- assertVisible:
+    id: list-compound-status
+    text: 'Row presses: 1'
+- tapOn:
+    id: list-compound-passive-row
+- assertVisible:
+    id: list-compound-status
+    text: 'Row presses: 1'

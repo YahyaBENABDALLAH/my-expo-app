@@ -1,0 +1,25 @@
+appId: com.hyrkul.likan
+name: Native picker selects and resets
+tags: [smoke, storybook]
+env:
+  STORYBOOK_URL: myappexpo://storybook
+---
+- runFlow:
+    file: ../helpers/open-story.yaml
+    env:
+      STORY_ID: components-picker--menu
+      READY_ID: expo-ui-picker
+- assertVisible:
+    id: expo-ui-picker-value
+    text: 'Selected: casablanca'
+- tapOn:
+    id: expo-ui-picker
+- tapOn: Rabat
+- assertVisible:
+    id: expo-ui-picker-value
+    text: 'Selected: rabat'
+- tapOn:
+    id: expo-ui-picker-reset
+- assertVisible:
+    id: expo-ui-picker-value
+    text: 'Selected: casablanca'

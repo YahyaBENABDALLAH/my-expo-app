@@ -1,10 +1,13 @@
 # Page layout and motion
 
-Exports: `PageScreen`, `PageFrame`, `PageHeader` and `PageMotionOverlay`.
+Exports: `PageScreen`, `PageFrame`, `PageHeader`, `PageMotionOverlay` and `pageFormModifiers`.
 
-`PageScreen` and Home blur scrolling content only inside the animated wave shapes.
-`PageFrame.headerBlur` enables this behavior; scrolling children use
-`usePageHeaderInset()` for padding inside their scroll content. The inset measures
+Every titled `PageFrame` blurs its header by default, including Settings, maps,
+developer tools and recovery screens. `headerBlur={false}` explicitly opts out.
+The default frame keeps its header in normal layout and reserves the measured
+title height above its content. Its full-frame blur source sits below the header.
+`PageScreen`, Home and Settings use `scrollsBehindHeader` and `usePageHeaderInset()` to reserve that height
+inside their scroll content instead. The inset measures
 the real header, including the status bar, back button and larger text. The first
 item starts below the title and can scroll behind it. Content mounts before the
 blur and supplies a `BlurTargetView` reference for Android that excludes the title
@@ -14,6 +17,10 @@ and back button. The mask sits below those controls so they stay sharp.
 cached paths and UI-thread transforms between the visible artwork and the
 platform blur mask. No second animation loop or per-frame
 React updates are needed. Outside the two wave silhouettes the header is clear.
+The wave clock accumulates active frame time instead of restarting a repeating
+animation. Replacing a page's mask joins the current phase; backgrounding, Reduce
+Motion, explicit pause and visibility changes retain that phase. Resume excludes
+paused time, and a delayed frame advances by at most 64 ms to avoid a sudden jump.
 The optional `children` slot supplies this context to local previews; `visible`
 hides the artwork and mask without remounting navigation. Splash waves keep their
 existing opaque fills and do not supply a blur mask.
@@ -30,21 +37,27 @@ gray thin-material overlay and keeping more of the content visible. Android 12+
 uses native blur; older Android versions use a translucent fallback. iOS Reduce
 Transparency replaces the blur with the theme's `background` token. The backdrop
 ignores touches and title-only floating headers pass gestures through to content.
-Settings' native grouped form and other plain frames retain their in-flow layout.
+Settings reserves its measured header height inside the first section's custom
+header, so that space scrolls away and the native form passes beneath the wave
+blur. `pageFormModifiers` fills the native viewport and, on iOS, hides the system
+Form canvas as well as the view background;
+Android retains the transparent native FieldGroup. Neither platform nests scroll
+containers. The title and back control stay above the blur; the viewport clips
+only to the full content frame. Full-height overlays retain the top device inset for map controls.
+Without wave context, a rectangular native blur covers the measured header and
+retains the same Reduce Transparency fallback.
 
-`BlurredHeader`, `DarkBlurredHeader` and `AnimatedWaves` in `Pages/Navigation shell`
-provide long, deterministic cards and a counted back action. The header Maestro flow exercises
-scrolling and back actions in both appearances. JS checks cover measured scroll
-padding, retained drafts during header resizing and live Reduce Transparency
-changes. Geometry checks confirm that mask and artwork share paths, drift and
-width, and that hiding waves removes the mask. iOS checks also ensure the material
-is native SwiftUI, the mask is SVG, and Metro selects the platform surface adapter.
-Native blur appearance still
-requires a device.
+`Components/Page Header` previews default, dark, scrolling, full-height overlay
+and no-wave headers with deterministic cards and a counted back action.
+`AppSettings` and `DarkAppSettings` render the actual grouped settings form,
+with a counted back action outside the form for checking scrolling and header interaction.
+`tests/components/page-frame.test.mjs` checks measured content spacing, retained
+drafts during header resizing, overlay safe areas and live Reduce Transparency.
+Native blur appearance and interaction still require a device.
 
 `page-screen.tsx` composes scrolling content and actions.
 `page-frame.tsx` handles the header's safe area and leaves other edges to content.
-Its optional `headerOverlay` floats the transparent header above full-height content,
+Its optional `headerOverlay` floats the blurred header above full-height content,
 as used by Cartes. Overlay content retains the top device inset for native map controls;
 a title-only overlay ignores touches so map gestures work beneath the header.
 Its adjusted safe-area context keeps a stable identity until content insets change,
@@ -61,8 +74,20 @@ Its default `overlay` variant decorates headers; `variant="splash"` places the
 same moving paths in normal flow with opaque fills for the launch screen's bottom
 edge. Both use the exported `PAGE_WAVE_HEIGHT` and the same motion guards.
 The back wave resolves theme opacity first; the splash keeps full opacity.
-The wave drifts on a 10-second cycle. Header layers share the theme's tint with
+The wave is 180 points tall and drifts on an 8-second cycle. Both Bézier contours
+have half their previous vertical depth for a flatter shape, shared by
+the artwork and blur masks. Horizontal travel is 40 / 50 design units and
+vertical travel is 2 / 3 points, half the previous movement. RTL reverses both
+layers' horizontal direction without restarting their phase. `AnimatedLtr` and
+`AnimatedRtl` in the header stories preview these settings; motion tests exercise
+60/120-Hz timing, direction changes and pause/resume without per-frame React work.
+Header layers share the theme's tint with
 a gentle 20% gradient fade for a more consistent color across the filled area.
+`Pages/Shared Skia motion/NavigationContinuity` replaces Home, Search and Saved
+recipes frames beneath one overlay, with pause/resume and a back action. Its
+Maestro flow checks the controls and retained pause state across replacement;
+geometry tests check the wave phase at 60/120 Hz on both platform adapters. These
+checks do not establish native visual continuity or device performance.
 `expanded` positions the wave at 35% of the window height and fills its background
 continuously to the top. Login uses it while signed out. Successful login raises
 the wave to the header over one second. Opening Register and returning to Login
@@ -88,8 +113,8 @@ Page actions accept stable `testID` values independent of translated labels.
 Motion follows focus/activity/reduced-motion guards and ignores touches.
 See [shared motion](../../../../docs/shared-skia-motion.md).
 
-Existing composition story: [page-screen.stories.tsx](../../../../.rnstorybook/stories/pages/page-screen.stories.tsx),
-including `TransparentHeader` for the overlay with a simulated notch.
+Composition story: [page-header.stories.tsx](../../../../.rnstorybook/stories/components/page-header.stories.tsx),
+including `FullHeightOverlay` with a simulated notch.
 
 Import public components from `@components/ui`; UI implementations import
 concrete files directly. [Back to the UI guide](../README.md).

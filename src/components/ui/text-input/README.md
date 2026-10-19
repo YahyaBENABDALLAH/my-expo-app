@@ -1,23 +1,48 @@
 # Text input
 
-`UniversalTextInput` hosts the field at an RN boundary; `UniversalTextInputContent` composes inside an existing Host. Both keep the universal Expo UI input props, label, helperText, status, optional palette, leading/trailing icons and accessible trailing action.
+Use `TextInput` for ordinary fields and `FormTextInput` for React Hook Form.
+Both render the same Expo UI control. Import them from `@components/ui` and
+compose inside an existing `UniversalHost` or `PageScreen`.
 
-The Host supplies native typography and tint. The wrapper adds the shared text, surface, border, muted and validation colors. Explicit native color props and palette overrides remain supported. Disabled content dims while the surface stays intact; read-only editing and a separate icon action remain independent.
+```tsx
+<TextInput label="Search" value={query} onChangeText={setQuery} testID="recipe-search" />
+```
 
-The border uses the theme or palette `tint` while focused and returns to `border` on blur. Error, success and warning colors remain visible during focus; disabled fields keep their resting border. Explicit `style.borderColor` overrides still take precedence. Only color changes, so focusing does not change field geometry.
+`value` is a normal string. The input owns the native observable and synchronizes
+external edits and resets without replacing the field. For uncontrolled editing,
+omit `value` and supply an optional `defaultValue`; later default changes do not
+replace native edits. Use `keyboardType="decimal-pad"` for numeric fields.
 
-There is no width-measurement state, delayed first render, calculated text height or forced remount. Native layout handles width; focus state updates the border, and guards suppress duplicate/initial native notifications. Observable values and input refs retain external reset, selection and keyboard behavior.
+The public API keeps native keyboard, selection, focus, ref, multiline and secure
+entry props, plus labels, helper text, status colors and optional icons. There
+are no separate NativeField or UniversalTextInput/Content exports. At a React
+Native boundary, supply a `UniversalHost` explicitly; ordinary native composition
+reuses its existing Host. `FormTextInput` adds form binding, translated validation,
+password toggles and validation feedback. See the [form guide](../form/README.md).
 
-On iOS, both SecureField and TextField use `textFieldStyle('plain')`. Vertical padding is no longer added to the editable text. The surface has a 48-point minimum height, matching the eye button’s 48 × 48 native tap area; content can grow for larger fonts or multiline text. Caller height, width, padding and rounded-border overrides remain available. The iOS adapter applies its sizing before surface paint and inset stroke so the whole native surface keeps the supplied dimensions. Android uses its native minimum-size modifier and field weight.
+The owning Host supplies appearance and tint. The input uses shared text,
+surface, border, muted and status colors, with caller overrides. Focus changes
+only the border color; error/success/warning colors take priority. Disabled fields
+retain their surface and suppress editing and icon actions. Read-only editing
+and a separate icon action remain independent. Icon actions require an accessible
+label.
 
-Icons retain 20 × 20 frames. Right actions require an accessibility label and suppress disabled actions. Password toggling changes the native display mode and icon while retaining the observable value and shared surface geometry.
+Native layout owns sizing. iOS uses plain TextField/SecureField styling and a
+48-point minimum surface; Android keeps its native minimum size. Password mode
+changes retain the same observable and ref. There is no width measurement,
+delayed rendering or remount to synchronize values.
 
-[Native stories](../../../../.rnstorybook/stories/expo-ui/text-input.stories.tsx) cover editing, read-only/disabled, themes, custom geometry and passwords. PasswordVisibility, PasswordVisibilityLargeText, PasswordVisibilityEmpty, PasswordVisibilityDisabled and PasswordVisibilityLight expose native layout status and toggle counts. Their measurement exists only in the story fixture. The [Maestro flow](../../../../.maestro/storybook/text-input-icons.yaml) asserts stable height, value visibility and disabled suppression.
+[Native stories](../../../../.rnstorybook/stories/expo-ui/text-input.stories.tsx)
+cover controlled strings, external updates/reset, default values, icons, focus,
+passwords, disabled/read-only states, themes and geometry. Standalone story
+previews supply a Host; the production input itself adds none. Existing Maestro
+flows in `.maestro/storybook/text-input-*.yaml` assert editing, reset, selection,
+focus and password actions. `Controlled` uses the same string API as app callers.
 
-The Focused and FocusedLight stories show focus status with explicit focus/blur controls. The [focus flow](../../../../.maestro/storybook/text-input-focus.yaml) checks autofocus, typing, blur and refocus; it does not compare border pixels.
+JS checks verify value/reset synchronization, native field retention, focus
+colors/guards, disabled actions, refs, geometry and theme inheritance. They mock
+native views; current iOS/Android keyboard, touch, selection and visual behavior
+still require device verification. Earlier manual checks do not verify this API
+migration.
 
-Manual focus verification on the iOS 27 iPhone 18 Pro in Device Hub confirmed a tinted registration-field border and transfer of the highlight to the next field, with the blurred required field retaining its red validation border. Android appearance and the Maestro focus flow remain unverified; Maestro is not installed in this environment, and native Storybook remained on its loading screen.
-
-JS tests cover value/field retention, border color on focus/blur, explicit overrides, focus guards, immediate rendering, resizing and native module resolution. On the iPhone 18 Pro simulator running iOS 27, registration inputs retained their visible surface height when hiding/showing empty and filled values, and the filled value survived repeated toggles. The Storybook update removed the duplicate `react-native-safe-area-context` dependency that caused RNCSafeAreaProvider registration errors; architecture checks now guard shared native module resolution. Full Storybook/large-text and Android native checks remain pending. These manual checks are not automated screenshot comparison.
-
-Context7 guidance was checked against [SDK 57 TextInput](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/textinput/) and installed Expo UI 57.0.21 native implementations.
+API reference: [Expo SDK 57 TextInput](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/textinput/).

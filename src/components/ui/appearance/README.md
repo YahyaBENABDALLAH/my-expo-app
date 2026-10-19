@@ -5,8 +5,8 @@ Exports: `ColorSchemeControl`, `LayoutDirectionControl`, `LanguagePicker` and `T
 `ThemePicker` and `ColorSchemeControl` render inside App Settings (`/settings`),
 using the `app-settings-theme-picker` and `app-settings-color-scheme-picker`
 selectors, inside the Appearance FieldGroup section. Preference sheets use the
-app background color. The settings viewport and
-FieldGroup are transparent so the shared app Aurora background remains visible.
+app background color. The settings viewport is transparent; Expo's universal
+FieldGroup owns its native form and row surfaces.
 The theme menu includes **UX Template**, with black primary fills, white labels,
 and neutral foundations with restrained danger, success and warning accents in both appearances.
 It uses the stable `ux` ID and the same session

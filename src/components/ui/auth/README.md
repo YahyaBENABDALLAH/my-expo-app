@@ -18,8 +18,8 @@ container. Registration supplies sections directly to this mode and shares the
 frame's heading, width, keyboard and safe-area handling. Keep this full-height
 grouped form out of another scroll container; its long content scrolls normally.
 FieldGroup owns the grouped form's horizontal gutters; the auth frame adds only
-side safe-area insets. Its scroll background is transparent to preserve the page
-background. On iOS, section rows use the shared `surface` color for contrast.
+side safe-area insets. Expo's universal FieldGroup owns the native form
+background, section row colors and scroll indicators.
 
 Compose `AuthText` and `UniversalButtonContent` inside the frame. `AuthText`
 aliases `UniversalTextContent`; buttons use the shared theme tokens and

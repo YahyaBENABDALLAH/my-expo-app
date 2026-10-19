@@ -1,5 +1,45 @@
 # Universal component catalog
 
+## Current Storybook and test scope
+
+The catalog intentionally contains only **Components** and **Forms**. Use Controls for theme, appearance, disabled states and minor prop variations. The current scope is in [Storybook](../../../../.rnstorybook/README.md); JS suites are in [tests](../../../../tests/README.md). Full-page, onboarding, recipe showcase, motion and theme-token demos were removed. Dated entries below record historical implementation details and may reference retired fixtures; they are not a requirement to restore those stories or test suites.
+
+## Two input APIs (2026-10-19)
+
+`TextInput` accepts ordinary string `value`/`onChangeText` props and owns the
+native observable plus external reset synchronization. `FormTextInput` binds
+React Hook Form to that same component, adding validation/password behavior.
+Both compose inside the existing Host; standalone story previews supply a Host.
+`NativeField` and the UniversalTextInput/Content exports were removed and all
+callers migrated. Existing theme roles, native geometry, refs, focus guards and
+password behavior remain. `text-input.stories.tsx` now exercises controlled strings
+with external update/reset, and its Maestro flow targets `Controlled`. Portable
+checks cover reset/value/field retention and existing auth/recipe integrations;
+native keyboard, selection and visual behavior require device verification.
+See the [input guide](../../../../src/components/ui/text-input/README.md).
+
+## Universal FieldGroup (2026-10-19)
+
+FieldGroup now directly re-exports `@expo/ui` on both platforms. The iOS adapter
+and its row/background/scroll-indicator overrides are removed. The existing
+Section/Header/Footer API and bounded Host composition remain. Native themes
+own the form surfaces and row colors. Existing Field Group stories cover
+preferences, custom headers, disabled controls and light/dark appearance;
+layout checks cover slots and shared Metro resolution. Native appearance needs
+device verification after this change.
+
+## Button renderer simplification (2026-10-19)
+
+Standalone and hosted buttons resolve their existing native/UX color policy once
+and share the platform renderer. The public API, native geometry, glass fallback,
+disabled guards and semantic token roles remain unchanged. The internal renderer
+is excluded from the public UI barrel. The existing button stories now expose
+padding and color controls and preserve partial caller overrides. SDK 57's root
+Button still lacks the native color, padding, shape and destructive-role props
+needed here, so the platform adapters remain. See the
+[button guide](../../../../src/components/ui/button/README.md) for supported props
+and verification limits.
+
 ## Native sheet height and geometry merge (2026-10-19)
 
 The stash-conflict resolution preserves the current minimal native BottomSheet
@@ -278,14 +318,14 @@ See the [folder guide](../../../../src/components/ui/README.md).
 | [Checkbox](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/checkbox/)       | `checkbox/checkbox.tsx`                                                                 | `checkbox.stories.tsx`                              | Checked/unchecked, disabled, state change and reset                                                                  |
 | [BottomSheet](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/bottomsheet/) | `bottom-sheet/bottom-sheet.tsx`                                                         | `bottom-sheet.stories.tsx`                          | Native defaults, hidden iOS handle, light/dark appearance, open/close, dismissal, reopen, tall content               |
 | [Collapsible](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/collapsible/) | `collapsible/collapsible.tsx`                                                           | `collapsible.stories.tsx`                           | Expand/collapse reveals and hides content, long header/content                                                       |
-| [FieldGroup](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/fieldgroup/)   | `field-group/field-group.tsx` + iOS background adapter                                  | `field-group.stories.tsx`                           | Labels/supporting text, grouped fields, empty/error composition, keyboard                                            |
+| [FieldGroup](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/fieldgroup/)   | Direct Expo UI export via `field-group/field-group.tsx`                                 | `field-group.stories.tsx`                           | Labels/supporting text, grouped fields, empty/error composition, keyboard                                            |
 | [Icon](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/icon/)               | Direct Expo UI export; Storybook showcase                                               | `icon.stories.tsx`                                  | Valid symbols on both platforms, size/tint, meaning conveyed by adjacent text                                        |
 | [List](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/list/)               | `list/list.tsx`                                                                         | `list.stories.tsx`                                  | Empty/short groups, row selection, refresh if exposed, scroll behavior                                               |
 | [ListItem](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/list/)           | `list-item/list-item.tsx`; direct `UniversalListItem` alias                             | Within `list.stories.tsx`; focused coverage pending | Leading/supporting/trailing slots, press/disabled, long text, accessory alignment                                    |
 | [Picker](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/picker/)           | `picker/picker.<platform>.tsx`                                                          | `picker.stories.tsx`                                | Menu/wheel differences, selected value, disabled, value callback, long option labels                                 |
 | [RNHostView](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/rnhostview/)   | Direct Expo UI export                                                                   | Shared story frame composition                      | Necessary RN infrastructure inside native trees, intrinsic sizing and interaction; no substitute RN controls         |
 | [Spacer](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/spacer/)           | Direct Expo UI export                                                                   | `spacer.stories.tsx`                                | Horizontal/vertical expansion in constrained layouts                                                                 |
-| [TextInput](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/textinput/)     | `text-input/universal-text-input.tsx`                                                   | `text-input.stories.tsx`                            | Empty/type/clear/reset, controlled updates, password, editable/read-only, focus/blur, keyboard, multiline            |
+| [TextInput](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/textinput/)     | `text-input/text-input.tsx`; `form/form-text-input.tsx`                                 | `text-input.stories.tsx`; `auth-screen.stories.tsx` | String editing/reset, form validation, password, editable/read-only, focus/blur, keyboard, multiline                 |
 
 ## Compound exports and helpers
 
@@ -420,7 +460,7 @@ content. These checks establish JS behavior; native rendering still requires dev
 `PageMotionOverlay.variant` defaults to `overlay` for the page header. Its `splash`
 variant reuses the same drifting paths and crest in normal flow with opaque theme
 fills, replacing the launch screen's fixed bottom curves. Both placements use
-`PAGE_WAVE_HEIGHT` (144) and the existing activity/reduced-motion guards. The
+`PAGE_WAVE_HEIGHT` (180) and the existing activity/reduced-motion guards. The
 replayable Animated splash story covers this moving edge during the two-second exit;
 actual native wave continuity remains unverified.
 
@@ -450,9 +490,9 @@ The following top-edge wave is mounted above root navigation alongside the full-
 aurora behind navigation. Both layers pause while the splash covers them. The aurora
 composition stories also include the header wave; focused wave stories remain available:
 
-`PageMotionOverlay` (`src/components/ui/page/page-motion-overlay.tsx`) provides a single 144-point-tall Skia canvas above the root navigation tree. It covers all routed pages, including authentication, details, and utility screens, without modifying their native control trees. `animate` defaults to true; optional `colorScheme` supplies deterministic light/dark previews. It consumes existing `tint` and `tabIconSelected` colors. Two oversized paths drift gently in opposite directions on a shared 12-second UI-thread loop. Width follows the wrapper's `onLayout` event, with no per-frame measurement or React updates. `useMotionEnabled` cancels/resets motion during background/inactive states, live Reduce Motion changes, and explicit static mode. The root keeps it static beneath the launch screen.
+`PageMotionOverlay` (`src/components/ui/page/page-motion-overlay.tsx`) provides a single 180-point-tall Skia canvas above the root navigation tree, with flatter curves with half the previous vertical depth shared by the artwork and blur masks. It covers all routed pages, including authentication, details, and utility screens, without modifying their native control trees. `animate` defaults to true; optional `colorScheme` supplies deterministic light/dark previews. It consumes existing `tint` and `tabIconSelected` colors. Two oversized paths drift in opposite directions on the current 8-second UI-thread loop, with horizontal travel of 40 / 50 design units and vertical travel of 2 / 3 points. The current layout direction reverses horizontal motion in RTL without resetting phase. Width follows the wrapper's `onLayout` event, with no per-frame measurement or React updates. `useMotionEnabled` pauses motion during background/inactive states, live Reduce Motion changes, and explicit static mode. The root keeps it static beneath the launch screen.
 
-Both wrapper and canvas ignore touches, and the decorative wrapper is hidden from accessibility. `.rnstorybook/stories/pages/page-motion.stories.tsx` covers Light, Dark, Static, and NarrowPhone with native buttons underneath the artwork, a visible action count, and pause/resume. `.maestro/storybook/page-motion.yaml` checks single tap delivery and those control states. These fixtures do not prove animation timing, actual native stacking, screen-reader behavior, rotation, or device performance; see [shared motion verification](../../../../docs/shared-skia-motion.md).
+Both wrapper and canvas ignore touches, and the decorative wrapper is hidden from accessibility. `AnimatedLtr` and `AnimatedRtl` in `.rnstorybook/stories/components/page-header.stories.tsx` preview the taller waves above scrolling content with a counted back action. `tests/components/page-wave-motion.test.mjs` checks 60/120-Hz timing, mirrored direction, phase retention and pause/resume using mocked native boundaries. These fixtures do not prove native stacking, screen-reader behavior, rotation, or device performance; see [shared motion verification](../../../../docs/shared-skia-motion.md).
 
 ### Navigation page composition
 
@@ -647,8 +687,11 @@ The custom Expo Router tab bar retains Expo UI segmented controls and adds the R
 
 ### Screen safe areas
 
-`PageScreen` and Home use `PageFrame.headerBlur` to blur scrolling content only
-inside the two wave shapes, with the blur below the sharp title and back button.
+Every titled `PageFrame` now blurs by default, including Settings, maps, tools
+and recovery screens. `headerBlur={false}` opts out. Default frames reserve the
+measured title height; `PageScreen`, Home and Settings use `scrollsBehindHeader` with
+`usePageHeaderInset()` inside their scrolling content. Blur stays inside the two
+wave shapes, below the sharp title and back button.
 `PageMotionOverlay` wraps root navigation and supplies cached paths and shared
 UI-thread transforms through `PageWaveContext` to the platform mask; artwork
 and mask use one motion loop. Its `children` slot supports local compositions and
@@ -666,13 +709,29 @@ and older Android uses a translucent fallback. The Android `extraLight` / `dark`
 backdrop avoids Android's gray thin-material overlay, ignores touches, uses
 intensity 40, and follows Reduce Transparency with
 the theme's `background` token. Title and back button retain the `text` role and
-native controls. The header is clear outside the wave silhouettes. Plain frames, Settings' native form and `headerOverlay` maps
-retain their existing inset contract. `BlurredHeader` / `DarkBlurredHeader` in
-`page-screen.stories.tsx` exercise scrolling with a counted back action, and
-`AnimatedWaves` previews mask motion;
-`.maestro/storybook/page-header.yaml` covers those actions. Page appearance checks
-cover scroll padding, draft retention during header resizing and accessibility
-changes. Native blur appearance and interaction require a connected device.
+native controls. The header is clear outside the wave silhouettes. Fixed headers
+stay in normal layout above their full-frame blur source and reserve their measured
+content space. Settings puts the measured inset inside its first section header,
+so its single native FieldGroup scrolls behind the wave blur. The iOS-only
+`scrollContentBackground('hidden')` modifier removes the system Form canvas;
+Android keeps the existing transparent form. Its full-frame viewport remains
+bounded and the title/back control stay above the blur. `headerOverlay` maps retain their top device inset.
+When waves are unavailable, a rectangular native blur covers the measured header
+and honors Reduce Transparency. `Components/Page Header` in
+`page-header.stories.tsx` covers light/dark, scrolling, full-height overlays and
+the no-wave fallback with a counted back action; `AppSettings` and `DarkAppSettings`
+exercise the actual grouped settings form and back action. `tests/components/page-frame.test.mjs`
+covers spacing, draft retention, map insets and accessibility changes.
+Native blur appearance and interaction require a connected device.
+
+The wave's single UI-thread frame callback retains its phase through page-mask
+replacement, background/inactive states, live Reduce Motion, explicit pause and
+visibility changes. Resume excludes paused time; delayed frames advance by at most
+64 ms. `Pages/Shared Skia motion/NavigationContinuity` and the page-motion Maestro
+flow exercise page replacement, back actions and retained pause state. Geometry
+tests check continuous drift at 60/120 Hz for both platform adapters; native visual
+continuity and performance still require a device. This supersedes the earlier
+cancel/reset behavior in the motion catalog entry above.
 
 `PageScreen` owns top/side insets on all pages; the normal-flow custom tab bar owns the bottom inset for tabs, and standalone pages own their bottom inset. Root native stack headers are hidden. The title keeps the Home 26-point semibold typography and app background; standalone pages add a native back arrow in the same content header and remove the duplicate toolbar and bottom Back link. `onBack` optionally overrides the default Expo Router back/Home fallback for controlled compositions. Page Hosts ignore SwiftUI automatic insets to avoid duplication. Both `PageScreen` and `AuthScreenFrame` use RN keyboard padding on iOS and Android, keeping the native scroll viewport above the keyboard; both tab and detail pages have no native-header keyboard offset. Page system insets sit outside keyboard padding so it cannot overwrite the bottom safe area. `AuthScreenFrame.tab` selects bottom ownership for the account tab. No fixed tab-bar height is added to content. `page-screen.stories.tsx` includes notched, asymmetric side-cutout, light/dark headers with and without a back arrow, long-content, and KeyboardAccess cases. The back-arrow fixtures count native activations; `.maestro/storybook/page-header.yaml` checks repeated taps and arrow absence on tab headers. The private `PageBackButton` adapters use a Compose IconButton with an auto-mirrored Material arrow and a plain SwiftUI Button with `arrow.backward`, 48-point hit bounds, the `text` token and a Go back accessibility label. `.maestro/storybook/keyboard-access.yaml` types and submits in the auth frame and saves a multiline page field twice, scrolling to each action without first dismissing the keyboard. Four tests in `tests/layout/screen-insets.test.mjs` check the shared inset contract. Native geometry, keyboard, sheets, and resize behavior still require devices. See [safe-area handling](../../../../docs/safe-area-handling.md) for the edge ownership table and documentation sources.
 

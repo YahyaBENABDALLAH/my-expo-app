@@ -1,74 +1,29 @@
-# Expo UI Storybook selectors
+# Storybook selectors
 
-Open the on-device Storybook tab and select a story under **Expo UI** before targeting its IDs. IDs stay the same across states of a component; only one story canvas is rendered at a time. Fixture prefixes stay fixed; test IDs and event callbacks are hidden from Controls. When rendering multiple component instances elsewhere in the app, supply a unique `testID` to each instance.
+Open a story under **Components** or **Forms**. Existing native test IDs keep
+their `expo-ui-` prefixes; Storybook links use `components-` or `forms-`.
 
-| Story group            | Root test ID           |
-| ---------------------- | ---------------------- |
-| Universal Button       | `expo-ui-button`       |
-| Universal Text         | `expo-ui-text`         |
-| Universal Text Input   | `expo-ui-text-input`   |
-| Universal Bottom Sheet | `expo-ui-bottom-sheet` |
-| Universal Collapsible  | `expo-ui-collapsible`  |
-| Universal Switch       | `expo-ui-switch`       |
-| Universal Slider       | `expo-ui-slider`       |
-| Universal Picker       | `expo-ui-picker`       |
-| Universal Field Group  | `expo-ui-field-group`  |
-| Universal Icon         | `expo-ui-icon`         |
-| Universal Spacer       | `expo-ui-spacer`       |
-| Universal Column       | `expo-ui-column`       |
-| Universal Checkbox     | `expo-ui-checkbox`     |
-| Universal Scroll View  | `expo-ui-scroll-view`  |
-| Universal List         | `expo-ui-list`         |
+| Story                             | Main selectors                                                                                          |
+| --------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| Button / Primary                  | `expo-ui-button`, `expo-ui-button-presses`                                                              |
+| Button / Interaction              | `button-count`, `button-disabled`, `button-reset`, `button-press-count`                                 |
+| Text Input / Empty                | `expo-ui-text-input`                                                                                    |
+| Text Input / Controlled           | `expo-ui-text-input-set-value`, `expo-ui-text-input-reset`, `expo-ui-text-input-description`            |
+| Text Input / Imperative Actions   | `expo-ui-text-input-focus`, `expo-ui-text-input-blur`, `expo-ui-text-input-clear`                       |
+| Text Input / Clickable Right Icon | `expo-ui-text-input-right-icon`, `expo-ui-text-input-press-count`, `expo-ui-text-input-toggle-disabled` |
+| Text Input / Password Visibility  | `expo-ui-text-input-right-icon`, `password-visibility-state`                                            |
+| Bottom Sheet                      | `expo-ui-bottom-sheet-open`, `expo-ui-bottom-sheet-close`, `expo-ui-bottom-sheet-state`                 |
+| Switch                            | `expo-ui-switch`, `expo-ui-switch-value`, `expo-ui-switch-reset`                                        |
+| Checkbox                          | `expo-ui-checkbox`, `expo-ui-checkbox-value`                                                            |
+| Picker                            | `expo-ui-picker`, `expo-ui-picker-value`, `expo-ui-picker-reset`                                        |
+| List                              | `expo-ui-list-row-2`, `expo-ui-list-status`                                                             |
+| Skeleton                          | `skeleton-toggle-animation`, `skeleton-animation-state`                                                 |
+| Loading State                     | `loading-demo-title`, `loading-demo-content`, `loading-demo-complete`, `query-error`                    |
+| Toast                             | `toast-story-show`, `toast-story-state`, `toast-dismiss`                                                |
+| Login Form                        | `native-form-login`, `native-form-password`, `native-form-submit`, `native-form-submit-status`          |
+| OTP                               | `otp-demo-open`, `otp-sheet-input`, `otp-sheet-verify`, `otp-sheet-resend`                              |
 
-The root ID is forwarded to the native component where its installed Expo UI implementation supports it. Standalone wrapper components also expose a React Native host selector with `-container`, and canvases use `-canvas`. Hidden components and closed sheets have no visible native target; use the canvas or relevant open control to reach their visible state.
-
-The button stories keep the semantic variants, disabled state, rounded shape,
-and both diagonal corner shapes. `TopLeftBottomRight` and `TopRightBottomLeft`
-use `expo-ui-button` with visible `expo-ui-button-presses` output. Their native
-flow is `.maestro/storybook/button-corners.yaml`.
-
-Skeleton `AnimationControls` uses the CSS-driven standalone placeholders with
-`skeleton-css-fixed` and `skeleton-css-fill`. The playback action and status use
-`skeleton-toggle-animation` and `skeleton-animation-state`.
-
-## Interactive selectors
-
-| Group             | Useful suffixes appended to the root ID                                               |
-| ----------------- | ------------------------------------------------------------------------------------- |
-| Text Input        | `-label`, `-helper`, `-focus`, `-blur`, `-clear`, `-select`, `-set-value`, `-reset`   |
-| Bottom Sheet      | `-open`, `-close`, `-state`, `-content`, `-title`, `-description`                     |
-| Switch / Slider   | `-value`, `-reset`                                                                    |
-| Picker / Checkbox | `-value`                                                                              |
-| Collapsible       | `-content`, `-text`                                                                   |
-| Field Group       | `-preferences`, `-notifications`, `-terms`, `-audio`, `-volume`, `-volume-value`      |
-| Column            | `-item-1`, `-item-2`, etc.                                                            |
-| Spacer            | `-start`, `-end`                                                                      |
-| Scroll View       | `-content`, `-item-1`, `-item-2`, etc.                                                |
-| List              | `-status`, `-empty`, `-row-1`, `-row-1-label`, `-row-1-icon`, `-row-1-trailing`, etc. |
-
-Selectors only exist in stories that render the relevant elements. For example, use **Imperative Actions** for input focus/blur/clear buttons and **Controlled Native State** for set/reset buttons.
-
-The **Recipes/Compact recipe card** stories use `recipe-card-storybook-recipe`
-for the native action and `recipe-card-press-count` for its visible activation
-count. Each press logs the recipe UUID and increments the count without navigating.
-Use `recipes-compact-recipe-card--light` with the existing story-opening helper;
-`.maestro/storybook/recipe-card.yaml` asserts repeated activation and the canvas.
-
-**Recipes/Home catalog** uses `home-card-<section>-sample-<1..8>-open` for
-Details and `home-card-hero-sample-<1..3>-save` for hero saves. The preview exposes
-`home-sample-preview-title`, `home-sample-preview-description`,
-`home-sample-preview-item-sample-<1..8>` and `home-sample-preview-close`.
-`.maestro/storybook/home-catalog.yaml` uses `recipes-home-catalog--dark` and checks
-reopening, dismissal and recipe selection through both scroll directions.
-
-## Installed SDK limitations
-
-- Collapsible has no native `testID` prop. Its root ID is applied to its Host. Tap the native header within that host and assert `expo-ui-collapsible-content` after expanding.
-- Picker forwards `testID` on iOS but drops it on Android in the installed version. Use `expo-ui-picker-container` to locate the Android dropdown and select its options by their visible labels.
-- Android ListItem also drops its `testID` prop. The shared `ListItem` Android adapter supplies the equivalent Compose test-ID modifier so row selectors are retained. `UniversalListItem` directly aliases that adapter.
-- Spacer is a layout element; assert the positions of its `-start` and `-end` siblings instead of trying to tap it.
-- Native test IDs' visibility to a specific automation driver must be verified on a device. Bundling and typechecking do not inspect the accessibility hierarchy.
-
-For example, after selecting **Universal Bottom Sheet → Closed**, tap `expo-ui-bottom-sheet-open`, assert `expo-ui-bottom-sheet-title`, tap `expo-ui-bottom-sheet-close`, then assert that `expo-ui-bottom-sheet-state` contains `Closed`.
-
-For **Universal List → Default**, tap `expo-ui-list-row-2` and assert that `expo-ui-list-status` contains `Selected row: 2`.
+Input validation errors append `-error`; hints append `-helper`. Closed sheets
+have no visible content selector. Native selector exposure must be verified on
+each platform. See the maintained `.maestro/components/` and `.maestro/forms/`
+flows for complete interaction sequences.

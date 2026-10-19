@@ -2,7 +2,7 @@
 
 Navigation themes, root/authentication/onboarding stack content and tab scenes use the active theme's opaque `background` token. Each incoming route covers the outgoing route's text during transitions. Page frames, headers, auth forms, loading and recovery content reveal their owning scene's background. Cards, fields and native controls keep their semantic surfaces. The full-screen `AuroraBackground` remains available in the launch screen, dedicated Skia demo and Storybook previews; the root does not render a hidden shader behind opaque navigation scenes.
 
-`PageMotionOverlay` wraps navigation and draws its artwork above it and below the splash. Its two translucent Skia waves animate across the top 144 points of every page on a 10-second cycle. It ignores touches and accessibility, pauses while the splash covers it, and respects app lifecycle and live Reduce Motion changes.
+`PageMotionOverlay` wraps navigation and draws its artwork above it and below the splash. Its two translucent Skia waves use a 180-point canvas, flatter curves with half the previous vertical depth, and the current 8-second cycle. Horizontal travel is 40 / 50 design units and vertical travel is 2 / 3 points. RTL reverses horizontal movement while keeping the current phase. Artwork and native blur masks share the same paths and transforms. The overlay ignores touches and accessibility, pauses while the splash covers it, and respects app lifecycle and live Reduce Motion changes.
 
 Its context shares cached paths and UI-thread transforms with the native blur mask
 in scrolling page frames. Android uses Expo UI's `MaskedView` to clip `expo-blur`
@@ -15,6 +15,17 @@ those controls remain sharp. A single wave loop drives both artwork and mask;
 no snapshots or per-frame React updates are used. The existing reduced-motion
 guard freezes both shapes together. The root's `visible` prop hides waves during
 onboarding without remounting navigation. Splash waves remain unmasked.
+
+The wave now accumulates active frame time on the UI thread. Pausing, backgrounding,
+Reduce Motion and visibility changes keep its current phase instead of resetting
+the drift to zero. Resuming excludes paused time; a delayed frame advances by at
+most 64 ms. Page-local masks join the existing root phase when they mount. The
+memoized frame callback is retained through root updates and navigation changes.
+`Pages/Shared Skia motion/NavigationContinuity` replaces page frames beneath a
+single overlay and offers pause/resume and back actions. Its Maestro flow checks
+those controls; the JS geometry suite checks continuity at 60/120 Hz through page
+replacement and lifecycle pauses on both platform adapters. Native visual
+continuity remains unverified without a connected device.
 
 The splash's bottom edge uses this same component with `variant="splash"`. This variant keeps the header's wave paths, opposite drift and lit crest, but uses opaque theme fills and normal-flow placement to form the moving reveal edge. The waves continue animating throughout the 300-ms upward exit. The shared `PAGE_WAVE_HEIGHT` keeps both artwork and exit geometry consistent.
 

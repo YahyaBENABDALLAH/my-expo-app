@@ -9,16 +9,17 @@ import {
   Column,
   FieldGroup,
   Icon,
-  nativeFillSize,
   nativeFillWidth,
   nativeRowWeight,
   PageFrame,
+  pageFormModifiers,
   Row,
   Switch,
   ThemePicker,
   UniversalButtonContent,
   UniversalHost,
   UniversalTextContent as Text,
+  usePageHeaderInset,
 } from '@components/ui';
 import { useLanguage } from '@/context/language.context';
 import { useThemeColors } from '@/hooks/use-theme';
@@ -43,15 +44,17 @@ export function SettingsPage({
   language,
   onLanguageChange,
   languageReady = true,
+  onBack,
 }: {
   language: Language;
   onLanguageChange?: (language: Language) => void;
   languageReady?: boolean;
+  onBack?: () => void;
 }) {
   const { t } = useTranslation();
   const colors = useThemeColors();
   const [languageOpen, setLanguageOpen] = useState(false);
-  const back = () => (router.canGoBack() ? router.back() : router.replace('/'));
+  const back = onBack ?? (() => (router.canGoBack() ? router.back() : router.replace('/')));
   const external = (
     <Icon
       name={Icon.select({
@@ -73,7 +76,7 @@ export function SettingsPage({
     />
   );
   return (
-    <PageFrame title={t('settings.title')} onBack={back}>
+    <PageFrame title={t('settings.title')} onBack={back} scrollsBehindHeader>
       <SettingsViewport>
         <UniversalHost
           matchContents={false}
@@ -82,11 +85,14 @@ export function SettingsPage({
           testID="app-settings-content"
         >
           <FieldGroup
-            modifiers={nativeFillSize}
+            modifiers={pageFormModifiers}
             style={{ backgroundColor: 'transparent' }}
             testID="app-settings-groups"
           >
             <FieldGroup.Section title={t('common.account')} titleUppercase>
+              <FieldGroup.SectionHeader>
+                <SettingsAccountHeader />
+              </FieldGroup.SectionHeader>
               <SettingsRow
                 label={t('settings.yourAccount')}
                 testID="app-settings-account"
@@ -244,10 +250,36 @@ export function SettingsPage({
   );
 }
 
+/** Keep the initial header clearance inside the form so rows can scroll beneath the blur. */
+function SettingsAccountHeader() {
+  const { t } = useTranslation();
+  const colors = useThemeColors();
+  const headerInset = usePageHeaderInset();
+  return (
+    <Column
+      modifiers={nativeFillWidth}
+      style={{ paddingTop: headerInset }}
+      testID="app-settings-scroll-inset"
+    >
+      <Text variant="caption" textStyle={{ color: colors.muted }}>
+        {t('common.account').toLocaleUpperCase()}
+      </Text>
+    </Column>
+  );
+}
+
 // FieldGroup owns scrolling; the RN boundary supplies a bounded native viewport and safe areas.
 function SettingsViewport({ children }: { children: ReactNode }) {
   const insets = useSafeAreaInsets();
-  return <View style={{ flex: 1, ...screenInsets(insets) }}>{children}</View>;
+  return (
+    <View
+      testID="app-settings-viewport"
+      collapsable={false}
+      style={{ flex: 1, overflow: 'hidden', ...screenInsets(insets) }}
+    >
+      {children}
+    </View>
+  );
 }
 
 function SettingsRow({

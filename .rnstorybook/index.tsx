@@ -40,7 +40,7 @@ export default function StorybookUI({
       initialSelection: isStoryId(initialStoryId)
         ? initialStoryId
         : canvasMode
-          ? 'expo-ui-universal-button--primary'
+          ? 'components-button--primary'
           : undefined,
       // The built-in UI-less canvas groups iOS descendants into one accessible
       // element. A custom canvas retains each control's native test target.

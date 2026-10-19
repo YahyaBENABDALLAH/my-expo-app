@@ -1,0 +1,26 @@
+appId: com.hyrkul.likan
+name: Loading, offline, and persistent retry states
+tags: [smoke, storybook]
+env:
+  STORYBOOK_URL: myappexpo://storybook
+---
+- runFlow:
+    file: ../helpers/open-story.yaml
+    env:
+      STORY_ID: components-loading-state--error-state
+      READY_ID: query-error
+- assertVisible: 'Content couldn’t load. Please try again.'
+- tapOn: Retry
+- assertVisible:
+    id: loading-demo-content
+- tapOn: Start loading
+- assertVisible: 'Loading…'
+- assertNotVisible:
+    id: loading-demo-content
+- tapOn:
+    id: loading-demo-complete
+- assertVisible:
+    id: loading-demo-content
+- tapOn: Go offline
+- assertVisible: 'Offline. Reconnect to load content.'
+- assertNotVisible: 'Loading…'

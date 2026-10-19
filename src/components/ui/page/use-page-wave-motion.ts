@@ -1,20 +1,23 @@
+import { useLayoutDirection } from '@/context/layout-direction.context';
+import { useMotionEnabled } from '@/hooks/use-motion-enabled';
 import { Skia, vec } from '@shopify/react-native-skia';
-import { useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import { useWindowDimensions } from 'react-native';
 import {
   cancelAnimation,
   Easing,
+  type FrameInfo,
   ReduceMotion,
   useDerivedValue,
+  useFrameCallback,
   useSharedValue,
-  withRepeat,
   withTiming,
 } from 'react-native-reanimated';
 import { scheduleOnRN } from 'react-native-worklets';
-import { useMotionEnabled } from '@/hooks/use-motion-enabled';
 
-export const PAGE_WAVE_HEIGHT = 144;
+export const PAGE_WAVE_HEIGHT = 200;
 const WAVE_WIDTH = 1000;
+const WAVE_DURATION_MS = 8000;
 
 /** One motion source keeps the visible artwork and native blur mask aligned. */
 export function usePageWaveMotion({
@@ -29,12 +32,14 @@ export function usePageWaveMotion({
   onCollapseComplete?: () => void;
 }) {
   const enabled = useMotionEnabled(animate);
+  const direction = useLayoutDirection();
+  const horizontalDirection = direction === 'rtl' ? -1 : 1;
   const { height } = useWindowDimensions();
   const expandedOffset = Math.max(0, height * 0.35 - PAGE_WAVE_HEIGHT / 2);
   const target = expanded && !splash ? expandedOffset : 0;
   const { frontWave, backWave, frontSvg, backSvg } = useMemo(() => {
-    const frontSvg = `M -500 ${-height} H 1500 V 62 C 1250 8 1120 112 820 72 S 330 16 80 58 S -240 118 -500 62 Z`;
-    const backSvg = `M -500 ${-height} H 1500 V 46 C 1280 98 1060 20 780 56 S 300 112 20 74 S -260 12 -500 48 Z`;
+    const frontSvg = `M -500 ${-height} H 1500 V 78.75 C 1250 51 1120 110 820 85 S 330 56 80 76.25 S -240 113.75 -500 78.75 Z`;
+    const backSvg = `M -500 ${-height} H 1500 V 66.25 C 1000 98.75 1060 55 780 72.5 S 300 107.5 20 83.75 S -260 51 -500 67.5 Z`;
     return {
       frontSvg,
       backSvg,
@@ -68,25 +73,21 @@ export function usePageWaveMotion({
     return () => cancelAnimation(offset);
   }, [enabled, expanded, offset, target, onCollapseComplete]);
 
+  const advance = useCallback(
+    ({ timeSincePreviousFrame }: FrameInfo) => {
+      'worklet';
+      // Activation starts with a null delta, so paused time never advances the wave.
+      if (timeSincePreviousFrame === null) return;
+      const elapsed = Math.min(timeSincePreviousFrame, 64);
+      phase.set((value) => (value + (elapsed / WAVE_DURATION_MS) * 2 * Math.PI) % (2 * Math.PI));
+    },
+    [phase],
+  );
+  const { setActive } = useFrameCallback(advance, false);
   useEffect(() => {
-    cancelAnimation(phase);
-    phase.set(0);
-    if (!enabled) return;
-    phase.set(
-      withRepeat(
-        withTiming(2 * Math.PI, {
-          duration: 10000,
-          easing: Easing.linear,
-          reduceMotion: ReduceMotion.Never,
-        }),
-        -1,
-        false,
-        undefined,
-        ReduceMotion.Never,
-      ),
-    );
-    return () => cancelAnimation(phase);
-  }, [enabled, phase]);
+    setActive(enabled);
+    return () => setActive(false);
+  }, [enabled, setActive]);
 
   const fit = useDerivedValue(() => [
     { scaleX: width.get() / WAVE_WIDTH },
@@ -94,12 +95,12 @@ export function usePageWaveMotion({
   ]);
   const gradientStart = useDerivedValue(() => vec(0, -offset.get()));
   const frontDrift = useDerivedValue(() => [
-    { translateX: Math.sin(phase.get()) * 80 },
-    { translateY: Math.sin(phase.get()) * 4 },
+    { translateX: Math.sin(phase.get()) * 40 * horizontalDirection },
+    { translateY: Math.sin(phase.get()) * 2 },
   ]);
   const backDrift = useDerivedValue(() => [
-    { translateX: -Math.sin(phase.get()) * 100 },
-    { translateY: -Math.sin(phase.get()) * 6 },
+    { translateX: -Math.sin(phase.get()) * 50 * horizontalDirection },
+    { translateY: -Math.sin(phase.get()) * 3 },
   ]);
 
   return useMemo(

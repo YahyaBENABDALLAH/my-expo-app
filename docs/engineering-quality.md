@@ -1,5 +1,7 @@
 # Engineering quality and product cleanup
 
+Current test scope: Components and Forms only. Run `npm test` or `npm run test:e2e`; see [tests](../tests/README.md). The dated verification results below describe the earlier, broader suite.
+
 Verified 2026-10-11 against Expo SDK 57. The change preserves the existing feature
 architecture and native component library while improving product behavior and
 adding checks that prevent regressions.
@@ -55,9 +57,7 @@ a complete dependency-cycle or dynamic-import analyzer.
 `npm run check` runs strict types, zero-warning lint, formatting, behavioral tests
 and architecture probes. The GitHub Actions workflow installs locked dependencies
 with Node 22.18.0, regenerates Storybook registration and runs the same command.
-Localization tests use a checked-in key contract, so a fresh checkout does not
-require the ignored local `Reference/` directory. The workflow has not been run on
-a hosted runner in this chat.
+The maintained test suites are documented in [tests](../tests/README.md). The workflow has not been run on a hosted runner in this chat.
 
 ## Verification
 

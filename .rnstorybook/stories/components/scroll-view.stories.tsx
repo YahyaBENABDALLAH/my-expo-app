@@ -1,0 +1,89 @@
+import { useThemeColors } from '@/hooks/use-theme';
+import { Column, Row, Text } from '@components/ui';
+import {
+  UniversalScrollView,
+  type UniversalScrollViewProps,
+} from '../../components/showcase/universal-scroll-view';
+import type { Meta, StoryObj } from '@storybook/react-native';
+import { action } from 'storybook/actions';
+import { NativeStoryFrame, nativeThemeControls } from '../../components/native-story-frame';
+
+type DemoProps = UniversalScrollViewProps & {
+  itemCount: number;
+  onItemPress: (item: number) => void;
+};
+
+function ScrollViewDemo({ itemCount, onItemPress, ...args }: DemoProps) {
+  const colors = useThemeColors(args.colorScheme);
+  const Container = args.direction === 'horizontal' ? Row : Column;
+  return (
+    <UniversalScrollView {...args}>
+      <Container spacing={12} style={{ padding: 12 }} testID={`${args.testID}-content`}>
+        {Array.from({ length: itemCount }, (_, i) => (
+          <Text
+            key={i}
+            testID={`${args.testID}-item-${i + 1}`}
+            onPress={args.disabled ? undefined : () => onItemPress(i + 1)}
+            style={{
+              width: 220,
+              height: 72,
+              padding: 16,
+              borderRadius: 12,
+              backgroundColor: colors.primaryContainer,
+            }}
+            textStyle={{ fontSize: 16, color: colors.onPrimaryContainer }}
+          >{`Item ${i + 1}`}</Text>
+        ))}
+      </Container>
+    </UniversalScrollView>
+  );
+}
+
+const meta = {
+  title: 'Components/Scroll View',
+  component: ScrollViewDemo,
+  args: {
+    testID: 'expo-ui-scroll-view',
+    direction: 'vertical',
+    showsIndicators: true,
+    viewportHeight: 320,
+    itemCount: 12,
+    disabled: false,
+    hidden: false,
+    colorScheme: 'dark',
+    onItemPress: action('scroll item pressed'),
+    onAppear: action('scroll view appeared'),
+    onDisappear: action('scroll view disappeared'),
+  },
+  argTypes: {
+    ...nativeThemeControls,
+    direction: { control: 'select', options: ['vertical', 'horizontal'] },
+    showsIndicators: {
+      control: 'boolean',
+      description: 'Native indicator visibility is iOS-only.',
+    },
+    viewportHeight: { control: { type: 'number', min: 150, max: 600 } },
+    itemCount: { control: { type: 'number', min: 0, max: 30, step: 1 } },
+    disabled: {
+      control: 'boolean',
+      description: 'Disables item actions; native scrolling may remain available.',
+    },
+    hidden: { control: 'boolean' },
+    children: { control: false },
+    modifiers: { control: false },
+    onItemPress: { control: false },
+    onAppear: { control: false },
+    onDisappear: { control: false },
+  },
+  render: (args) => (
+    <NativeStoryFrame {...args}>
+      <ScrollViewDemo {...args} />
+    </NativeStoryFrame>
+  ),
+} satisfies Meta<typeof ScrollViewDemo>;
+
+export default meta;
+
+type Story = StoryObj<typeof meta>;
+
+export const Vertical: Story = {};
