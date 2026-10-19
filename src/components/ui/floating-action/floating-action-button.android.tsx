@@ -16,7 +16,9 @@ export function FloatingActionButton({
     <Button
       onClick={onPress}
       enabled={!disabled}
-      shape={Shape.Circle({})}
+      // The installed native ShapeRecord defaults radius to zero, clipping
+      // both the icon and the pointer target to the center of the button.
+      shape={Shape.Circle({ radius: 1 })}
       colors={{
         containerColor: 'transparent',
         disabledContainerColor: 'transparent',

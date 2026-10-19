@@ -13,7 +13,7 @@ const normalizedStories = [
     files: "*.stories.?(ts|tsx|js|jsx)",
     importPathMatcher: /^\.[\\/](?:(?!\.)(?=.)[^\\/]*?\.stories\.(?:ts|tsx|js|jsx)?)$/,
     req: require.context(
-      '../.rnstorybook/stories/components',
+      './stories/components',
       false,
       /^\.[\\/](?:(?!\.)(?=.)[^\\/]*?\.stories\.(?:ts|tsx|js|jsx)?)$/
     ),
@@ -24,7 +24,7 @@ const normalizedStories = [
     files: "*.stories.?(ts|tsx|js|jsx)",
     importPathMatcher: /^\.[\\/](?:(?!\.)(?=.)[^\\/]*?\.stories\.(?:ts|tsx|js|jsx)?)$/,
     req: require.context(
-      '../.rnstorybook/stories/forms',
+      './stories/forms',
       false,
       /^\.[\\/](?:(?!\.)(?=.)[^\\/]*?\.stories\.(?:ts|tsx|js|jsx)?)$/
     ),

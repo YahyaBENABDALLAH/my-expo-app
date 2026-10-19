@@ -29,7 +29,7 @@ export function PageHeader({
         {title ? (
           <Row alignment="center" spacing={8} modifiers={nativeFillWidth}>
             {onBack ? <PageBackButton color={colors.text} onPress={onBack} /> : null}
-            <Column modifiers={nativeRowWeight}>
+            <Column alignment="start" modifiers={isIOS ? nativeFillWidth : nativeRowWeight}>
               <Text variant="title" testID="page-title">
                 {title}
               </Text>

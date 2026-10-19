@@ -1,5 +1,69 @@
 # Middle-button wave verification
 
+## Repeated action delivery (2026-10-19)
+
+The production `ReferenceTabBar` had a shared 800 ms press lockout. A successful
+native click started animation and haptics before this handler silently rejected
+the action; the timer also carried across route/step changes. The lockout is
+removed. Each enabled native activation invokes the current registered action or
+the existing `router.navigate` fallback. Recipe publishing's explicit submitting
+ref and pending/disabled state remain in `useRecipeCreation`.
+
+All four JS regression checks pass. They use the real action provider,
+registration hook and tab-bar dispatcher, covering focus/keyboard state and
+rapid presses across filters, profile, navigation and recipe Continue/Submit
+steps. A constant clock keeps every activation inside the former lockout window.
+
+The native floating-action story now also registers the outer Storybook-tab
+action through the production dispatcher and exposes a separate production count.
+The Maestro flow includes bursts of three and two taps at 100 ms intervals,
+disabled suppression and re-enabling for that action.
+
+The isolated regression fails against the original dispatcher on both platforms
+(both filter actions are dropped after the preceding navigation tap) and passes
+against the repaired dispatcher. Lint and typecheck pass.
+
+Android API 37 emulator execution passes the extended native flow, including all
+five rapid production activations and disabled suppression. Results are under
+`.expo/floating-action-repeat-native/`. A second check with animation enabled
+delivers three taps in 647 ms and increments the production count from five to
+eight. Its script, native screenshot and results are saved as
+`.expo/floating-action-repeat-animated.cjs`, `.png` and `.json`. The emulator's
+original motion setting is restored after verification.
+
+## Android floating-action repair (2026-10-19)
+
+The production tab bar explicitly disabled Android animation. It now passes its
+focus state on both platforms. Existing app activity, reduced-motion and disabled
+guards remain in `useMotionEnabled` and `FloatingAction`.
+
+The installed Expo UI Android ShapeRecord defaults `radius` to zero. Its circle
+path clamps this to 0.002, leaving a nearly invisible clipping and hit shape despite
+the button's full accessibility bounds. Passing `Shape.Circle({ radius: 1 })`
+restores the native icon and circular tap area. The existing Box/ZStack layout,
+76-point button, glyphs, haptics and motion timing remain unchanged.
+
+The new `Components/FloatingAction/Interaction` story includes the production bar,
+all action glyphs, press count, disabled toggle and motion toggle. Its native flow
+is `.maestro/components/floating-action.yaml`. JS focus/keyboard regression checks
+pass on Android and iOS; lint and typecheck pass. The full JS suite has 101 passes
+and two existing page-wave failures (`PAGE_WAVE_HEIGHT` is 200; the tests expect
+180).
+
+Android API 37 emulator verification passes the new Maestro flow: upper/lower
+edge taps increment the counter once, disabled taps leave it unchanged, enabling
+restores activation, all seven action contexts can be selected, static mode still
+accepts taps, and destination selection preserves the action. The native screenshot
+`.expo/floating-action-radius.png` confirms that the fork/spoon icon is visible.
+Maestro output is saved under `.expo/floating-action-native-final/`.
+
+The screenshot comparison in `.expo/floating-action-motion-check.cjs` checks the
+production button's artwork over two 1.3-second intervals. Reduced motion produces
+zero changed pixels; restoring motion produces 9,532 changed pixels in the same
+110-by-98-pixel interior region. The emulator's original motion setting was restored.
+This verifies native movement and the live accessibility guard, not release-device
+frame rate. Native iOS execution and release-device performance remain unverified.
+
 ## Edge-to-edge dock and page overlap (2026-10-11)
 
 The dock is now rectangular and borderless, with no decorative left/right or

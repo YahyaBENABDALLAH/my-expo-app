@@ -1,5 +1,34 @@
 # Universal component catalog
 
+## Android floating-action repair (2026-10-19)
+
+The Android button now passes `Shape.Circle({ radius: 1 })`. The installed native
+ShapeRecord defaults its radius to zero, clipping the icon and hit shape down to
+the center even though accessibility reports a full-size button. The existing
+76-point control, Box/ZStack artwork composition, 28-point symbols, native styles,
+labels and disabled behavior remain. `ReferenceTabBar` enables motion on Android
+as well as iOS while focused; app activity, reduced motion, disabled and Static
+guards remain.
+
+Repeated-action follow-up: `ReferenceTabBar` no longer drops activations inside a
+shared 800 ms window. Each native press reaches its current action; recipe
+publishing retains its own submitting/pending guard. The JS fixture now exercises
+the real action provider, registration and dispatcher with time held constant,
+including rapid taps, tab changes and changing Continue/Submit callbacks. The
+floating-action story also registers a production Storybook-tab action and shows
+a separate counter. Its Maestro flow repeats production taps 100 ms apart and
+checks disabled suppression and re-enabling.
+
+`Components/FloatingAction/Interaction` in
+`.rnstorybook/stories/components/floating-action.stories.tsx` replaces the deleted
+page stories for this component. Controls expose theme, all seven action kinds,
+disabled and animated states; local toggles and a press count exercise the actual
+navigation composition. `.maestro/components/floating-action.yaml` checks upper
+and lower action edges, disabled suppression, icon changes, static-mode activation
+and destination selection. `tests/components/floating-action.test.mjs` checks
+focus-driven animation and keyboard visibility on both platforms. Device execution
+and remaining native limitations are recorded in `docs/navbar-wave-verification.md`.
+
 ## Current Storybook and test scope
 
 The catalog intentionally contains only **Components** and **Forms**. Use Controls for theme, appearance, disabled states and minor prop variations. The current scope is in [Storybook](../../../../.rnstorybook/README.md); JS suites are in [tests](../../../../tests/README.md). Full-page, onboarding, recipe showcase, motion and theme-token demos were removed. Dated entries below record historical implementation details and may reference retired fixtures; they are not a requirement to restore those stories or test suites.
@@ -48,6 +77,10 @@ not restore the obsolete sheet width context or RN/Host measurement bridge.
 Optional `BottomSheet.contentHeight` bounds a caller's known viewport in a native
 Column before presentation; Home shares its existing `min(420, screenHeight * 0.6)`
 value with the inner ScrollView. Outer sheet height and detents remain native.
+The sheet uses the owning Host's theme `surface` for `containerColor` and `text`
+for Android's `contentColor`. This colors the full native sheet, including its
+safe-area background, with no extra wrapper, public prop or dependency.
+The bottom-sheet `Light` and `Dark` stories preview the selected theme colors.
 `FixedContentHeight` covers this in the bottom-sheet stories. `GeometryLight` and
 `GeometryDark` retain native/default, rounded, square and disabled button checks.
 Portable checks verify independent radius/padding overrides and first-render
@@ -291,7 +324,7 @@ Existing stories are recorded without implying full behavioral coverage.
 `OtpBottomSheet` composes the native [BottomSheet](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/bottomsheet/) and [TextInput](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/textinput/) with six visible digit slots. Its public props control presentation, recipient, verification/resend callbacks, cooldown, helper copy, theme and selector prefix. Platform overlay stacks keep a single transparent native input above the slots; an explicit-width direction bridge keeps digits LTR in Arabic. Slots use equal measured widths, explicit font-scale-aware heights and inset rounded fills; the iOS input uses plain field styling. A finite scroll viewport (70% of window height, at most 620 points/dp) prevents unbounded Compose measurement; its iOS frame preserves that height. Shared text/surface/tint/selection/border and success/error roles style the form. A fixed-size Reanimated boundary animates only the native shield and respects reduced motion. `otp-bottom-sheet.stories.tsx` covers both themes, cooldown, request failures and a long recipient using isolated English copy; `.maestro/storybook/otp-bottom-sheet.yaml` covers opening/dismissal, rejection, backspace, success, incomplete input, resend and reopening. Portable checks cover paste/numeric scripts, finite viewport sizing and the installed iOS style translation for narrow rows and larger text. Native keyboard/autofill, accessibility, hit areas, large fonts and constrained geometry remain unverified without devices. See [component guide](../../../../src/components/ui/otp-bottom-sheet/README.md).
 
 OTP measures its own native input section. The shared sheet adds no measurement,
-width context, styling or padding and hides the iOS drag indicator. Reopening resets
+width context or padding, uses the shared surface/text colors and hides the iOS drag indicator. Reopening resets
 form state without a forced keyed remount. Resend countdown state is isolated
 to its button and its timer stops at expiry or dismissal; hidden feedback does
 not allocate animation hooks. The existing OTP stories and Maestro flow cover
@@ -686,6 +719,12 @@ The custom Expo Router tab bar retains Expo UI segmented controls and adds the R
 `reference-motion.stories.tsx` covers interactive action counts, step changes, light/dark canvases, and static artwork. `.maestro/pages/context-actions.yaml` covers actual context-action destinations and invalid-form gating. `tests/validation/recipe-draft.test.mjs`, `tests/recipes/collections.test.mjs`, and auth tests verify payload validation/normalization, storage isolation and serialization, cancellation forwarding, and metadata updates without clobbering rotated tokens. Native drawing, clipping, segment/button hit coverage, large text, keyboard behavior, and accessibility remain device checks.
 
 ### Screen safe areas
+
+`PageHeader` titles align to the leading edge on iOS and Android (left in LTR,
+right in RTL), using a leading full-width iOS frame and the existing Android
+weighted column. Its `title`, `onBack` and `colorScheme` props and `text` theme
+role are unchanged. Existing `Components/Page Header` stories cover titles and
+counted back actions; native alignment requires visual verification on both platforms.
 
 Every titled `PageFrame` now blurs by default, including Settings, maps, tools
 and recovery screens. `headerBlur={false}` opts out. Default frames reserve the

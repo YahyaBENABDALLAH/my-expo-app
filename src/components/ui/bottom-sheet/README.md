@@ -6,9 +6,11 @@ A minimal adapter over the native Expo UI `BottomSheet`. Supported props are
 `children`, `isPresented`, `onDismiss`, `testID` and optional `contentHeight`. The iOS drag indicator is
 hidden; Android retains its native default.
 
-Apart from the optional content height, the adapter adds no styling, padding,
-color, corner radius, detents, measurement or nested Host. Expo UI supplies its own native defaults and owns
-presentation/dismissal. Light/dark appearance follows the native app mode;
+The sheet's `containerColor` uses the active theme's `surface` token, including
+the native chrome and safe-area background. Android's default `contentColor` uses
+the theme's `text` token. Both resolve the owning Host's color scheme.
+Expo UI owns layout, padding, corners, detents and presentation/dismissal.
+Light/dark appearance follows the native app mode;
 the root layout synchronizes the existing appearance preference with React Native
 `Appearance.setColorScheme`, including system mode.
 
@@ -23,8 +25,8 @@ This bounds the content, not the sheet's outer height or a 50% snap point; nativ
 chrome and partial/expanded states remain platform-owned. Omit it for intrinsic
 content. `FixedContentHeight` is the corresponding native Storybook fixture.
 
-Existing native stories: `Expo UI/Universal Bottom Sheet` and
-`Pages/Login preferences`. Maestro flows cover opening, closing, reopening and
+Native stories: `Components/Bottom Sheet`, including `Light`, `Dark` and
+`FixedContentHeight`. Maestro flows cover opening, closing, reopening and
 language selection; the login flow also includes swipe dismissal. Native views
 are mocked in the JS checks, so they do not establish native rendering or gestures.
 

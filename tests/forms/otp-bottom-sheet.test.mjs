@@ -64,7 +64,7 @@ function setup(
     '@expo/ui/jetpack-compose/modifiers': { onSizeChanged: (geometry) => ({ geometry }) },
     '@expo/material-symbols/lock.xml': 1,
     '@/hooks/use-theme': {
-      useThemeColors: () => ({ surface: '#fafafa', surfaceRaised: '#eeeeee' }),
+      useThemeColors: () => ({ surface: '#fafafa', surfaceRaised: '#eeeeee', text: '#101010' }),
     },
     '@/components/ui/host/universal-host': {
       UniversalHost: element('Host'),
@@ -192,7 +192,8 @@ for (const platform of ['ios', 'android']) {
   test(`${platform} OTP input measures its own section and retains its value across resizing`, (t) => {
     const fixture = setup(t, {}, { platform, width: 360, initiallyOpen: false });
     fixture.open();
-    assert.equal(fixture.findAll('Sheet')[0].props.containerColor, undefined);
+    assert.equal(fixture.findAll('Sheet')[0].props.containerColor, '#fafafa');
+    assert.equal(fixture.findAll('Sheet')[0].props.contentColor, '#101010');
     assert.equal(fixture.findAll('Sheet')[0].props.contentPadding, undefined);
     fixture.measure(312);
     const input = fixture.findAll('Input')[0];

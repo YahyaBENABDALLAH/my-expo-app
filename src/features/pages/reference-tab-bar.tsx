@@ -2,8 +2,8 @@ import { useTranslation } from 'react-i18next';
 import { ReferenceNavigationBar, type FloatingActionKind } from '@components/ui';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { router, useIsFocused, type Tabs } from 'expo-router';
-import { useEffect, useRef, useState, type ComponentProps } from 'react';
-import { Keyboard, Platform } from 'react-native';
+import { useEffect, useState, type ComponentProps } from 'react';
+import { Keyboard } from 'react-native';
 import { useTabActions } from './tab-actions';
 
 type BottomTabBarProps = Parameters<NonNullable<ComponentProps<typeof Tabs>['tabBar']>>[0];
@@ -22,7 +22,6 @@ export function ReferenceTabBar({ state, navigation, insets }: BottomTabBarProps
   const activeRoute = state.routes[state.index];
   const { actions } = useTabActions();
   const action = actions[activeRoute.name];
-  const lastPress = useRef(0);
   const [keyboardVisible, setKeyboardVisible] = useState(Keyboard.isVisible());
   useEffect(() => {
     const show = Keyboard.addListener('keyboardDidShow', () => setKeyboardVisible(true));
@@ -40,7 +39,7 @@ export function ReferenceTabBar({ state, navigation, insets }: BottomTabBarProps
     <ReferenceNavigationBar
       colorScheme={scheme}
       selected={activeRoute.name}
-      animate={focused && Platform.OS !== 'android'}
+      animate={focused}
       leftInset={insets.left}
       rightInset={insets.right}
       bottomInset={insets.bottom}
@@ -52,9 +51,6 @@ export function ReferenceTabBar({ state, navigation, insets }: BottomTabBarProps
           action?.disabled ||
           ((kind === 'filters' || kind === 'active-filters' || kind === 'profile') && !action),
         onPress: () => {
-          const now = Date.now();
-          if (now - lastPress.current < 800) return;
-          lastPress.current = now;
           if (action) action.onPress();
           else router.navigate(kind === 'liked' ? '/my-recipes/liked-favorites' : '/create-recipe');
         },

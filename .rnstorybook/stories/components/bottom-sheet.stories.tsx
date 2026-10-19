@@ -45,7 +45,8 @@ function BottomSheetDemo({ title, content, onOpen, onClose, ...args }: DemoProps
         {`State: ${isPresented ? 'Open' : 'Closed'}. Swipe down or tap Close to dismiss.`}
       </UniversalText>
       <UniversalText colorScheme={args.colorScheme}>
-        The sheet uses native light/dark appearance and dismissal. The iOS drag indicator is hidden.
+        The sheet uses the active theme surface color and native dismissal. The iOS drag indicator
+        is hidden.
       </UniversalText>
       <BottomSheet
         {...args}
@@ -116,5 +117,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Closed: Story = {};
+export const Light: Story = { args: { colorScheme: 'light', isPresented: true } };
+export const Dark: Story = { args: { colorScheme: 'dark', isPresented: true } };
 
 export const FixedContentHeight: Story = { args: { contentHeight: 320 } };

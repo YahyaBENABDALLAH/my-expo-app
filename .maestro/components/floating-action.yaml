@@ -1,0 +1,88 @@
+appId: com.hyrkul.likan
+name: Floating action accepts edge taps, changes icons and suppresses disabled taps
+tags: [smoke, storybook]
+env:
+  STORYBOOK_URL: myappexpo://storybook
+---
+- runFlow:
+    file: ../helpers/open-story.yaml
+    env:
+      STORY_ID: components-floatingaction--interaction
+      READY_ID: floating-action-count
+- assertVisible: 'Action: create'
+- tapOn:
+    id: tab-context-action
+    text: 'Context action: .*'
+    point: '50%,10%'
+- assertVisible: 'Presses: 1'
+- tapOn:
+    id: tab-context-action
+    text: 'Context action: .*'
+    point: '50%,90%'
+- assertVisible: 'Presses: 2'
+- tapOn:
+    id: floating-action-toggle-disabled
+- tapOn:
+    id: tab-context-action
+    text: 'Context action: .*'
+- assertVisible: 'Presses: 2'
+- tapOn:
+    id: floating-action-toggle-disabled
+- tapOn:
+    id: floating-action-next-icon
+- assertVisible: 'Action: continue'
+- tapOn:
+    id: tab-context-action
+    text: 'Context action: .*'
+- assertVisible: 'Presses: 3'
+- tapOn:
+    id: floating-action-next-icon
+- assertVisible: 'Action: filters'
+- tapOn:
+    id: floating-action-next-icon
+- assertVisible: 'Action: active-filters'
+- tapOn:
+    id: floating-action-next-icon
+- assertVisible: 'Action: liked'
+- tapOn:
+    id: floating-action-next-icon
+- assertVisible: 'Action: profile'
+- tapOn:
+    id: floating-action-next-icon
+- assertVisible: 'Action: submit'
+- tapOn:
+    id: floating-action-toggle-motion
+- tapOn:
+    id: tab-context-action
+    text: 'Context action: .*'
+- assertVisible: 'Presses: 4'
+- tapOn:
+    id: floating-action-toggle-motion
+- tapOn:
+    id: tab-search
+    index: 0
+- assertVisible: 'Selected: search'
+- tapOn:
+    id: tab-context-action
+    text: 'Context action: .*'
+- assertVisible: 'Presses: 5'
+- tapOn:
+    id: tab-context-action
+    text: Production context action
+    repeat: 3
+    delay: 100
+- assertVisible: 'Production presses: 3'
+- tapOn:
+    id: floating-action-toggle-disabled
+- tapOn:
+    id: tab-context-action
+    text: Production context action
+- assertVisible: 'Production presses: 3'
+- tapOn:
+    id: floating-action-toggle-disabled
+- tapOn:
+    id: tab-context-action
+    text: Production context action
+    repeat: 2
+    delay: 100
+- assertVisible: 'Production presses: 5'
