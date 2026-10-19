@@ -6,7 +6,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { UniversalHost } from '../host/universal-host';
 import { RefreshableScrollView } from '../refreshable-scroll-view/refreshable-scroll-view';
 import { nativeFillWidth } from '../native/native-fill-width';
-import { PageFrame } from './page-frame';
+import { PageFrame, usePageHeaderInset } from './page-frame';
 import { UniversalTextContent } from '../text/universal-text';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import type { ReactNode } from 'react';
@@ -34,7 +34,7 @@ export function PageScreen({
   const scheme = useColorScheme(colorScheme);
   const goBack = onBack ?? (() => (router.canGoBack() ? router.back() : router.replace('/')));
   return (
-    <PageFrame title={title} onBack={tab ? undefined : goBack} colorScheme={scheme}>
+    <PageFrame title={title} onBack={tab ? undefined : goBack} colorScheme={scheme} headerBlur>
       <PageContent
         description={description}
         actions={actions}
@@ -64,6 +64,7 @@ function PageContent({
   colorScheme: 'light' | 'dark';
 }) {
   const insets = useSafeAreaInsets();
+  const headerInset = usePageHeaderInset();
   return (
     <View
       style={{
@@ -80,7 +81,11 @@ function PageContent({
           style={{ flex: 1 }}
         >
           <RefreshableScrollView onRefresh={onRefresh} testID="page-scroll">
-            <Column spacing={16} modifiers={nativeFillWidth} style={{ padding: 24 }}>
+            <Column
+              spacing={16}
+              modifiers={nativeFillWidth}
+              style={{ padding: 24, paddingTop: headerInset + 24 }}
+            >
               <UniversalTextContent>{description}</UniversalTextContent>
               {children}
               {actions.map(({ label, href, testID }) => (

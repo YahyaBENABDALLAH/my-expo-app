@@ -5,12 +5,15 @@ import {
   PageScreen,
   UniversalButtonContent,
   UniversalTextContent as Text,
+  Column,
+  nativeFillWidth,
 } from '@components/ui';
 import type { Meta, StoryObj } from '@storybook/react-native';
 import { SafeAreaInsetsContext } from 'react-native-safe-area-context';
 
 import { useEffect, useRef, useState } from 'react';
 import { View } from 'react-native';
+import { useThemeColors } from '@/hooks/use-theme';
 
 const meta = {
   title: 'Pages/Navigation shell',
@@ -95,6 +98,46 @@ export const HeaderWithBackArrow: Story = {
 export const DarkHeaderWithBackArrow: Story = {
   ...HeaderWithBackArrow,
   args: { ...HeaderWithBackArrow.args, colorScheme: 'dark' },
+};
+
+function ScrollBlurExample(props: Parameters<typeof PageScreen>[0]) {
+  const [presses, setPresses] = useState(0);
+  const colors = useThemeColors(props.colorScheme);
+  return (
+    <PageScreen {...props} tab={false} onBack={() => setPresses((count) => count + 1)}>
+      <Text testID="page-back-presses">{`Back presses: ${presses}`}</Text>
+      {Array.from({ length: 24 }, (_, index) => (
+        <Column
+          key={index}
+          spacing={8}
+          modifiers={nativeFillWidth}
+          style={{
+            padding: 24,
+            backgroundColor: index % 2 ? colors.surface : colors.selection,
+          }}
+          testID={`page-blur-item-${index + 1}`}
+        >
+          <Text variant="title">{`Recipe ${index + 1}`}</Text>
+          <Text>
+            Scroll this card behind the title to inspect the lighter, clearer native blur.
+          </Text>
+        </Column>
+      ))}
+    </PageScreen>
+  );
+}
+
+export const BlurredHeader: Story = {
+  decorators: notchedInsets,
+  args: {
+    title: 'Saved recipes',
+    description: 'Scroll the cards beneath the translucent header, then tap Back.',
+  },
+  render: (args) => <ScrollBlurExample {...args} />,
+};
+export const DarkBlurredHeader: Story = {
+  ...BlurredHeader,
+  args: { ...BlurredHeader.args, colorScheme: 'dark' },
 };
 
 function RefreshExample({

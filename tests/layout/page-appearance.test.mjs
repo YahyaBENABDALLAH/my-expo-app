@@ -12,7 +12,8 @@ import {
 import { createSourceLoader } from '../helpers/load-source.mjs';
 import { renderFixture } from '../helpers/render-fixture.mjs';
 
-function setup(deviceScheme = 'light') {
+function setup(deviceScheme = 'light', transparencyRead = Promise.resolve(false)) {
+  const transparencyListeners = new Set();
   const appearanceListeners = new Set();
   const subscribeAppearance = (listener) => {
     appearanceListeners.add(listener);
@@ -34,6 +35,14 @@ function setup(deviceScheme = 'light') {
   const mocks = {
     'react-native': {
       View: native('View'),
+      StyleSheet: { absoluteFill: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 } },
+      AccessibilityInfo: {
+        isReduceTransparencyEnabled: () => transparencyRead,
+        addEventListener: (_name, listener) => {
+          transparencyListeners.add(listener);
+          return { remove: () => transparencyListeners.delete(listener) };
+        },
+      },
       KeyboardAvoidingView: native('KeyboardAvoidingView'),
       Platform: { OS: 'ios' },
       useWindowDimensions: () => ({ width: 390, height: 844 }),
@@ -44,6 +53,7 @@ function setup(deviceScheme = 'light') {
       LocaleProvider: native('LocaleProvider'),
       router: { canGoBack: () => true, back() {}, push() {}, replace() {} },
     },
+    'expo-blur': { BlurTargetView: native('BlurTarget'), BlurView: native('BlurView') },
     'react-native-safe-area-context': {
       SafeAreaInsetsContext,
       useSafeAreaInsets: () => useContext(SafeAreaInsetsContext),
@@ -113,12 +123,88 @@ function setup(deviceScheme = 'light') {
     ...exports,
     SettingsScreen: settings.default,
     SettingsPage: settings.SettingsPage,
+    setReduceTransparency(value) {
+      transparencyListeners.forEach((listener) => listener(value));
+    },
     setDeviceScheme(value) {
       deviceScheme = value;
       appearanceListeners.forEach((listener) => listener());
     },
   };
 }
+
+for (const scheme of ['light', 'dark']) {
+  test(`${scheme}: blurred pages keep draft state and scroll padding aligned when the measured header resizes`, (t) => {
+    const s = setup(scheme);
+    let setDraft;
+    let backs = 0;
+    function Draft() {
+      const [value, update] = useState('Unsaved recipe');
+      setDraft = update;
+      return createElement('Draft', { value });
+    }
+    const view = renderFixture(
+      createElement(
+        s.PageScreen,
+        {
+          title: 'Saved recipes',
+          description: 'Scroll content',
+          colorScheme: scheme,
+          onBack: () => backs++,
+        },
+        createElement(Draft),
+      ),
+    );
+    t.after(() => view.unmount());
+    const header = view
+      .findAll('View')
+      .find(({ props }) => props.testID === 'page-header-safe-area');
+    const scroll = view.findAll('ScrollView')[0];
+    const draft = view.findAll('Draft')[0];
+    const content = () => descendants(scroll, 'Column')[0];
+    view.flush(() => header.props.onLayout({ nativeEvent: { layout: { height: 115 } } }));
+    assert.equal(content().props.style.paddingTop, 139);
+    assert.equal(header.props.style.paddingTop, 59);
+    const blur = view.findAll('BlurView')[0];
+    assert.equal(blur.props.tint, scheme === 'dark' ? 'dark' : 'extraLight');
+    assert.equal(blur.props.pointerEvents, 'none');
+    assert.equal(blur.props.blurTarget.current, view.findAll('BlurTarget')[0]);
+    view.flush(() => setDraft('Updated draft'));
+    view.flush(() => header.props.onLayout({ nativeEvent: { layout: { height: 163 } } }));
+    assert.equal(content().props.style.paddingTop, 187);
+    assert.equal(view.findAll('Draft')[0], draft);
+    assert.equal(draft.props.value, 'Updated draft');
+    view.flush(() => view.findAll('BackButton')[0].props.onPress());
+    assert.equal(backs, 1);
+  });
+}
+
+test('Reduce Transparency changes replace the blur and take precedence over an older accessibility read', async (t) => {
+  let finishRead;
+  const s = setup(
+    'light',
+    new Promise((resolve) => {
+      finishRead = resolve;
+    }),
+  );
+  const view = renderFixture(
+    createElement(s.PageScreen, { title: 'Recipes', description: 'Content' }),
+  );
+  t.after(() => view.unmount());
+  assert.equal(view.findAll('BlurView').length, 1);
+  view.flush(() => s.setReduceTransparency(true));
+  assert.equal(view.findAll('BlurView').length, 0);
+  assert.equal(
+    view.findAll('View').some(({ props }) => props.testID === 'page-header-solid-background'),
+    true,
+  );
+  finishRead(false);
+  await new Promise((resolve) => setImmediate(resolve));
+  view.flush(() => {});
+  assert.equal(view.findAll('BlurView').length, 0);
+  view.flush(() => s.setReduceTransparency(false));
+  assert.equal(view.findAll('BlurView').length, 1);
+});
 
 test('the language sheet waits for readiness, selects each autonym, updates direction and dismisses without changing a selection', (t) => {
   const s = setup();

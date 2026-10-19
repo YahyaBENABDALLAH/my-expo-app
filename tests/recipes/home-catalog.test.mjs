@@ -21,6 +21,7 @@ function setup() {
     nativeRowWeight: [],
     useHostColorScheme: () => 'light',
     PageFrame: native('PageFrame'),
+    usePageHeaderInset: () => 0,
     UniversalHost: native('Host'),
   };
   const load = createSourceLoader({

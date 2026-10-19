@@ -23,6 +23,7 @@ function setup() {
       I18nManager: { isRTL: false },
     },
     'expo-router': { LocaleProvider: native('Locale'), router: { push() {} } },
+    'expo-blur': { BlurTargetView: native('BlurTarget'), BlurView: native('BlurView') },
     '@react-native-async-storage/async-storage': {
       getItem: async () => 'en',
       setItem: async () => {},

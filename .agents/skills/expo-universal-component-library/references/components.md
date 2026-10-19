@@ -647,6 +647,21 @@ The custom Expo Router tab bar retains Expo UI segmented controls and adds the R
 
 ### Screen safe areas
 
+`PageScreen` and Home use `PageFrame.headerBlur` to float a native blur above
+scrolling content. `usePageHeaderInset()` reserves the measured header height
+inside the scroll, including the top safe area and dynamic text/back-button
+height. `BlurTargetView` supplies the Android source; Android 12+ uses native blur
+and older Android uses a translucent fallback. The `extraLight` / `dark` tinted
+backdrop avoids Android's gray thin-material overlay, ignores touches, uses
+intensity 40, and follows Reduce Transparency with
+the theme's `background` token. Title and back button retain the `text` role and
+native controls. Plain frames, Settings' native form and `headerOverlay` maps
+retain their existing inset contract. `BlurredHeader` / `DarkBlurredHeader` in
+`page-screen.stories.tsx` exercise scrolling with a counted back action;
+`.maestro/storybook/page-header.yaml` covers those actions. Page appearance checks
+cover scroll padding, draft retention during header resizing and accessibility
+changes. Native blur appearance and interaction require a connected device.
+
 `PageScreen` owns top/side insets on all pages; the normal-flow custom tab bar owns the bottom inset for tabs, and standalone pages own their bottom inset. Root native stack headers are hidden. The title keeps the Home 26-point semibold typography and app background; standalone pages add a native back arrow in the same content header and remove the duplicate toolbar and bottom Back link. `onBack` optionally overrides the default Expo Router back/Home fallback for controlled compositions. Page Hosts ignore SwiftUI automatic insets to avoid duplication. Both `PageScreen` and `AuthScreenFrame` use RN keyboard padding on iOS and Android, keeping the native scroll viewport above the keyboard; both tab and detail pages have no native-header keyboard offset. Page system insets sit outside keyboard padding so it cannot overwrite the bottom safe area. `AuthScreenFrame.tab` selects bottom ownership for the account tab. No fixed tab-bar height is added to content. `page-screen.stories.tsx` includes notched, asymmetric side-cutout, light/dark headers with and without a back arrow, long-content, and KeyboardAccess cases. The back-arrow fixtures count native activations; `.maestro/storybook/page-header.yaml` checks repeated taps and arrow absence on tab headers. The private `PageBackButton` adapters use a Compose IconButton with an auto-mirrored Material arrow and a plain SwiftUI Button with `arrow.backward`, 48-point hit bounds, the `text` token and a Go back accessibility label. `.maestro/storybook/keyboard-access.yaml` types and submits in the auth frame and saves a multiline page field twice, scrolling to each action without first dismissing the keyboard. Four tests in `tests/layout/screen-insets.test.mjs` check the shared inset contract. Native geometry, keyboard, sheets, and resize behavior still require devices. See [safe-area handling](../../../../docs/safe-area-handling.md) for the edge ownership table and documentation sources.
 
 ### Reference navigation bar

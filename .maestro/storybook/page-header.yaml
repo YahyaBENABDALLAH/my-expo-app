@@ -11,6 +11,46 @@ env:
       READY_ID: page-title
 - assertNotVisible:
     id: page-back
+- openLink: '${STORYBOOK_URL}?STORYBOOK_STORY_ID=pages-navigation-shell--blurred-header&mode=canvas'
+- extendedWaitUntil:
+    visible:
+      id: page-blur-item-1
+    timeout: 30000
+- swipe:
+    start: 50%, 80%
+    end: 50%, 30%
+- assertVisible:
+    id: page-title
+    text: Saved recipes
+- tapOn:
+    id: page-back
+- scrollUntilVisible:
+    element:
+      id: page-back-presses
+    direction: UP
+- assertVisible:
+    id: page-back-presses
+    text: 'Back presses: 1'
+- openLink: '${STORYBOOK_URL}?STORYBOOK_STORY_ID=pages-navigation-shell--dark-blurred-header&mode=canvas'
+- extendedWaitUntil:
+    visible:
+      id: page-blur-item-1
+    timeout: 30000
+- swipe:
+    start: 50%, 80%
+    end: 50%, 30%
+- assertVisible:
+    id: page-title
+    text: Saved recipes
+- tapOn:
+    id: page-back
+- scrollUntilVisible:
+    element:
+      id: page-back-presses
+    direction: UP
+- assertVisible:
+    id: page-back-presses
+    text: 'Back presses: 1'
 - openLink: '${STORYBOOK_URL}?STORYBOOK_STORY_ID=pages-navigation-shell--header-with-back-arrow&mode=canvas'
 - extendedWaitUntil:
     visible:
