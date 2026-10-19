@@ -1,5 +1,5 @@
 appId: com.hyrkul.likan
-name: Shared page headers and native back arrow in both themes
+name: Wave-only blur, scrolling headers and native back arrow in both themes
 tags: [smoke, storybook, navigation]
 env:
   STORYBOOK_URL: myappexpo://storybook
@@ -12,6 +12,26 @@ env:
 - assertNotVisible:
     id: page-back
 - openLink: '${STORYBOOK_URL}?STORYBOOK_STORY_ID=pages-navigation-shell--blurred-header&mode=canvas'
+- extendedWaitUntil:
+    visible:
+      id: page-blur-item-1
+    timeout: 30000
+- swipe:
+    start: 50%, 80%
+    end: 50%, 30%
+- assertVisible:
+    id: page-title
+    text: Saved recipes
+- tapOn:
+    id: page-back
+- scrollUntilVisible:
+    element:
+      id: page-back-presses
+    direction: UP
+- assertVisible:
+    id: page-back-presses
+    text: 'Back presses: 1'
+- openLink: '${STORYBOOK_URL}?STORYBOOK_STORY_ID=pages-navigation-shell--animated-waves&mode=canvas'
 - extendedWaitUntil:
     visible:
       id: page-blur-item-1

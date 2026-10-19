@@ -2,12 +2,21 @@
 
 Exports: `PageScreen`, `PageFrame`, `PageHeader` and `PageMotionOverlay`.
 
-`PageScreen` and Home float a translucent native blur above scrolling content.
+`PageScreen` and Home blur scrolling content only inside the animated wave shapes.
 `PageFrame.headerBlur` enables this behavior; scrolling children use
 `usePageHeaderInset()` for padding inside their scroll content. The inset measures
 the real header, including the status bar, back button and larger text. The first
 item starts below the title and can scroll behind it. Content mounts before the
-blur and supplies a shared `BlurTargetView` reference for Android.
+blur and supplies a `BlurTargetView` reference for Android that excludes the title
+and back button. The mask sits below those controls so they stay sharp.
+
+`PageMotionOverlay` wraps root navigation with `PageWaveContext`, sharing the same
+cached paths and UI-thread transforms between the visible artwork and the
+`@expo/ui/community/masked-view` blur mask. No second animation loop or per-frame
+React updates are needed. Outside the two wave silhouettes the header is clear.
+The optional `children` slot supplies this context to local previews; `visible`
+hides the artwork and mask without remounting navigation. Splash waves keep their
+existing opaque fills and do not supply a blur mask.
 
 The backdrop uses `extraLight` / `dark` tint at intensity 40, avoiding Android's
 gray thin-material overlay and keeping more of the content visible. Android 12+
@@ -16,11 +25,13 @@ Transparency replaces the blur with the theme's `background` token. The backdrop
 ignores touches and title-only floating headers pass gestures through to content.
 Settings' native grouped form and other plain frames retain their in-flow layout.
 
-`BlurredHeader` and `DarkBlurredHeader` in `Pages/Navigation shell` provide long,
-deterministic cards and a counted back action. The header Maestro flow exercises
+`BlurredHeader`, `DarkBlurredHeader` and `AnimatedWaves` in `Pages/Navigation shell`
+provide long, deterministic cards and a counted back action. The header Maestro flow exercises
 scrolling and back actions in both appearances. JS checks cover measured scroll
 padding, retained drafts during header resizing and live Reduce Transparency
-changes. Native blur appearance still requires a device.
+changes. Geometry checks confirm that mask and artwork share paths, drift and
+width, and that hiding waves removes the mask. Native blur appearance still
+requires a device.
 
 `page-screen.tsx` composes scrolling content and actions.
 `page-frame.tsx` handles the header's safe area and leaves other edges to content.

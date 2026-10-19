@@ -34,31 +34,32 @@ function BackgroundDemo({
         animate={animate && !paused}
         style={{ position: 'absolute', top: 0, right: 0, bottom: 0, left: 0 }}
       />
-      <PageScreen
-        title="My recipes"
-        description="The shared Skia aurora sits behind the page, with the original animated header wave above it."
-        colorScheme={colorScheme}
-        tab
-      >
-        <UniversalButtonContent
-          variant="secondary"
-          label="Try the button over the background"
-          testID="aurora-action"
-          onPress={() => setPresses((count) => count + 1)}
-        />
-        <Text testID="aurora-count">{`Button presses: ${presses}`}</Text>
-        <UniversalButtonContent
-          variant="secondary"
-          label={paused ? 'Resume background' : 'Pause background'}
-          testID="aurora-toggle"
-          disabled={!animate}
-          onPress={() => setPaused((value) => !value)}
-        />
-        <Text testID="aurora-status">
-          {animate && !paused ? 'Motion requested' : 'Static background'}
-        </Text>
-      </PageScreen>
-      <PageMotionOverlay animate={animate && !paused} colorScheme={colorScheme} />
+      <PageMotionOverlay animate={animate && !paused} colorScheme={colorScheme}>
+        <PageScreen
+          title="My recipes"
+          description="The shared Skia aurora sits behind the page, with the original animated header wave above it."
+          colorScheme={colorScheme}
+          tab
+        >
+          <UniversalButtonContent
+            variant="secondary"
+            label="Try the button over the background"
+            testID="aurora-action"
+            onPress={() => setPresses((count) => count + 1)}
+          />
+          <Text testID="aurora-count">{`Button presses: ${presses}`}</Text>
+          <UniversalButtonContent
+            variant="secondary"
+            label={paused ? 'Resume background' : 'Pause background'}
+            testID="aurora-toggle"
+            disabled={!animate}
+            onPress={() => setPaused((value) => !value)}
+          />
+          <Text testID="aurora-status">
+            {animate && !paused ? 'Motion requested' : 'Static background'}
+          </Text>
+        </PageScreen>
+      </PageMotionOverlay>
     </View>
   );
 }

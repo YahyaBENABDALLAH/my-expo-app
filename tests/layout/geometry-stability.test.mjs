@@ -55,6 +55,11 @@ function setup(platform = 'ios') {
     'react-native': {
       Platform: { OS: platform },
       View: native('View'),
+      StyleSheet: { absoluteFill: { position: 'absolute', top: 0, right: 0, bottom: 0, left: 0 } },
+      AccessibilityInfo: {
+        isReduceTransparencyEnabled: async () => false,
+        addEventListener: () => ({ remove() {} }),
+      },
       useWindowDimensions: () => useContext(dimensions),
     },
     '@/hooks/use-color-scheme': { useColorScheme: (scheme) => scheme ?? 'light' },
@@ -85,6 +90,11 @@ function setup(platform = 'ios') {
       Text: native('Text'),
       TextInput: native('Input'),
       Icon: native('Icon'),
+    },
+    'expo-blur': { BlurView: native('BlurView') },
+    '@expo/ui/community/masked-view': {
+      MaskedView: ({ maskElement, children, ...props }) =>
+        h('MaskedView', props, h('Mask', null, maskElement), children),
     },
     '@expo/ui/swift-ui': {
       HStack: native('Stack'),
@@ -407,6 +417,59 @@ test('page wave reuses parsed path objects through resizes, parent updates and r
     view.unmount();
   }
 });
+
+for (const platform of ['ios', 'android']) {
+  test(`${platform}: the blur mask shares wave geometry, drift and size without reparsing paths`, (t) => {
+    const s = setup(platform);
+    s.mocks['@/hooks/use-motion-enabled'].useMotionEnabled = (animate) => animate;
+    s.mocks['react-native-reanimated'].withRepeat = () => Math.PI / 2;
+    const { PageMotionOverlay } = s.load('components/ui/page/page-motion-overlay.tsx');
+    const { PageHeaderBackground } = s.load('components/ui/page/page-header-background.tsx');
+    const { PageWaveContext } = s.load('components/ui/page/page-wave-context.ts');
+    let geometry;
+    let toggle;
+    function Surface() {
+      geometry = useContext(PageWaveContext);
+      return h(PageHeaderBackground, { blurTarget: { current: null } });
+    }
+    function Frame() {
+      const [visible, setVisible] = useState(true);
+      toggle = setVisible;
+      return h(PageMotionOverlay, { visible }, h(Surface));
+    }
+    const view = renderFixture(h(Frame));
+    t.after(() => view.unmount());
+    const mask = () => view.findAll('MaskedView')[0];
+    const assertGeometry = () => {
+      const maskGroup = view.findAll('Mask')[0].props.children.props.children;
+      assert.equal(maskGroup.props.transform, geometry.fit);
+      const [back, front] = maskGroup.props.children;
+      assert.equal(back.props.transform, geometry.backDrift);
+      assert.equal(front.props.transform, geometry.frontDrift);
+      assert.equal(back.props.children.props.path, geometry.backWave);
+      assert.equal(front.props.children.props.path, geometry.frontWave);
+      assert.equal(mask().props.style.height, geometry.overlayHeight);
+    };
+    assertGeometry();
+    assert.ok(Math.abs(geometry.frontDrift.get()[0].translateX - 80) < 0.000001);
+    assert.ok(Math.abs(geometry.backDrift.get()[0].translateX + 100) < 0.000001);
+    const wave = view.findAll('View').find(({ props }) => props.testID === 'page-motion-overlay');
+    view.flush(() => wave.props.onLayout({ nativeEvent: { layout: { width: 280 } } }));
+    assert.equal(geometry.fit.get()[0].scaleX, 0.28);
+    assertGeometry();
+    const surface = view.findAll('BlurView')[0];
+    view.flush(() => toggle(false));
+    assert.equal(view.findAll('MaskedView').length, 0);
+    assert.equal(
+      view.findAll('View').some(({ props }) => props.testID === 'page-motion-overlay'),
+      false,
+    );
+    view.flush(() => toggle(true));
+    assertGeometry();
+    assert.notEqual(view.findAll('BlurView')[0], surface);
+    assert.equal(s.calls.pathParses, 2);
+  });
+}
 
 test('login wave fills to the top from 35% and returns to the header with reduced-motion support', () => {
   const s = setup();

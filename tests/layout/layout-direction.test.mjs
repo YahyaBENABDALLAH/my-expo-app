@@ -506,8 +506,9 @@ for (const [platform, authenticated, introductionRequired] of [
     const authProvider = view.findAll('AuthProvider')[0];
     let headerWave = view.findAll('PageMotionOverlay')[0];
     const launch = view.findAll('LaunchScreen')[0];
-    assert.equal(headerWave?.props.animate, introductionRequired ? undefined : false);
-    assert.equal(headerWave?.props.expanded, introductionRequired ? undefined : !authenticated);
+    assert.equal(headerWave.props.visible, !introductionRequired);
+    assert.equal(headerWave.props.animate, false);
+    assert.equal(headerWave.props.expanded, !authenticated);
     assert.equal(launch.props.exiting, false);
     // Time alone cannot release startup while required resources are unavailable.
     view.flush(() => t.mock.timers.tick(5_000));
@@ -534,9 +535,10 @@ for (const [platform, authenticated, introductionRequired] of [
     );
     view.flush(() => launch.props.onExitComplete());
     assert.equal(view.findAll('LaunchScreen').length, 0);
-    assert.equal(view.findAll('PageMotionOverlay').length, introductionRequired ? 0 : 1);
+    assert.equal(view.findAll('PageMotionOverlay').length, 1);
     assert.equal(view.findAll('PageMotionOverlay')[0], headerWave);
-    assert.equal(headerWave?.props.animate, introductionRequired ? undefined : true);
+    assert.equal(headerWave.props.visible, !introductionRequired);
+    assert.equal(headerWave.props.animate, true);
     assert.equal(
       view.findAll('View').some((node) => node.props.testID === 'app-ready'),
       true,

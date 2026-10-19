@@ -2,7 +2,16 @@
 
 Navigation themes, root/authentication/onboarding stack content and tab scenes use the active theme's opaque `background` token. Each incoming route covers the outgoing route's text during transitions. Page frames, headers, auth forms, loading and recovery content reveal their owning scene's background. Cards, fields and native controls keep their semantic surfaces. The full-screen `AuroraBackground` remains available in the launch screen, dedicated Skia demo and Storybook previews; the root does not render a hidden shader behind opaque navigation scenes.
 
-`PageMotionOverlay` remains mounted once above navigation and below the splash. Its two translucent Skia waves animate across the top 144 points of every page on a 12-second cycle. It ignores touches and accessibility, pauses while the splash covers it, and respects app lifecycle and live Reduce Motion changes.
+`PageMotionOverlay` wraps navigation and draws its artwork above it and below the splash. Its two translucent Skia waves animate across the top 144 points of every page on a 10-second cycle. It ignores touches and accessibility, pauses while the splash covers it, and respects app lifecycle and live Reduce Motion changes.
+
+Its context shares cached paths and UI-thread transforms with the native blur mask
+in scrolling page frames. Expo UI's `MaskedView` clips `expo-blur` to the union of
+the two wave silhouettes. The rest of the header remains transparent. The blur
+samples each frame's content target and sits below its title/back controls, so
+those controls remain sharp. A single wave loop drives both artwork and mask;
+no snapshots or per-frame React updates are used. The existing reduced-motion
+guard freezes both shapes together. The root's `visible` prop hides waves during
+onboarding without remounting navigation. Splash waves remain unmasked.
 
 The splash's bottom edge uses this same component with `variant="splash"`. This variant keeps the header's wave paths, opposite drift and lit crest, but uses opaque theme fills and normal-flow placement to form the moving reveal edge. The waves continue animating throughout the 300-ms upward exit. The shared `PAGE_WAVE_HEIGHT` keeps both artwork and exit geometry consistent.
 

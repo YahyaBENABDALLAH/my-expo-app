@@ -647,17 +647,23 @@ The custom Expo Router tab bar retains Expo UI segmented controls and adds the R
 
 ### Screen safe areas
 
-`PageScreen` and Home use `PageFrame.headerBlur` to float a native blur above
-scrolling content. `usePageHeaderInset()` reserves the measured header height
+`PageScreen` and Home use `PageFrame.headerBlur` to blur scrolling content only
+inside the two wave shapes, with the blur below the sharp title and back button.
+`PageMotionOverlay` wraps root navigation and supplies cached paths and shared
+UI-thread transforms through `PageWaveContext` to an Expo UI `MaskedView`; artwork
+and mask use one motion loop. Its `children` slot supports local compositions and
+`visible` hides the artwork/mask without remounting navigation. Splash waves keep
+their existing opaque treatment. `usePageHeaderInset()` reserves the measured header height
 inside the scroll, including the top safe area and dynamic text/back-button
 height. `BlurTargetView` supplies the Android source; Android 12+ uses native blur
 and older Android uses a translucent fallback. The `extraLight` / `dark` tinted
 backdrop avoids Android's gray thin-material overlay, ignores touches, uses
 intensity 40, and follows Reduce Transparency with
 the theme's `background` token. Title and back button retain the `text` role and
-native controls. Plain frames, Settings' native form and `headerOverlay` maps
+native controls. The header is clear outside the wave silhouettes. Plain frames, Settings' native form and `headerOverlay` maps
 retain their existing inset contract. `BlurredHeader` / `DarkBlurredHeader` in
-`page-screen.stories.tsx` exercise scrolling with a counted back action;
+`page-screen.stories.tsx` exercise scrolling with a counted back action, and
+`AnimatedWaves` previews mask motion;
 `.maestro/storybook/page-header.yaml` covers those actions. Page appearance checks
 cover scroll padding, draft retention during header resizing and accessibility
 changes. Native blur appearance and interaction require a connected device.

@@ -2,6 +2,7 @@ import {
   AuroraBackground,
   NativeField,
   PageFrame,
+  PageMotionOverlay,
   PageScreen,
   UniversalButtonContent,
   UniversalTextContent as Text,
@@ -26,14 +27,19 @@ const meta = {
     colorScheme: 'light',
   },
   decorators: [
-    (Story, { args }) => (
+    (Story, { args, parameters }) => (
       <View style={{ flex: 1 }}>
         <AuroraBackground
           colorScheme={args.colorScheme}
           animate={false}
           style={{ position: 'absolute', top: 0, right: 0, bottom: 0, left: 0 }}
         />
-        <Story />
+        <PageMotionOverlay
+          colorScheme={args.colorScheme}
+          animate={Boolean(parameters.animateWaves)}
+        >
+          <Story />
+        </PageMotionOverlay>
       </View>
     ),
   ],
@@ -119,7 +125,7 @@ function ScrollBlurExample(props: Parameters<typeof PageScreen>[0]) {
         >
           <Text variant="title">{`Recipe ${index + 1}`}</Text>
           <Text>
-            Scroll this card behind the title to inspect the lighter, clearer native blur.
+            Only the curved wave area blurs this card. The rest of the header stays transparent.
           </Text>
         </Column>
       ))}
@@ -131,13 +137,17 @@ export const BlurredHeader: Story = {
   decorators: notchedInsets,
   args: {
     title: 'Saved recipes',
-    description: 'Scroll the cards beneath the translucent header, then tap Back.',
+    description: 'Scroll beneath the waves, then tap Back. Blur follows only the wave shapes.',
   },
   render: (args) => <ScrollBlurExample {...args} />,
 };
 export const DarkBlurredHeader: Story = {
   ...BlurredHeader,
   args: { ...BlurredHeader.args, colorScheme: 'dark' },
+};
+export const AnimatedWaves: Story = {
+  ...BlurredHeader,
+  parameters: { animateWaves: true },
 };
 
 function RefreshExample({

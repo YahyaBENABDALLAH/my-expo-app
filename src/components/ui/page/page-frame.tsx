@@ -59,9 +59,6 @@ export function PageFrame({
         paddingRight: insets.right,
       }}
     >
-      {blurHeader ? (
-        <PageHeaderBackground blurTarget={blurTarget} colorScheme={colorScheme} />
-      ) : null}
       {title ? <PageHeader title={title} onBack={onBack} colorScheme={colorScheme} /> : null}
     </View>
   );
@@ -77,6 +74,9 @@ export function PageFrame({
         </PageHeaderInsetContext.Provider>
       </SafeAreaInsetsContext.Provider>
       {/* Mount the blur after its content so it tracks native scrolling on Android. */}
+      {blurHeader ? (
+        <PageHeaderBackground blurTarget={blurTarget} colorScheme={colorScheme} />
+      ) : null}
       {floating && header}
     </View>
   );

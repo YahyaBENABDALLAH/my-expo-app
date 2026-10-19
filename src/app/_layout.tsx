@@ -116,14 +116,14 @@ function RootLayoutContent() {
         style={{ flex: 1, backgroundColor: colors.background }}
       >
         <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
-        {ready || !showBrandScreen ? <RootLayoutNav holdLogin={holdLogin} /> : null}
-        {onboardingCompleted && (
-          <PageMotionOverlay
-            animate={animatePageArtwork}
-            expanded={expanded}
-            onCollapseComplete={finishLoginWave}
-          />
-        )}
+        <PageMotionOverlay
+          visible={onboardingCompleted}
+          animate={animatePageArtwork}
+          expanded={expanded}
+          onCollapseComplete={finishLoginWave}
+        >
+          {ready || !showBrandScreen ? <RootLayoutNav holdLogin={holdLogin} /> : null}
+        </PageMotionOverlay>
         {showBrandScreen && (
           <LaunchScreen
             exiting={ready}

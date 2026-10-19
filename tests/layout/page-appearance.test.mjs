@@ -54,6 +54,25 @@ function setup(deviceScheme = 'light', transparencyRead = Promise.resolve(false)
       router: { canGoBack: () => true, back() {}, push() {}, replace() {} },
     },
     'expo-blur': { BlurTargetView: native('BlurTarget'), BlurView: native('BlurView') },
+    '@expo/ui/community/masked-view': {
+      MaskedView: ({ maskElement, children, ...props }) =>
+        createElement('MaskedView', props, createElement('Mask', null, maskElement), children),
+    },
+    '@shopify/react-native-skia': {
+      Canvas: native('Canvas'),
+      Group: native('Group'),
+      Path: native('Path'),
+    },
+    '@/components/ui/page/page-wave-context': {
+      PageWaveContext: createContext({
+        overlayHeight: 144,
+        frontWave: { id: 'front' },
+        backWave: { id: 'back' },
+        fit: { get: () => [{ scaleX: 0.39 }, { translateY: 0 }] },
+        frontDrift: { get: () => [{ translateX: 0 }, { translateY: 0 }] },
+        backDrift: { get: () => [{ translateX: 0 }, { translateY: 0 }] },
+      }),
+    },
     'react-native-safe-area-context': {
       SafeAreaInsetsContext,
       useSafeAreaInsets: () => useContext(SafeAreaInsetsContext),
