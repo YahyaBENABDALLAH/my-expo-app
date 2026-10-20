@@ -1,5 +1,14 @@
 # Universal component catalog
 
+## Page wave paths (2026-10-20)
+
+`PageMotionOverlay` uses the supplied front and back SVG paths, filled below
+their curves. Their negative Y coordinates are fitted into the 200-point overlay
+without rotation or mirroring; side margins cover the existing horizontal drift.
+The artwork and both platform blur masks share this fit. Theme roles and props
+are unchanged. `Components/Page Header` (`Default`, `Dark`, `AnimatedLtr` and
+`AnimatedRtl`) previews the production paths. Native appearance remains unverified.
+
 ## Page title alignment (2026-10-20)
 
 `PageHeader` top-aligns its title row so the native 48-point back action does not

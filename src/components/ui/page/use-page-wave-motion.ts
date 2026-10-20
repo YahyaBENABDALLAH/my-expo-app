@@ -16,7 +16,9 @@ import {
 import { scheduleOnRN } from 'react-native-worklets';
 
 export const PAGE_WAVE_HEIGHT = 200;
-const WAVE_WIDTH = 1000;
+// Crop 50 design units from each side of the shorter path for horizontal drift.
+const WAVE_WIDTH = 1587 - 100;
+const WAVE_SCALE_Y = PAGE_WAVE_HEIGHT / 210;
 const WAVE_DURATION_MS = 8000;
 
 /** One motion source keeps the visible artwork and native blur mask aligned. */
@@ -38,15 +40,15 @@ export function usePageWaveMotion({
   const expandedOffset = Math.max(0, height * 0.35 - PAGE_WAVE_HEIGHT / 2);
   const target = expanded && !splash ? expandedOffset : 0;
   const { frontWave, backWave, frontSvg, backSvg } = useMemo(() => {
-    const frontSvg = `M -500 ${-height} H 1500 V 78.75 C 1250 51 1127 89 947 75 S 330 56 80 76.25 S -240 113.75 -500 78.75 Z`;
-    const backSvg = `M -500 ${-height} H 1500 V 46 C 1304 10 1060 20 663 65 S 260 0 23 70 S -270 139 -500 48 Z`;
+    const frontSvg = 'M0-204c43 28 300-30 423 18s358 8 586 59 351 183 578 38V0H0Z';
+    const backSvg = 'M0-204c43 28 300-30 423 18s374-34 586 59 334-143 630-1V0H0Z';
     return {
       frontSvg,
       backSvg,
       frontWave: Skia.Path.MakeFromSVGString(frontSvg)!,
       backWave: Skia.Path.MakeFromSVGString(backSvg)!,
     };
-  }, [height]);
+  }, []);
   const phase = useSharedValue(0);
   const width = useSharedValue(0);
   const offset = useSharedValue(target);
@@ -91,9 +93,13 @@ export function usePageWaveMotion({
 
   const fit = useDerivedValue(() => [
     { scaleX: width.get() / WAVE_WIDTH },
-    { translateY: offset.get() },
+    { translateY: offset.get() + PAGE_WAVE_HEIGHT },
+    { translateX: -50 },
+    { scaleY: WAVE_SCALE_Y },
   ]);
-  const gradientStart = useDerivedValue(() => vec(0, -offset.get()));
+  const gradientStart = useDerivedValue(() =>
+    vec(0, -(offset.get() + PAGE_WAVE_HEIGHT) / WAVE_SCALE_Y),
+  );
   const frontDrift = useDerivedValue(() => [
     { translateX: Math.sin(phase.get()) * 40 * horizontalDirection },
     { translateY: Math.sin(phase.get()) * 2 },

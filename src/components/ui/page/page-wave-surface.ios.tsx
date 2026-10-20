@@ -28,7 +28,17 @@ export function PageWaveSurface({
   const fitProps = useAnimatedProps<GProps>(
     () => {
       const transform = fit.get();
-      return { transform: [transform[0].scaleX ?? 0, 0, 0, 1, 0, transform[1].translateY ?? 0] };
+      const scaleX = transform[0].scaleX ?? 0;
+      return {
+        transform: [
+          scaleX,
+          0,
+          0,
+          transform[3].scaleY ?? 1,
+          scaleX * (transform[2].translateX ?? 0),
+          transform[1].translateY ?? 0,
+        ],
+      };
     },
     undefined,
     svgMatrixAdapter,

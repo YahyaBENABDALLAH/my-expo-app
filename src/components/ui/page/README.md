@@ -86,15 +86,17 @@ push the title lower than a title-only header such as Accueil. Long titles may
 grow downward. Back actions retain their native touch area. The Page Header
 story's `showBack` control compares both states; `Home` opens the Accueil case.
 `page-motion-overlay.tsx` contains the shared animated top-edge wave artwork.
-Its two SVG paths are cached for the window height. Animation updates transforms,
+Its two SVG paths are cached independently of the window height. Animation updates transforms,
 with no path parsing or React state update per frame.
 Its default `overlay` variant decorates headers; `variant="splash"` places the
 same moving paths in normal flow with opaque fills for the launch screen's bottom
 edge. Both use the exported `PAGE_WAVE_HEIGHT` and the same motion guards.
 The back wave resolves theme opacity first; the splash keeps full opacity.
-The wave is 180 points tall and drifts on an 8-second cycle. Both Bézier contours
-have half their previous vertical depth for a flatter shape, shared by
-the artwork and blur masks. Horizontal travel is 40 / 50 design units and
+The wave is 200 points tall and drifts on an 8-second cycle. The supplied front
+and back SVG contours retain their original orientation and fill below the curve.
+Their negative Y coordinates are fitted into the canvas with a positive scale
+and translation, shared by the artwork and blur masks. A 50-design-unit side
+margin keeps the moving edges outside the viewport. Horizontal travel is 40 / 50 design units and
 vertical travel is 2 / 3 points, half the previous movement. RTL reverses both
 layers' horizontal direction without restarting their phase. `AnimatedLtr` and
 `AnimatedRtl` in the header stories preview these settings; motion tests exercise

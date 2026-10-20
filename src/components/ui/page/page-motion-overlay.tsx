@@ -67,7 +67,7 @@ export function PageMotionOverlay({
             <Path path={backWave} opacity={splash ? 1 : overlayBackOpacity}>
               <LinearGradient
                 start={gradientStart}
-                end={vec(0, PAGE_WAVE_HEIGHT)}
+                end={vec(0, 0)}
                 colors={splash ? [colors.tint, colors.tabIconSelected] : overlayColors}
               />
             </Path>
@@ -77,7 +77,7 @@ export function PageMotionOverlay({
             <Path path={frontWave} opacity={scheme === 'dark' ? 0.2 : 0.12}>
               <LinearGradient
                 start={gradientStart}
-                end={vec(0, PAGE_WAVE_HEIGHT)}
+                end={vec(0, 0)}
                 colors={splash ? [colors.tint, `${colors.tint}00`] : overlayColors}
               />
             </Path>
