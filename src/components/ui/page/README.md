@@ -105,7 +105,7 @@ with the text. Long titles retain their natural height. Back actions keep their
 48-point native touch area. The Page Header
 story's `showBack` control compares both states; `Home` opens the Accueil case.
 `page-motion-overlay.tsx` contains the shared animated top-edge wave artwork.
-Its two SVG paths are cached for window/header size and splash variant. Animation updates transforms,
+Its two SVG paths are cached for window/header size, shape and splash variant. Animation updates transforms,
 with no path parsing or React state update per frame.
 Its default `overlay` variant decorates headers; `variant="splash"` places the
 original moving paths in normal flow with opaque fills for the launch screen's bottom
@@ -114,12 +114,19 @@ their measured height. Both retain the same motion guards.
 The back wave resolves theme opacity first; the splash keeps full opacity.
 Header paths use a 1000-by-100 design space. The leading 40% sits at full height;
 the trailing cubic curves scale between 60% and 100% of their depth around that
-fixed baseline, in opposite phases on an 8-second cycle. A 50-unit side margin
-covers the 40 / 50-unit horizontal drift. Artwork and both blur masks share these
-transforms, including vertical scale in the iOS SVG matrix. `AnimatedLtr`,
+fixed baseline, in opposite phases on an 8-second cycle. Horizontal stretching
+is anchored to the 40% junction, so the animated curves never enter the leading
+section. Extended closing edges cover the full viewport. Artwork and both blur masks share these
+transforms, including both scales in the iOS SVG matrix. `AnimatedLtr`,
 `AnimatedRtl` and `LongTitle` in the header stories cover the new geometry;
 motion checks exercise resizing, fixed leading height, opposite depths,
 60/120-Hz timing, direction changes and pause/resume without per-frame React work.
+`PageMotionOverlay` accepts `shape="waves"` (default), `shape="ribbon"` or
+`shape="dunes"`. Waves have repeating crests/troughs; ribbon has broad flowing
+folds; dunes have gentle rolling contours. All variants share the measured header
+height, 40% junction, theme colors and motion guards. The Page Header story's
+`shape` control previews all three with the same title/back controls. Splash
+keeps its original paths regardless of `shape`.
 Header layers share the theme's tint with
 a gentle 20% gradient fade for a more consistent color across the filled area.
 `Pages/Shared Skia motion/NavigationContinuity` replaces Home, Search and Saved

@@ -77,8 +77,12 @@ function HeaderContent({
 
 function HeaderDemo({
   showBack = true,
+  shape: _shape,
   ...props
-}: Parameters<typeof PageFrame>[0] & { showBack?: boolean }) {
+}: Parameters<typeof PageFrame>[0] & {
+  showBack?: boolean;
+  shape?: Parameters<typeof PageMotionOverlay>[0]['shape'];
+}) {
   const [presses, setPresses] = useState(0);
   return (
     <PageFrame {...props} onBack={showBack ? () => setPresses((value) => value + 1) : undefined}>
@@ -90,8 +94,17 @@ function HeaderDemo({
 const meta = {
   title: 'Components/Page Header',
   component: HeaderDemo,
-  args: { title: 'Settings', colorScheme: 'light', scrollsBehindHeader: false, showBack: true },
-  argTypes: { showBack: { control: 'boolean' } },
+  args: {
+    title: 'Settings',
+    colorScheme: 'light',
+    scrollsBehindHeader: false,
+    showBack: true,
+    shape: 'waves',
+  },
+  argTypes: {
+    showBack: { control: 'boolean' },
+    shape: { control: 'select', options: ['waves', 'ribbon', 'dunes'] },
+  },
   decorators: [
     (Story, { args, parameters }) => {
       const colors = useThemeColors(args.colorScheme);
@@ -101,6 +114,7 @@ const meta = {
             <View style={{ flex: 1, backgroundColor: colors.background }}>
               <PageMotionOverlay
                 colorScheme={args.colorScheme}
+                shape={args.shape}
                 animate={Boolean(parameters.animateWaves)}
                 visible={!parameters.withoutWaves}
                 expanded={Boolean(parameters.expandedWaves)}

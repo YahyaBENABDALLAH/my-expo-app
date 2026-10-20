@@ -48,7 +48,7 @@ export function PageWaveSurface({
       const drift = backDrift.get();
       return {
         transform: [
-          1,
+          drift[3].scaleX ?? 1,
           0,
           0,
           drift[2].scaleY ?? 1,
@@ -65,7 +65,7 @@ export function PageWaveSurface({
       const drift = frontDrift.get();
       return {
         transform: [
-          1,
+          drift[3].scaleX ?? 1,
           0,
           0,
           drift[2].scaleY ?? 1,

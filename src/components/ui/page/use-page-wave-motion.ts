@@ -14,6 +14,7 @@ import {
   withTiming,
 } from 'react-native-reanimated';
 import { scheduleOnRN } from 'react-native-worklets';
+import { HEADER_CURVE_START, headerShapeCurves, type PageHeaderShape } from './page-header-shapes';
 
 export const PAGE_WAVE_HEIGHT = 80;
 const HEADER_WAVE_WIDTH = 1000;
@@ -26,11 +27,13 @@ export function usePageWaveMotion({
   animate,
   expanded,
   splash,
+  shape = 'waves',
   onCollapseComplete,
 }: {
   animate: boolean;
   expanded: boolean;
   splash: boolean;
+  shape?: PageHeaderShape;
   onCollapseComplete?: () => void;
 }) {
   const enabled = useMotionEnabled(animate);
@@ -49,19 +52,22 @@ export function usePageWaveMotion({
     // Each header path has a steady leading section and a variable trailing curve.
     // Closing above the screen keeps expanded Login filled throughout the motion.
     const fillEdge = -height / scaleY;
+    const curves = headerShapeCurves[shape];
+    const start = `M-100 100H${HEADER_CURVE_START}`;
+    const close = `V${fillEdge}H-100Z`;
     const frontSvg = splash
       ? 'M0-204c43 28 300-30 423 18s358 8 586 59 351 183 578 38V0H0Z'
-      : `M-50 100H267C525 60 756 90 855 56S1010 101 1050 80V${fillEdge}H-50Z`;
+      : `${start}${curves.front}${close}`;
     const backSvg = splash
       ? 'M0-204c43 28 300-30 423 18s374-34 586 59 334-143 630-1V0H0Z'
-      : `M-50 100H400C605 117 730 75 856 80S1000 35 1051 66V${fillEdge}H-50Z`;
+      : `${start}${curves.back}${close}`;
     return {
       frontSvg,
       backSvg,
       frontWave: Skia.Path.MakeFromSVGString(frontSvg)!,
       backWave: Skia.Path.MakeFromSVGString(backSvg)!,
     };
-  }, [height, scaleY, splash]);
+  }, [height, scaleY, shape, splash]);
   const phase = useSharedValue(0);
   const width = useSharedValue(0);
   const offset = useSharedValue(target);
@@ -124,19 +130,32 @@ export function usePageWaveMotion({
   const frontDrift = useDerivedValue(() => {
     const movement = Math.sin(phase.get());
     const depth = splash ? 1 : 0.8 + movement * 0.2;
+    const stretch = splash ? 1 : 1 + movement * 0.08;
     return [
-      { translateX: movement * 40 * horizontalDirection },
+      // Scale around the junction so motion cannot enter the leading 40%.
+      {
+        translateX: splash
+          ? movement * 40 * horizontalDirection
+          : HEADER_CURVE_START * (1 - stretch),
+      },
       { translateY: splash ? movement * 2 : HEADER_WAVE_HEIGHT * (1 - depth) },
       { scaleY: depth },
+      { scaleX: stretch },
     ];
   });
   const backDrift = useDerivedValue(() => {
     const movement = Math.sin(phase.get());
     const depth = splash ? 1 : 0.8 - movement * 0.2;
+    const stretch = splash ? 1 : 1 - movement * 0.1;
     return [
-      { translateX: -movement * 50 * horizontalDirection },
+      {
+        translateX: splash
+          ? -movement * 50 * horizontalDirection
+          : HEADER_CURVE_START * (1 - stretch),
+      },
       { translateY: splash ? -movement * 3 : HEADER_WAVE_HEIGHT * (1 - depth) },
       { scaleY: depth },
+      { scaleX: stretch },
     ];
   });
 

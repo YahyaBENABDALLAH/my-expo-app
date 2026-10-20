@@ -5,14 +5,17 @@ import { View } from 'react-native';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { PageWaveContext } from './page-wave-context';
 import { PAGE_WAVE_HEIGHT, usePageWaveMotion } from './use-page-wave-motion';
+import type { PageHeaderShape } from './page-header-shapes';
 
 export { PAGE_WAVE_HEIGHT } from './use-page-wave-motion';
+export type { PageHeaderShape } from './page-header-shapes';
 
 /** Header waves are absolute decoration; their SVG bounds never reserve content space. */
 export function PageMotionOverlay({
   animate = true,
   colorScheme,
   variant = 'overlay',
+  shape = 'waves',
   expanded = false,
   onCollapseComplete,
   children,
@@ -21,6 +24,7 @@ export function PageMotionOverlay({
   animate?: boolean;
   colorScheme?: 'light' | 'dark';
   variant?: 'overlay' | 'splash';
+  shape?: PageHeaderShape;
   expanded?: boolean;
   onCollapseComplete?: () => void;
   children?: ReactNode;
@@ -33,6 +37,7 @@ export function PageMotionOverlay({
     animate: animate && visible,
     expanded,
     splash,
+    shape,
     onCollapseComplete,
   });
   const {

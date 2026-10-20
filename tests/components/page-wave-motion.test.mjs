@@ -121,6 +121,7 @@ const close = (actual, expected) =>
 const x = (drift) => drift.get()[0].translateX;
 const y = (drift) => drift.get()[1].translateY;
 const scale = (drift) => drift.get()[2].scaleY;
+const stretch = (drift) => drift.get()[3].scaleX;
 
 for (const hz of [60, 120]) {
   test(`${hz} Hz: opposite wave heights keep the leading section anchored through the 8-second cycle`, (t) => {
@@ -135,14 +136,14 @@ for (const hz of [60, 120]) {
       ltr.tick(1000 / hz);
       rtl.tick(1000 / hz);
     }
-    close(x(ltr.motion.frontDrift), 40);
-    close(x(ltr.motion.backDrift), -50);
+    close(stretch(ltr.motion.frontDrift), 1.08);
+    close(stretch(ltr.motion.backDrift), 0.9);
     close(scale(ltr.motion.frontDrift), 1);
     close(scale(ltr.motion.backDrift), 0.6);
     close(y(ltr.motion.frontDrift) + 100 * scale(ltr.motion.frontDrift), 100);
     close(y(ltr.motion.backDrift) + 100 * scale(ltr.motion.backDrift), 100);
-    close(x(rtl.motion.frontDrift), -x(ltr.motion.frontDrift));
-    close(x(rtl.motion.backDrift), -x(ltr.motion.backDrift));
+    close(x(rtl.motion.frontDrift), x(ltr.motion.frontDrift));
+    close(x(rtl.motion.backDrift), x(ltr.motion.backDrift));
     close(y(rtl.motion.frontDrift), y(ltr.motion.frontDrift));
     assert.equal(ltr.renders, initialRenders, 'Frame callbacks must not render React.');
     assert.equal(ltr.parses, 2, 'Paths stay cached while transforms animate.');
@@ -171,6 +172,7 @@ test('header measurements resize both SVGs without restarting phase or changing 
     s.tick(50);
     for (const drift of [s.motion.frontDrift, s.motion.backDrift]) {
       close(y(drift) + 100 * scale(drift), 100);
+      close(x(drift) + 400 * stretch(drift), 400);
       assert.ok(scale(drift) >= 0.6 && scale(drift) <= 1);
     }
     close(scale(s.motion.frontDrift) + scale(s.motion.backDrift), 1.6);
@@ -227,15 +229,41 @@ test('changing direction retains phase and cached paths; pause/resume and frame 
   const before = x(s.motion.frontDrift);
   const path = s.motion.frontWave;
   s.update({ direction: 'rtl' });
-  close(x(s.motion.frontDrift), -before);
+  close(x(s.motion.frontDrift), before);
   assert.equal(s.motion.frontWave, path);
   assert.equal(s.parses, 2);
   s.update({ active: false });
   s.tick(10000);
-  close(x(s.motion.frontDrift), -before);
+  close(x(s.motion.frontDrift), before);
   s.update({ active: true });
   s.tick(null);
-  close(x(s.motion.frontDrift), -before);
+  close(x(s.motion.frontDrift), before);
   s.tick(10000);
-  close(x(s.motion.frontDrift), -Math.sin((1064 / 8000) * 2 * Math.PI) * 40);
+  close(x(s.motion.frontDrift), -Math.sin((1064 / 8000) * 2 * Math.PI) * 32);
+});
+
+test('all header shapes pin the junction to 40% in LTR and RTL; changing shape retains motion phase', (t) => {
+  const s = setup();
+  t.after(() => s.unmount());
+  s.motion.width.set(390);
+  for (let index = 0; index < 20; index++) s.tick(50);
+  const before = stretch(s.motion.frontDrift);
+  const shapes = new Set();
+  for (const shape of ['waves', 'ribbon', 'dunes']) {
+    s.update({ shape });
+    shapes.add(s.motion.frontSvg);
+    close(stretch(s.motion.frontDrift), before);
+    for (const direction of ['ltr', 'rtl']) {
+      s.update({ direction });
+      const fit = s.motion.fit.get();
+      for (const drift of [s.motion.frontDrift, s.motion.backDrift]) {
+        const junction = x(drift) + 400 * stretch(drift);
+        const pixel = fit[0].scaleX * (fit[2].translateX + junction);
+        close(pixel, 390 * (direction === 'rtl' ? 0.6 : 0.4));
+        close(y(drift) + 100 * scale(drift), 100);
+      }
+    }
+  }
+  assert.equal(shapes.size, 3, 'Each variant supplies a different SVG contour.');
+  assert.equal(s.parses, 6, 'Only a shape change parses a new pair of paths.');
 });
