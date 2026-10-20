@@ -153,17 +153,14 @@ function setup(
   }
   const fixture = renderFixture(createElement(Harness));
   t.after(() => fixture.unmount());
-  // Measure the sheet bridge, then OTP's own input section.
-  for (let pass = 0; pass < 2; pass++) {
-    fixture.flush(() =>
-      fixture
-        .findAll('Column')
-        .filter(({ props }) => props.modifiers?.some((modifier) => modifier.geometry))
-        .at(-1)
-        .props.modifiers.find((modifier) => modifier.geometry)
-        .geometry({ width: width - 48 }),
-    );
-  }
+  // OTP measures its own input section; this fixture mocks that native boundary.
+  fixture.flush(() =>
+    fixture
+      .findAll('Column')
+      .find(({ props }) => props.modifiers?.some((modifier) => modifier.geometry))
+      .props.modifiers.find((modifier) => modifier.geometry)
+      .geometry({ width: width - 48 }),
+  );
   const button = (suffix) =>
     fixture.findAll('Button').find(({ props }) => props.testID === `otp-sheet-${suffix}`).props;
   return {
@@ -179,8 +176,7 @@ function setup(
       fixture.flush(() =>
         fixture
           .findAll('Column')
-          .filter(({ props }) => props.modifiers?.some((modifier) => modifier.geometry))
-          .at(-1)
+          .find(({ props }) => props.modifiers?.some((modifier) => modifier.geometry))
           .props.modifiers.find((modifier) => modifier.geometry)
           .geometry({ width }),
       ),

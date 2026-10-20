@@ -14,23 +14,19 @@ Light/dark appearance follows the native app mode;
 the root layout synchronizes the existing appearance preference with React Native
 `Appearance.setColorScheme`, including system mode.
 
-Compose native content inside the sheet. A single `RNHostView` / `UniversalHost`
-boundary carries the owning Host's live LTR/RTL direction into Expo's separately
-hosted sheet. It measures the available native content width, including sheet
-padding, so it also fits tablets and rotation. Direction changes retain content
-state. Callers own their content layout; OTP keeps its explicit LTR digit field.
+Compose native content inside the sheet. Callers own their content layout and
+any specialized React Native boundaries. OTP measures its own input section;
+there is no shared sheet-width context or theme/direction bridge.
 
 For a known scroll viewport, `contentHeight` applies its height to a native Column
 before presentation. Home supplies `min(420, screenHeight * 0.6)` here and on its
-inner ScrollView to reserve that viewport while the direction boundary measures.
+inner ScrollView, so the native sheet does not wait for an RN/Host size round trip.
 This bounds the content, not the sheet's outer height or a 50% snap point; native
 chrome and partial/expanded states remain platform-owned. Omit it for intrinsic
 content. `FixedContentHeight` is the corresponding native Storybook fixture.
 
 Native stories: `Components/Bottom Sheet`, including `Light`, `Dark` and
-`FixedContentHeight`. The page and in-sheet RTL switches let the same example
-exercise initial direction and live changes; Start/End labels show row order.
-Maestro flows cover opening, closing, reopening and
+`FixedContentHeight`. Maestro flows cover opening, closing, reopening and
 language selection; the login flow also includes swipe dismissal. Native views
 are mocked in the JS checks, so they do not establish native rendering or gestures.
 
