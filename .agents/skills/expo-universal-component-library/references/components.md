@@ -22,7 +22,7 @@ production form; native iOS appearance still needs a device check.
 ## Page wave paths (2026-10-20)
 
 `PageMotionOverlay` fits two cached SVG paths to the focused frame's measured
-header height, including safe area and scaled text. Each leading section stays at
+header height, including safe area and scaled text. Each leading 40% section stays at
 full height while the trailing curve changes depth in opposite phases on the
 8-second UI-thread loop. RTL mirrors the steady section beneath the title/back
 control. The iOS SVG mask includes the same vertical scale as the Skia artwork.

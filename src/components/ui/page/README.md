@@ -112,7 +112,7 @@ original moving paths in normal flow with opaque fills for the launch screen's b
 edge. The splash retains the exported 80-point `PAGE_WAVE_HEIGHT`; headers use
 their measured height. Both retain the same motion guards.
 The back wave resolves theme opacity first; the splash keeps full opacity.
-Header paths use a 1000-by-100 design space. The leading 55% sits at full height;
+Header paths use a 1000-by-100 design space. The leading 40% sits at full height;
 the trailing cubic curves scale between 60% and 100% of their depth around that
 fixed baseline, in opposite phases on an 8-second cycle. A 50-unit side margin
 covers the 40 / 50-unit horizontal drift. Artwork and both blur masks share these
