@@ -3,6 +3,7 @@ import { Box } from '@expo/ui/jetpack-compose';
 import { clip, paddingAll, Shapes, size, zIndex } from '@expo/ui/jetpack-compose/modifiers';
 import { Image } from 'expo-image';
 import type { HomeRecipeCardImageProps } from './home-recipe-card-image.types';
+import { radii, spacing } from '@/constants/layout';
 
 /** Keep badge overlays in the native tree above the passive hosted image. */
 export function HomeRecipeCardImage({
@@ -13,7 +14,7 @@ export function HomeRecipeCardImage({
   bottom,
 }: HomeRecipeCardImageProps) {
   return (
-    <Box modifiers={[size(width, height), clip(Shapes.RoundedCorner(14))]}>
+    <Box modifiers={[size(width, height), clip(Shapes.RoundedCorner(radii.card))]}>
       <RNHostView matchContents>
         <Image
           source={source}
@@ -26,14 +27,17 @@ export function HomeRecipeCardImage({
         />
       </RNHostView>
       {top ? (
-        <Box contentAlignment="topEnd" modifiers={[size(width, height), paddingAll(12), zIndex(1)]}>
+        <Box
+          contentAlignment="topEnd"
+          modifiers={[size(width, height), paddingAll(spacing.md), zIndex(1)]}
+        >
           {top}
         </Box>
       ) : null}
       {bottom ? (
         <Box
           contentAlignment="bottomEnd"
-          modifiers={[size(width, height), paddingAll(12), zIndex(1)]}
+          modifiers={[size(width, height), paddingAll(spacing.md), zIndex(1)]}
         >
           {bottom}
         </Box>

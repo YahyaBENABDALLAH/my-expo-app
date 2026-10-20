@@ -11,16 +11,18 @@ import {
   UniversalButtonContent,
   UniversalTextContent as Text,
   nativeFillWidth,
+  PageSection,
 } from '@components/ui';
 import { homeRecipeExamples } from './home-card-examples.data';
+import { spacing } from '@/constants/layout';
 
 /** Inline editorial cards share the page's vertical scroll; showcases can bound their viewport. */
 export function HomeCardExamples({ editorialScroll = true }: { editorialScroll?: boolean }) {
   const { t } = useTranslation();
   const { width, height } = useWindowDimensions();
   const insets = useSafeAreaInsets();
-  // Card buttons have no extra padding; PageScreen owns 24-point side insets.
-  const cardWidth = Math.min(560, Math.max(1, width - insets.left - insets.right - 48));
+  // The containing section owns the same gutters as the other recipe sections.
+  const cardWidth = Math.min(560, Math.max(1, width - insets.left - insets.right - spacing.lg * 2));
   const popularWidth = Math.min(280, cardWidth);
   const examples = useMemo(() => homeRecipeExamples(t), [t]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -54,14 +56,14 @@ export function HomeCardExamples({ editorialScroll = true }: { editorialScroll?:
     [examples, cardWidth],
   );
   return (
-    <Column spacing={16} modifiers={nativeFillWidth} testID="home-card-examples">
-      <Column spacing={4}>
+    <Column spacing={spacing.lg} modifiers={nativeFillWidth} testID="home-card-examples">
+      <Column spacing={spacing.xs}>
         <Text variant="title">{t('home.cards.title')}</Text>
         <Text variant="caption">{t('home.cards.sampleHint', { count: examples.length })}</Text>
       </Column>
       <Text fontWeight="600">{t('home.popular')}</Text>
       <ScrollView direction="horizontal" testID="home-popular-card-examples">
-        <Row spacing={12}>{popularCards}</Row>
+        <Row spacing={spacing.md}>{popularCards}</Row>
       </ScrollView>
       <Text fontWeight="600">{t('home.editorsChoice')}</Text>
       {editorialScroll ? (
@@ -70,12 +72,16 @@ export function HomeCardExamples({ editorialScroll = true }: { editorialScroll?:
           style={{ height: 300 }}
           testID="home-editorial-card-examples"
         >
-          <Column spacing={16} modifiers={nativeFillWidth}>
+          <Column spacing={spacing.lg} modifiers={nativeFillWidth}>
             {editorialCards}
           </Column>
         </ScrollView>
       ) : (
-        <Column spacing={16} modifiers={nativeFillWidth} testID="home-editorial-card-examples">
+        <Column
+          spacing={spacing.lg}
+          modifiers={nativeFillWidth}
+          testID="home-editorial-card-examples"
+        >
           {editorialCards}
         </Column>
       )}
@@ -86,7 +92,7 @@ export function HomeCardExamples({ editorialScroll = true }: { editorialScroll?:
           testID="home-example-recipe-sheet"
         >
           <ScrollView style={{ height: Math.min(520, Math.max(120, height * 0.65)) }}>
-            <Column spacing={14} modifiers={nativeFillWidth}>
+            <PageSection>
               <Text variant="caption">{t('home.cards.samplePreview')}</Text>
               <Text variant="title" testID="home-example-recipe-title">
                 {selected.title}
@@ -100,7 +106,7 @@ export function HomeCardExamples({ editorialScroll = true }: { editorialScroll?:
                 onPress={() => setSelectedId(null)}
                 testID="home-example-recipe-close"
               />
-            </Column>
+            </PageSection>
           </ScrollView>
         </BottomSheet>
       ) : null}

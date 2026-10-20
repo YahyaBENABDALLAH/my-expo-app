@@ -2,6 +2,7 @@ import { useTranslation } from 'react-i18next';
 import {
   UniversalButtonContent,
   PageScreen,
+  PageSection,
   UniversalTextContent as Text,
   TextInput,
   QueryContent,
@@ -37,13 +38,15 @@ export function CategoryScreen() {
         },
       ]}
     >
-      {valid ? (
-        <QueryContent query={query} empty={query.data?.data.length === 0}>
-          {query.data?.data.map((recipe) => (
-            <RecipeCard key={recipe.uuid} recipe={recipe} onPress={openRecipe} />
-          ))}
-        </QueryContent>
-      ) : null}
+      <PageSection>
+        {valid ? (
+          <QueryContent query={query} empty={query.data?.data.length === 0}>
+            {query.data?.data.map((recipe) => (
+              <RecipeCard key={recipe.uuid} recipe={recipe} onPress={openRecipe} />
+            ))}
+          </QueryContent>
+        ) : null}
+      </PageSection>
     </PageScreen>
   );
 }
@@ -61,32 +64,34 @@ export function IngredientsScreen() {
       description={t('recipes.ingredientDescription')}
       onRefresh={onRefresh}
     >
-      <TextInput
-        label={t('recipes.searchIngredients')}
-        testID="ingredients-search"
-        value={search}
-        onChangeText={(value) => {
-          setSearch(value);
-          setPage(1);
-        }}
-      />
-      <QueryContent query={query}>
-        {query.data?.data.map((item) => (
-          <Text key={item.uuid}>{lookupLabel(item)}</Text>
-        ))}
-      </QueryContent>
-      <UniversalButtonContent
-        variant="secondary"
-        label={t('common.previousPage')}
-        disabled={page === 1}
-        onPress={() => setPage(page - 1)}
-      />
-      <UniversalButtonContent
-        variant="secondary"
-        label={t('common.nextPage')}
-        disabled={!query.data?.meta.hasNextPage}
-        onPress={() => setPage(page + 1)}
-      />
+      <PageSection>
+        <TextInput
+          label={t('recipes.searchIngredients')}
+          testID="ingredients-search"
+          value={search}
+          onChangeText={(value) => {
+            setSearch(value);
+            setPage(1);
+          }}
+        />
+        <QueryContent query={query}>
+          {query.data?.data.map((item) => (
+            <Text key={item.uuid}>{lookupLabel(item)}</Text>
+          ))}
+        </QueryContent>
+        <UniversalButtonContent
+          variant="secondary"
+          label={t('common.previousPage')}
+          disabled={page === 1}
+          onPress={() => setPage(page - 1)}
+        />
+        <UniversalButtonContent
+          variant="secondary"
+          label={t('common.nextPage')}
+          disabled={!query.data?.meta.hasNextPage}
+          onPress={() => setPage(page + 1)}
+        />
+      </PageSection>
     </PageScreen>
   );
 }

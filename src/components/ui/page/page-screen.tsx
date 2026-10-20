@@ -7,6 +7,7 @@ import { UniversalHost } from '../host/universal-host';
 import { RefreshableScrollView } from '../refreshable-scroll-view/refreshable-scroll-view';
 import { nativeFillWidth } from '../native/native-fill-width';
 import { PageFrame, usePageHeaderInset } from './page-frame';
+import { PageSection } from './page-section';
 import { UniversalTextContent } from '../text/universal-text';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import type { ReactNode } from 'react';
@@ -87,24 +88,32 @@ function PageContent({
         >
           <RefreshableScrollView onRefresh={onRefresh} testID="page-scroll">
             <Column
-              spacing={16}
+              spacing={0}
               modifiers={nativeFillWidth}
-              style={{ padding: 24, paddingTop: headerInset + 24 }}
+              style={{ padding: 0, paddingTop: headerInset }}
             >
-              <UniversalTextContent>{description}</UniversalTextContent>
+              {description ? (
+                <PageSection>
+                  <UniversalTextContent>{description}</UniversalTextContent>
+                </PageSection>
+              ) : null}
               {children}
-              {actions.map(({ label, href, testID }) => (
-                <UniversalButtonContent
-                  key={testID ?? (typeof href === 'string' ? href : JSON.stringify(href))}
-                  label={label}
-                  variant="secondary"
-                  testID={
-                    testID ??
-                    `page-action-${(typeof href === 'string' ? href : href.pathname).replaceAll(/[^a-zA-Z0-9]+/g, '-').replaceAll(/^-|-$/g, '')}`
-                  }
-                  onPress={() => router.push(href)}
-                />
-              ))}
+              {actions.length > 0 ? (
+                <PageSection>
+                  {actions.map(({ label, href, testID }) => (
+                    <UniversalButtonContent
+                      key={testID ?? (typeof href === 'string' ? href : JSON.stringify(href))}
+                      label={label}
+                      variant="secondary"
+                      testID={
+                        testID ??
+                        `page-action-${(typeof href === 'string' ? href : href.pathname).replaceAll(/[^a-zA-Z0-9]+/g, '-').replaceAll(/^-|-$/g, '')}`
+                      }
+                      onPress={() => router.push(href)}
+                    />
+                  ))}
+                </PageSection>
+              ) : null}
             </Column>
           </RefreshableScrollView>
         </UniversalHost>

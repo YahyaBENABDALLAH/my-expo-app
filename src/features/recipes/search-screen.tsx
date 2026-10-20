@@ -1,3 +1,4 @@
+import { spacing } from '@/constants/layout';
 import { useTranslation } from 'react-i18next';
 import {
   BottomSheet,
@@ -7,6 +8,7 @@ import {
   Picker,
   UniversalButtonContent,
   PageScreen,
+  PageSection,
   UniversalTextContent as Text,
   TextInput,
   QueryContent,
@@ -107,123 +109,125 @@ function SearchContent({ params }: { params: SearchParams }) {
       description={t('search.description')}
       tab
     >
-      <TextInput
-        label={t('search.recipes')}
-        testID="recipe-search-input"
-        value={text}
-        onChangeText={setText}
-      />
-      <UniversalButtonContent
-        variant="secondary"
-        label={
-          filterCount ? t('search.activeFilters', { count: filterCount }) : t('search.filters')
-        }
-        testID="search-filters"
-        onPress={openFilters}
-      />
-      {query.isSuccess ? (
-        <Text variant="caption" testID="search-result-count">
-          {t('search.resultCount', { count: query.data.meta.itemCount })}
-        </Text>
-      ) : null}
-      <QueryContent query={query} empty={empty} emptyMessage={t('search.noResults')}>
-        {query.data?.data.map((recipe) => (
-          <RecipeCard key={recipe.uuid} recipe={recipe} onPress={openRecipe} />
-        ))}
-      </QueryContent>
-      {empty && (search || filterCount) ? (
+      <PageSection>
+        <TextInput
+          label={t('search.recipes')}
+          testID="recipe-search-input"
+          value={text}
+          onChangeText={setText}
+        />
         <UniversalButtonContent
           variant="secondary"
-          label={t('search.resetSearch')}
-          testID="search-reset"
-          onPress={() => {
-            setText('');
-            setSearch('');
-            router.setParams({ ...emptyFilters, q: '' });
-            setPage(1);
-          }}
+          label={
+            filterCount ? t('search.activeFilters', { count: filterCount }) : t('search.filters')
+          }
+          testID="search-filters"
+          onPress={openFilters}
         />
-      ) : null}
-      {query.data && (page > 1 || query.data.meta.hasNextPage) ? (
-        <Column spacing={8} modifiers={nativeFillWidth}>
-          <Text variant="caption">{t('common.page', { page })}</Text>
-          <Row spacing={12} alignment="center" modifiers={nativeFillWidth}>
-            <UniversalButtonContent
-              variant="secondary"
-              label={t('common.previousPage')}
-              testID="search-previous-page"
-              disabled={page === 1 || query.isFetching}
-              onPress={() => setPage(page - 1)}
-            />
-            <UniversalButtonContent
-              variant="secondary"
-              label={t('common.nextPage')}
-              testID="search-next-page"
-              disabled={!query.data.meta.hasNextPage || query.isFetching}
-              onPress={() => setPage(page + 1)}
-            />
-          </Row>
-        </Column>
-      ) : null}
-      <BottomSheet isPresented={sheet} onDismiss={() => setSheet(false)}>
-        <SearchFilterViewport>
-          <Column spacing={16} modifiers={nativeFillWidth}>
-            <Text variant="title" testID="search-filter-title">
-              {t('search.filterTitle')}
-            </Text>
-            {(
-              [
-                ['categoryUuid', t('common.category'), categories],
-                ['cuisineUuid', t('common.cuisine'), cuisines],
-                ['difficultyUuid', t('common.difficulty'), difficulties],
-              ] as const
-            ).map(([key, label, lookup]) => (
-              <Column key={key} spacing={8} modifiers={nativeFillWidth}>
-                <Text>{label}</Text>
-                <QueryContent query={lookup}>
-                  <Picker
-                    testID={`search-filter-${key}`}
-                    selectedValue={draftFilters[key]}
-                    onValueChange={(value) =>
-                      setDraftFilters((current) => ({ ...current, [key]: String(value) }))
-                    }
-                  >
-                    <Picker.Item value="" label={t('common.all')} />
-                    {lookup.data?.data.map((item) => (
-                      <Picker.Item key={item.uuid} value={item.uuid} label={lookupLabel(item)} />
-                    ))}
-                  </Picker>
-                </QueryContent>
-              </Column>
-            ))}
-            <UniversalButtonContent
-              variant="link"
-              fullWidth
-              label={t('search.clearFilters')}
-              testID="search-clear-filters"
-              onPress={() => setDraftFilters(emptyFilters)}
-            />
-            <UniversalButtonContent
-              variant="primary"
-              label={t('search.applyFilters')}
-              testID="search-filter-done"
-              fullWidth
-              onPress={() => {
-                router.setParams(draftFilters);
-                setPage(1);
-                setSheet(false);
-              }}
-            />
-            <UniversalButtonContent
-              variant="link"
-              fullWidth
-              label={t('auth.cancel')}
-              testID="search-filter-cancel"
-              onPress={() => setSheet(false)}
-            />
+        {query.isSuccess ? (
+          <Text variant="caption" testID="search-result-count">
+            {t('search.resultCount', { count: query.data.meta.itemCount })}
+          </Text>
+        ) : null}
+        <QueryContent query={query} empty={empty} emptyMessage={t('search.noResults')}>
+          {query.data?.data.map((recipe) => (
+            <RecipeCard key={recipe.uuid} recipe={recipe} onPress={openRecipe} />
+          ))}
+        </QueryContent>
+        {empty && (search || filterCount) ? (
+          <UniversalButtonContent
+            variant="secondary"
+            label={t('search.resetSearch')}
+            testID="search-reset"
+            onPress={() => {
+              setText('');
+              setSearch('');
+              router.setParams({ ...emptyFilters, q: '' });
+              setPage(1);
+            }}
+          />
+        ) : null}
+        {query.data && (page > 1 || query.data.meta.hasNextPage) ? (
+          <Column spacing={spacing.sm} modifiers={nativeFillWidth}>
+            <Text variant="caption">{t('common.page', { page })}</Text>
+            <Row spacing={spacing.md} alignment="center" modifiers={nativeFillWidth}>
+              <UniversalButtonContent
+                variant="secondary"
+                label={t('common.previousPage')}
+                testID="search-previous-page"
+                disabled={page === 1 || query.isFetching}
+                onPress={() => setPage(page - 1)}
+              />
+              <UniversalButtonContent
+                variant="secondary"
+                label={t('common.nextPage')}
+                testID="search-next-page"
+                disabled={!query.data.meta.hasNextPage || query.isFetching}
+                onPress={() => setPage(page + 1)}
+              />
+            </Row>
           </Column>
-        </SearchFilterViewport>
-      </BottomSheet>
+        ) : null}
+        <BottomSheet isPresented={sheet} onDismiss={() => setSheet(false)}>
+          <SearchFilterViewport>
+            <PageSection>
+              <Text variant="title" testID="search-filter-title">
+                {t('search.filterTitle')}
+              </Text>
+              {(
+                [
+                  ['categoryUuid', t('common.category'), categories],
+                  ['cuisineUuid', t('common.cuisine'), cuisines],
+                  ['difficultyUuid', t('common.difficulty'), difficulties],
+                ] as const
+              ).map(([key, label, lookup]) => (
+                <Column key={key} spacing={spacing.sm} modifiers={nativeFillWidth}>
+                  <Text>{label}</Text>
+                  <QueryContent query={lookup}>
+                    <Picker
+                      testID={`search-filter-${key}`}
+                      selectedValue={draftFilters[key]}
+                      onValueChange={(value) =>
+                        setDraftFilters((current) => ({ ...current, [key]: String(value) }))
+                      }
+                    >
+                      <Picker.Item value="" label={t('common.all')} />
+                      {lookup.data?.data.map((item) => (
+                        <Picker.Item key={item.uuid} value={item.uuid} label={lookupLabel(item)} />
+                      ))}
+                    </Picker>
+                  </QueryContent>
+                </Column>
+              ))}
+              <UniversalButtonContent
+                variant="link"
+                fullWidth
+                label={t('search.clearFilters')}
+                testID="search-clear-filters"
+                onPress={() => setDraftFilters(emptyFilters)}
+              />
+              <UniversalButtonContent
+                variant="primary"
+                label={t('search.applyFilters')}
+                testID="search-filter-done"
+                fullWidth
+                onPress={() => {
+                  router.setParams(draftFilters);
+                  setPage(1);
+                  setSheet(false);
+                }}
+              />
+              <UniversalButtonContent
+                variant="link"
+                fullWidth
+                label={t('auth.cancel')}
+                testID="search-filter-cancel"
+                onPress={() => setSheet(false)}
+              />
+            </PageSection>
+          </SearchFilterViewport>
+        </BottomSheet>
+      </PageSection>
     </PageScreen>
   );
 }

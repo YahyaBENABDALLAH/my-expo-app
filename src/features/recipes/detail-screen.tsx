@@ -1,8 +1,10 @@
+import { spacing } from '@/constants/layout';
 import { useTranslation } from 'react-i18next';
 import {
   Column,
   UniversalButtonContent,
   PageScreen,
+  PageSection,
   UniversalTextContent as Text,
   QueryContent,
 } from '@components/ui';
@@ -63,44 +65,46 @@ export default function DetailScreen() {
       onRefresh={onRefresh}
       description={recipe.data?.summary ?? t('recipes.details')}
     >
-      <QueryContent query={recipe}>
-        <Text variant="title">{recipe.data?.title ?? ''}</Text>
-        <Text>
-          {t('recipes.facts', {
-            minutes: recipe.data?.totalTimeMinutes ?? 0,
-            servings: recipe.data?.servings ?? 0,
-          })}
-        </Text>
-        {!userUuid ? <Text>{t('recipes.loginLike')}</Text> : null}
-        <UniversalButtonContent
-          variant={favorite ? 'destructive' : 'secondary'}
-          label={t(favoriteActionLabel(save.isPending, favorite))}
-          testID="recipe-favorite"
-          disabled={!userUuid || !favorites.data || save.isPending}
-          onPress={() => save.mutate({ recipe: recipe.data, remove: favorite })}
-        />
-        {save.error ? <Text>{t('recipes.favoriteFailed')}</Text> : null}
-        <UniversalButtonContent
-          variant="secondary"
-          label={t(likeActionLabel(like.isPending, like.isSuccess))}
-          disabled={like.isPending || like.isSuccess || !userUuid}
-          onPress={() => like.mutate()}
-        />
-        {like.error ? <Text>{t('recipes.likeFailed')}</Text> : null}
-        <Text variant="title">{t('common.ingredients')}</Text>
-        {recipe.data?.ingredients?.map((item) => (
-          <Text
-            key={`${item.sortOrder}:${item.ingredientName}:${item.unitLabel ?? ''}`}
-          >{`${item.quantity ?? ''} ${item.unitLabel ?? ''} ${item.ingredientName}${item.isOptional ? t('recipes.optional') : ''}`}</Text>
-        ))}
-        <Text variant="title">{t('recipes.instructions')}</Text>
-        {recipe.data?.steps?.map((item) => (
-          <Column key={item.stepNumber} spacing={8}>
-            <Text fontWeight="600">{`${item.stepNumber}. ${item.title}`}</Text>
-            <Text>{item.instruction}</Text>
-          </Column>
-        ))}
-      </QueryContent>
+      <PageSection>
+        <QueryContent query={recipe}>
+          <Text variant="title">{recipe.data?.title ?? ''}</Text>
+          <Text>
+            {t('recipes.facts', {
+              minutes: recipe.data?.totalTimeMinutes ?? 0,
+              servings: recipe.data?.servings ?? 0,
+            })}
+          </Text>
+          {!userUuid ? <Text>{t('recipes.loginLike')}</Text> : null}
+          <UniversalButtonContent
+            variant={favorite ? 'destructive' : 'secondary'}
+            label={t(favoriteActionLabel(save.isPending, favorite))}
+            testID="recipe-favorite"
+            disabled={!userUuid || !favorites.data || save.isPending}
+            onPress={() => save.mutate({ recipe: recipe.data, remove: favorite })}
+          />
+          {save.error ? <Text>{t('recipes.favoriteFailed')}</Text> : null}
+          <UniversalButtonContent
+            variant="secondary"
+            label={t(likeActionLabel(like.isPending, like.isSuccess))}
+            disabled={like.isPending || like.isSuccess || !userUuid}
+            onPress={() => like.mutate()}
+          />
+          {like.error ? <Text>{t('recipes.likeFailed')}</Text> : null}
+          <Text variant="title">{t('common.ingredients')}</Text>
+          {recipe.data?.ingredients?.map((item) => (
+            <Text
+              key={`${item.sortOrder}:${item.ingredientName}:${item.unitLabel ?? ''}`}
+            >{`${item.quantity ?? ''} ${item.unitLabel ?? ''} ${item.ingredientName}${item.isOptional ? t('recipes.optional') : ''}`}</Text>
+          ))}
+          <Text variant="title">{t('recipes.instructions')}</Text>
+          {recipe.data?.steps?.map((item) => (
+            <Column key={item.stepNumber} spacing={spacing.sm}>
+              <Text fontWeight="600">{`${item.stepNumber}. ${item.title}`}</Text>
+              <Text>{item.instruction}</Text>
+            </Column>
+          ))}
+        </QueryContent>
+      </PageSection>
     </PageScreen>
   );
 }

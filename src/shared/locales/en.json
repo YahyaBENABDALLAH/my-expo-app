@@ -267,6 +267,8 @@
     "title": "App Settings",
     "description": "Manage your appearance and language preferences.",
     "appearance": "Appearance",
+    "components": "Components",
+    "componentList": "Component list",
     "yourAccount": "Your account",
     "comingSoon": "Coming soon",
     "socialNotifications": "Social notifications",

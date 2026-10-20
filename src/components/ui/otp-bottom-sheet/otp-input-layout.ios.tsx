@@ -1,3 +1,4 @@
+import { spacing } from '@/constants/layout';
 import { Row, TextInput } from '@expo/ui';
 import { ZStack } from '@expo/ui/swift-ui';
 import {
@@ -19,7 +20,10 @@ export function OtpInputLayout({
 }: OtpInputLayoutProps) {
   return (
     <ZStack modifiers={[frame({ maxWidth: Infinity, height })]}>
-      <Row spacing={8} modifiers={[frame({ maxWidth: Infinity }), accessibilityHidden(true)]}>
+      <Row
+        spacing={spacing.sm}
+        modifiers={[frame({ maxWidth: Infinity }), accessibilityHidden(true)]}
+      >
         {slots}
       </Row>
       <TextInput

@@ -38,8 +38,8 @@ export function usePageWaveMotion({
   const expandedOffset = Math.max(0, height * 0.35 - PAGE_WAVE_HEIGHT / 2);
   const target = expanded && !splash ? expandedOffset : 0;
   const { frontWave, backWave, frontSvg, backSvg } = useMemo(() => {
-    const frontSvg = `M -500 ${-height} H 1500 V 78.75 C 1250 51 1120 110 820 85 S 330 56 80 76.25 S -240 113.75 -500 78.75 Z`;
-    const backSvg = `M -500 ${-height} H 1500 V 66.25 C 1000 98.75 1060 55 780 72.5 S 300 107.5 20 83.75 S -260 51 -500 67.5 Z`;
+    const frontSvg = `M -500 ${-height} H 1500 V 78.75 C 1250 51 1127 89 947 75 S 330 56 80 76.25 S -240 113.75 -500 78.75 Z`;
+    const backSvg = `M -500 ${-height} H 1500 V 46 C 1304 10 1060 20 663 65 S 260 0 23 70 S -270 139 -500 48 Z`;
     return {
       frontSvg,
       backSvg,

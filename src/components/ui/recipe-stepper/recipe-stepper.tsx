@@ -1,3 +1,4 @@
+import { spacing } from '@/constants/layout';
 import { useTranslation } from 'react-i18next';
 import { useThemeColors } from '@/hooks/use-theme';
 import { Column } from '@expo/ui';
@@ -197,7 +198,7 @@ export const RecipeStepper = memo(function RecipeStepper({
   const gradientEnd = useDerivedValue(() => vec(phase.get() + waveLength, centerY));
 
   return (
-    <Column spacing={8} modifiers={nativeFillWidth}>
+    <Column spacing={spacing.sm} modifiers={nativeFillWidth}>
       <RecipeStepperLayout
         indicatorHeight={indicatorHeight}
         renderArtwork={(canvasWidth) => (

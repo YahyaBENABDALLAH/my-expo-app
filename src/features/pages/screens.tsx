@@ -2,6 +2,7 @@ import { useTranslation } from 'react-i18next';
 import {
   OtpBottomSheet,
   PageScreen,
+  PageSection,
   UniversalButtonContent,
   UniversalTextContent,
 } from '@components/ui';
@@ -170,26 +171,28 @@ export function DevelopmentPagesScreen() {
             : []),
         ]}
       >
-        {appDevEnabled && (
-          <>
+        <PageSection>
+          {appDevEnabled && (
+            <>
+              <UniversalButtonContent
+                variant="primary"
+                fullWidth
+                label={t('otp.openDemo')}
+                testID="development-otp-open"
+                onPress={() => setOtpPresented(true)}
+              />
+              <UniversalTextContent variant="caption">{t('otp.demoHint')}</UniversalTextContent>
+            </>
+          )}
+          {developmentGuest && (
             <UniversalButtonContent
-              variant="primary"
-              fullWidth
-              label={t('otp.openDemo')}
-              testID="development-otp-open"
-              onPress={() => setOtpPresented(true)}
+              variant="secondary"
+              label={t('tools.exitGuest')}
+              testID="development-guest-exit"
+              onPress={exitDevelopmentGuest}
             />
-            <UniversalTextContent variant="caption">{t('otp.demoHint')}</UniversalTextContent>
-          </>
-        )}
-        {developmentGuest && (
-          <UniversalButtonContent
-            variant="secondary"
-            label={t('tools.exitGuest')}
-            testID="development-guest-exit"
-            onPress={exitDevelopmentGuest}
-          />
-        )}
+          )}
+        </PageSection>
       </PageScreen>
       {appDevEnabled && (
         <OtpBottomSheet

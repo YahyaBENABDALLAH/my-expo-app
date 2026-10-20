@@ -1,7 +1,9 @@
+import { spacing, radii } from '@/constants/layout';
 import { useTranslation } from 'react-i18next';
 import {
   Column,
   PageScreen,
+  PageSection,
   Row,
   UniversalTextContent as Text,
   nativeFillWidth,
@@ -21,24 +23,26 @@ export default function TokensScreen() {
         mode: t(`appearance.${scheme}`),
       })}
     >
-      {Object.entries(colors).map(([role, value]) => (
-        <Row key={role} spacing={12} alignment="center" modifiers={nativeFillWidth}>
-          <Column
-            style={{
-              width: 28,
-              height: 28,
-              backgroundColor: value,
-              borderWidth: 1,
-              borderColor: colors.border,
-              borderRadius: 6,
-            }}
-          />
-          <Column spacing={2} modifiers={nativeRowWeight}>
-            <Text>{role}</Text>
-            <Text variant="caption">{value}</Text>
-          </Column>
-        </Row>
-      ))}
+      <PageSection>
+        {Object.entries(colors).map(([role, value]) => (
+          <Row key={role} spacing={spacing.md} alignment="center" modifiers={nativeFillWidth}>
+            <Column
+              style={{
+                width: 28,
+                height: 28,
+                backgroundColor: value,
+                borderWidth: 1,
+                borderColor: colors.border,
+                borderRadius: radii.sm,
+              }}
+            />
+            <Column spacing={spacing.xs} modifiers={nativeRowWeight}>
+              <Text>{role}</Text>
+              <Text variant="caption">{value}</Text>
+            </Column>
+          </Row>
+        ))}
+      </PageSection>
     </PageScreen>
   );
 }

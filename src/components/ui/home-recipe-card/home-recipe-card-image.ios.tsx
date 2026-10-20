@@ -3,6 +3,7 @@ import { VStack, ZStack } from '@expo/ui/swift-ui';
 import { clipShape, frame, padding } from '@expo/ui/swift-ui/modifiers';
 import { Image } from 'expo-image';
 import type { HomeRecipeCardImageProps } from './home-recipe-card-image.types';
+import { radii, spacing } from '@/constants/layout';
 
 export function HomeRecipeCardImage({
   source,
@@ -12,7 +13,7 @@ export function HomeRecipeCardImage({
   bottom,
 }: HomeRecipeCardImageProps) {
   return (
-    <ZStack modifiers={[frame({ width, height }), clipShape('roundedRectangle', 14)]}>
+    <ZStack modifiers={[frame({ width, height }), clipShape('roundedRectangle', radii.card)]}>
       <RNHostView matchContents>
         <Image
           source={source}
@@ -26,14 +27,20 @@ export function HomeRecipeCardImage({
       </RNHostView>
       {top ? (
         <VStack
-          modifiers={[padding({ all: 12 }), frame({ width, height, alignment: 'topTrailing' })]}
+          modifiers={[
+            padding({ all: spacing.md }),
+            frame({ width, height, alignment: 'topTrailing' }),
+          ]}
         >
           {top}
         </VStack>
       ) : null}
       {bottom ? (
         <VStack
-          modifiers={[padding({ all: 12 }), frame({ width, height, alignment: 'bottomTrailing' })]}
+          modifiers={[
+            padding({ all: spacing.md }),
+            frame({ width, height, alignment: 'bottomTrailing' }),
+          ]}
         >
           {bottom}
         </VStack>

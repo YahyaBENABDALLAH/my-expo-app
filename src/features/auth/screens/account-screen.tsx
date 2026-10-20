@@ -1,3 +1,4 @@
+import { spacing } from '@/constants/layout';
 import { useTranslation } from 'react-i18next';
 import {
   Column,
@@ -31,7 +32,7 @@ export function AccountScreen() {
       description={developmentGuest ? t('account.guestDescription') : t('account.signedIn')}
       tab
     >
-      <Column spacing={16} modifiers={nativeFillWidth}>
+      <Column spacing={spacing.lg} modifiers={nativeFillWidth}>
         <AuthText>{identity.data?.email ?? user?.email ?? ''}</AuthText>
         {identity.isLoading ? <AuthText>{t('account.loadingProfile')}</AuthText> : null}
         {identity.fetchStatus === 'paused' ? <AuthText>{t('account.offline')}</AuthText> : null}

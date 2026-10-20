@@ -59,6 +59,7 @@ export * from './page/page-form-modifiers';
 export * from './page/page-header';
 export * from './page/page-motion-overlay';
 export * from './page/page-screen';
+export * from './page/page-section';
 export * from './picker/picker';
 export * from './recipe-card/recipe-card';
 export * from './recipe-stepper/recipe-stepper';

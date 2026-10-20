@@ -2,6 +2,7 @@ import {
   Column,
   nativeFillWidth,
   PageFrame,
+  PageSection,
   PageMotionOverlay,
   ScrollView,
   UniversalHost,
@@ -15,6 +16,7 @@ import { SafeAreaInsetsContext } from 'react-native-safe-area-context';
 import { useThemeColors } from '@/hooks/use-theme';
 import { SettingsPage } from '@/features/settings/settings-screen';
 import { LayoutDirectionProvider } from '@/context/layout-direction.context';
+import { spacing, radii } from '@/constants/layout';
 
 function HeaderContent({
   colorScheme,
@@ -34,24 +36,28 @@ function HeaderContent({
     >
       <ScrollView testID="page-header-scroll">
         <Column
-          spacing={16}
+          spacing={0}
           modifiers={nativeFillWidth}
-          style={{ padding: 24, paddingTop: headerInset + 24 }}
+          style={{ padding: 0, paddingTop: headerInset }}
         >
-          <Text testID="page-header-back-count">{`Back presses: ${presses}`}</Text>
+          <PageSection>
+            <Text testID="page-header-back-count">{`Back presses: ${presses}`}</Text>
+          </PageSection>
           {Array.from({ length: 20 }, (_, index) => (
-            <Column
-              key={index}
-              spacing={8}
-              modifiers={nativeFillWidth}
-              style={{
-                padding: 24,
-                backgroundColor: index % 2 ? colors.surface : colors.selection,
-              }}
-            >
-              <Text variant="title">{`Recipe ${index + 1}`}</Text>
-              <Text>Scroll to inspect the shared header blur.</Text>
-            </Column>
+            <PageSection key={index}>
+              <Column
+                spacing={spacing.sm}
+                modifiers={nativeFillWidth}
+                style={{
+                  padding: spacing.lg,
+                  borderRadius: radii.card,
+                  backgroundColor: index % 2 ? colors.surface : colors.selection,
+                }}
+              >
+                <Text variant="title">{`Recipe ${index + 1}`}</Text>
+                <Text>Scroll to inspect the shared header blur.</Text>
+              </Column>
+            </PageSection>
           ))}
         </Column>
       </ScrollView>

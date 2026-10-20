@@ -1,3 +1,4 @@
+import { radii } from '@/constants/layout';
 import { Icon, RNHostView } from '@expo/ui';
 import type { ComponentProps } from 'react';
 import Animated, { cubicBezier } from 'react-native-reanimated';
@@ -61,7 +62,7 @@ function AnimatedOtpFeedback({
             height: 80,
             alignItems: 'center',
             justifyContent: 'center',
-            borderRadius: 26,
+            borderRadius: radii.pill,
             backgroundColor: error ? colors.errorContainer : colors.successContainer,
           },
           motion ? (error ? shake : fadeIn) : undefined,

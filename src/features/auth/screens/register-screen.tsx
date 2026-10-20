@@ -1,3 +1,4 @@
+import { spacing } from '@/constants/layout';
 import {
   authInputIcons,
   AuthScreenFrame,
@@ -140,7 +141,7 @@ export function RegisterScreen() {
         />
       </FieldGroup.Section>
       <FieldGroup.Section title={t('auth.preferencesSection')}>
-        <Column spacing={8} modifiers={nativeFillWidth}>
+        <Column spacing={spacing.sm} modifiers={nativeFillWidth}>
           <Text fontWeight="600">{t('auth.preferredLanguage')}</Text>
           <Picker<Language>
             testID="auth-register-language"
@@ -179,7 +180,7 @@ export function RegisterScreen() {
         </ListItem>
       </FieldGroup.Section>
       <FieldGroup.Section>
-        <Column spacing={12} modifiers={nativeFillWidth}>
+        <Column spacing={spacing.md} modifiers={nativeFillWidth}>
           <FormSubmit
             testID="auth-register-submit"
             label={t('auth.signUp')}

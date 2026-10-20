@@ -1,8 +1,10 @@
+import { spacing } from '@/constants/layout';
 import { useTranslation } from 'react-i18next';
 import {
   Column,
   UniversalButtonContent,
   PageScreen,
+  PageSection,
   SegmentedControl,
   UniversalTextContent as Text,
   QueryContent,
@@ -60,17 +62,19 @@ export function MyRecipesScreen() {
         },
       ]}
     >
-      {userUuid ? (
-        <Text>
-          {t('recipes.collectionCounts', {
-            favorites: favorites.data?.length ?? '…',
-            history: history.data?.length ?? '…',
-          })}
-        </Text>
-      ) : null}
-      <QueryContent query={likes} disabledMessage={t('recipes.loginSaved')}>
-        <Text>{t('recipes.likedCount', { count: likes.data?.meta.itemCount ?? 0 })}</Text>
-      </QueryContent>
+      <PageSection>
+        {userUuid ? (
+          <Text>
+            {t('recipes.collectionCounts', {
+              favorites: favorites.data?.length ?? '…',
+              history: history.data?.length ?? '…',
+            })}
+          </Text>
+        ) : null}
+        <QueryContent query={likes} disabledMessage={t('recipes.loginSaved')}>
+          <Text>{t('recipes.likedCount', { count: likes.data?.meta.itemCount ?? 0 })}</Text>
+        </QueryContent>
+      </PageSection>
     </PageScreen>
   );
 }
@@ -91,43 +95,53 @@ export function SavedRecipesScreen() {
       description={t('recipes.savedDescription')}
       onRefresh={user?.uuid ? onRefresh : undefined}
     >
-      <SegmentedControl
-        label={t('common.savedRecipes')}
-        selectedValue={favorite ? 'favorite' : 'liked'}
-        options={[
-          { value: 'liked', label: t('common.likedRecipes'), testID: 'page-action-liked-recipes' },
-          { value: 'favorite', label: t('common.favoritesOnly'), testID: 'page-action-favorites' },
-        ]}
-        onValueChange={(tab) => router.setParams({ tab })}
-      />
-      {favorite ? (
-        <QueryContent
-          query={favorites}
-          empty={favorites.data?.length === 0}
-          disabledMessage={t('recipes.loginFavorites')}
-        >
-          {favorites.data?.map((recipe) => (
-            <RecipeCard key={recipe.uuid} recipe={recipe} onPress={openRecipe} />
-          ))}
-        </QueryContent>
-      ) : (
-        <QueryContent
-          query={likes}
-          empty={likes.data?.data.length === 0}
-          disabledMessage={t('recipes.loginLiked')}
-        >
-          {likes.data?.data.map((item) => (
-            <UniversalButtonContent
-              variant="secondary"
-              key={item.recipeUuid}
-              label={item.recipeTitle ?? t('recipes.openRecipe')}
-              onPress={() =>
-                router.push({ pathname: '/recipe/[uuid]', params: { uuid: item.recipeUuid } })
-              }
-            />
-          ))}
-        </QueryContent>
-      )}
+      <PageSection>
+        <SegmentedControl
+          label={t('common.savedRecipes')}
+          selectedValue={favorite ? 'favorite' : 'liked'}
+          options={[
+            {
+              value: 'liked',
+              label: t('common.likedRecipes'),
+              testID: 'page-action-liked-recipes',
+            },
+            {
+              value: 'favorite',
+              label: t('common.favoritesOnly'),
+              testID: 'page-action-favorites',
+            },
+          ]}
+          onValueChange={(tab) => router.setParams({ tab })}
+        />
+        {favorite ? (
+          <QueryContent
+            query={favorites}
+            empty={favorites.data?.length === 0}
+            disabledMessage={t('recipes.loginFavorites')}
+          >
+            {favorites.data?.map((recipe) => (
+              <RecipeCard key={recipe.uuid} recipe={recipe} onPress={openRecipe} />
+            ))}
+          </QueryContent>
+        ) : (
+          <QueryContent
+            query={likes}
+            empty={likes.data?.data.length === 0}
+            disabledMessage={t('recipes.loginLiked')}
+          >
+            {likes.data?.data.map((item) => (
+              <UniversalButtonContent
+                variant="secondary"
+                key={item.recipeUuid}
+                label={item.recipeTitle ?? t('recipes.openRecipe')}
+                onPress={() =>
+                  router.push({ pathname: '/recipe/[uuid]', params: { uuid: item.recipeUuid } })
+                }
+              />
+            ))}
+          </QueryContent>
+        )}
+      </PageSection>
     </PageScreen>
   );
 }
@@ -148,24 +162,26 @@ export function HistoryScreen() {
       description={t('recipes.historyDescription')}
       onRefresh={userUuid ? onRefresh : undefined}
     >
-      <QueryContent
-        query={query}
-        empty={query.data?.length === 0}
-        disabledMessage={t('recipes.loginHistory')}
-      >
-        {query.data?.map((recipe) => (
-          <RecipeCard key={recipe.uuid} recipe={recipe} onPress={openRecipe} />
-        ))}
-      </QueryContent>
-      <UniversalButtonContent
-        variant="destructive"
-        color={colors.error}
-        contentColor={colors.onError}
-        label={clear.isPending ? t('recipes.clearingHistory') : t('recipes.clearHistory')}
-        disabled={!userUuid || clear.isPending}
-        onPress={() => clear.mutate({})}
-      />
-      {clear.error ? <Text>{t('recipes.clearHistoryFailed')}</Text> : null}
+      <PageSection>
+        <QueryContent
+          query={query}
+          empty={query.data?.length === 0}
+          disabledMessage={t('recipes.loginHistory')}
+        >
+          {query.data?.map((recipe) => (
+            <RecipeCard key={recipe.uuid} recipe={recipe} onPress={openRecipe} />
+          ))}
+        </QueryContent>
+        <UniversalButtonContent
+          variant="destructive"
+          color={colors.error}
+          contentColor={colors.onError}
+          label={clear.isPending ? t('recipes.clearingHistory') : t('recipes.clearHistory')}
+          disabled={!userUuid || clear.isPending}
+          onPress={() => clear.mutate({})}
+        />
+        {clear.error ? <Text>{t('recipes.clearHistoryFailed')}</Text> : null}
+      </PageSection>
     </PageScreen>
   );
 }
@@ -195,7 +211,7 @@ export function CreationsScreen() {
   if (chefUuid) {
     content = (
       <QueryContent query={query} empty={recipes.length === 0}>
-        <Column spacing={12}>
+        <Column spacing={spacing.md}>
           {recipes.map((recipe) => (
             <RecipeCard key={recipe.uuid} recipe={recipe} onPress={openRecipe} />
           ))}
@@ -225,7 +241,7 @@ export function CreationsScreen() {
         },
       ]}
     >
-      {content}
+      <PageSection>{content}</PageSection>
     </PageScreen>
   );
 }

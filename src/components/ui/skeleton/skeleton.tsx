@@ -1,4 +1,5 @@
 import { useThemeColors } from '@/hooks/use-theme';
+import { radii } from '@/constants/layout';
 import { useMotionEnabled } from '@/hooks/use-motion-enabled';
 import { Column } from '@expo/ui';
 import { forwardRef, type ComponentProps, type ComponentRef } from 'react';
@@ -90,7 +91,7 @@ export function SkeletonContent({ colorScheme, testID, style = {} }: SkeletonCon
       modifiers={skeletonModifiers({
         width: typeof style.width === 'number' ? style.width : undefined,
         height: style.height ?? 16,
-        borderRadius: style.borderRadius ?? 12,
+        borderRadius: style.borderRadius ?? radii.control,
         backgroundColor: style.backgroundColor ?? colors.border,
         opacity: style.opacity ?? 0.72,
       })}

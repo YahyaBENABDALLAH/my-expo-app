@@ -1,3 +1,4 @@
+import { radii, spacing } from '@/constants/layout';
 import { useThemeColors } from '@/hooks/use-theme';
 import {
   Column,
@@ -81,9 +82,9 @@ export function TextInput({
   const contentStyle = { opacity: disabled ? 0.5 : 1 };
   const iconStyle = { width: 20, height: 20, ...contentStyle };
   const fieldAppearance = inputFieldAppearance({
-    paddingHorizontal: style?.paddingHorizontal ?? style?.padding ?? 14,
+    paddingHorizontal: style?.paddingHorizontal ?? style?.padding ?? spacing.lg,
     backgroundColor: colors.surface,
-    borderRadius: 12,
+    borderRadius: radii.control,
     borderWidth: 1,
     borderColor: semanticColor ?? (focused && !disabled ? colors.tint : colors.border),
     ...style,
@@ -119,7 +120,7 @@ export function TextInput({
 
   return (
     <Column
-      spacing={8}
+      spacing={spacing.sm}
       modifiers={style?.width === undefined ? nativeFillWidth : undefined}
       style={{ width: style?.width }}
     >
@@ -134,7 +135,7 @@ export function TextInput({
       {/* Keep the field surface and border outside the disabled content opacity. */}
       <Row
         alignment="center"
-        spacing={8}
+        spacing={spacing.sm}
         style={fieldAppearance.style}
         modifiers={fieldAppearance.modifiers}
       >

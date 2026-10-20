@@ -1,3 +1,4 @@
+import { spacing, radii } from '@/constants/layout';
 import { useTranslation } from 'react-i18next';
 import { memo } from 'react';
 import { useThemeColors } from '@/hooks/use-theme';
@@ -7,6 +8,7 @@ import { Image } from 'expo-image';
 import { UniversalTextContent as Text } from '../text/universal-text';
 import { useHostColorScheme } from '../host/universal-host';
 import type { RecipeCardData } from '@/types/recipe.types';
+import { nativeFillWidth } from '../native/native-fill-width';
 
 export type RecipeCardProps = {
   recipe: RecipeCardData;
@@ -19,18 +21,22 @@ export const RecipeCard = memo(function RecipeCard({ recipe, onPress }: RecipeCa
   return (
     <UniversalButtonContent
       variant="link"
+      fullWidth
+      contentPadding={spacing.none}
+      borderRadius={radii.card}
       testID={`recipe-card-${recipe.uuid}`}
       onPress={() => onPress(recipe.uuid)}
     >
       <Column
-        spacing={8}
-        style={{ backgroundColor: colors.surface, padding: 12, borderRadius: 16 }}
+        spacing={spacing.sm}
+        modifiers={nativeFillWidth}
+        style={{ backgroundColor: colors.surface, padding: spacing.lg, borderRadius: radii.card }}
       >
         {recipe.coverImageUrl ? (
           <RNHostView matchContents>
             <Image
               source={{ uri: recipe.coverImageUrl }}
-              style={{ width: 260, height: 160, borderRadius: 12 }}
+              style={{ width: 260, height: 160, borderRadius: radii.control }}
               contentFit="cover"
               accessibilityLabel={recipe.title}
             />

@@ -1,3 +1,4 @@
+import { radii, spacing } from '@/constants/layout';
 import { Column, RNHostView, Row, ScrollView, Spacer } from '@expo/ui';
 import { Image, type ImageSource } from 'expo-image';
 import { useEffect, useState } from 'react';
@@ -52,7 +53,7 @@ export function OnboardingPage({
   const reducedMotion = useReducedMotion();
   const { width, height, fontScale } = useWindowDimensions();
   const [step, setStep] = useState(initialStep);
-  const pageWidth = Math.min(width - insets.left - insets.right - 48, 480);
+  const pageWidth = Math.min(width - insets.left - insets.right - spacing.lg * 2, 480);
   const compact = height < 740 || fontScale > 1.25;
   const photoHeight = Math.round(Math.min(compact ? 200 : 320, height * (compact ? 0.26 : 0.35)));
   const textAlign = direction === 'rtl' ? 'right' : 'left';
@@ -87,7 +88,7 @@ export function OnboardingPage({
         <Row
           alignment="center"
           modifiers={nativeFillWidth}
-          style={{ paddingTop: insets.top + 8, paddingBottom: compact ? 16 : 24 }}
+          style={{ paddingTop: insets.top + spacing.sm, paddingBottom: spacing.sm }}
         >
           <Text fontSize={21} fontWeight="800" textStyle={{ letterSpacing: 2 }}>
             {t('brand.wordmark')}
@@ -119,12 +120,12 @@ export function OnboardingPage({
         >
           {pages.map((page) => (
             <ScrollView key={page.id} showsIndicators={false} modifiers={nativeFillSize}>
-              <Column spacing={compact ? 24 : 32} modifiers={nativeFillWidth}>
+              <Column spacing={compact ? spacing.xl : spacing.xxl} modifiers={nativeFillWidth}>
                 <RNHostView matchContents>
                   <Image
                     source={page.image}
                     testID={`onboarding-photo-${page.id}`}
-                    style={{ width: pageWidth, height: photoHeight, borderRadius: 32 }}
+                    style={{ width: pageWidth, height: photoHeight, borderRadius: radii.card }}
                     contentFit="cover"
                     transition={0}
                     accessible={false}
@@ -132,7 +133,11 @@ export function OnboardingPage({
                     cachePolicy="memory-disk"
                   />
                 </RNHostView>
-                <Column spacing={12} modifiers={nativeFillWidth} style={{ paddingBottom: 16 }}>
+                <Column
+                  spacing={spacing.md}
+                  modifiers={nativeFillWidth}
+                  style={{ paddingBottom: spacing.lg }}
+                >
                   <Text
                     fontSize={11}
                     fontWeight="700"
@@ -177,19 +182,19 @@ export function OnboardingPage({
         style={{ width: pageWidth }}
       >
         <Column
-          spacing={20}
+          spacing={spacing.lg}
           modifiers={nativeFillWidth}
-          style={{ paddingTop: 20, paddingBottom: insets.bottom + 16 }}
+          style={{ paddingTop: spacing.lg, paddingBottom: insets.bottom + spacing.lg }}
         >
-          <Row alignment="center" spacing={8} modifiers={nativeFillWidth}>
-            <Row spacing={7} alignment="center">
+          <Row alignment="center" spacing={spacing.sm} modifiers={nativeFillWidth}>
+            <Row spacing={spacing.sm} alignment="center">
               {pages.map((page, index) => (
                 <Column
                   key={page.id}
                   style={{
                     width: index === step ? 24 : 6,
                     height: 6,
-                    borderRadius: 3,
+                    borderRadius: radii.pill,
                     backgroundColor: index === step ? colors.tint : colors.border,
                   }}
                 />
@@ -210,7 +215,7 @@ export function OnboardingPage({
             </Text>
           ) : null}
           {saving ? <LoadingContent label={t('common.wait')} /> : null}
-          <Row alignment="center" spacing={16} modifiers={nativeFillWidth}>
+          <Row alignment="center" spacing={spacing.lg} modifiers={nativeFillWidth}>
             <UniversalButtonContent
               variant="link"
               label={t('onboarding.back')}
@@ -224,8 +229,8 @@ export function OnboardingPage({
                 label={step === lastStep ? t('onboarding.start') : t('onboarding.next')}
                 testID={step === lastStep ? 'onboarding-start' : 'onboarding-next'}
                 fullWidth
-                contentPadding={16}
-                borderRadius={18}
+                contentPadding={spacing.lg}
+                borderRadius={radii.control}
                 disabled={saving}
                 onPress={() => {
                   if (saving) return;

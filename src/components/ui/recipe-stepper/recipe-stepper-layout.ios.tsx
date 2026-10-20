@@ -1,3 +1,4 @@
+import { spacing } from '@/constants/layout';
 import { RNHostView } from '@expo/ui';
 import { HStack, VStack, ZStack } from '@expo/ui/swift-ui';
 import {
@@ -20,7 +21,7 @@ export function RecipeStepperLayout({
       {width > 0 && <RNHostView matchContents>{renderArtwork(width)}</RNHostView>}
       <HStack
         alignment="top"
-        spacing={0}
+        spacing={spacing.none}
         modifiers={[
           frame({ minWidth: 0, maxWidth: Infinity }),
           onGeometryChange((layout) => setWidth(layout.width)),
@@ -29,7 +30,7 @@ export function RecipeStepperLayout({
         {steps.map((step) => (
           <VStack
             key={step.id}
-            spacing={0}
+            spacing={spacing.none}
             testID={step.id}
             modifiers={[
               frame({ maxWidth: Infinity }),

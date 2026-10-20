@@ -1,3 +1,4 @@
+import { spacing } from '@/constants/layout';
 import { useTranslation } from 'react-i18next';
 import { Column } from '@expo/ui';
 import { nativeFillWidth } from '../native/native-fill-width';
@@ -23,7 +24,7 @@ export function FormSubmit({
   const { t } = useTranslation();
   const { colors } = useAuthTheme();
   return (
-    <Column spacing={16} modifiers={nativeFillWidth}>
+    <Column spacing={spacing.lg} modifiers={nativeFillWidth}>
       <UniversalButtonContent
         variant="primary"
         testID={testID}

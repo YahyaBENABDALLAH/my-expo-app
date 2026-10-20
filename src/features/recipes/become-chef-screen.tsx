@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import {
   UniversalButtonContent,
   PageScreen,
+  PageSection,
   UniversalTextContent as Text,
   TextInput,
 } from '@components/ui';
@@ -25,48 +26,50 @@ export default function BecomeChefScreen() {
   });
   return (
     <PageScreen title={t('chefProfile.heroTitle')} description={t('chef.description')}>
-      {user?.chefProfileUuid ? (
-        <Text>{t('chef.ready')}</Text>
-      ) : (
-        <>
-          <TextInput
-            label={t('chefProfile.displayName')}
-            testID="chef-display-name"
-            value={name}
-            onChangeText={setName}
-          />
-          <TextInput
-            label={t('chefProfile.bio')}
-            multiline
-            testID="chef-bio"
-            value={bio}
-            onChangeText={setBio}
-          />
-          <TextInput
-            label={t('chefProfile.specialty')}
-            testID="chef-specialty"
-            value={specialty}
-            onChangeText={setSpecialty}
-          />
-          {validation ? <Text>{translateValidationMessage(validation)}</Text> : null}
-          {!user?.uuid ? <Text>{t('chef.login')}</Text> : null}
-          {mutation.error ? <Text>{t('chef.failed')}</Text> : null}
-          <UniversalButtonContent
-            variant="primary"
-            label={mutation.isPending ? t('chefProfile.submitting') : t('chefProfile.submit')}
-            disabled={!user?.uuid || mutation.isPending}
-            onPress={() => {
-              const result = schema.safeParse({ displayName: name, bio, specialty });
-              if (!result.success) {
-                setValidation(result.error.issues.map((issue) => issue.message).join('\n'));
-                return;
-              }
-              setValidation('');
-              mutation.mutate(result.data);
-            }}
-          />
-        </>
-      )}
+      <PageSection>
+        {user?.chefProfileUuid ? (
+          <Text>{t('chef.ready')}</Text>
+        ) : (
+          <>
+            <TextInput
+              label={t('chefProfile.displayName')}
+              testID="chef-display-name"
+              value={name}
+              onChangeText={setName}
+            />
+            <TextInput
+              label={t('chefProfile.bio')}
+              multiline
+              testID="chef-bio"
+              value={bio}
+              onChangeText={setBio}
+            />
+            <TextInput
+              label={t('chefProfile.specialty')}
+              testID="chef-specialty"
+              value={specialty}
+              onChangeText={setSpecialty}
+            />
+            {validation ? <Text>{translateValidationMessage(validation)}</Text> : null}
+            {!user?.uuid ? <Text>{t('chef.login')}</Text> : null}
+            {mutation.error ? <Text>{t('chef.failed')}</Text> : null}
+            <UniversalButtonContent
+              variant="primary"
+              label={mutation.isPending ? t('chefProfile.submitting') : t('chefProfile.submit')}
+              disabled={!user?.uuid || mutation.isPending}
+              onPress={() => {
+                const result = schema.safeParse({ displayName: name, bio, specialty });
+                if (!result.success) {
+                  setValidation(result.error.issues.map((issue) => issue.message).join('\n'));
+                  return;
+                }
+                setValidation('');
+                mutation.mutate(result.data);
+              }}
+            />
+          </>
+        )}
+      </PageSection>
     </PageScreen>
   );
 }

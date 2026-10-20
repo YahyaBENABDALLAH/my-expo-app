@@ -267,6 +267,8 @@
     "title": "Paramètres de l’application",
     "description": "Gérez vos préférences d’apparence et de langue.",
     "appearance": "Apparence",
+    "components": "Composants",
+    "componentList": "Liste des composants",
     "yourAccount": "Votre compte",
     "comingSoon": "Bientôt disponible",
     "socialNotifications": "Notifications sociales",

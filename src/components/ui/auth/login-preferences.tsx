@@ -1,4 +1,5 @@
-import { Column, Icon, Row, Spacer } from '@expo/ui';
+import { spacing } from '@/constants/layout';
+import { Icon, Row, Spacer } from '@expo/ui';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -12,6 +13,7 @@ import { nativeFillWidth } from '../native/native-fill-width';
 import { UniversalTextContent as Text } from '../text/universal-text';
 import { AuthIconButton } from './auth-icon-button';
 import { useAuthTheme } from './auth-theme';
+import { PageSection } from '../page/page-section';
 
 const icons = {
   language: Icon.select({ ios: 'globe', android: require('@expo/material-symbols/language.xml') }),
@@ -39,9 +41,9 @@ export function LoginPreferences() {
           alignment="center"
           modifiers={nativeFillWidth}
           style={{
-            paddingVertical: 8,
-            paddingLeft: insets.left + 16,
-            paddingRight: insets.right + 16,
+            paddingVertical: spacing.sm,
+            paddingLeft: insets.left + spacing.lg,
+            paddingRight: insets.right + spacing.lg,
           }}
         >
           <AuthIconButton
@@ -61,7 +63,7 @@ export function LoginPreferences() {
         onDismiss={() => setLanguageOpen(false)}
         testID="auth-login-language-sheet"
       >
-        <Column spacing={12} modifiers={nativeFillWidth}>
+        <PageSection>
           <Text variant="title">{t('common.language')}</Text>
           {SUPPORTED_LANGUAGES.map((value) => (
             <UniversalButtonContent
@@ -84,7 +86,7 @@ export function LoginPreferences() {
             testID="auth-login-language-close"
             onPress={() => setLanguageOpen(false)}
           />
-        </Column>
+        </PageSection>
       </BottomSheet>
     </>
   );

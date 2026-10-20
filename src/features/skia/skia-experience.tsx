@@ -7,7 +7,7 @@ import {
   UniversalTextContent as Text,
   UniversalButtonContent,
   nativeFillSize,
-  nativeFillWidth,
+  PageSection,
   AuroraBackground,
 } from '@components/ui';
 import { useState } from 'react';
@@ -16,6 +16,8 @@ import { View } from 'react-native';
 import { useReducedMotion, useSharedValue, withTiming } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import { useThemeColors } from '@/hooks/use-theme';
+import { screenInsets } from '@/lib/screen-insets';
 
 const paletteNames = ['canvas.aurora', 'canvas.prism', 'canvas.tidal'];
 
@@ -23,6 +25,7 @@ export default function SkiaExperience() {
   const { t } = useTranslation();
   const focused = useIsFocused();
   const scheme = useColorScheme();
+  const colors = useThemeColors(scheme);
   const insets = useSafeAreaInsets();
   const reduceMotion = useReducedMotion();
   const hue = useSharedValue(0);
@@ -33,7 +36,7 @@ export default function SkiaExperience() {
     hue.set(withTiming(next * 2.1, { duration: reduceMotion ? 0 : 250 }));
   };
   return (
-    <View style={{ flex: 1 }}>
+    <View style={{ flex: 1, backgroundColor: colors.background }}>
       {focused ? <AuroraBackground hue={hue} colorScheme={scheme} style={{ flex: 1 }} /> : null}
       <UniversalHost
         colorScheme={scheme}
@@ -44,15 +47,12 @@ export default function SkiaExperience() {
         <Column
           modifiers={nativeFillSize}
           style={{
-            paddingTop: insets.top + 24,
-            paddingBottom: 24,
-            paddingLeft: Math.max(24, insets.left + 16),
-            paddingRight: Math.max(24, insets.right + 16),
+            ...screenInsets(insets, { tabBarShown: true }),
           }}
         >
           <Spacer flexible />
           <ScrollView showsIndicators={false}>
-            <Column spacing={12} modifiers={nativeFillWidth}>
+            <PageSection>
               <Text variant="caption">{t('canvas.live')}</Text>
               <Text variant="heading">{t('canvas.title')}</Text>
               <Text>{t('canvas.description')}</Text>
@@ -61,7 +61,7 @@ export default function SkiaExperience() {
                 label={t('canvas.palette', { palette: t(paletteNames[palette]) })}
                 onPress={changePalette}
               />
-            </Column>
+            </PageSection>
           </ScrollView>
         </Column>
       </UniversalHost>

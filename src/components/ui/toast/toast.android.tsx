@@ -1,3 +1,4 @@
+import { spacing, radii } from '@/constants/layout';
 import { Column, Icon, Row } from '@expo/ui';
 import { IconButton, Shape, Surface } from '@expo/ui/jetpack-compose';
 import { fillMaxWidth, semantics, size, testID, weight } from '@expo/ui/jetpack-compose/modifiers';
@@ -30,23 +31,32 @@ export function Toast({ variant, message, title, onDismiss, colorScheme }: Toast
         color={colors.surfaceRaised}
         shadowElevation={6}
         shape={Shape.RoundedCorner({
-          cornerRadii: { topStart: 20, topEnd: 20, bottomStart: 20, bottomEnd: 20 },
+          cornerRadii: {
+            topStart: radii.card,
+            topEnd: radii.card,
+            bottomStart: radii.card,
+            bottomEnd: radii.card,
+          },
         })}
         modifiers={[fillMaxWidth()]}
       >
         <Row
           alignment="start"
-          spacing={12}
-          style={{ paddingLeft: 16, paddingRight: 8, paddingVertical: 16 }}
+          spacing={spacing.md}
+          style={{ padding: spacing.lg }}
           modifiers={[fillMaxWidth()]}
         >
           <Row
             alignment="center"
-            style={{ padding: 9, borderRadius: 12, backgroundColor: presentation.container }}
+            style={{
+              padding: spacing.sm,
+              borderRadius: radii.control,
+              backgroundColor: presentation.container,
+            }}
           >
             <Icon name={toastIcons[variant]} size={22} color={presentation.accent} />
           </Row>
-          <Column alignment="start" spacing={4} modifiers={[weight(1)]}>
+          <Column alignment="start" spacing={spacing.xs} modifiers={[weight(1)]}>
             <UniversalTextContent testID="toast-title" fontSize={15} fontWeight="600">
               {heading}
             </UniversalTextContent>

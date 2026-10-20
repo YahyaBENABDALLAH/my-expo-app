@@ -1,5 +1,12 @@
+import { spacing } from '@/constants/layout';
 import { useTranslation } from 'react-i18next';
-import { Column, ListItem, PageScreen, UniversalTextContent as Text } from '@components/ui';
+import {
+  Column,
+  ListItem,
+  PageScreen,
+  PageSection,
+  UniversalTextContent as Text,
+} from '@components/ui';
 import { useState } from 'react';
 
 export default function ListScreen() {
@@ -7,18 +14,22 @@ export default function ListScreen() {
   const [selected, setSelected] = useState('common.none');
   return (
     <PageScreen title={t('showcase.list')} description={t('showcase.listDescription')}>
-      <Column spacing={8}>
-        {['common.recipes', 'common.favoritesOnly', 'common.recipeHistory'].map((label) => (
-          <ListItem
-            key={t(label)}
-            supportingText={t('showcase.open', { label: t(label) })}
-            onPress={() => setSelected(label)}
-          >
-            {t(label)}
-          </ListItem>
-        ))}
-      </Column>
-      <Text testID="demo-list-selection">{t('common.selectedValue', { value: t(selected) })}</Text>
+      <PageSection>
+        <Column spacing={spacing.sm}>
+          {['common.recipes', 'common.favoritesOnly', 'common.recipeHistory'].map((label) => (
+            <ListItem
+              key={t(label)}
+              supportingText={t('showcase.open', { label: t(label) })}
+              onPress={() => setSelected(label)}
+            >
+              {t(label)}
+            </ListItem>
+          ))}
+        </Column>
+        <Text testID="demo-list-selection">
+          {t('common.selectedValue', { value: t(selected) })}
+        </Text>
+      </PageSection>
     </PageScreen>
   );
 }

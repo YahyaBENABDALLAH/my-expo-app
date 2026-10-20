@@ -1,3 +1,4 @@
+import { spacing } from '@/constants/layout';
 import { useTranslation } from 'react-i18next';
 import { Column } from '@expo/ui';
 import { UniversalButtonContent } from '../button/universal-button-content';
@@ -37,7 +38,7 @@ export function QueryContent<T>({
 }) {
   const { t } = useTranslation();
   return (
-    <Column spacing={12}>
+    <Column spacing={spacing.lg}>
       {query.error ? (
         <>
           <Text testID="query-error">

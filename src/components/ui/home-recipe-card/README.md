@@ -1,5 +1,13 @@
 # Home recipe cards
 
+Cards and artwork use the shared geometry in `src/constants/layout.ts`: 16-point
+card/image corners, 12-point thumbnail corners and consistent content gaps.
+Home's content sections own their 16-point gutters and padding. Production card
+actions, local save state and bundled images are included in
+`Components/Page Section/Interaction`; appearance is selectable in Controls.
+Native image clipping and hit areas require device verification. Older story
+and test references below describe the retired page catalog.
+
 Exports: `HomeRecipeCard`, `HomeRecipeCardData` and `HomeRecipeCardProps`.
 
 `HomeCatalogCard`, `HomeCatalogItem` and `HomeCatalogCardProps` supply the

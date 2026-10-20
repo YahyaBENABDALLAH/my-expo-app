@@ -1,3 +1,4 @@
+import { spacing } from '@/constants/layout';
 import { useTranslation } from 'react-i18next';
 import {
   Column,
@@ -74,7 +75,7 @@ export function LoginScreen() {
           }}
         />
       )}
-      <Column spacing={20} modifiers={nativeFillWidth}>
+      <Column spacing={spacing.lg} modifiers={nativeFillWidth}>
         <FormTextInput
           control={form.control}
           name="login"
@@ -89,7 +90,7 @@ export function LoginScreen() {
           onSubmitEditing={() => form.setFocus('password')}
           disabled={pending}
         />
-        <Column spacing={2} modifiers={nativeFillWidth}>
+        <Column spacing={spacing.xs} modifiers={nativeFillWidth}>
           <FormTextInput
             control={form.control}
             name="password"

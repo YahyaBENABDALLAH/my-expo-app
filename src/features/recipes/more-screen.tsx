@@ -1,3 +1,4 @@
+import { spacing } from '@/constants/layout';
 import { useTranslation } from 'react-i18next';
 import {
   BottomSheet,
@@ -5,6 +6,7 @@ import {
   UniversalButtonContent,
   UniversalTextContent as Text,
   PageScreen,
+  PageSection,
   LanguagePicker,
   nativeFillWidth,
 } from '@components/ui';
@@ -71,51 +73,53 @@ export default function MoreScreen() {
         },
       ]}
     >
-      <Text variant="title">{fullName}</Text>
-      <Text>{user?.email ?? ''}</Text>
-      <UniversalButtonContent
-        variant="secondary"
-        label={t('profile.preferences')}
-        testID="more-profile"
-        onPress={() => setProfile(true)}
-      />
-      <UniversalButtonContent
-        variant="destructive"
-        color={colors.error}
-        contentColor={colors.onError}
-        label={logout.isPending ? t('account.signingOut') : signOutLabel}
-        testID="more-sign-out"
-        disabled={logout.isPending}
-        onPress={() => logout.mutate()}
-      />
-      {logout.error ? <Text>{t('account.signOutFailed')}</Text> : null}
-      <BottomSheet isPresented={profile} onDismiss={() => setProfile(false)}>
-        <Column spacing={16} modifiers={nativeFillWidth}>
-          <Text variant="title" testID="profile-preferences-title">
-            {t('profile.title')}
-          </Text>
-          <Text>{fullName}</Text>
-          <Text>{user?.userName ?? user?.email ?? ''}</Text>
-          <Text variant="caption">{t('common.language')}</Text>
-          <LanguagePicker testID="profile-language-picker" />
-          <UniversalButtonContent
-            variant="secondary"
-            fullWidth
-            label={t('account.details')}
-            onPress={() => {
-              setProfile(false);
-              router.push('/account');
-            }}
-          />
-          <UniversalButtonContent
-            variant="primary"
-            fullWidth
-            label={t('common.done')}
-            testID="profile-preferences-done"
-            onPress={() => setProfile(false)}
-          />
-        </Column>
-      </BottomSheet>
+      <PageSection>
+        <Text variant="title">{fullName}</Text>
+        <Text>{user?.email ?? ''}</Text>
+        <UniversalButtonContent
+          variant="secondary"
+          label={t('profile.preferences')}
+          testID="more-profile"
+          onPress={() => setProfile(true)}
+        />
+        <UniversalButtonContent
+          variant="destructive"
+          color={colors.error}
+          contentColor={colors.onError}
+          label={logout.isPending ? t('account.signingOut') : signOutLabel}
+          testID="more-sign-out"
+          disabled={logout.isPending}
+          onPress={() => logout.mutate()}
+        />
+        {logout.error ? <Text>{t('account.signOutFailed')}</Text> : null}
+        <BottomSheet isPresented={profile} onDismiss={() => setProfile(false)}>
+          <Column spacing={spacing.lg} modifiers={nativeFillWidth}>
+            <Text variant="title" testID="profile-preferences-title">
+              {t('profile.title')}
+            </Text>
+            <Text>{fullName}</Text>
+            <Text>{user?.userName ?? user?.email ?? ''}</Text>
+            <Text variant="caption">{t('common.language')}</Text>
+            <LanguagePicker testID="profile-language-picker" />
+            <UniversalButtonContent
+              variant="secondary"
+              fullWidth
+              label={t('account.details')}
+              onPress={() => {
+                setProfile(false);
+                router.push('/account');
+              }}
+            />
+            <UniversalButtonContent
+              variant="primary"
+              fullWidth
+              label={t('common.done')}
+              testID="profile-preferences-done"
+              onPress={() => setProfile(false)}
+            />
+          </Column>
+        </BottomSheet>
+      </PageSection>
     </PageScreen>
   );
 }

@@ -1,3 +1,4 @@
+import { spacing, radii } from '@/constants/layout';
 import { useThemeColors } from '@/hooks/use-theme';
 import { Column, SkeletonContent, nativeFillWidth, useHostColorScheme } from '@components/ui';
 
@@ -5,13 +6,13 @@ import { Column, SkeletonContent, nativeFillWidth, useHostColorScheme } from '@c
 export function HomeRecipeSkeletons() {
   const colors = useThemeColors(useHostColorScheme());
   return (
-    <Column spacing={12} modifiers={nativeFillWidth} testID="home-loading-skeletons">
+    <Column spacing={spacing.md} modifiers={nativeFillWidth} testID="home-loading-skeletons">
       {[0, 1].map((index) => (
         <Column
           key={index}
-          spacing={8}
+          spacing={spacing.sm}
           modifiers={nativeFillWidth}
-          style={{ backgroundColor: colors.surface, padding: 12, borderRadius: 16 }}
+          style={{ backgroundColor: colors.surface, padding: spacing.lg, borderRadius: radii.card }}
           testID={`home-recipe-skeleton-${index}`}
         >
           <SkeletonContent style={{ height: 160 }} />

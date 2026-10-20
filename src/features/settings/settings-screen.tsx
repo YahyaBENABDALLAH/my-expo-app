@@ -1,3 +1,5 @@
+import { spacing, radii } from '@/constants/layout';
+import { appDevEnabled } from '@/constants/app-dev';
 import { useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { router } from 'expo-router';
@@ -12,6 +14,7 @@ import {
   nativeFillWidth,
   nativeRowWeight,
   PageFrame,
+  PageSection,
   pageFormModifiers,
   Row,
   Switch,
@@ -99,7 +102,11 @@ export function SettingsPage({
                 leading={
                   <Column
                     alignment="center"
-                    style={{ padding: 12, borderRadius: 24, backgroundColor: colors.selection }}
+                    style={{
+                      padding: spacing.md,
+                      borderRadius: radii.pill,
+                      backgroundColor: colors.selection,
+                    }}
                   >
                     <Icon
                       name={Icon.select({
@@ -139,11 +146,27 @@ export function SettingsPage({
                   if (languageReady && onLanguageChange) setLanguageOpen(true);
                 }}
                 trailing={
-                  <Row alignment="center" spacing={8}>
+                  <Row alignment="center" spacing={spacing.sm}>
                     <Text textStyle={{ color: colors.muted }}>{languageLabel(language)}</Text>
                     {chevron}
                   </Row>
                 }
+              />
+            </FieldGroup.Section>
+            <FieldGroup.Section title={t('settings.components')} titleUppercase>
+              {appDevEnabled ? (
+                <SettingsRow
+                  label={t('tools.storybook')}
+                  testID="app-settings-storybook"
+                  onPress={() => router.push('/storybook')}
+                  trailing={chevron}
+                />
+              ) : null}
+              <SettingsRow
+                label={t('settings.componentList')}
+                testID="app-settings-component-list"
+                onPress={() => router.push('/ui')}
+                trailing={chevron}
               />
             </FieldGroup.Section>
             <FieldGroup.Section title={t('settings.socialNotifications')} titleUppercase>
@@ -207,7 +230,7 @@ export function SettingsPage({
             onDismiss={() => setLanguageOpen(false)}
             testID="app-settings-language-sheet"
           >
-            <Column spacing={8} modifiers={nativeFillWidth}>
+            <PageSection>
               <Text variant="title" testID="app-settings-language-title">
                 {t('common.language')}
               </Text>
@@ -242,7 +265,7 @@ export function SettingsPage({
                 testID="app-settings-language-close"
                 onPress={() => setLanguageOpen(false)}
               />
-            </Column>
+            </PageSection>
           </BottomSheet>
         </UniversalHost>
       </SettingsViewport>
@@ -303,12 +326,12 @@ function SettingsRow({
   const content = (
     <Row
       alignment="center"
-      spacing={16}
+      spacing={spacing.lg}
       modifiers={nativeFillWidth}
-      style={{ paddingVertical: 16 }}
+      style={{ paddingVertical: spacing.lg }}
     >
       {leading}
-      <Column spacing={4} modifiers={nativeRowWeight}>
+      <Column spacing={spacing.xs} modifiers={nativeRowWeight}>
         <Text>{label}</Text>
         {detail ? (
           <Text fontSize={14} textStyle={{ color: colors.muted }}>
@@ -324,7 +347,7 @@ function SettingsRow({
       <UniversalButtonContent
         variant="link"
         fullWidth
-        contentPadding={0}
+        contentPadding={spacing.none}
         onPress={() => {
           if (!disabled) onPress();
         }}

@@ -1,3 +1,4 @@
+import { spacing } from '@/constants/layout';
 import { useTranslation } from 'react-i18next';
 import { Column } from '@expo/ui';
 import { useLayoutDirectionSettings } from '@/context/layout-direction.context';
@@ -23,7 +24,7 @@ export function LayoutDirectionControl({
   );
   if (compact) return control;
   return (
-    <Column spacing={8}>
+    <Column spacing={spacing.sm}>
       <Text>{t('appearance.direction')}</Text>
       {control}
     </Column>

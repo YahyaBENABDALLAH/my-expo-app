@@ -15,6 +15,10 @@ import { RefreshableScrollView } from '../refreshable-scroll-view/refreshable-sc
 import { UniversalHost } from '../host/universal-host';
 import { UniversalTextContent as AuthText } from '../text/universal-text';
 import { useLanguage } from '@/context/language.context';
+import { spacing } from '@/constants/layout';
+import { PageSection } from '../page/page-section';
+import { pageFormModifiers } from '../page/page-form-modifiers';
+import { screenInsets } from '@/lib/screen-insets';
 
 /** Owns the native Host; children must stay in the Expo UI rendering tree. */
 export function AuthScreenFrame({
@@ -53,13 +57,10 @@ function AuthScreenContent({
   const { t } = useTranslation();
   const { colors, scheme } = useAuthTheme(colorScheme);
   const [viewportHeight, setViewportHeight] = useState(0);
-  const horizontalPadding = grouped
-    ? Math.max(insets.left, insets.right)
-    : Math.max(24, insets.left + 16, insets.right + 16);
   const platformHeadingFont = Platform.OS === 'android' ? 'Inter-Black' : 'InterBlack';
   const headingFont = language === 'ar' ? undefined : platformHeadingFont;
   const heading = (
-    <Column spacing={12} modifiers={nativeFillWidth}>
+    <Column spacing={spacing.md} modifiers={nativeFillWidth}>
       <AuthText variant="caption" fontWeight="700" textStyle={{ color: colors.tint }}>
         {t('brand.wordmark')}
       </AuthText>
@@ -78,8 +79,7 @@ function AuthScreenContent({
       behavior="padding"
       style={{
         flex: 1,
-        paddingHorizontal: horizontalPadding,
-        paddingBottom: tab ? 0 : insets.bottom,
+        ...screenInsets(insets, { tabBarShown: tab }),
       }}
     >
       <UniversalHost
@@ -93,7 +93,7 @@ function AuthScreenContent({
         {grouped ? (
           <FieldGroup
             testID={`${testID}-scroll`}
-            modifiers={nativeFillSize}
+            modifiers={pageFormModifiers}
             style={{ backgroundColor: 'transparent' }}
           >
             {heading}
@@ -107,10 +107,10 @@ function AuthScreenContent({
             onRefresh={onRefresh}
           >
             <Column modifiers={nativeCenteredMinHeight(viewportHeight)}>
-              <Column spacing={32} modifiers={nativeFillWidth} style={{ paddingVertical: 32 }}>
+              <PageSection spacing={spacing.xl}>
                 {heading}
                 {children}
-              </Column>
+              </PageSection>
             </Column>
           </RefreshableScrollView>
         )}

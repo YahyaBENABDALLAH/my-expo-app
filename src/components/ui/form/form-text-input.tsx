@@ -1,3 +1,4 @@
+import { spacing } from '@/constants/layout';
 import { translateValidationMessage } from '@/lib/i18n';
 import { useTranslation } from 'react-i18next';
 import { Column } from '@expo/ui';
@@ -69,7 +70,7 @@ export function FormTextInput<T extends FieldValues>({
   }, [invalid]);
 
   return (
-    <Column spacing={8} modifiers={nativeFillWidth}>
+    <Column spacing={spacing.sm} modifiers={nativeFillWidth}>
       <TextInput
         {...props}
         {...passwordInputOverrides(

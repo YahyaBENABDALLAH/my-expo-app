@@ -1,6 +1,15 @@
 # Page layout and motion
 
-Exports: `PageScreen`, `PageFrame`, `PageHeader`, `PageMotionOverlay` and `pageFormModifiers`.
+Exports: `PageScreen`, `PageSection`, `PageFrame`, `PageHeader`, `PageMotionOverlay` and `pageFormModifiers`.
+
+Screens have zero decorative padding. Wrap ordinary content in `PageSection`,
+which owns symmetric 16-point padding and a 16-point child gap. Use
+`inset={false}` for full-width sections whose rails/text own horizontal gutters.
+Description and route actions have their own sections. Safe areas, keyboard
+avoidance and measured title clearance remain infrastructure insets.
+`PageFrame` supplies the selected theme's `background`, including standalone
+previews. See [shared geometry](../../../../docs/layout-consistency.md) for the
+token roles, native-form limitations and component story.
 
 Every titled `PageFrame` blurs its header by default, including Settings, maps,
 developer tools and recovery screens. `headerBlur={false}` explicitly opts out.
@@ -69,8 +78,8 @@ The iOS title uses an explicitly leading full-width frame so SwiftUI does not
 center it in the available space; Android retains its weighted title column.
 The existing `Components/Page Header` stories cover titles and counted back actions;
 native title alignment still requires iOS and Android visual verification.
-iOS adds only 4 points of vertical
-header padding; Android retains 8. The status-bar inset is applied once by
+Both platforms use 8 points of vertical and 16 points of horizontal
+header padding. The status-bar inset is applied once by
 `PageFrame`, while the header Host ignores automatic native safe areas.
 `page-motion-overlay.tsx` contains the shared animated top-edge wave artwork.
 Its two SVG paths are cached for the window height. Animation updates transforms,

@@ -1,3 +1,4 @@
+import { spacing, radii } from '@/constants/layout';
 import { useTranslation } from 'react-i18next';
 import { useThemeColors } from '@/hooks/use-theme';
 import {
@@ -8,6 +9,7 @@ import {
   Row,
   ScrollView,
   PageScreen,
+  PageSection,
   UniversalTextContent as Text,
   SkeletonContent,
   Switch,
@@ -25,9 +27,11 @@ export default function HomeExamplesScreen() {
       title={t('showcase.homeExamples')}
       description={t('showcase.homeExamplesDescription')}
     >
-      <HomeSkeletonPreview />
-      <HomeCardExamples />
-      <HomeComponentExamples />
+      <PageSection>
+        <HomeSkeletonPreview />
+        <HomeCardExamples />
+        <HomeComponentExamples />
+      </PageSection>
     </PageScreen>
   );
 }
@@ -44,36 +48,36 @@ function HomeSkeletonPreview() {
   if (!visible) return null;
 
   return (
-    <Column spacing={12} modifiers={nativeFillWidth} testID="home-skeleton-preview">
+    <Column spacing={spacing.md} modifiers={nativeFillWidth} testID="home-skeleton-preview">
       <Text variant="title" testID="home-skeleton-title">
         {t('showcase.skeleton')}
       </Text>
-      <Row spacing={12} alignment="center" modifiers={nativeFillWidth}>
+      <Row spacing={spacing.md} alignment="center" modifiers={nativeFillWidth}>
         <SkeletonContent
           testID="home-skeleton-avatar"
-          style={{ width: 48, height: 48, borderRadius: 9999 }}
+          style={{ width: 48, height: 48, borderRadius: radii.pill }}
         />
-        <Column spacing={8} modifiers={nativeRowWeight}>
+        <Column spacing={spacing.sm} modifiers={nativeRowWeight}>
           <SkeletonContent testID="home-skeleton-heading" style={{ height: 20 }} />
-          <SkeletonContent style={{ width: 120, height: 12, borderRadius: 9999 }} />
+          <SkeletonContent style={{ width: 120, height: 12, borderRadius: radii.pill }} />
         </Column>
       </Row>
       <Row
-        spacing={8}
+        spacing={spacing.sm}
         modifiers={nativeFillWidth}
-        style={{ backgroundColor: colors.surface, borderRadius: 14, padding: 8 }}
+        style={{ backgroundColor: colors.surface, borderRadius: radii.card, padding: spacing.sm }}
       >
         <SkeletonContent
           testID="home-skeleton-image"
-          style={{ width: 96, height: 96, borderRadius: 14 }}
+          style={{ width: 96, height: 96, borderRadius: radii.card }}
         />
-        <Column spacing={8} modifiers={nativeRowWeight}>
-          <SkeletonContent style={{ width: 64, height: 12, borderRadius: 9999 }} />
+        <Column spacing={spacing.sm} modifiers={nativeRowWeight}>
+          <SkeletonContent style={{ width: 64, height: 12, borderRadius: radii.pill }} />
           <SkeletonContent style={{ height: 20 }} />
-          <SkeletonContent style={{ width: 96, height: 20, borderRadius: 9999 }} />
-          <Row spacing={12}>
-            <SkeletonContent style={{ width: 64, height: 12, borderRadius: 9999 }} />
-            <SkeletonContent style={{ width: 48, height: 12, borderRadius: 9999 }} />
+          <SkeletonContent style={{ width: 96, height: 20, borderRadius: radii.pill }} />
+          <Row spacing={spacing.md}>
+            <SkeletonContent style={{ width: 64, height: 12, borderRadius: radii.pill }} />
+            <SkeletonContent style={{ width: 48, height: 12, borderRadius: radii.pill }} />
           </Row>
         </Column>
       </Row>
@@ -105,8 +109,8 @@ function HomeComponentExamples() {
   const [selectedMeal, setSelectedMeal] = useState('common.none');
 
   return (
-    <Column spacing={20} modifiers={nativeFillWidth} testID="home-component-examples">
-      <Column spacing={8} modifiers={nativeFillWidth}>
+    <Column spacing={spacing.lg} modifiers={nativeFillWidth} testID="home-component-examples">
+      <Column spacing={spacing.sm} modifiers={nativeFillWidth}>
         <Text variant="title">{t('showcase.fieldGroup')}</Text>
         {/* Native forms and lists need a bounded height inside the page's scroll view. */}
         <FieldGroup style={{ height: 240 }} modifiers={nativeFillWidth} testID="home-field-group">
@@ -131,7 +135,7 @@ function HomeComponentExamples() {
           </FieldGroup.Section>
         </FieldGroup>
       </Column>
-      <Column spacing={8} modifiers={nativeFillWidth}>
+      <Column spacing={spacing.sm} modifiers={nativeFillWidth}>
         <Text variant="title">{t('showcase.listTitle')}</Text>
         <Text variant="caption">{t('showcase.selectMeal')}</Text>
         <Column style={{ height: 240 }} modifiers={nativeFillWidth}>
@@ -153,7 +157,7 @@ function HomeComponentExamples() {
           {t('common.selectedValue', { value: t(selectedMeal) })}
         </Text>
       </Column>
-      <Column spacing={8} modifiers={nativeFillWidth}>
+      <Column spacing={spacing.sm} modifiers={nativeFillWidth}>
         <Text variant="title">{t('showcase.horizontal')}</Text>
         <Text variant="caption">{t('showcase.swipeMeals')}</Text>
         <ScrollView
@@ -162,15 +166,15 @@ function HomeComponentExamples() {
           modifiers={nativeFillWidth}
           testID="home-horizontal-scroll"
         >
-          <Row spacing={12}>
+          <Row spacing={spacing.md}>
             {exampleMeals.map((meal) => (
               <Column
                 key={meal.id}
-                spacing={8}
+                spacing={spacing.sm}
                 style={{
                   width: 200,
-                  padding: 16,
-                  borderRadius: 14,
+                  padding: spacing.lg,
+                  borderRadius: radii.card,
                   backgroundColor: colors.surface,
                 }}
                 testID={`home-horizontal-${meal.id}`}
@@ -184,7 +188,7 @@ function HomeComponentExamples() {
           </Row>
         </ScrollView>
       </Column>
-      <Column spacing={8} modifiers={nativeFillWidth}>
+      <Column spacing={spacing.sm} modifiers={nativeFillWidth}>
         <Text variant="title">{t('showcase.vertical')}</Text>
         <Text variant="caption">{t('showcase.swipeTips')}</Text>
         <ScrollView
@@ -193,13 +197,17 @@ function HomeComponentExamples() {
           modifiers={nativeFillWidth}
           testID="home-vertical-scroll"
         >
-          <Column spacing={8} modifiers={nativeFillWidth}>
+          <Column spacing={spacing.sm} modifiers={nativeFillWidth}>
             {cookingTips.map((tip, index) => (
               <Column
                 key={t(tip)}
-                spacing={4}
+                spacing={spacing.xs}
                 modifiers={nativeFillWidth}
-                style={{ padding: 16, borderRadius: 14, backgroundColor: colors.surface }}
+                style={{
+                  padding: spacing.lg,
+                  borderRadius: radii.card,
+                  backgroundColor: colors.surface,
+                }}
                 testID={`home-vertical-tip-${index + 1}`}
               >
                 <Text fontWeight="600">{t('showcase.tip', { index: index + 1 })}</Text>

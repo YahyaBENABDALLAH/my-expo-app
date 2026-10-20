@@ -16,15 +16,14 @@ Updated recipe data, inherited theme and language still update the card.
 
 See the Home card family for the separate popular/editorial presentation.
 
-Native story: [recipe-card.stories.tsx](../../../../.rnstorybook/stories/pages/recipe-card.stories.tsx).
-It covers light/dark, missing image, embedded image, long titles, unrelated parent
-updates and changed like counts. Activation increments a visible press count and
-logs the UUID without leaving Storybook or querying a fixture route.
-`tests/layout/render-stability.test.mjs` verifies unchanged data skips the image
-tree while real data updates render, and activation uses the current UUID and
-latest callback. `tests/recipes/home-skeleton.test.mjs` verifies Home still opens
-the recipe detail route with a stable action. The native flow is
-`.maestro/storybook/recipe-card.yaml`; native layout and presses need device checks.
+The card's native action fills its section width with zero extra button padding.
+The surface owns symmetric 16-point padding and corners; inset images use the
+shared 12-point radius. Colors retain the existing `surface` and text roles.
+`Components/Page Section/Interaction` in
+[page-section.stories.tsx](../../../../.rnstorybook/stories/components/page-section.stories.tsx)
+embeds the production card and counts activations. Controls select light/dark
+appearance and the existing brand theme. Native layout and presses need device
+checks; retired page stories and recipe suites are not current coverage.
 
 Import public components from `@components/ui`; UI implementations import
 concrete files directly. [Back to the UI guide](../README.md).

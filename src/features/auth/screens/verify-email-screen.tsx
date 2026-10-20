@@ -1,3 +1,4 @@
+import { spacing } from '@/constants/layout';
 import { useTranslation } from 'react-i18next';
 import {
   Column,
@@ -81,7 +82,7 @@ export function VerifyEmailScreen() {
         email: challenge.maskedEmail ?? t('auth.yourEmail'),
       })}
     >
-      <Column spacing={20} modifiers={nativeFillWidth}>
+      <Column spacing={spacing.lg} modifiers={nativeFillWidth}>
         <FormTextInput
           control={form.control}
           name="code"

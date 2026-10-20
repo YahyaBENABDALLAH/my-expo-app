@@ -7,6 +7,7 @@ import { nativeFillWidth } from '../native/native-fill-width';
 import MapView, { Marker } from 'react-native-maps';
 import { View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { spacing, radii } from '@/constants/layout';
 
 const CASABLANCA = { latitude: 33.5731, longitude: -7.5898 };
 
@@ -28,16 +29,16 @@ export function MapExperience() {
       <UniversalHost
         style={{
           position: 'absolute',
-          left: Math.max(20, insets.left + 12),
-          right: Math.max(20, insets.right + 12),
-          bottom: 20,
+          left: insets.left + spacing.lg,
+          right: insets.right + spacing.lg,
+          bottom: insets.bottom + spacing.lg,
           width: undefined,
         }}
       >
         <Column
-          spacing={8}
+          spacing={spacing.sm}
           modifiers={nativeFillWidth}
-          style={{ backgroundColor: colors.surface, padding: 20, borderRadius: 24 }}
+          style={{ backgroundColor: colors.surface, padding: spacing.lg, borderRadius: radii.card }}
         >
           <Text variant="caption">{t('map.title')}</Text>
           <Text variant="title">{t('map.city')}</Text>

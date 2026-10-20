@@ -1,5 +1,27 @@
 # Universal component catalog
 
+## Shared screen geometry (2026-10-20)
+
+`PageScreen` has zero decorative padding; `PageSection` owns symmetric 16-point
+padding and a default 16-point gap. Supported props are children, spacing,
+alignment, style, testID and `inset` (false for full-width sections/rails).
+It composes in the existing Host with native Column and has no color role or
+measurement state. `src/constants/layout.ts` supplies shared spacing and uniform
+card/control/badge radii across app-owned components. Native control/grouped-form
+geometry remains platform-owned. `PageFrame`, navigation, loading, recovery and
+auth use the same theme background; both headers use 16/8 horizontal/vertical
+padding. Registration shares Settings' transparent native form canvas.
+
+`.rnstorybook/stories/components/page-section.stories.tsx` supplies
+`Components/Page Section/Interaction`: inset/full-width sections, controlled
+input, production recipe/home cards, counted native actions and local saves with
+bundled images; Controls select appearance and brand. Existing Page Header and
+Auth Screen stories cover the corresponding compositions. See
+[shared geometry](../../../../docs/layout-consistency.md) for the route audit,
+theme roles and native verification limits. Existing behavioral checks cover
+retained inputs, grouped settings, actions and OTP; no screenshot comparison is
+claimed. No Android device was connected and iOS verification remains pending.
+
 ## Android floating-action repair (2026-10-19)
 
 The Android button now passes `Shape.Circle({ radius: 1 })`. The installed native

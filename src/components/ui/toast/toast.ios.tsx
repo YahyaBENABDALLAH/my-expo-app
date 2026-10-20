@@ -1,3 +1,4 @@
+import { spacing, radii } from '@/constants/layout';
 import { Column, Icon, Row } from '@expo/ui';
 import { Button } from '@expo/ui/swift-ui';
 import {
@@ -39,11 +40,11 @@ export function Toast({ variant, message, title, onDismiss, colorScheme }: Toast
     <UniversalHost colorScheme={scheme} ignoreSafeArea="all">
       <Row
         alignment="start"
-        spacing={12}
+        spacing={spacing.md}
         modifiers={[
-          padding({ leading: 16, trailing: 8, vertical: 16 }),
+          padding({ all: spacing.lg }),
           frame({ maxWidth: Infinity, alignment: 'leading' }),
-          background(colors.surfaceRaised, shapes.roundedRectangle({ cornerRadius: 20 })),
+          background(colors.surfaceRaised, shapes.roundedRectangle({ cornerRadius: radii.card })),
           shadow({ radius: 12, y: 4, color: colors.shadow }),
         ]}
       >
@@ -53,13 +54,16 @@ export function Toast({ variant, message, title, onDismiss, colorScheme }: Toast
           color={presentation.accent}
           modifiers={[
             frame({ width: 40, height: 40 }),
-            background(presentation.container, shapes.roundedRectangle({ cornerRadius: 12 })),
+            background(
+              presentation.container,
+              shapes.roundedRectangle({ cornerRadius: radii.control }),
+            ),
             accessibilityHidden(),
           ]}
         />
         <Column
           alignment="start"
-          spacing={4}
+          spacing={spacing.xs}
           modifiers={[frame({ maxWidth: Infinity, alignment: 'leading' })]}
         >
           <UniversalTextContent

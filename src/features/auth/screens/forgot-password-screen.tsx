@@ -1,3 +1,4 @@
+import { spacing } from '@/constants/layout';
 import { useTranslation } from 'react-i18next';
 import {
   Column,
@@ -44,7 +45,7 @@ export function ForgotPasswordScreen() {
           }}
         />
       ) : (
-        <Column spacing={20} modifiers={nativeFillWidth}>
+        <Column spacing={spacing.lg} modifiers={nativeFillWidth}>
           <FormTextInput
             control={form.control}
             name="email"

@@ -3,8 +3,8 @@
 Exports: `AuthScreenFrame`, `LoginPreferences`, `authInputIcons` and the existing auth theme helpers.
 
 `auth-screen-frame.tsx` owns keyboard/safe-area layout, the full-width native
-Host and scrolling. Forms automatically fill the available window width with
-safe horizontal gutters, without a maximum width. The
+Host and scrolling. The screen adds only device safe areas; an inner
+`PageSection` owns symmetric 16-point content padding without a maximum width. The
 Host's actual keyboard-adjusted height supplies a native minimum content height:
 short forms center vertically; longer forms grow and scroll from the top. This
 uses the available layout, without device detection or breakpoints. Native
@@ -19,7 +19,8 @@ frame's heading, width, keyboard and safe-area handling. Keep this full-height
 grouped form out of another scroll container; its long content scrolls normally.
 FieldGroup owns the grouped form's horizontal gutters; the auth frame adds only
 side safe-area insets. Expo's universal FieldGroup owns the native form
-background, section row colors and scroll indicators.
+section row colors and scroll indicators. Like Settings, the grouped form hides
+its system canvas so the page's theme background remains visible between groups.
 
 Compose `AuthText` and `UniversalButtonContent` inside the frame. `AuthText`
 aliases `UniversalTextContent`; buttons use the shared theme tokens and

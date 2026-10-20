@@ -1,3 +1,4 @@
+import { spacing } from '@/constants/layout';
 import { translateValidationMessage } from '@/lib/i18n';
 import { useTranslation } from 'react-i18next';
 import {
@@ -7,6 +8,7 @@ import {
   UniversalTextContent as Text,
   RecipeStepper,
   PageScreen,
+  PageSection,
   TextInput,
   QueryContent,
 } from '@components/ui';
@@ -99,135 +101,119 @@ export default function CreateScreen() {
       tab
       onRefresh={onRefresh}
     >
-      <RecipeStepper current={step} isCurrentValid={isCurrentValid} animate={focused} />
-      <ChefRequirement
-        chef={chef}
-        chefUuid={chefUuid}
-        needsChef={needsChef}
-        canCreateChef={canCreateChef}
-      />
-      {error ? <Text testID="recipe-form-error">{translateValidationMessage(error)}</Text> : null}
-      {step === 0 ? (
-        <>
-          <TextInput
-            label={t('recipeForm.title')}
-            testID="recipe-title"
-            value={draft.title}
-            onChangeText={(value) => setField('title', value)}
-          />
-          <TextInput
-            label={t('recipeForm.summary')}
-            testID="recipe-summary"
-            value={draft.summary}
-            onChangeText={(value) => setField('summary', value)}
-            multiline
-          />
-        </>
-      ) : null}
-      {step === 1 ? (
-        <>
-          {(
-            [
-              ['difficultyUuid', t('common.difficulty'), difficulties],
-              ['cuisineUuid', t('common.cuisine'), cuisines],
-            ] as const
-          ).map(([key, label, query]) => (
-            <Column key={key} spacing={8}>
-              <Text>{label}</Text>
-              <QueryContent query={query}>
-                <Picker
-                  selectedValue={draft[key]}
-                  onValueChange={(value) => setField(key, String(value))}
-                >
-                  <Picker.Item label={t('common.select')} value="" />
-                  {query.data?.data.map((item) => (
-                    <Picker.Item key={item.uuid} value={item.uuid} label={lookupLabel(item)} />
-                  ))}
-                </Picker>
-              </QueryContent>
-            </Column>
-          ))}
-          {(
-            [
-              ['prepTimeMinutes', 'recipeForm.preparation'],
-              ['cookTimeMinutes', 'recipeForm.cooking'],
-              ['servings', 'recipeForm.servings'],
-            ] as const
-          ).map(([key, label]) => (
+      <PageSection>
+        <RecipeStepper current={step} isCurrentValid={isCurrentValid} animate={focused} />
+        <ChefRequirement
+          chef={chef}
+          chefUuid={chefUuid}
+          needsChef={needsChef}
+          canCreateChef={canCreateChef}
+        />
+        {error ? <Text testID="recipe-form-error">{translateValidationMessage(error)}</Text> : null}
+        {step === 0 ? (
+          <>
             <TextInput
-              key={key}
-              label={t(label)}
-              testID={`recipe-${key}`}
-              value={draft[key]}
-              keyboardType="decimal-pad"
-              onChangeText={(value) => setField(key, value)}
+              label={t('recipeForm.title')}
+              testID="recipe-title"
+              value={draft.title}
+              onChangeText={(value) => setField('title', value)}
             />
-          ))}
-        </>
-      ) : null}
-      {step === 2 ? (
-        <>
-          <TextInput
-            label={t('recipeForm.findIngredients')}
-            testID="ingredient-search"
-            value={ingredientSearch}
-            onChangeText={searchIngredients}
-          />
-          <QueryContent query={ingredients}>
-            <Text>
-              {t('recipeForm.ingredientPage', {
-                count: ingredients.data?.data.length ?? 0,
-                page: lookupPage,
-              })}
-            </Text>
-          </QueryContent>
-          <UniversalButtonContent
-            variant="secondary"
-            label={t('recipeForm.previousIngredients')}
-            disabled={lookupPage === 1}
-            onPress={() => setLookupPage(lookupPage - 1)}
-          />
-          <UniversalButtonContent
-            variant="secondary"
-            label={t('recipeForm.nextIngredients')}
-            disabled={!ingredients.data?.meta.hasNextPage}
-            onPress={() => setLookupPage(lookupPage + 1)}
-          />
-          {draft.ingredients.map((item, index) => (
-            <Column key={item.id} spacing={8}>
-              <Text>{t('recipeForm.ingredientNumber', { index: index + 1 })}</Text>
-              <Picker
-                selectedValue={item.ingredientUuid}
-                onValueChange={(value) =>
-                  updateIngredient(item.id, { ingredientUuid: String(value) })
-                }
-              >
-                <Picker.Item value="" label={t('recipeForm.selectIngredient')} />
-                {item.ingredientUuid &&
-                !ingredients.data?.data.some((option) => option.uuid === item.ingredientUuid) ? (
-                  <Picker.Item
-                    value={item.ingredientUuid}
-                    label={t('recipeForm.selectedIngredient')}
-                  />
-                ) : null}
-                {ingredients.data?.data.map((option) => (
-                  <Picker.Item key={option.uuid} value={option.uuid} label={lookupLabel(option)} />
-                ))}
-              </Picker>
+            <TextInput
+              label={t('recipeForm.summary')}
+              testID="recipe-summary"
+              value={draft.summary}
+              onChangeText={(value) => setField('summary', value)}
+              multiline
+            />
+          </>
+        ) : null}
+        {step === 1 ? (
+          <>
+            {(
+              [
+                ['difficultyUuid', t('common.difficulty'), difficulties],
+                ['cuisineUuid', t('common.cuisine'), cuisines],
+              ] as const
+            ).map(([key, label, query]) => (
+              <Column key={key} spacing={spacing.sm}>
+                <Text>{label}</Text>
+                <QueryContent query={query}>
+                  <Picker
+                    selectedValue={draft[key]}
+                    onValueChange={(value) => setField(key, String(value))}
+                  >
+                    <Picker.Item label={t('common.select')} value="" />
+                    {query.data?.data.map((item) => (
+                      <Picker.Item key={item.uuid} value={item.uuid} label={lookupLabel(item)} />
+                    ))}
+                  </Picker>
+                </QueryContent>
+              </Column>
+            ))}
+            {(
+              [
+                ['prepTimeMinutes', 'recipeForm.preparation'],
+                ['cookTimeMinutes', 'recipeForm.cooking'],
+                ['servings', 'recipeForm.servings'],
+              ] as const
+            ).map(([key, label]) => (
               <TextInput
-                label={t('recipeForm.quantity')}
+                key={key}
+                label={t(label)}
+                testID={`recipe-${key}`}
+                value={draft[key]}
                 keyboardType="decimal-pad"
-                testID={`ingredient-${item.id}-quantity`}
-                value={item.quantity}
-                onChangeText={(value) => updateIngredient(item.id, { quantity: value })}
+                onChangeText={(value) => setField(key, value)}
               />
-              <QueryContent query={units}>
+            ))}
+          </>
+        ) : null}
+        {step === 2 ? (
+          <>
+            <TextInput
+              label={t('recipeForm.findIngredients')}
+              testID="ingredient-search"
+              value={ingredientSearch}
+              onChangeText={searchIngredients}
+            />
+            <QueryContent query={ingredients}>
+              <Text>
+                {t('recipeForm.ingredientPage', {
+                  count: ingredients.data?.data.length ?? 0,
+                  page: lookupPage,
+                })}
+              </Text>
+            </QueryContent>
+            <UniversalButtonContent
+              variant="secondary"
+              label={t('recipeForm.previousIngredients')}
+              disabled={lookupPage === 1}
+              onPress={() => setLookupPage(lookupPage - 1)}
+            />
+            <UniversalButtonContent
+              variant="secondary"
+              label={t('recipeForm.nextIngredients')}
+              disabled={!ingredients.data?.meta.hasNextPage}
+              onPress={() => setLookupPage(lookupPage + 1)}
+            />
+            {draft.ingredients.map((item, index) => (
+              <Column key={item.id} spacing={spacing.sm}>
+                <Text>{t('recipeForm.ingredientNumber', { index: index + 1 })}</Text>
                 <Picker
-                  selectedValue={item.unitUuid}
-                  onValueChange={(value) => updateIngredient(item.id, { unitUuid: String(value) })}
+                  selectedValue={item.ingredientUuid}
+                  onValueChange={(value) =>
+                    updateIngredient(item.id, { ingredientUuid: String(value) })
+                  }
                 >
-                  <Picker.Item value="" label={t('recipeForm.noUnit')} />
-                  {units.data?.data.map((option) => (
+                  <Picker.Item value="" label={t('recipeForm.selectIngredient')} />
+                  {item.ingredientUuid &&
+                  !ingredients.data?.data.some((option) => option.uuid === item.ingredientUuid) ? (
+                    <Picker.Item
+                      value={item.ingredientUuid}
+                      label={t('recipeForm.selectedIngredient')}
+                    />
+                  ) : null}
+                  {ingredients.data?.data.map((option) => (
                     <Picker.Item
                       key={option.uuid}
                       value={option.uuid}
@@ -235,70 +221,94 @@ export default function CreateScreen() {
                     />
                   ))}
                 </Picker>
-              </QueryContent>
-              <UniversalButtonContent
-                variant="destructive"
-                color={colors.error}
-                contentColor={colors.onError}
-                label={t('recipeForm.removeIngredient')}
-                onPress={() => removeIngredient(item.id)}
-              />
-            </Column>
-          ))}
-          <UniversalButtonContent
-            variant="secondary"
-            label={t('recipeForm.addIngredient')}
-            testID="recipe-add-ingredient"
-            onPress={addIngredient}
-          />
-        </>
-      ) : null}
-      {step === 3 ? (
-        <>
-          {draft.steps.map((item, index) => (
-            <Column key={item.id} spacing={8}>
-              <TextInput
-                label={t('recipeForm.stepNumber', { index: index + 1 })}
-                multiline
-                testID={`recipe-instruction-${item.id}`}
-                value={item.instruction}
-                onChangeText={(value) => updateStep(item.id, value)}
-              />
-              <UniversalButtonContent
-                variant="destructive"
-                color={colors.error}
-                contentColor={colors.onError}
-                label={t('recipeForm.removeStep')}
-                onPress={() => removeStep(item.id)}
-              />
-            </Column>
-          ))}
-          <UniversalButtonContent
-            variant="secondary"
-            label={t('recipeForm.addStep')}
-            testID="recipe-add-step"
-            onPress={addStep}
-          />
-        </>
-      ) : null}
-      <UniversalButtonContent
-        variant="secondary"
-        label={t('recipeForm.previousStep')}
-        disabled={step === 0 || mutation.isPending}
-        onPress={previousStep}
-      />
-      <UniversalButtonContent
-        variant={isFinalStep ? 'success' : 'primary'}
-        color={isFinalStep ? colors.success : undefined}
-        contentColor={isFinalStep ? colors.onSuccess : undefined}
-        label={mutation.isPending ? t('recipeForm.publishing') : continueLabel}
-        testID="recipe-continue"
-        onPress={advance}
-        disabled={continueDisabled}
-      />
-      {mutation.error ? (
-        <Text testID="recipe-publish-error">{t('recipeForm.publishFailed')}</Text>
-      ) : null}
+                <TextInput
+                  label={t('recipeForm.quantity')}
+                  keyboardType="decimal-pad"
+                  testID={`ingredient-${item.id}-quantity`}
+                  value={item.quantity}
+                  onChangeText={(value) => updateIngredient(item.id, { quantity: value })}
+                />
+                <QueryContent query={units}>
+                  <Picker
+                    selectedValue={item.unitUuid}
+                    onValueChange={(value) =>
+                      updateIngredient(item.id, { unitUuid: String(value) })
+                    }
+                  >
+                    <Picker.Item value="" label={t('recipeForm.noUnit')} />
+                    {units.data?.data.map((option) => (
+                      <Picker.Item
+                        key={option.uuid}
+                        value={option.uuid}
+                        label={lookupLabel(option)}
+                      />
+                    ))}
+                  </Picker>
+                </QueryContent>
+                <UniversalButtonContent
+                  variant="destructive"
+                  color={colors.error}
+                  contentColor={colors.onError}
+                  label={t('recipeForm.removeIngredient')}
+                  onPress={() => removeIngredient(item.id)}
+                />
+              </Column>
+            ))}
+            <UniversalButtonContent
+              variant="secondary"
+              label={t('recipeForm.addIngredient')}
+              testID="recipe-add-ingredient"
+              onPress={addIngredient}
+            />
+          </>
+        ) : null}
+        {step === 3 ? (
+          <>
+            {draft.steps.map((item, index) => (
+              <Column key={item.id} spacing={spacing.sm}>
+                <TextInput
+                  label={t('recipeForm.stepNumber', { index: index + 1 })}
+                  multiline
+                  testID={`recipe-instruction-${item.id}`}
+                  value={item.instruction}
+                  onChangeText={(value) => updateStep(item.id, value)}
+                />
+                <UniversalButtonContent
+                  variant="destructive"
+                  color={colors.error}
+                  contentColor={colors.onError}
+                  label={t('recipeForm.removeStep')}
+                  onPress={() => removeStep(item.id)}
+                />
+              </Column>
+            ))}
+            <UniversalButtonContent
+              variant="secondary"
+              label={t('recipeForm.addStep')}
+              testID="recipe-add-step"
+              onPress={addStep}
+            />
+          </>
+        ) : null}
+        <UniversalButtonContent
+          variant="secondary"
+          label={t('recipeForm.previousStep')}
+          disabled={step === 0 || mutation.isPending}
+          onPress={previousStep}
+        />
+        <UniversalButtonContent
+          variant={isFinalStep ? 'success' : 'primary'}
+          color={isFinalStep ? colors.success : undefined}
+          contentColor={isFinalStep ? colors.onSuccess : undefined}
+          label={mutation.isPending ? t('recipeForm.publishing') : continueLabel}
+          testID="recipe-continue"
+          onPress={advance}
+          disabled={continueDisabled}
+        />
+        {mutation.error ? (
+          <Text testID="recipe-publish-error">{t('recipeForm.publishFailed')}</Text>
+        ) : null}
+      </PageSection>
     </PageScreen>
   );
 }

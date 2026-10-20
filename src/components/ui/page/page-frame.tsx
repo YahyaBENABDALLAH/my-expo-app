@@ -11,6 +11,8 @@ import { View } from 'react-native';
 import { SafeAreaInsetsContext, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { PageHeader } from './page-header';
 import { PageHeaderBackground } from './page-header-background';
+import { useThemeColors } from '@/hooks/use-theme';
+import { useHostColorScheme } from '../host/universal-host';
 
 const PageHeaderInsetContext = createContext(0);
 
@@ -38,6 +40,7 @@ export function PageFrame({
   /** Children reserve usePageHeaderInset() inside their own scroll content. */
   scrollsBehindHeader?: boolean;
 }>) {
+  const colors = useThemeColors(useHostColorScheme(colorScheme));
   const insets = useSafeAreaInsets();
   const blurHeader = headerBlur && Boolean(title);
   const scrollHeader = blurHeader && scrollsBehindHeader && !headerOverlay;
@@ -69,7 +72,7 @@ export function PageFrame({
   );
   const ContentView = blurHeader ? BlurTargetView : View;
   return (
-    <View style={{ flex: 1 }}>
+    <View style={{ flex: 1, backgroundColor: colors.background }}>
       {!floating && header}
       <SafeAreaInsetsContext.Provider value={contentInsets}>
         <PageHeaderInsetContext.Provider value={scrollHeader ? headerHeight : 0}>

@@ -3,6 +3,7 @@ import { View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { dismissToast, getToast, subscribeToasts } from '@/lib/toasts';
 import { Toast } from './toast';
+import { spacing } from '@/constants/layout';
 
 /** Lives above navigation so notifications survive auth redirects and screen changes. */
 export function ToastHost() {
@@ -19,9 +20,9 @@ export function ToastHost() {
       pointerEvents="box-none"
       style={{
         position: 'absolute',
-        top: insets.top + 12,
-        left: insets.left + 16,
-        right: insets.right + 16,
+        top: insets.top + spacing.lg,
+        left: insets.left + spacing.lg,
+        right: insets.right + spacing.lg,
       }}
     >
       <Toast

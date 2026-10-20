@@ -1,3 +1,4 @@
+import { spacing } from '@/constants/layout';
 import { useTranslation } from 'react-i18next';
 import {
   Column,
@@ -57,7 +58,7 @@ function ResetPasswordForm({ challengeId }: { challengeId: string | null }) {
       description={saved ? t('auth.resetComplete') : recoveryDescription}
     >
       {valid && !saved && (
-        <Column spacing={20} modifiers={nativeFillWidth}>
+        <Column spacing={spacing.lg} modifiers={nativeFillWidth}>
           <FormTextInput
             control={form.control}
             name="code"

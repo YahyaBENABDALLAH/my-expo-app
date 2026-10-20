@@ -1,3 +1,4 @@
+import { spacing } from '@/constants/layout';
 import { Row, TextInput } from '@expo/ui';
 import { Box } from '@expo/ui/jetpack-compose';
 import {
@@ -11,7 +12,7 @@ import type { OtpInputLayoutProps } from './otp-input-layout.types';
 export function OtpInputLayout({ slots, input, accessibilityLabel, height }: OtpInputLayoutProps) {
   return (
     <Box contentAlignment="center" modifiers={[fillMaxWidth(), nativeHeight(height)]}>
-      <Row spacing={8} modifiers={[fillMaxWidth()]}>
+      <Row spacing={spacing.sm} modifiers={[fillMaxWidth()]}>
         {slots}
       </Row>
       <TextInput

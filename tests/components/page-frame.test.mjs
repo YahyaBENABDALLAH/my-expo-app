@@ -10,6 +10,7 @@ function setup(platform = 'ios') {
   const PageWaveContext = createContext(null);
   const listeners = new Set();
   const mocks = {
+    '@/constants/app-dev': { appDevEnabled: true },
     'react-native': {
       View: native('View'),
       Platform: { OS: platform },

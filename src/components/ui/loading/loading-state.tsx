@@ -1,3 +1,4 @@
+import { spacing } from '@/constants/layout';
 import { useTranslation } from 'react-i18next';
 import { useThemeColors } from '@/hooks/use-theme';
 import { Column, Row, Spacer } from '@expo/ui';
@@ -6,6 +7,8 @@ import { LoadingIndicator } from './loading-indicator';
 import { UniversalHost, useHostColorScheme } from '../host/universal-host';
 import { UniversalTextContent } from '../text/universal-text';
 import { nativeFillSize } from '../native/native-fill-width';
+import { screenInsets } from '@/lib/screen-insets';
+import { PageSection } from '../page/page-section';
 
 export function LoadingContent({
   label,
@@ -17,7 +20,7 @@ export function LoadingContent({
   const { t } = useTranslation();
   const colors = useThemeColors(useHostColorScheme());
   return (
-    <Row spacing={12} alignment="center" testID={testID}>
+    <Row spacing={spacing.md} alignment="center" testID={testID}>
       <LoadingIndicator color={colors.tint} />
       <UniversalTextContent>{label ?? t('common.loading')}</UniversalTextContent>
     </Row>
@@ -34,24 +37,19 @@ export function LoadingScreen({
 }) {
   const scheme = useHostColorScheme(colorScheme);
   const insets = useSafeAreaInsets();
+  const colors = useThemeColors(scheme);
   return (
     <UniversalHost
       colorScheme={scheme}
       matchContents={false}
       ignoreSafeArea="all"
-      style={{ flex: 1 }}
+      style={{ flex: 1, backgroundColor: colors.background, ...screenInsets(insets) }}
     >
-      <Column
-        alignment="center"
-        modifiers={nativeFillSize}
-        style={{
-          paddingTop: insets.top + 24,
-          paddingBottom: insets.bottom + 24,
-          paddingHorizontal: Math.max(24, insets.left, insets.right),
-        }}
-      >
+      <Column alignment="center" modifiers={nativeFillSize}>
         <Spacer flexible />
-        <LoadingContent label={label} />
+        <PageSection alignment="center">
+          <LoadingContent label={label} />
+        </PageSection>
         <Spacer flexible />
       </Column>
     </UniversalHost>

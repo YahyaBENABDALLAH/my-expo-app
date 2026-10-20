@@ -7,6 +7,7 @@ import {
   LoadingContent,
   nativeFillSize,
   PageFrame,
+  PageSection,
   PageMotionOverlay,
   Spacer,
   UniversalButtonContent,
@@ -33,6 +34,7 @@ import { ThemePreferencesProvider, useThemeSettings } from '@/context/theme.cont
 import { useAuthGuards } from '@/guards/auth-guards';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useThemeColors } from '@/hooks/use-theme';
+import { screenInsets } from '@/lib/screen-insets';
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -154,11 +156,7 @@ function RootLayoutNav({ holdLogin }: { holdLogin: boolean }) {
         <View
           style={{
             flex: 1,
-            padding: 24,
-            paddingTop: 24,
-            paddingBottom: 24,
-            paddingLeft: insets.left + 24,
-            paddingRight: insets.right + 24,
+            ...screenInsets(insets, { headerShown: true }),
           }}
         >
           <Host
@@ -170,18 +168,20 @@ function RootLayoutNav({ holdLogin }: { holdLogin: boolean }) {
           >
             <Column spacing={16} alignment="center" modifiers={nativeFillSize}>
               <Spacer flexible />
-              {error ? (
-                <AuthText>{error}</AuthText>
-              ) : (
-                <LoadingContent label={t('session.restoring')} />
-              )}
-              {error ? (
-                <UniversalButtonContent
-                  variant="secondary"
-                  label={t('common.tryAgain')}
-                  onPress={retryRestore}
-                />
-              ) : null}
+              <PageSection alignment="center">
+                {error ? (
+                  <AuthText>{error}</AuthText>
+                ) : (
+                  <LoadingContent label={t('session.restoring')} />
+                )}
+                {error ? (
+                  <UniversalButtonContent
+                    variant="secondary"
+                    label={t('common.tryAgain')}
+                    onPress={retryRestore}
+                  />
+                ) : null}
+              </PageSection>
               <Spacer flexible />
             </Column>
           </Host>

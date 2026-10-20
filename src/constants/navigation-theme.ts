@@ -9,7 +9,7 @@ export function navigationTheme(scheme: AppColorScheme, colors: ColorTokens = Co
       ...base.colors,
       primary: colors.tint,
       background: colors.background,
-      card: colors.surfaceRaised,
+      card: colors.background,
       text: colors.text,
       border: colors.divider,
       notification: colors.error,

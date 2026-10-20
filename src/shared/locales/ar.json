@@ -267,6 +267,8 @@
     "title": "إعدادات التطبيق",
     "description": "إدارة تفضيلات المظهر واللغة.",
     "appearance": "المظهر",
+    "components": "المكوّنات",
+    "componentList": "قائمة المكوّنات",
     "yourAccount": "حسابك",
     "comingSoon": "قريبًا",
     "socialNotifications": "الإشعارات الاجتماعية",

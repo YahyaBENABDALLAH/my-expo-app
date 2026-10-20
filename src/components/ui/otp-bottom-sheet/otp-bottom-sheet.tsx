@@ -1,3 +1,4 @@
+import { spacing, radii } from '@/constants/layout';
 import {
   Column,
   RNHostView,
@@ -192,7 +193,12 @@ function OtpForm({
   }
   return (
     <ScrollView style={{ height: viewportHeight }}>
-      <Column alignment="center" spacing={24} modifiers={nativeFillWidth}>
+      <Column
+        alignment="center"
+        spacing={spacing.xl}
+        modifiers={nativeFillWidth}
+        style={{ padding: spacing.lg }}
+      >
         <Row modifiers={nativeFillWidth} alignment="center">
           <Spacer flexible />
           <UniversalButtonContent
@@ -203,7 +209,11 @@ function OtpForm({
           />
         </Row>
         <OtpFeedback status={status} visible={isPresented && success} />
-        <Column alignment={success ? 'center' : 'start'} spacing={24} modifiers={nativeFillWidth}>
+        <Column
+          alignment={success ? 'center' : 'start'}
+          spacing={spacing.xl}
+          modifiers={nativeFillWidth}
+        >
           <UniversalTextContent
             testID={`${testID}-title`}
             fontSize={30}
@@ -212,7 +222,11 @@ function OtpForm({
           >
             {t(success ? 'otp.successTitle' : 'otp.title')}
           </UniversalTextContent>
-          <Column alignment={success ? 'center' : 'start'} spacing={8} modifiers={nativeFillWidth}>
+          <Column
+            alignment={success ? 'center' : 'start'}
+            spacing={spacing.sm}
+            modifiers={nativeFillWidth}
+          >
             <UniversalTextContent
               fontSize={18}
               textStyle={{ textAlign: success ? 'center' : undefined, color: colors.muted }}
@@ -227,7 +241,7 @@ function OtpForm({
           </Column>
         </Column>
         {!success && (
-          <Column spacing={12} modifiers={[...nativeFillWidth, inputSizing]}>
+          <Column spacing={spacing.md} modifiers={[...nativeFillWidth, inputSizing]}>
             {/* An explicit-width direction bridge keeps OTP digits LTR inside Arabic sheets. */}
             {width > 0 && (
               <RNHostView matchContents>
@@ -271,23 +285,23 @@ function OtpForm({
                           key={index}
                           testID={`${testID}-slot-${index}`}
                           alignment="center"
-                          spacing={0}
+                          spacing={spacing.none}
                           style={{
                             width: slotWidth,
                             height: inputHeight,
                             padding: borderWidth,
-                            borderRadius: 10,
+                            borderRadius: radii.control,
                             backgroundColor: borderColor,
                           }}
                         >
                           {/* Inset fills preserve rounded borders on SwiftUI as well as Compose. */}
                           <Column
                             alignment="center"
-                            spacing={0}
+                            spacing={spacing.none}
                             style={{
                               width: slotWidth - borderWidth * 2,
                               height: inputHeight - borderWidth * 2,
-                              borderRadius: 10 - borderWidth,
+                              borderRadius: radii.control - borderWidth,
                               backgroundColor,
                             }}
                           >
@@ -330,8 +344,8 @@ function OtpForm({
           color={success ? colors.success : undefined}
           contentColor={success ? colors.onSuccess : undefined}
           fullWidth
-          contentPadding={12}
-          borderRadius={16}
+          contentPadding={spacing.md}
+          borderRadius={radii.control}
           testID={`${testID}-verify`}
           label={t(success ? 'otp.done' : 'otp.verify')}
           disabled={!success && (!complete || busy)}
@@ -342,7 +356,7 @@ function OtpForm({
           ) : undefined}
         </UniversalButtonContent>
         {!success && onResend && (
-          <Column alignment="center" spacing={0} modifiers={nativeFillWidth}>
+          <Column alignment="center" spacing={spacing.none} modifiers={nativeFillWidth}>
             <OtpResendButton
               testID={`${testID}-resend`}
               deadline={deadline}

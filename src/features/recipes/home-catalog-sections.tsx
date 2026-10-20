@@ -17,26 +17,28 @@ import { useTranslation } from 'react-i18next';
 import { useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { homeCatalogItems } from './home-catalog.data';
+import { spacing, radii } from '@/constants/layout';
+import { PageSection } from '@components/ui';
 
-const gutter = 16;
+const gutter = spacing.lg;
 
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <Column spacing={24} modifiers={nativeFillWidth}>
+    <PageSection inset={false}>
       <Column style={{ paddingHorizontal: gutter }}>
         <Text fontSize={24} fontWeight="700">
           {title}
         </Text>
       </Column>
       {children}
-    </Column>
+    </PageSection>
   );
 }
 
 function HorizontalRail({ children }: { children: ReactNode }) {
   return (
     <ScrollView direction="horizontal" showsIndicators={false} modifiers={nativeFillWidth}>
-      <Row spacing={16} style={{ paddingHorizontal: gutter }}>
+      <Row spacing={spacing.lg} style={{ paddingHorizontal: gutter }}>
         {children}
       </Row>
     </ScrollView>
@@ -54,7 +56,7 @@ export function HomeCatalogSections({
   const insets = useSafeAreaInsets();
   const colors = useThemeColors(useHostColorScheme());
   const viewportWidth = width - insets.left - insets.right;
-  const heroWidth = Math.min(520, Math.max(1, viewportWidth - 48));
+  const heroWidth = Math.min(520, Math.max(1, viewportWidth - gutter * 2));
   const landscapeWidth = Math.min(460, Math.max(1, viewportWidth * 0.78));
   const fullWidth = Math.max(1, viewportWidth - gutter * 2);
   const previewHeight = Math.min(420, height * 0.6);
@@ -84,7 +86,7 @@ export function HomeCatalogSections({
       <Section title={title}>
         <HorizontalRail>
           {(reverse ? [...compactColumns].reverse() : compactColumns).map((column, index) => (
-            <Column key={index} spacing={16} style={{ width: heroWidth }}>
+            <Column key={index} spacing={spacing.lg} style={{ width: heroWidth }}>
               {column.map((item) => (
                 <HomeCatalogCard
                   key={item.id}
@@ -103,16 +105,15 @@ export function HomeCatalogSections({
   }
 
   return (
-    <Column spacing={48} modifiers={nativeFillWidth} style={{ paddingTop: 12, paddingBottom: 32 }}>
-      <Column spacing={24} modifiers={nativeFillWidth}>
+    <Column spacing={spacing.none} modifiers={nativeFillWidth}>
+      <PageSection inset={false}>
         <Column modifiers={nativeFillWidth} style={{ paddingHorizontal: gutter }}>
           <UniversalButtonContent
             label={t('home.search')}
             variant="secondary"
             testID="home-search"
             fullWidth
-            borderRadius={4}
-
+            borderRadius={radii.control}
             onPress={() => router.navigate('/search')}
           />
         </Column>
@@ -138,7 +139,7 @@ export function HomeCatalogSections({
             );
           })}
         </HorizontalRail>
-      </Column>
+      </PageSection>
 
       {compactRail(t('home.catalog.featured'), 'featured')}
 
@@ -172,16 +173,12 @@ export function HomeCatalogSections({
         </HorizontalRail>
       </Section>
 
-      <Column
-        spacing={24}
-        modifiers={nativeFillWidth}
+      <PageSection
         style={{
           backgroundColor: colors.infoContainer,
-          paddingHorizontal: gutter,
-          paddingVertical: 28,
         }}
       >
-        <Column spacing={6}>
+        <Column spacing={spacing.sm}>
           <Text fontSize={24} fontWeight="700">
             {t('home.catalog.freeRecipes')}
           </Text>
@@ -195,13 +192,17 @@ export function HomeCatalogSections({
           ribbon={t('home.catalog.freeNow')}
           onPress={() => openPreview(items[1])}
         />
-      </Column>
+      </PageSection>
 
       {compactRail(t('home.catalog.quickMeals'), 'quick', true)}
       {compactRail(t('home.catalog.chefPicks'), 'chefs')}
 
       <Section title={t('home.discover')}>
-        <Column spacing={16} modifiers={nativeFillWidth} style={{ paddingHorizontal: gutter }}>
+        <Column
+          spacing={spacing.lg}
+          modifiers={nativeFillWidth}
+          style={{ paddingHorizontal: gutter }}
+        >
           {items.map((item) => (
             <HomeCatalogCard
               key={item.id}
@@ -223,7 +224,7 @@ export function HomeCatalogSections({
       >
         {selected ? (
           <ScrollView style={{ height: previewHeight }}>
-            <Column spacing={16} modifiers={nativeFillWidth}>
+            <PageSection>
               <Text variant="caption">{t('home.cards.samplePreview')}</Text>
               <Text variant="title" testID="home-sample-preview-title">
                 {selected.title}
@@ -240,7 +241,7 @@ export function HomeCatalogSections({
                 testID="home-sample-preview-close"
                 onPress={closePreview}
               />
-            </Column>
+            </PageSection>
           </ScrollView>
         ) : null}
       </BottomSheet>

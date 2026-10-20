@@ -1,3 +1,4 @@
+import { spacing, radii } from '@/constants/layout';
 import { Column, Icon, Row } from '@expo/ui';
 import type { ImageSource } from 'expo-image';
 import { useThemeColors } from '@/hooks/use-theme';
@@ -44,8 +45,12 @@ export function HomeRecipeCard({ recipe, variant, width, onPress, testID }: Home
   const chef = (
     <Row
       alignment="center"
-      spacing={6}
-      style={{ backgroundColor: colors.surfaceRaised, borderRadius: 9999, padding: 8 }}
+      spacing={spacing.sm}
+      style={{
+        backgroundColor: colors.surfaceRaised,
+        borderRadius: radii.pill,
+        padding: spacing.sm,
+      }}
     >
       <Icon name={person} size={18} color={colors.tint} />
       <Text fontSize={13} fontWeight="600" numberOfLines={1}>
@@ -56,16 +61,16 @@ export function HomeRecipeCard({ recipe, variant, width, onPress, testID }: Home
   return (
     <UniversalButtonContent
       variant="link"
-      borderRadius={0}
-      contentPadding={0}
+      borderRadius={radii.none}
+      contentPadding={spacing.none}
       onPress={onPress}
       testID={testID}
     >
       <Column
-        spacing={popular ? 10 : 0}
+        spacing={popular ? spacing.md : spacing.none}
         style={{
           width,
-          ...(popular ? {} : { backgroundColor: colors.surfaceRaised, borderRadius: 14 }),
+          ...(popular ? {} : { backgroundColor: colors.surfaceRaised, borderRadius: radii.card }),
         }}
       >
         <HomeRecipeCardImage
@@ -76,8 +81,12 @@ export function HomeRecipeCard({ recipe, variant, width, onPress, testID }: Home
             popular ? (
               <Row
                 alignment="center"
-                spacing={6}
-                style={{ backgroundColor: colors.surfaceRaised, borderRadius: 9999, padding: 8 }}
+                spacing={spacing.sm}
+                style={{
+                  backgroundColor: colors.surfaceRaised,
+                  borderRadius: radii.pill,
+                  padding: spacing.sm,
+                }}
               >
                 <Icon name={heart} size={16} color={colors.error} />
                 <Text fontSize={14} fontWeight="600">
@@ -89,19 +98,19 @@ export function HomeRecipeCard({ recipe, variant, width, onPress, testID }: Home
           bottom={popular ? chef : undefined}
         />
         <Column
-          spacing={popular ? 6 : 12}
+          spacing={popular ? spacing.sm : spacing.md}
           modifiers={nativeFillWidth}
-          style={popular ? undefined : { padding: 18 }}
+          style={popular ? undefined : { padding: spacing.lg }}
         >
           {!popular ? (
-            <Row alignment="center" spacing={8} modifiers={nativeFillWidth}>
+            <Row alignment="center" spacing={spacing.sm} modifiers={nativeFillWidth}>
               <Column modifiers={nativeRowWeight}>
                 <Column
                   style={{
                     backgroundColor: colors.surfaceVariant,
-                    borderRadius: 9999,
-                    paddingHorizontal: 12,
-                    paddingVertical: 6,
+                    borderRadius: radii.pill,
+                    paddingHorizontal: spacing.md,
+                    paddingVertical: spacing.sm,
                   }}
                 >
                   <Text
@@ -127,14 +136,14 @@ export function HomeRecipeCard({ recipe, variant, width, onPress, testID }: Home
           {!popular ? (
             <Text textStyle={{ color: colors.muted, lineHeight: 24 }}>{recipe.description}</Text>
           ) : null}
-          <Row alignment="center" spacing={14} modifiers={nativeFillWidth}>
-            <Row alignment="center" spacing={5}>
+          <Row alignment="center" spacing={spacing.lg} modifiers={nativeFillWidth}>
+            <Row alignment="center" spacing={spacing.sm}>
               <Icon name={clock} size={16} color={colors.tint} />
               <Text fontSize={14} fontWeight="600" textStyle={{ color: colors.tint }}>
                 {recipe.duration}
               </Text>
             </Row>
-            <Row alignment="center" spacing={5} modifiers={nativeRowWeight}>
+            <Row alignment="center" spacing={spacing.sm} modifiers={nativeRowWeight}>
               {!popular ? <Icon name={star} size={16} color={colors.tint} /> : null}
               <Text fontSize={14} numberOfLines={1} textStyle={{ color: colors.muted }}>
                 {popular ? recipe.category : recipe.secondaryMeta}

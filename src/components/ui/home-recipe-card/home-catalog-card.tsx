@@ -1,3 +1,4 @@
+import { spacing, radii } from '@/constants/layout';
 import { Column, Icon, RNHostView, Row } from '@expo/ui';
 import { Image, type ImageSource } from 'expo-image';
 import { useThemeColors } from '@/hooks/use-theme';
@@ -42,7 +43,7 @@ function HomeCatalogArtwork({
   source,
   width,
   height,
-  borderRadius = 14,
+  borderRadius = radii.card,
   testID,
 }: {
   source: ImageSource | number;
@@ -87,13 +88,13 @@ export function HomeCatalogCard({
   const compact = variant === 'compact';
   const thumbnailSize = compact ? 64 : 48;
   const metadata = (
-    <Row spacing={compact ? 10 : 12} alignment="center" modifiers={nativeFillWidth}>
+    <Row spacing={spacing.md} alignment="center" modifiers={nativeFillWidth}>
       <HomeCatalogArtwork
         source={item.image}
         testID={`home-card-${item.id}-thumbnail`}
         width={thumbnailSize}
         height={thumbnailSize}
-        borderRadius={compact ? 12 : 10}
+        borderRadius={radii.control}
       />
       <Column modifiers={nativeRowWeight}>
         <Text fontSize={compact ? 15 : 17} fontWeight="500" numberOfLines={2}>
@@ -104,9 +105,9 @@ export function HomeCatalogCard({
         alignment="center"
         style={{
           width: 44,
-          paddingVertical: 6,
+          paddingVertical: spacing.sm,
           backgroundColor: colors.surfaceVariant,
-          borderRadius: 4,
+          borderRadius: radii.sm,
         }}
       >
         <Text fontSize={11} fontWeight="700" numberOfLines={1}>
@@ -130,12 +131,12 @@ export function HomeCatalogCard({
     return (
       <UniversalButtonContent
         variant="link"
-        contentPadding={0}
-        borderRadius={14}
+        contentPadding={spacing.none}
+        borderRadius={radii.card}
         onPress={onPress}
         testID={`home-card-${item.id}-open`}
       >
-        <Column spacing={8} style={{ width }}>
+        <Column spacing={spacing.sm} style={{ width }}>
           <HomeCatalogArtwork
             source={item.image}
             testID={`home-card-${item.id}-artwork`}
@@ -152,25 +153,25 @@ export function HomeCatalogCard({
 
   return (
     <Column
-      spacing={hero ? 0 : 16}
+      spacing={hero ? spacing.none : spacing.lg}
       style={{
         width,
-        ...(hero ? { backgroundColor: colors.warningContainer, borderRadius: 16 } : {}),
+        ...(hero ? { backgroundColor: colors.warningContainer, borderRadius: radii.card } : {}),
       }}
     >
-      <Column modifiers={nativeFillWidth} style={{ borderRadius: hero ? 0 : 14 }}>
+      <Column modifiers={nativeFillWidth}>
         <HomeCatalogArtwork
           source={item.image}
           testID={`home-card-${item.id}-artwork`}
           width={width}
           height={Math.round(width * 0.56)}
-          borderRadius={0}
+          borderRadius={radii.card}
         />
         {ribbon ? (
           <Column
             alignment="center"
             modifiers={nativeFillWidth}
-            style={{ backgroundColor: colors.info, paddingVertical: 8 }}
+            style={{ backgroundColor: colors.info, paddingVertical: spacing.sm }}
           >
             <Text fontSize={14} fontWeight="600" textStyle={{ color: colors.onInfo }}>
               {ribbon}
@@ -179,18 +180,18 @@ export function HomeCatalogCard({
         ) : null}
       </Column>
       <Column
-        spacing={hero ? 28 : 12}
+        spacing={spacing.lg}
         modifiers={nativeFillWidth}
-        style={hero ? { padding: 16 } : undefined}
+        style={hero ? { padding: spacing.lg } : undefined}
       >
         {metadata}
-        <Column spacing={6} modifiers={nativeFillWidth}>
+        <Column spacing={spacing.sm} modifiers={nativeFillWidth}>
           {!hero ? (
             <Text variant="caption" textStyle={{ color: colors.muted }}>
               {item.category}
             </Text>
           ) : null}
-          <Row spacing={8} alignment="center" modifiers={nativeFillWidth}>
+          <Row spacing={spacing.sm} alignment="center" modifiers={nativeFillWidth}>
             <Column modifiers={nativeRowWeight}>
               <UniversalButtonContent
                 label={actionLabel}
@@ -206,7 +207,7 @@ export function HomeCatalogCard({
                 onPress={onSave}
                 testID={`home-card-${item.id}-save`}
               >
-                <Row spacing={6} alignment="center">
+                <Row spacing={spacing.sm} alignment="center">
                   <Icon name={saved ? bookmarkFilled : bookmark} size={18} color={colors.tint} />
                   <Text fontSize={13}>{saveLabel}</Text>
                 </Row>
