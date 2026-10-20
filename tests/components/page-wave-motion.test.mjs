@@ -124,7 +124,7 @@ for (const hz of [60, 120]) {
     close(y(rtl.motion.frontDrift), y(ltr.motion.frontDrift));
     assert.equal(ltr.renders, initialRenders, 'Frame callbacks must not render React.');
     assert.equal(ltr.parses, 2, 'Paths stay cached while transforms animate.');
-    assert.equal(ltr.height, 200);
+    assert.equal(ltr.height, 80);
     assert.equal(ltr.motion.frontWave.svg, ltr.motion.frontSvg);
     assert.equal(ltr.motion.backWave.svg, ltr.motion.backSvg);
   });

@@ -2,9 +2,10 @@
 
 ## Page wave paths (2026-10-20)
 
-`PageMotionOverlay` uses the supplied front and back SVG paths, filled below
-their curves. Their negative Y coordinates are fitted into the 200-point overlay
-without rotation or mirroring; side margins cover the existing horizontal drift.
+`PageMotionOverlay` uses the supplied front and back SVG paths. A vertical flip
+corrects the header's upside-down fill in the 80-point overlay; the splash keeps
+its reveal orientation. Login positioning, expansion and collapse behavior are
+retained. Side margins cover the existing horizontal drift.
 The artwork and both platform blur masks share this fit. Theme roles and props
 are unchanged. `Components/Page Header` (`Default`, `Dark`, `AnimatedLtr` and
 `AnimatedRtl`) previews the production paths. Native appearance remains unverified.

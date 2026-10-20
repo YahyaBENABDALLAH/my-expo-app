@@ -15,7 +15,7 @@ import {
 } from 'react-native-reanimated';
 import { scheduleOnRN } from 'react-native-worklets';
 
-export const PAGE_WAVE_HEIGHT = 200;
+export const PAGE_WAVE_HEIGHT = 80;
 // Crop 50 design units from each side of the shorter path for horizontal drift.
 const WAVE_WIDTH = 1587 - 100;
 const WAVE_SCALE_Y = PAGE_WAVE_HEIGHT / 210;
@@ -93,12 +93,15 @@ export function usePageWaveMotion({
 
   const fit = useDerivedValue(() => [
     { scaleX: width.get() / WAVE_WIDTH },
-    { translateY: offset.get() + PAGE_WAVE_HEIGHT },
+    { translateY: offset.get() + (splash ? PAGE_WAVE_HEIGHT : 0) },
     { translateX: -50 },
-    { scaleY: WAVE_SCALE_Y },
+    { scaleY: splash ? WAVE_SCALE_Y : -WAVE_SCALE_Y },
   ]);
   const gradientStart = useDerivedValue(() =>
-    vec(0, -(offset.get() + PAGE_WAVE_HEIGHT) / WAVE_SCALE_Y),
+    vec(
+      0,
+      splash ? -(offset.get() + PAGE_WAVE_HEIGHT) / WAVE_SCALE_Y : offset.get() / WAVE_SCALE_Y,
+    ),
   );
   const frontDrift = useDerivedValue(() => [
     { translateX: Math.sin(phase.get()) * 40 * horizontalDirection },
@@ -117,6 +120,7 @@ export function usePageWaveMotion({
       backSvg,
       fit,
       gradientStart,
+      gradientEnd: vec(0, splash ? 0 : -PAGE_WAVE_HEIGHT / WAVE_SCALE_Y),
       frontDrift,
       backDrift,
       width,
@@ -133,6 +137,7 @@ export function usePageWaveMotion({
       backDrift,
       width,
       expandedOffset,
+      splash,
     ],
   );
 }

@@ -1,5 +1,5 @@
 import { useThemeColors } from '@/hooks/use-theme';
-import { Canvas, Group, LinearGradient, Path, vec } from '@shopify/react-native-skia';
+import { Canvas, Group, LinearGradient, Path } from '@shopify/react-native-skia';
 import type { ReactNode } from 'react';
 import { View } from 'react-native';
 import { useColorScheme } from '@/hooks/use-color-scheme';
@@ -35,8 +35,17 @@ export function PageMotionOverlay({
     splash,
     onCollapseComplete,
   });
-  const { frontWave, backWave, fit, gradientStart, frontDrift, backDrift, width, overlayHeight } =
-    motion;
+  const {
+    frontWave,
+    backWave,
+    fit,
+    gradientStart,
+    gradientEnd,
+    frontDrift,
+    backDrift,
+    width,
+    overlayHeight,
+  } = motion;
   const overlayBackOpacity = scheme === 'dark' ? 0.12 : 0.08;
   const overlayColors = [colors.tint, `${colors.tint}CC`];
 
@@ -67,7 +76,7 @@ export function PageMotionOverlay({
             <Path path={backWave} opacity={splash ? 1 : overlayBackOpacity}>
               <LinearGradient
                 start={gradientStart}
-                end={vec(0, 0)}
+                end={gradientEnd}
                 colors={splash ? [colors.tint, colors.tabIconSelected] : overlayColors}
               />
             </Path>
@@ -77,7 +86,7 @@ export function PageMotionOverlay({
             <Path path={frontWave} opacity={scheme === 'dark' ? 0.2 : 0.12}>
               <LinearGradient
                 start={gradientStart}
-                end={vec(0, 0)}
+                end={gradientEnd}
                 colors={splash ? [colors.tint, `${colors.tint}00`] : overlayColors}
               />
             </Path>

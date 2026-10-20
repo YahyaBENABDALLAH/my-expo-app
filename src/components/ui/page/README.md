@@ -92,10 +92,10 @@ Its default `overlay` variant decorates headers; `variant="splash"` places the
 same moving paths in normal flow with opaque fills for the launch screen's bottom
 edge. Both use the exported `PAGE_WAVE_HEIGHT` and the same motion guards.
 The back wave resolves theme opacity first; the splash keeps full opacity.
-The wave is 200 points tall and drifts on an 8-second cycle. The supplied front
-and back SVG contours retain their original orientation and fill below the curve.
-Their negative Y coordinates are fitted into the canvas with a positive scale
-and translation, shared by the artwork and blur masks. A 50-design-unit side
+The wave is 80 points tall and drifts on an 8-second cycle. The supplied front
+and back SVG path strings stay unchanged. A vertical flip corrects the header's
+upside-down fill; the splash retains its original reveal orientation.
+The artwork and blur masks share the fit and existing vertical positioning. A 50-design-unit side
 margin keeps the moving edges outside the viewport. Horizontal travel is 40 / 50 design units and
 vertical travel is 2 / 3 points, half the previous movement. RTL reverses both
 layers' horizontal direction without restarting their phase. `AnimatedLtr` and
@@ -108,8 +108,7 @@ recipes frames beneath one overlay, with pause/resume and a back action. Its
 Maestro flow checks the controls and retained pause state across replacement;
 geometry tests check the wave phase at 60/120 Hz on both platform adapters. These
 checks do not establish native visual continuity or device performance.
-`expanded` positions the wave at 35% of the window height and fills its background
-continuously to the top. Login uses it while signed out. Successful login raises
+`expanded` centers the shallow wave band at 35% of the window height. Login uses it while signed out. Successful login raises
 the wave to the header over one second. Opening Register and returning to Login
 use the same slower transition. `onCollapseComplete` releases navigation only
 after a completed rise, so Home cannot interrupt the successful-login animation.
