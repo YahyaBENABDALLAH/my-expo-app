@@ -65,10 +65,13 @@ function HeaderContent({
   );
 }
 
-function HeaderDemo(props: Parameters<typeof PageFrame>[0]) {
+function HeaderDemo({
+  showBack = true,
+  ...props
+}: Parameters<typeof PageFrame>[0] & { showBack?: boolean }) {
   const [presses, setPresses] = useState(0);
   return (
-    <PageFrame {...props} onBack={() => setPresses((value) => value + 1)}>
+    <PageFrame {...props} onBack={showBack ? () => setPresses((value) => value + 1) : undefined}>
       <HeaderContent colorScheme={props.colorScheme} presses={presses} />
     </PageFrame>
   );
@@ -77,7 +80,8 @@ function HeaderDemo(props: Parameters<typeof PageFrame>[0]) {
 const meta = {
   title: 'Components/Page Header',
   component: HeaderDemo,
-  args: { title: 'Settings', colorScheme: 'light', scrollsBehindHeader: false },
+  args: { title: 'Settings', colorScheme: 'light', scrollsBehindHeader: false, showBack: true },
+  argTypes: { showBack: { control: 'boolean' } },
   decorators: [
     (Story, { args, parameters }) => {
       const colors = useThemeColors(args.colorScheme);
@@ -105,6 +109,9 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {};
+export const Home: Story = {
+  args: { title: 'Accueil', showBack: false, scrollsBehindHeader: true },
+};
 export const Dark: Story = { args: { colorScheme: 'dark' } };
 export const Scrolling: Story = { args: { title: 'Saved recipes', scrollsBehindHeader: true } };
 export const FullHeightOverlay: Story = { args: { title: 'Overlay', headerOverlay: true } };

@@ -38,7 +38,7 @@ export function usePageWaveMotion({
   const expandedOffset = Math.max(0, height * 0.35 - PAGE_WAVE_HEIGHT / 2);
   const target = expanded && !splash ? expandedOffset : 0;
   const { frontWave, backWave, frontSvg, backSvg } = useMemo(() => {
-    const frontSvg = `M -500 ${-height} H 1500 V 78.75 C 1250 51 1127 89 947 75 S 330 56 80 76.25 S -240 113.75 -500 78.75 Z`;
+    const frontSvg = `M0 0H1500V59C1300 125 1133 26 988 110S270 97 6 ${height}`;
     const backSvg = `M -500 ${-height} H 1500 V 46 C 1304 10 1060 20 663 65 S 260 0 23 70 S -270 139 -500 48 Z`;
     return {
       frontSvg,

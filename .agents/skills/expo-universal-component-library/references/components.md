@@ -1,5 +1,14 @@
 # Universal component catalog
 
+## Page title alignment (2026-10-20)
+
+`PageHeader` top-aligns its title row so the native 48-point back action does not
+lower a title relative to Accueil. Existing title/text colors, symmetric padding,
+safe-area ownership and native back touch areas remain. `Components/Page Header`
+adds a `showBack` control and a `Home` story for comparing title positions.
+Existing page-frame checks cover header resizing, retained state and back actions;
+native visual alignment still needs device verification.
+
 ## Shared screen geometry (2026-10-20)
 
 `PageScreen` has zero decorative padding; `PageSection` owns symmetric 16-point

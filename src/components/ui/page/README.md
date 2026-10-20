@@ -81,6 +81,10 @@ native title alignment still requires iOS and Android visual verification.
 Both platforms use 8 points of vertical and 16 points of horizontal
 header padding. The status-bar inset is applied once by
 `PageFrame`, while the header Host ignores automatic native safe areas.
+The title row aligns its children to the top, so a 48-point back action cannot
+push the title lower than a title-only header such as Accueil. Long titles may
+grow downward. Back actions retain their native touch area. The Page Header
+story's `showBack` control compares both states; `Home` opens the Accueil case.
 `page-motion-overlay.tsx` contains the shared animated top-edge wave artwork.
 Its two SVG paths are cached for the window height. Animation updates transforms,
 with no path parsing or React state update per frame.
