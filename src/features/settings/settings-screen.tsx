@@ -3,7 +3,7 @@ import { appDevEnabled } from '@/constants/app-dev';
 import { useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { router } from 'expo-router';
-import { View } from 'react-native';
+import { Platform, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
   BottomSheet,
@@ -331,7 +331,10 @@ function SettingsRow({
       style={{ paddingVertical: spacing.lg }}
     >
       {leading}
-      <Column spacing={spacing.xs} modifiers={nativeRowWeight}>
+      <Column
+        spacing={spacing.xs}
+        modifiers={Platform.OS === 'ios' ? nativeFillWidth : nativeRowWeight}
+      >
         <Text>{label}</Text>
         {detail ? (
           <Text fontSize={14} textStyle={{ color: colors.muted }}>

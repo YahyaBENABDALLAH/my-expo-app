@@ -6,13 +6,14 @@ import {
   PageMotionOverlay,
   ScrollView,
   UniversalHost,
+  UniversalButtonContent,
   UniversalTextContent as Text,
   usePageHeaderInset,
 } from '@components/ui';
 import type { Meta, StoryObj } from '@storybook/react-native';
 import { useState } from 'react';
 import { View } from 'react-native';
-import { SafeAreaInsetsContext } from 'react-native-safe-area-context';
+import { SafeAreaInsetsContext, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useThemeColors } from '@/hooks/use-theme';
 import { SettingsPage } from '@/features/settings/settings-screen';
 import { LayoutDirectionProvider } from '@/context/layout-direction.context';
@@ -27,6 +28,8 @@ function HeaderContent({
 }) {
   const colors = useThemeColors(colorScheme);
   const headerInset = usePageHeaderInset();
+  const insets = useSafeAreaInsets();
+  const [contentPresses, setContentPresses] = useState(0);
   return (
     <UniversalHost
       colorScheme={colorScheme}
@@ -38,9 +41,16 @@ function HeaderContent({
         <Column
           spacing={0}
           modifiers={nativeFillWidth}
-          style={{ padding: 0, paddingTop: headerInset }}
+          style={{ padding: 0, paddingTop: headerInset + insets.top }}
         >
           <PageSection>
+            <UniversalButtonContent
+              variant="secondary"
+              label="Content action"
+              testID="page-header-content-action"
+              onPress={() => setContentPresses((value) => value + 1)}
+            />
+            <Text testID="page-header-content-count">{`Content presses: ${contentPresses}`}</Text>
             <Text testID="page-header-back-count">{`Back presses: ${presses}`}</Text>
           </PageSection>
           {Array.from({ length: 20 }, (_, index) => (

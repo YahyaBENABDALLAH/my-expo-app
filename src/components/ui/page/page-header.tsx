@@ -25,7 +25,7 @@ export function PageHeader({
       <Column
         spacing={spacing.sm}
         modifiers={nativeFillWidth}
-        style={{ paddingHorizontal: spacing.lg, paddingVertical: spacing.sm }}
+        style={{ paddingHorizontal: spacing.lg }}
       >
         {title ? (
           <Row alignment="center" spacing={spacing.sm} modifiers={nativeFillWidth}>

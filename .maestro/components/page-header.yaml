@@ -1,5 +1,5 @@
 appId: com.hyrkul.likan
-name: Blurred headers keep back actions usable before and after scrolling
+name: Headers block covered actions and keep Back usable
 tags: [smoke, storybook]
 env:
   STORYBOOK_URL: myappexpo://storybook
@@ -48,6 +48,27 @@ env:
     env:
       STORY_ID: components-page-header--default
       READY_ID: page-header-back-count
+- tapOn:
+    id: page-header-content-action
+- assertVisible:
+    id: page-header-content-count
+    text: 'Content presses: 1'
+- tapOn:
+    id: page-back
+- assertVisible:
+    id: page-header-back-count
+    text: 'Back presses: 1'
+- runFlow:
+    file: ../helpers/open-story.yaml
+    env:
+      STORY_ID: components-page-header--full-height-overlay
+      READY_ID: page-header-content-count
+# The first content button sits under the title. Tapping the title must not activate it.
+- tapOn:
+    id: page-title
+- assertVisible:
+    id: page-header-content-count
+    text: 'Content presses: 0'
 - tapOn:
     id: page-back
 - assertVisible:

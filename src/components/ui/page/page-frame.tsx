@@ -11,6 +11,7 @@ import { View } from 'react-native';
 import { SafeAreaInsetsContext, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { PageHeader } from './page-header';
 import { PageHeaderBackground } from './page-header-background';
+import { PageHeaderTouchShield } from './page-header-touch-shield';
 import { useThemeColors } from '@/hooks/use-theme';
 import { useHostColorScheme } from '../host/universal-host';
 
@@ -60,7 +61,9 @@ export function PageFrame({
         blurHeader ? ({ nativeEvent }) => setHeaderHeight(nativeEvent.layout.height) : undefined
       }
       style={{
-        zIndex: 1,
+        zIndex: 2,
+        // Temporary visual debugging: show the full titled header, including its safe area.
+        backgroundColor: title ? '#FF0000' : undefined,
         ...(floating ? { position: 'absolute', top: 0, left: 0, right: 0 } : {}),
         paddingTop: insets.top,
         paddingLeft: insets.left,
@@ -101,6 +104,7 @@ export function PageFrame({
         />
       ) : null}
       {floating && header}
+      <PageHeaderTouchShield height={headerHeight} />
     </View>
   );
 }

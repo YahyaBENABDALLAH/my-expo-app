@@ -27,6 +27,11 @@ function setup(platform = 'ios') {
       useSafeAreaInsets: () => useContext(SafeAreaInsetsContext),
     },
     'expo-blur': { BlurTargetView: native('BlurTarget'), BlurView: native('BlurView') },
+    'react-native-reanimated': {
+      __esModule: true,
+      default: { View: native('TouchShield') },
+      useAnimatedStyle: (compute) => ({ compute }),
+    },
     '@/hooks/use-theme': { useThemeColors: () => ({ background: '#FFFFFF' }) },
     '@/components/ui/host/universal-host': {
       useHostColorScheme: (scheme) => scheme ?? 'light',
@@ -34,6 +39,7 @@ function setup(platform = 'ios') {
     '@/components/ui/page/page-header': { PageHeader: native('Header') },
     '@/components/ui/page/page-wave-context': { PageWaveContext },
     '@/components/ui/page/page-wave-surface': { PageWaveSurface: native('WaveSurface') },
+    '@/components/ui/page/use-page-wave-motion': { PAGE_WAVE_HEIGHT: 80 },
     '@/components/ui/native/native-fill-width': { nativeFillSize: [] },
     '@expo/ui/swift-ui/modifiers': {
       scrollContentBackground: (visible) => ({ type: 'scrollContentBackground', visible }),
@@ -163,7 +169,7 @@ for (const platform of ['ios', 'android']) {
     );
     assert.equal(
       headerArea(view).props.style.zIndex,
-      1,
+      2,
       'The title stays above the blur and native form.',
     );
     assert.equal(target.props.style.position, 'absolute');
@@ -185,19 +191,23 @@ for (const platform of ['ios', 'android']) {
     assert.equal(backs, 1);
   });
 
-  test(`${platform}: scrolling frames own one header inset and share the wave backdrop`, (t) => {
+  test(`${platform}: wave bounds and visibility never add to the measured header inset`, (t) => {
     const s = setup(platform);
-    const wave = { overlayHeight: 180 };
+    const wave = { overlayHeight: 80 };
+    let updateWave;
     function ScrollContent() {
       return h('ScrollContent', { paddingTop: s.usePageHeaderInset() + 24 });
     }
-    const view = renderFixture(
-      h(
+    function Preview() {
+      const [currentWave, setWave] = useState(wave);
+      updateWave = setWave;
+      return h(
         s.PageWaveContext.Provider,
-        { value: wave },
+        { value: currentWave },
         h(s.PageFrame, { title: 'Home', scrollsBehindHeader: true }, h(ScrollContent)),
-      ),
-    );
+      );
+    }
+    const view = renderFixture(h(Preview));
     t.after(() => view.unmount());
     measure(view, 115);
     assert.equal(view.findAll('BlurTarget')[0].props.style.paddingTop, 0);
@@ -205,6 +215,16 @@ for (const platform of ['ios', 'android']) {
     assert.equal(view.findAll('ScrollContent')[0].props.paddingTop, 139);
     assert.equal(view.findAll('WaveSurface')[0].props.wave, wave);
     assert.equal(headerArea(view).props.pointerEvents, 'none');
+    const headerStyle = { ...headerArea(view).props.style };
+    const contentStyle = { ...view.findAll('BlurTarget')[0].props.style };
+    const content = view.findAll('ScrollContent')[0];
+    for (const nextWave of [{ overlayHeight: 400 }, { overlayHeight: 1400 }, null, wave]) {
+      view.flush(() => updateWave(nextWave));
+      assert.deepEqual(headerArea(view).props.style, headerStyle);
+      assert.deepEqual(view.findAll('BlurTarget')[0].props.style, contentStyle);
+      assert.equal(view.findAll('ScrollContent')[0], content, 'Wave changes retain content.');
+      assert.equal(content.props.paddingTop, 139, 'Only the measured title adds clearance.');
+    }
     measure(view, 163);
     assert.equal(view.findAll('ScrollContent')[0].props.paddingTop, 187);
   });
@@ -223,6 +243,48 @@ for (const platform of ['ios', 'android']) {
     assert.equal(view.findAll('Map')[0].props.insets.top, 59);
     assert.equal(view.findAll('BlurView').length, 1);
     assert.equal(headerArea(view).props.pointerEvents, 'none');
+  });
+  test(`${platform}: the header blocks covered content while Back remains above the shield`, (t) => {
+    const s = setup(platform);
+    let offset = 0;
+    const wave = { fit: { get: () => [{ scaleX: 1 }, { translateY: offset }] } };
+    let backs = 0;
+    const view = renderFixture(
+      h(
+        s.PageWaveContext.Provider,
+        { value: wave },
+        h(
+          s.PageFrame,
+          { title: 'Settings', onBack: () => backs++, scrollsBehindHeader: true },
+          h('ContentAction'),
+        ),
+      ),
+    );
+    t.after(() => view.unmount());
+    measure(view, 115);
+    const shield = view.findAll('TouchShield')[0];
+    const [bounds, animated] = shield.props.style;
+    assert.equal(bounds.position, 'absolute');
+    assert.equal(shield.props.pointerEvents, 'box-only');
+    assert.equal(shield.props.onStartShouldSetResponder(), true);
+    assert.equal(shield.props.onMoveShouldSetResponder(), true);
+    assert.equal(shield.props.onResponderTerminationRequest(), false);
+    assert.equal(animated.compute().height, 115);
+    assert.ok(headerArea(view).props.style.zIndex > bounds.zIndex);
+    assert.equal(headerArea(view).props.pointerEvents, 'box-none');
+    view.flush(() => view.findAll('Header')[0].props.onBack());
+    assert.equal(backs, 1);
+    offset = 250;
+    assert.equal(animated.compute().height, 330, 'Expanded waves cover only their current band.');
+    offset = 100;
+    assert.equal(
+      animated.compute().height,
+      180,
+      'The shield follows collapse without React renders.',
+    );
+    offset = 0;
+    assert.equal(animated.compute().height, 115);
+    assert.equal(view.findAll('BlurTarget')[0].props.style.paddingTop, 0);
   });
 }
 

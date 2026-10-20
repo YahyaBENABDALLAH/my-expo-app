@@ -8,7 +8,7 @@ import { PAGE_WAVE_HEIGHT, usePageWaveMotion } from './use-page-wave-motion';
 
 export { PAGE_WAVE_HEIGHT } from './use-page-wave-motion';
 
-/** Shared wave artwork for the page header and the splash's moving bottom edge. */
+/** Header waves are absolute decoration; their SVG bounds never reserve content space. */
 export function PageMotionOverlay({
   animate = true,
   colorScheme,

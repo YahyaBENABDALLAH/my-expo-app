@@ -1,5 +1,24 @@
 # Universal component catalog
 
+## Header touch blocking (2026-10-20)
+
+`PageFrame` places an absolute, accessibility-hidden touch shield above content
+and below its back-button layer. It follows the current animated wave bottom or
+measured header height, whichever is larger, so expanded Login and collapse block
+only the current header band. The shield claims taps and gestures without adding
+spacing. Content below it remains interactive. Existing Page Header stories expose
+a counted content action and Back action; use `FullHeightOverlay` to place the
+content action beneath the header. Portable checks verify responder claims,
+stacking, Back delivery and animated bounds; native hit testing remains unverified.
+
+## Settings row alignment (2026-10-20)
+
+Settings label/detail columns use a leading full-width frame on iOS. The previous
+centered flexible frame left a large empty area before each label. Android keeps
+its weighted column. Native form gutters, row controls and header clearance are
+unchanged. `Components/Page Header/AppSettings` and `DarkAppSettings` cover the
+production form; native iOS appearance still needs a device check.
+
 ## Page wave paths (2026-10-20)
 
 `PageMotionOverlay` uses the supplied front and back SVG curves. A vertical flip
@@ -8,11 +27,19 @@ its reveal orientation. Login positioning, expansion and collapse behavior are
 retained. The header's straight closing edges extend offscreen so the expanded
 Login wave fills continuously from the screen's top to its curved edge.
 Side margins cover the existing horizontal drift.
+Header artwork and blur masks stay absolute: SVG size, expansion and visibility
+never add header/content spacing. Only the measured title/back row and safe area
+determine clearance. Page-frame checks vary wave height and visibility while
+asserting unchanged header geometry, content padding and retained content.
 The artwork and both platform blur masks share this fit. Theme roles and props
 are unchanged. `Components/Page Header` (`Default`, `Dark`, `AnimatedLtr` and
 `AnimatedRtl`, `ExpandedLogin`) previews the production paths. Native appearance remains unverified.
 
 ## Page title alignment (2026-10-20)
+
+Header vertical padding is zero; horizontal padding stays at 16 points and the
+top safe-area inset remains. A temporary red background marks the complete
+titled header for the user's visual debugging.
 
 `PageHeader` vertically centers its back button and title in the shared row so
 the arrow aligns with the text. Existing title/text colors, symmetric padding,
