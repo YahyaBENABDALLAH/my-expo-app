@@ -2,18 +2,20 @@
 
 ## Page wave paths (2026-10-20)
 
-`PageMotionOverlay` uses the supplied front and back SVG paths. A vertical flip
+`PageMotionOverlay` uses the supplied front and back SVG curves. A vertical flip
 corrects the header's upside-down fill in the 80-point overlay; the splash keeps
 its reveal orientation. Login positioning, expansion and collapse behavior are
-retained. Side margins cover the existing horizontal drift.
+retained. The header's straight closing edges extend offscreen so the expanded
+Login wave fills continuously from the screen's top to its curved edge.
+Side margins cover the existing horizontal drift.
 The artwork and both platform blur masks share this fit. Theme roles and props
 are unchanged. `Components/Page Header` (`Default`, `Dark`, `AnimatedLtr` and
-`AnimatedRtl`) previews the production paths. Native appearance remains unverified.
+`AnimatedRtl`, `ExpandedLogin`) previews the production paths. Native appearance remains unverified.
 
 ## Page title alignment (2026-10-20)
 
-`PageHeader` top-aligns its title row so the native 48-point back action does not
-lower a title relative to Accueil. Existing title/text colors, symmetric padding,
+`PageHeader` vertically centers its back button and title in the shared row so
+the arrow aligns with the text. Existing title/text colors, symmetric padding,
 safe-area ownership and native back touch areas remain. `Components/Page Header`
 adds a `showBack` control and a `Home` story for comparing title positions.
 Existing page-frame checks cover header resizing, retained state and back actions;

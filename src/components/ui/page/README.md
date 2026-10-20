@@ -81,19 +81,19 @@ native title alignment still requires iOS and Android visual verification.
 Both platforms use 8 points of vertical and 16 points of horizontal
 header padding. The status-bar inset is applied once by
 `PageFrame`, while the header Host ignores automatic native safe areas.
-The title row aligns its children to the top, so a 48-point back action cannot
-push the title lower than a title-only header such as Accueil. Long titles may
-grow downward. Back actions retain their native touch area. The Page Header
+The title row vertically centers the back button and title so the arrow aligns
+with the text. Long titles retain their natural height. Back actions keep their
+48-point native touch area. The Page Header
 story's `showBack` control compares both states; `Home` opens the Accueil case.
 `page-motion-overlay.tsx` contains the shared animated top-edge wave artwork.
-Its two SVG paths are cached independently of the window height. Animation updates transforms,
+Its two SVG paths are cached for the window height and splash variant. Animation updates transforms,
 with no path parsing or React state update per frame.
 Its default `overlay` variant decorates headers; `variant="splash"` places the
 same moving paths in normal flow with opaque fills for the launch screen's bottom
 edge. Both use the exported `PAGE_WAVE_HEIGHT` and the same motion guards.
 The back wave resolves theme opacity first; the splash keeps full opacity.
 The wave is 80 points tall and drifts on an 8-second cycle. The supplied front
-and back SVG path strings stay unchanged. A vertical flip corrects the header's
+and back SVG curves stay unchanged. A vertical flip corrects the header's
 upside-down fill; the splash retains its original reveal orientation.
 The artwork and blur masks share the fit and existing vertical positioning. A 50-design-unit side
 margin keeps the moving edges outside the viewport. Horizontal travel is 40 / 50 design units and
@@ -108,7 +108,11 @@ recipes frames beneath one overlay, with pause/resume and a back action. Its
 Maestro flow checks the controls and retained pause state across replacement;
 geometry tests check the wave phase at 60/120 Hz on both platform adapters. These
 checks do not establish native visual continuity or device performance.
-`expanded` centers the shallow wave band at 35% of the window height. Login uses it while signed out. Successful login raises
+`expanded` centers the shallow wave band at 35% of the window height and fills
+continuously from the top of the screen to the curved edge. Only the straight
+closing edges extend upward; the supplied curves retain their shape and shallow
+height. `Components/Page Header/ExpandedLogin` previews this filled area.
+Login uses it while signed out. Successful login raises
 the wave to the header over one second. Opening Register and returning to Login
 use the same slower transition. `onCollapseComplete` releases navigation only
 after a completed rise, so Home cannot interrupt the successful-login animation.

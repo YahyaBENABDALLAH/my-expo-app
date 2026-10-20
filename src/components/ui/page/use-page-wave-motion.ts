@@ -40,15 +40,17 @@ export function usePageWaveMotion({
   const expandedOffset = Math.max(0, height * 0.35 - PAGE_WAVE_HEIGHT / 2);
   const target = expanded && !splash ? expandedOffset : 0;
   const { frontWave, backWave, frontSvg, backSvg } = useMemo(() => {
-    const frontSvg = 'M0-204c43 28 300-30 423 18s358 8 586 59 351 183 578 38V0H0Z';
-    const backSvg = 'M0-204c43 28 300-30 423 18s374-34 586 59 334-143 630-1V0H0Z';
+    // After the vertical flip, this closing edge stays above the screen during expansion.
+    const fillEdge = splash ? 0 : height / WAVE_SCALE_Y;
+    const frontSvg = `M0-204c43 28 300-30 423 18s358 8 586 59 351 183 578 38V${fillEdge}H0Z`;
+    const backSvg = `M0-204c43 28 300-30 423 18s374-34 586 59 334-143 630-1V${fillEdge}H0Z`;
     return {
       frontSvg,
       backSvg,
       frontWave: Skia.Path.MakeFromSVGString(frontSvg)!,
       backWave: Skia.Path.MakeFromSVGString(backSvg)!,
     };
-  }, []);
+  }, [height, splash]);
   const phase = useSharedValue(0);
   const width = useSharedValue(0);
   const offset = useSharedValue(target);

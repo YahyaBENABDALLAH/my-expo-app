@@ -93,6 +93,7 @@ const meta = {
                 colorScheme={args.colorScheme}
                 animate={Boolean(parameters.animateWaves)}
                 visible={!parameters.withoutWaves}
+                expanded={Boolean(parameters.expandedWaves)}
               >
                 <Story />
               </PageMotionOverlay>
@@ -116,6 +117,10 @@ export const Dark: Story = { args: { colorScheme: 'dark' } };
 export const Scrolling: Story = { args: { title: 'Saved recipes', scrollsBehindHeader: true } };
 export const FullHeightOverlay: Story = { args: { title: 'Overlay', headerOverlay: true } };
 export const WithoutWaves: Story = { parameters: { withoutWaves: true } };
+export const ExpandedLogin: Story = {
+  args: { title: 'Login', showBack: false },
+  parameters: { expandedWaves: true },
+};
 export const AnimatedLtr: Story = {
   args: { title: 'Animated waves', scrollsBehindHeader: true },
   parameters: { animateWaves: true, waveDirection: 'ltr' },

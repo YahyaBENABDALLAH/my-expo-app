@@ -27,9 +27,8 @@ export function PageHeader({
         modifiers={nativeFillWidth}
         style={{ paddingHorizontal: spacing.lg, paddingVertical: spacing.sm }}
       >
-        {/* A taller back action must not move the title below title-only headers. */}
         {title ? (
-          <Row alignment="start" spacing={spacing.sm} modifiers={nativeFillWidth}>
+          <Row alignment="center" spacing={spacing.sm} modifiers={nativeFillWidth}>
             {onBack ? <PageBackButton color={colors.text} onPress={onBack} /> : null}
             <Column alignment="start" modifiers={isIOS ? nativeFillWidth : nativeRowWeight}>
               <Text variant="title" testID="page-title">
