@@ -125,6 +125,10 @@ export const Home: Story = {
 };
 export const Dark: Story = { args: { colorScheme: 'dark' } };
 export const Scrolling: Story = { args: { title: 'Saved recipes', scrollsBehindHeader: true } };
+export const LongTitle: Story = {
+  args: { title: 'Toutes les pages et les paramètres de l’application', scrollsBehindHeader: true },
+  parameters: { animateWaves: true },
+};
 export const FullHeightOverlay: Story = { args: { title: 'Overlay', headerOverlay: true } };
 export const WithoutWaves: Story = { parameters: { withoutWaves: true } };
 export const ExpandedLogin: Story = {

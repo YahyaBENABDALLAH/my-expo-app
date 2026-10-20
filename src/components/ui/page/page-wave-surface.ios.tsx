@@ -46,7 +46,16 @@ export function PageWaveSurface({
   const backProps = useAnimatedProps<GProps>(
     () => {
       const drift = backDrift.get();
-      return { transform: [1, 0, 0, 1, drift[0].translateX ?? 0, drift[1].translateY ?? 0] };
+      return {
+        transform: [
+          1,
+          0,
+          0,
+          drift[2].scaleY ?? 1,
+          drift[0].translateX ?? 0,
+          drift[1].translateY ?? 0,
+        ],
+      };
     },
     undefined,
     svgMatrixAdapter,
@@ -54,7 +63,16 @@ export function PageWaveSurface({
   const frontProps = useAnimatedProps<GProps>(
     () => {
       const drift = frontDrift.get();
-      return { transform: [1, 0, 0, 1, drift[0].translateX ?? 0, drift[1].translateY ?? 0] };
+      return {
+        transform: [
+          1,
+          0,
+          0,
+          drift[2].scaleY ?? 1,
+          drift[0].translateX ?? 0,
+          drift[1].translateY ?? 0,
+        ],
+      };
     },
     undefined,
     svgMatrixAdapter,

@@ -1,7 +1,6 @@
 import { useContext } from 'react';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 import { PageWaveContext } from './page-wave-context';
-import { PAGE_WAVE_HEIGHT } from './use-page-wave-motion';
 
 const claimTouch = () => true;
 const keepTouch = () => false;
@@ -10,9 +9,10 @@ const keepTouch = () => false;
 export function PageHeaderTouchShield({ height }: { height: number }) {
   const wave = useContext(PageWaveContext);
   const fit = wave?.fit;
+  const waveHeight = wave?.waveHeight ?? 0;
   const hasWave = wave !== null;
   const animatedStyle = useAnimatedStyle(() => ({
-    height: Math.max(height, hasWave ? (fit?.get()[1].translateY ?? 0) + PAGE_WAVE_HEIGHT : 0),
+    height: Math.max(height, hasWave ? (fit?.get()[1].translateY ?? 0) + waveHeight : 0),
   }));
 
   return (

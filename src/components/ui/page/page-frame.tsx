@@ -1,6 +1,8 @@
 import { BlurTargetView } from 'expo-blur';
+import { useFocusEffect } from 'expo-router';
 import {
   createContext,
+  useCallback,
   useContext,
   useMemo,
   useRef,
@@ -12,6 +14,7 @@ import { SafeAreaInsetsContext, useSafeAreaInsets } from 'react-native-safe-area
 import { PageHeader } from './page-header';
 import { PageHeaderBackground } from './page-header-background';
 import { PageHeaderTouchShield } from './page-header-touch-shield';
+import { PageWaveContext } from './page-wave-context';
 import { useThemeColors } from '@/hooks/use-theme';
 import { useHostColorScheme } from '../host/universal-host';
 
@@ -47,6 +50,12 @@ export function PageFrame({
   const scrollHeader = blurHeader && scrollsBehindHeader && !headerOverlay;
   const floating = headerOverlay || scrollHeader;
   const [headerHeight, setHeaderHeight] = useState(0);
+  const setWaveHeight = useContext(PageWaveContext)?.setHeaderHeight;
+  useFocusEffect(
+    useCallback(() => {
+      if (title && headerHeight > 0) setWaveHeight?.(headerHeight);
+    }, [title, headerHeight, setWaveHeight]),
+  );
   const blurTarget = useRef<View | null>(null);
   const contentTop = headerOverlay ? insets.top : 0;
   const contentInsets = useMemo(
@@ -57,13 +66,9 @@ export function PageFrame({
     <View
       testID="page-header-safe-area"
       pointerEvents={floating && !onBack ? 'none' : 'box-none'}
-      onLayout={
-        blurHeader ? ({ nativeEvent }) => setHeaderHeight(nativeEvent.layout.height) : undefined
-      }
+      onLayout={title ? ({ nativeEvent }) => setHeaderHeight(nativeEvent.layout.height) : undefined}
       style={{
         zIndex: 2,
-        // Temporary visual debugging: show the full titled header, including its safe area.
-        backgroundColor: title ? '#FF0000' : undefined,
         ...(floating ? { position: 'absolute', top: 0, left: 0, right: 0 } : {}),
         paddingTop: insets.top,
         paddingLeft: insets.left,

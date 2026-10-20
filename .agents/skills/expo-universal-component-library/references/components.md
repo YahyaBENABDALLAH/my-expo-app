@@ -21,25 +21,27 @@ production form; native iOS appearance still needs a device check.
 
 ## Page wave paths (2026-10-20)
 
-`PageMotionOverlay` uses the supplied front and back SVG curves. A vertical flip
-corrects the header's upside-down fill in the 80-point overlay; the splash keeps
-its reveal orientation. Login positioning, expansion and collapse behavior are
-retained. The header's straight closing edges extend offscreen so the expanded
-Login wave fills continuously from the screen's top to its curved edge.
-Side margins cover the existing horizontal drift.
+`PageMotionOverlay` fits two cached SVG paths to the focused frame's measured
+header height, including safe area and scaled text. Each leading section stays at
+full height while the trailing curve changes depth in opposite phases on the
+8-second UI-thread loop. RTL mirrors the steady section beneath the title/back
+control. The iOS SVG mask includes the same vertical scale as the Skia artwork.
+Login expansion/collapse retains its filled upper area and releases the extra
+drawing bounds after collapse. Splash retains its original paths and 80-point size.
 Header artwork and blur masks stay absolute: SVG size, expansion and visibility
 never add header/content spacing. Only the measured title/back row and safe area
 determine clearance. Page-frame checks vary wave height and visibility while
 asserting unchanged header geometry, content padding and retained content.
 The artwork and both platform blur masks share this fit. Theme roles and props
 are unchanged. `Components/Page Header` (`Default`, `Dark`, `AnimatedLtr` and
-`AnimatedRtl`, `ExpandedLogin`) previews the production paths. Native appearance remains unverified.
+`AnimatedRtl`, `LongTitle`, `ExpandedLogin`) previews the production paths.
+Motion/frame checks cover measured sizing, fixed leading height, opposite depths,
+phase continuity and header touch blocking. Native appearance remains unverified.
 
 ## Page title alignment (2026-10-20)
 
 Header vertical padding is zero; horizontal padding stays at 16 points and the
-top safe-area inset remains. A temporary red background marks the complete
-titled header for the user's visual debugging.
+top safe-area inset remains. The temporary red debug background is removed.
 
 `PageHeader` vertically centers its back button and title in the shared row so
 the arrow aligns with the text. Existing title/text colors, symmetric padding,
@@ -561,10 +563,11 @@ content. These checks establish JS behavior; native rendering still requires dev
 ### Shared page motion
 
 `PageMotionOverlay.variant` defaults to `overlay` for the page header. Its `splash`
-variant reuses the same drifting paths and crest in normal flow with opaque theme
-fills, replacing the launch screen's fixed bottom curves. Both placements use
-`PAGE_WAVE_HEIGHT` (180) and the existing activity/reduced-motion guards. The
-replayable Animated splash story covers this moving edge during the two-second exit;
+variant keeps its original drifting paths and crest in normal flow with opaque theme
+fills, replacing the launch screen's fixed bottom curves. Splash uses the 80-point
+`PAGE_WAVE_HEIGHT`; titled headers use the focused frame's measured height. Both
+retain the existing activity/reduced-motion guards. The
+replayable Animated splash story covers this moving edge during exit;
 actual native wave continuity remains unverified.
 
 The current default is the full-screen `AuroraBackground`, mounted behind root
@@ -593,7 +596,7 @@ The following top-edge wave is mounted above root navigation alongside the full-
 aurora behind navigation. Both layers pause while the splash covers them. The aurora
 composition stories also include the header wave; focused wave stories remain available:
 
-`PageMotionOverlay` (`src/components/ui/page/page-motion-overlay.tsx`) provides a single 180-point-tall Skia canvas above the root navigation tree, with flatter curves with half the previous vertical depth shared by the artwork and blur masks. It covers all routed pages, including authentication, details, and utility screens, without modifying their native control trees. `animate` defaults to true; optional `colorScheme` supplies deterministic light/dark previews. It consumes existing `tint` and `tabIconSelected` colors. Two oversized paths drift in opposite directions on the current 8-second UI-thread loop, with horizontal travel of 40 / 50 design units and vertical travel of 2 / 3 points. The current layout direction reverses horizontal motion in RTL without resetting phase. Width follows the wrapper's `onLayout` event, with no per-frame measurement or React updates. `useMotionEnabled` pauses motion during background/inactive states, live Reduce Motion changes, and explicit static mode. The root keeps it static beneath the launch screen.
+`PageMotionOverlay` (`src/components/ui/page/page-motion-overlay.tsx`) provides one Skia canvas above root navigation, sized to the focused header's measured height. Two cached paths keep their leading section at full height and animate trailing depth in opposite phases on an 8-second UI-thread loop. Horizontal travel is 40 / 50 design units. Artwork and native blur masks share the fit; RTL mirrors the steady section beneath the leading title/back controls. `animate` defaults to true; optional `colorScheme` supplies deterministic light/dark previews. Existing `tint` and `tabIconSelected` theme roles remain. Width follows the wrapper's `onLayout`; header height updates on focus/layout without per-frame measurement or React updates. `useMotionEnabled` pauses motion during background/inactive states, live Reduce Motion changes, and explicit static mode. The root keeps it static beneath the launch screen.
 
 Both wrapper and canvas ignore touches, and the decorative wrapper is hidden from accessibility. `AnimatedLtr` and `AnimatedRtl` in `.rnstorybook/stories/components/page-header.stories.tsx` preview the taller waves above scrolling content with a counted back action. `tests/components/page-wave-motion.test.mjs` checks 60/120-Hz timing, mirrored direction, phase retention and pause/resume using mocked native boundaries. These fixtures do not prove native stacking, screen-reader behavior, rotation, or device performance; see [shared motion verification](../../../../docs/shared-skia-motion.md).
 

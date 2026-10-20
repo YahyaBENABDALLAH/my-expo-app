@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { createContext, createElement as h, useContext, useState } from 'react';
+import { createContext, createElement as h, useContext, useEffect, useState } from 'react';
 import { createSourceLoader } from '../helpers/load-source.mjs';
 import { renderFixture } from '../helpers/render-fixture.mjs';
 
@@ -10,6 +10,10 @@ function setup(platform = 'ios') {
   const PageWaveContext = createContext(null);
   const listeners = new Set();
   const mocks = {
+    'expo-router': {
+      router: { canGoBack: () => true, back() {}, replace() {} },
+      useFocusEffect: useEffect,
+    },
     '@/constants/app-dev': { appDevEnabled: true },
     'react-native': {
       View: native('View'),
@@ -73,7 +77,6 @@ function setup(platform = 'ios') {
     nativeFillWidth: [],
     nativeRowWeight: [],
   };
-  mocks['expo-router'] = { router: { canGoBack: () => true, back() {}, replace() {} } };
   mocks['@/context/language.context'] = { useLanguage: () => ({ language: 'en', ready: true }) };
   for (const icon of ['open_in_new', 'chevron_right', 'person', 'check']) {
     mocks[`@expo/material-symbols/${icon}.xml`] = 1;
@@ -193,7 +196,8 @@ for (const platform of ['ios', 'android']) {
 
   test(`${platform}: wave bounds and visibility never add to the measured header inset`, (t) => {
     const s = setup(platform);
-    const wave = { overlayHeight: 80 };
+    const heights = [];
+    const wave = { overlayHeight: 80, setHeaderHeight: (height) => heights.push(height) };
     let updateWave;
     function ScrollContent() {
       return h('ScrollContent', { paddingTop: s.usePageHeaderInset() + 24 });
@@ -210,6 +214,8 @@ for (const platform of ['ios', 'android']) {
     const view = renderFixture(h(Preview));
     t.after(() => view.unmount());
     measure(view, 115);
+    assert.equal(heights.at(-1), 115, 'The focused header supplies its measured SVG height.');
+    assert.equal(headerArea(view).props.style.backgroundColor, undefined);
     assert.equal(view.findAll('BlurTarget')[0].props.style.paddingTop, 0);
     assert.equal(headerArea(view).props.style.position, 'absolute');
     assert.equal(view.findAll('ScrollContent')[0].props.paddingTop, 139);
@@ -227,6 +233,7 @@ for (const platform of ['ios', 'android']) {
     }
     measure(view, 163);
     assert.equal(view.findAll('ScrollContent')[0].props.paddingTop, 187);
+    assert.equal(heights.at(-1), 163, 'Larger text resizes both paths to the header.');
   });
 
   test(`${platform}: full-height overlays blur without shifting content or consuming map insets`, (t) => {
@@ -247,7 +254,7 @@ for (const platform of ['ios', 'android']) {
   test(`${platform}: the header blocks covered content while Back remains above the shield`, (t) => {
     const s = setup(platform);
     let offset = 0;
-    const wave = { fit: { get: () => [{ scaleX: 1 }, { translateY: offset }] } };
+    const wave = { waveHeight: 115, fit: { get: () => [{ scaleX: 1 }, { translateY: offset }] } };
     let backs = 0;
     const view = renderFixture(
       h(
@@ -275,11 +282,11 @@ for (const platform of ['ios', 'android']) {
     view.flush(() => view.findAll('Header')[0].props.onBack());
     assert.equal(backs, 1);
     offset = 250;
-    assert.equal(animated.compute().height, 330, 'Expanded waves cover only their current band.');
+    assert.equal(animated.compute().height, 365, 'Expanded waves cover only their current band.');
     offset = 100;
     assert.equal(
       animated.compute().height,
-      180,
+      215,
       'The shield follows collapse without React renders.',
     );
     offset = 0;

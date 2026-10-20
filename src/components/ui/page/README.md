@@ -28,7 +28,11 @@ platform blur mask. Header artwork and both blur masks are absolutely positioned
 SVG height, drift, expansion and visibility add no padding, margin, header height
 or content clearance. Only the actual title/back row and system safe area determine
 the measured header inset. The wave remains decorative when expanded on Login.
-No second animation loop or per-frame
+The focused frame supplies its measured header height, including safe area and
+scaled title text. Collapsed artwork and SVG mask bounds match that height. Both
+paths keep their leading section at full header height; only their trailing
+curves vary in opposite phases. RTL mirrors the artwork so the steady section
+stays beneath the title and back button. No second animation loop or per-frame
 React updates are needed. Outside the two wave silhouettes the header is clear.
 The wave clock accumulates active frame time instead of restarting a repeating
 animation. Replacing a page's mask joins the current phase; backgrounding, Reduce
@@ -93,28 +97,28 @@ center it in the available space; Android retains its weighted title column.
 The existing `Components/Page Header` stories cover titles and counted back actions;
 native title alignment still requires iOS and Android visual verification.
 Both platforms use zero vertical and 16 points of horizontal
-header padding. A temporary red background marks the full titled header,
-including the top safe-area inset, for visual debugging. The status-bar inset is applied once by
+header padding. The temporary red debug background has been removed.
+The status-bar inset is applied once by
 `PageFrame`, while the header Host ignores automatic native safe areas.
 The title row vertically centers the back button and title so the arrow aligns
 with the text. Long titles retain their natural height. Back actions keep their
 48-point native touch area. The Page Header
 story's `showBack` control compares both states; `Home` opens the Accueil case.
 `page-motion-overlay.tsx` contains the shared animated top-edge wave artwork.
-Its two SVG paths are cached for the window height and splash variant. Animation updates transforms,
+Its two SVG paths are cached for window/header size and splash variant. Animation updates transforms,
 with no path parsing or React state update per frame.
 Its default `overlay` variant decorates headers; `variant="splash"` places the
-same moving paths in normal flow with opaque fills for the launch screen's bottom
-edge. Both use the exported `PAGE_WAVE_HEIGHT` and the same motion guards.
+original moving paths in normal flow with opaque fills for the launch screen's bottom
+edge. The splash retains the exported 80-point `PAGE_WAVE_HEIGHT`; headers use
+their measured height. Both retain the same motion guards.
 The back wave resolves theme opacity first; the splash keeps full opacity.
-The wave is 80 points tall and drifts on an 8-second cycle. The supplied front
-and back SVG curves stay unchanged. A vertical flip corrects the header's
-upside-down fill; the splash retains its original reveal orientation.
-The artwork and blur masks share the fit and existing vertical positioning. A 50-design-unit side
-margin keeps the moving edges outside the viewport. Horizontal travel is 40 / 50 design units and
-vertical travel is 2 / 3 points, half the previous movement. RTL reverses both
-layers' horizontal direction without restarting their phase. `AnimatedLtr` and
-`AnimatedRtl` in the header stories preview these settings; motion tests exercise
+Header paths use a 1000-by-100 design space. The leading 55% sits at full height;
+the trailing cubic curves scale between 60% and 100% of their depth around that
+fixed baseline, in opposite phases on an 8-second cycle. A 50-unit side margin
+covers the 40 / 50-unit horizontal drift. Artwork and both blur masks share these
+transforms, including vertical scale in the iOS SVG matrix. `AnimatedLtr`,
+`AnimatedRtl` and `LongTitle` in the header stories cover the new geometry;
+motion checks exercise resizing, fixed leading height, opposite depths,
 60/120-Hz timing, direction changes and pause/resume without per-frame React work.
 Header layers share the theme's tint with
 a gentle 20% gradient fade for a more consistent color across the filled area.
@@ -125,8 +129,9 @@ geometry tests check the wave phase at 60/120 Hz on both platform adapters. Thes
 checks do not establish native visual continuity or device performance.
 `expanded` centers the shallow wave band at 35% of the window height and fills
 continuously from the top of the screen to the curved edge. Only the straight
-closing edges extend upward; the supplied curves retain their shape and shallow
-height. `Components/Page Header/ExpandedLogin` previews this filled area.
+closing edges extend upward; the curves retain their header-relative depth.
+Drawing bounds remain expanded until collapse completes, then return to the
+measured header height. `Components/Page Header/ExpandedLogin` previews this filled area.
 Login uses it while signed out. Successful login raises
 the wave to the header over one second. Opening Register and returning to Login
 use the same slower transition. `onCollapseComplete` releases navigation only
