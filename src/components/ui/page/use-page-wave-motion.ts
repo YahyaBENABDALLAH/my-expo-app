@@ -51,10 +51,10 @@ export function usePageWaveMotion({
     const fillEdge = -height / scaleY;
     const frontSvg = splash
       ? 'M0-204c43 28 300-30 423 18s358 8 586 59 351 183 578 38V0H0Z'
-      : `M-50 100H400C600 100 730 40 850 40S1000 85 1050 80V${fillEdge}H-50Z`;
+      : `M-50 100H267C525 60 756 90 855 56S1010 101 1050 80V${fillEdge}H-50Z`;
     const backSvg = splash
       ? 'M0-204c43 28 300-30 423 18s374-34 586 59 334-143 630-1V0H0Z'
-      : `M-50 100H400C600 100 730 75 850 75S1000 35 1050 45V${fillEdge}H-50Z`;
+      : `M-50 100H400C605 117 730 75 856 80S1000 35 1051 66V${fillEdge}H-50Z`;
     return {
       frontSvg,
       backSvg,
