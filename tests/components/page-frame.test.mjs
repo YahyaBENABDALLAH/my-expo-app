@@ -8,12 +8,16 @@ function setup(platform = 'ios') {
   const native = (type) => (props) => h(type, props, props.children);
   const SafeAreaInsetsContext = createContext({ top: 59, bottom: 34, left: 44, right: 0 });
   const PageWaveContext = createContext(null);
+  const FocusContext = createContext(true);
   const DirectionContext = createContext('ltr');
   const listeners = new Set();
   const mocks = {
     'expo-router': {
       router: { canGoBack: () => true, back() {}, replace() {} },
-      useFocusEffect: useEffect,
+      useFocusEffect: (callback) => {
+        const focused = useContext(FocusContext);
+        useEffect(() => (focused ? callback() : undefined), [focused, callback]);
+      },
     },
     '@/constants/app-dev': { appDevEnabled: true },
     '@/context/layout-direction.context': {
@@ -93,6 +97,7 @@ function setup(platform = 'ios') {
     SafeAreaInsetsContext,
     DirectionContext,
     PageWaveContext,
+    FocusContext,
     reduceTransparency: (value) => listeners.forEach((listener) => listener(value)),
   };
 }
@@ -103,6 +108,131 @@ const measure = (view, height) =>
   view.flush(() => headerArea(view).props.onLayout({ nativeEvent: { layout: { height } } }));
 
 for (const platform of ['ios', 'android']) {
+  test(`${platform}: initial header clearance survives incomplete native layout and grows for larger text`, (t) => {
+    const s = setup(platform);
+    const heights = [];
+    const wave = { setHeaderHeight: (height) => heights.push(height) };
+    function Content() {
+      return h('ScrollContent', { paddingTop: s.usePageHeaderInset() });
+    }
+    const view = renderFixture(
+      h(
+        s.PageWaveContext.Provider,
+        { value: wave },
+        h(s.PageFrame, { title: 'Home', scrollsBehindHeader: true }, h(Content)),
+      ),
+    );
+    t.after(() => view.unmount());
+    const content = view.findAll('ScrollContent')[0];
+    assert.equal(
+      content.props.paddingTop,
+      107,
+      'Reserve the status bar and 48-point row immediately.',
+    );
+    assert.deepEqual(heights, [107]);
+    for (const height of [0, 59, 90, 106, 107]) measure(view, height);
+    assert.equal(content.props.paddingTop, 107);
+    assert.deepEqual(heights, [107], 'An unmeasured Host must not shrink the shared SVG.');
+    measure(view, 163);
+    assert.equal(
+      content.props.paddingTop,
+      163,
+      'Wrapped/scaled titles retain their native height.',
+    );
+    measure(view, 59);
+    assert.equal(
+      content.props.paddingTop,
+      163,
+      'A later incomplete pass must not erase valid bounds.',
+    );
+    measure(view, 107);
+    assert.equal(
+      content.props.paddingTop,
+      107,
+      'Valid measurements can shrink after text changes.',
+    );
+    assert.equal(view.findAll('ScrollContent')[0], content);
+    assert.deepEqual(heights, [107, 163, 107]);
+  });
+
+  test(`${platform}: navigating to Back and returning keeps the shared wave height while inactive layouts stay local`, (t) => {
+    const s = setup(platform);
+    const heights = [];
+    const wave = { setHeaderHeight: (height) => heights.push(height) };
+    let navigate;
+    function Navigation() {
+      const [details, setDetails] = useState(false);
+      const [opened, setOpened] = useState(false);
+      navigate = (next) => {
+        if (next) setOpened(true);
+        setDetails(next);
+      };
+      return h(
+        s.PageWaveContext.Provider,
+        { value: wave },
+        h(s.FocusContext.Provider, { value: !details }, h(s.PageFrame, { title: 'Home' })),
+        opened
+          ? h(
+              s.FocusContext.Provider,
+              { value: details },
+              h(s.PageFrame, { title: 'Details', onBack: () => navigate(false) }),
+            )
+          : null,
+      );
+    }
+    const view = renderFixture(h(Navigation));
+    t.after(() => view.unmount());
+    measure(view, 107);
+    const homeArea = headerArea(view);
+    view.flush(() => navigate(true));
+    const detailsArea = view
+      .findAll('View')
+      .filter(({ props }) => props.testID === 'page-header-safe-area')[1];
+    view.flush(() => detailsArea.props.onLayout({ nativeEvent: { layout: { height: 59 } } }));
+    view.flush(() => detailsArea.props.onLayout({ nativeEvent: { layout: { height: 107 } } }));
+    assert.deepEqual(heights, [107, 107], 'Mounting a Back header retains the same bounds.');
+    view.flush(() => homeArea.props.onLayout({ nativeEvent: { layout: { height: 163 } } }));
+    assert.deepEqual(heights, [107, 107], 'An unfocused screen cannot resize the overlay.');
+    view.flush(() => homeArea.props.onLayout({ nativeEvent: { layout: { height: 107 } } }));
+    view.flush(() => view.findAll('Header')[1].props.onBack());
+    assert.deepEqual(heights, [107, 107, 107]);
+    assert.equal(headerArea(view), homeArea, 'Back restores the retained screen.');
+  });
+
+  test(`${platform}: safe-area changes immediately retain the measured title height`, (t) => {
+    const s = setup(platform);
+    const heights = [];
+    const wave = { setHeaderHeight: (height) => heights.push(height) };
+    let changeInsets;
+    function Content() {
+      return h('ScrollContent', { paddingTop: s.usePageHeaderInset() });
+    }
+    function Screen() {
+      const [top, setTop] = useState(59);
+      changeInsets = setTop;
+      return h(
+        s.SafeAreaInsetsContext.Provider,
+        { value: { top, bottom: 34, left: 0, right: 0 } },
+        h(
+          s.PageWaveContext.Provider,
+          { value: wave },
+          h(s.PageFrame, { title: 'Long title', scrollsBehindHeader: true }, h(Content)),
+        ),
+      );
+    }
+    const view = renderFixture(h(Screen));
+    t.after(() => view.unmount());
+    measure(view, 163);
+    const content = view.findAll('ScrollContent')[0];
+    view.flush(() => changeInsets(24));
+    assert.equal(content.props.paddingTop, 128, 'Keep the 104-point title, replace the top inset.');
+    assert.equal(heights.at(-1), 128);
+    measure(view, 72);
+    assert.equal(content.props.paddingTop, 72, 'A shorter title can settle after rotation.');
+    assert.equal(heights.at(-1), 72);
+    assert.equal(view.findAll('ScrollContent')[0], content);
+  });
+
   test(`${platform}: App Settings scrolls beneath the blur and reserves the measured title inside the form`, (t) => {
     const s = setup(platform);
     const { SettingsPage } = s.load('features/settings/settings-screen.tsx');

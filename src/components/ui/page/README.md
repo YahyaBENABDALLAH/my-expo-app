@@ -22,6 +22,19 @@ item starts below the title and can scroll behind it. Content mounts before the
 blur and supplies a `BlurTargetView` reference for Android that excludes the title
 and back button. The mask sits below those controls so they stay sharp.
 
+Titled frames reserve the top safe area plus a 48-point minimum title row on the
+first render. Pages with and without Back share that minimum, so navigation does
+not stretch the SVG just to accommodate the button. Incomplete native layout
+passes below that minimum are ignored; valid taller measurements still resize
+the header for wrapped titles and larger text. Only the focused frame publishes
+its height to the shared wave. Safe-area changes apply to the retained title
+height immediately. Titleless frames keep their existing safe-area-only layout.
+`Components/Page Header/NavigationContinuity` remounts Home and Details beneath
+one paused wave to inspect first-render height and Back round trips.
+The page-frame fixtures cover incomplete layout, initial clearance, valid growth
+and shrinkage, and measurements from inactive screens. These checks use mocked
+native boundaries; device layout and transition appearance remain manual checks.
+
 `PageMotionOverlay` wraps root navigation with `PageWaveContext`. The header uses
 original cubic vector artwork with independently moving control points. The leading
 40% stays level beneath the title/back button; only the trailing surface deforms.

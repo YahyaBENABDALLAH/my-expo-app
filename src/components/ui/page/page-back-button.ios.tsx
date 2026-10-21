@@ -8,6 +8,7 @@ import {
   shapes,
 } from '@expo/ui/swift-ui/modifiers';
 import type { PageBackButtonProps } from './page-back-button.types';
+import { PAGE_HEADER_MIN_HEIGHT } from './page-header-layout';
 
 export function PageBackButton({ color, onPress }: PageBackButtonProps) {
   const { t } = useTranslation();
@@ -21,7 +22,10 @@ export function PageBackButton({ color, onPress }: PageBackButtonProps) {
         systemName="arrow.backward"
         size={24}
         color={color}
-        modifiers={[frame({ width: 48, height: 48 }), contentShape(shapes.rectangle())]}
+        modifiers={[
+          frame({ width: PAGE_HEADER_MIN_HEIGHT, height: PAGE_HEADER_MIN_HEIGHT }),
+          contentShape(shapes.rectangle()),
+        ]}
       />
     </Button>
   );

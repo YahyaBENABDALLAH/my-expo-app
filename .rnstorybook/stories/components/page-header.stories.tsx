@@ -24,9 +24,11 @@ import { DEFAULT_HEADER_SHAPE, HEADER_SHAPES } from '@/constants/header-motion';
 function HeaderContent({
   colorScheme,
   presses,
+  onNavigate,
 }: {
   colorScheme?: 'light' | 'dark';
   presses: number;
+  onNavigate?: () => void;
 }) {
   const colors = useThemeColors(colorScheme);
   const headerInset = usePageHeaderInset();
@@ -46,6 +48,14 @@ function HeaderContent({
           style={{ padding: 0, paddingTop: headerInset + insets.top }}
         >
           <PageSection>
+            {onNavigate ? (
+              <UniversalButtonContent
+                variant="secondary"
+                label="Open details"
+                testID="page-header-open-details"
+                onPress={onNavigate}
+              />
+            ) : null}
             <UniversalButtonContent
               variant="secondary"
               label="Content action"
@@ -143,6 +153,46 @@ type Story = StoryObj<typeof meta>;
 export const Default: Story = {};
 export const Home: Story = {
   args: { title: 'Accueil', showBack: false, scrollsBehindHeader: true },
+};
+
+function NavigationHeaderDemo({ colorScheme }: { colorScheme?: 'light' | 'dark' }) {
+  const [details, setDetails] = useState(false);
+  const [returns, setReturns] = useState(0);
+  return (
+    <PageFrame
+      key={details ? 'details' : 'home'}
+      title={details ? 'Details' : 'Accueil'}
+      colorScheme={colorScheme}
+      scrollsBehindHeader
+      onBack={
+        details
+          ? () => {
+              setReturns((value) => value + 1);
+              setDetails(false);
+            }
+          : undefined
+      }
+    >
+      <HeaderContent
+        colorScheme={colorScheme}
+        presses={returns}
+        onNavigate={details ? undefined : () => setDetails(true)}
+      />
+    </PageFrame>
+  );
+}
+
+export const NavigationContinuity: Story = {
+  render: ({ colorScheme }) => <NavigationHeaderDemo colorScheme={colorScheme} />,
+  parameters: {
+    animateWaves: false,
+    docs: {
+      description: {
+        story:
+          'Open details and use Back repeatedly. Each page remounts beneath the same paused wave; the header band and initial content clearance should stay at the same height.',
+      },
+    },
+  },
 };
 export const Dark: Story = { args: { colorScheme: 'dark' } };
 export const Scrolling: Story = { args: { title: 'Saved recipes', scrollsBehindHeader: true } };

@@ -4,7 +4,12 @@ import { useThemeColors } from '@/hooks/use-theme';
 import { UniversalHost, useHostColorScheme } from '../host/universal-host';
 import { UniversalTextContent as Text } from '../text/universal-text';
 import { PageBackButton } from './page-back-button';
-import { nativeFillWidth, nativeRowWeight } from '../native/native-fill-width';
+import { PAGE_HEADER_MIN_HEIGHT } from './page-header-layout';
+import {
+  nativeCenteredMinHeight,
+  nativeFillWidth,
+  nativeRowWeight,
+} from '../native/native-fill-width';
 import { spacing } from '@/constants/layout';
 
 /** Page title and optional navigation action. Preferences live in App Settings. */
@@ -28,7 +33,11 @@ export function PageHeader({
         style={{ paddingHorizontal: spacing.lg }}
       >
         {title ? (
-          <Row alignment="center" spacing={spacing.sm} modifiers={nativeFillWidth}>
+          <Row
+            alignment="center"
+            spacing={spacing.sm}
+            modifiers={nativeCenteredMinHeight(PAGE_HEADER_MIN_HEIGHT)}
+          >
             {onBack ? <PageBackButton color={colors.text} onPress={onBack} /> : null}
             <Column alignment="start" modifiers={isIOS ? nativeFillWidth : nativeRowWeight}>
               <Text variant="title" testID="page-title">
