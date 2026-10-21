@@ -1,5 +1,24 @@
 # Universal component feasibility audit
 
+2026-10-21: Storybook removes Icon, Floating Action, Bottom Sheet/Closed and Page
+Header's Animated LTR/RTL and Settings previews. Skeleton now exposes circular
+avatars, image blocks and a native card composition as well as lines and the
+animation controls. Its public dimensions, radius and native rendering remain.
+
+Text adds `subtitle` and `label` typography plus a theme-aware `tone` prop;
+Button adds native text/plain `tertiary` and filled `info` variants. Both keep
+explicit caller overrides. Toast adds `info`, with the existing info/container
+tokens, native information symbols and English/French/Arabic default headings.
+Each family has named semantic stories in `.rnstorybook/stories/components/`.
+The iOS TextInput action now sizes its native button label to 48 points and
+preserves that size beside the flexible field. Its clickable-icon story binds
+native assets within the render harness.
+
+Portable checks cover text theme inheritance/overrides, button styles/colors and
+disabled actions, icon label/value retention and toast queue/dismissal semantics.
+The related component READMEs document props and limitations. Native iOS/Android
+appearance, hit testing and Skeleton pulse timing still need device verification.
+
 2026-10-14: the native-default simplification is implemented. Switch, Checkbox,
 Slider and List now use small shared universal wrappers; Collapsible uses the
 root export. FieldGroup directly re-exports the universal component on both

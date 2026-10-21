@@ -1,0 +1,24 @@
+appId: com.hyrkul.likan
+name: Right icon clears text and suppresses disabled actions
+tags: [smoke, storybook]
+env:
+  STORYBOOK_URL: myappexpo://storybook
+  STORY_ID: components-text-input--clickable-right-icon
+  READY_ID: expo-ui-text-input-right-icon
+---
+- runFlow: ../helpers/open-story.yaml
+- assertVisible: Soup
+- tapOn:
+    id: expo-ui-text-input-right-icon
+- assertVisible: 'Right icon presses: 1'
+- assertNotVisible: Soup
+- tapOn:
+    id: expo-ui-text-input-toggle-disabled
+- tapOn:
+    id: expo-ui-text-input-right-icon
+- assertVisible: 'Right icon presses: 1'
+- tapOn:
+    id: expo-ui-text-input-toggle-disabled
+- tapOn:
+    id: expo-ui-text-input-right-icon
+- assertVisible: 'Right icon presses: 2'

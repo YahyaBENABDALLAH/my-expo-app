@@ -64,7 +64,7 @@ const meta = {
   argTypes: {
     message: { control: 'text' },
     title: { control: 'text' },
-    variant: { control: 'select', options: ['error', 'success', 'warning'] },
+    variant: { control: 'select', options: ['error', 'success', 'warning', 'info'] },
     direction: { control: 'select', options: ['ltr', 'rtl'] },
   },
   render: (args) => (
@@ -80,3 +80,18 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Dark: Story = {};
+export const Error: Story = {
+  args: { variant: 'error', message: 'Unable to save your recipe. Please try again.' },
+};
+export const Success: Story = {
+  args: { variant: 'success', message: 'Your recipe was saved successfully.' },
+};
+export const Warning: Story = {
+  args: { variant: 'warning', message: 'You have unsaved changes. Review them before leaving.' },
+};
+export const Info: Story = {
+  args: {
+    variant: 'info',
+    message: 'Your draft is available offline and will sync when you reconnect.',
+  },
+};

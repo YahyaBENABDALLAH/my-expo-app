@@ -10,8 +10,14 @@ function setup(platform) {
     [
       'accessibilityLabel',
       'background',
+      'buttonStyle',
       'clipShape',
+      'contentShape',
+      'disabled',
+      'fixedSize',
       'frame',
+      'size',
+      'testID',
       'strokeBorder',
       'textFieldStyle',
       'defaultMinSize',
@@ -54,15 +60,20 @@ function setup(platform) {
       useHostColorScheme: () => 'light',
     },
     '@/components/ui/native/native-fill-width': { nativeFillWidth: [] },
-    '@/components/ui/text-input/text-input-icon-button': {
-      TextInputIconButton: native('IconButton'),
+    '@expo/ui/swift-ui': { Button: native('IconButton'), HStack: native('IconLabel') },
+    '@expo/ui/jetpack-compose': { IconButton: native('IconButton') },
+    '@expo/ui/swift-ui/modifiers': {
+      ...modifiers,
+      shapes: { rectangle: () => 'rectangle' },
     },
-    '@expo/ui/swift-ui/modifiers': modifiers,
     '@expo/ui/jetpack-compose/modifiers': modifiers,
   };
   const load = createSourceLoader(mocks);
   mocks['@/components/ui/text-input/text-input-modifiers'] = load(
     `components/ui/text-input/text-input-modifiers.${platform}.ts`,
+  );
+  mocks['@/components/ui/text-input/text-input-icon-button'] = load(
+    `components/ui/text-input/text-input-icon-button.${platform}.tsx`,
   );
   return load('components/ui/text-input/text-input.tsx');
 }
@@ -158,8 +169,24 @@ for (const platform of ['ios', 'android']) {
     const nativeValue = field.props.value;
     const surface = view.findAll('Row')[0];
     const initialModifiers = surface.props.modifiers;
+    const handler = platform === 'ios' ? 'onPress' : 'onClick';
+    if (platform === 'ios') {
+      assert.deepEqual(
+        view.findAll('IconLabel')[0].props.modifiers.find(({ $type }) => $type === 'frame').args,
+        [{ width: 48, height: 48 }],
+      );
+    }
     for (let index = 1; index <= 6; index++) {
-      view.flush(() => view.findAll('IconButton')[0].props.onPress());
+      view.flush(() => view.findAll('IconButton')[0].props[handler]());
+      assert.equal(view.findAll('Icon')[0].props.name, index % 2 ? 'eye.slash' : 'eye');
+      const labelModifier = platform === 'ios' ? 'accessibilityLabel' : 'semantics';
+      const actionLabel = view
+        .findAll('IconButton')[0]
+        .props.modifiers.find(({ $type }) => $type === labelModifier).args[0];
+      assert.equal(
+        platform === 'ios' ? actionLabel : actionLabel.contentDescription,
+        index % 2 ? 'Hide password' : 'Show password',
+      );
       assert.equal(view.findAll('TextInput')[0], field);
       assert.equal(field.props.value, nativeValue);
       assert.equal(nativeValue.get(), value);
@@ -171,7 +198,7 @@ for (const platform of ['ios', 'android']) {
     }
     assert.equal(changes, 6);
     view.flush(() => disable(true));
-    assert.equal(view.findAll('IconButton')[0].props.onPress, undefined);
+    assert.equal(view.findAll('IconButton')[0].props[handler], undefined);
     assert.equal(field.props.editable, false);
     assert.equal(field.props.value, nativeValue);
     assert.equal(nativeValue.get(), value);

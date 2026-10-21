@@ -18,6 +18,7 @@ their `expo-ui-` prefixes; Storybook links use `components-` or `forms-`.
 | Picker                            | `expo-ui-picker`, `expo-ui-picker-value`, `expo-ui-picker-reset`                                        |
 | List                              | `expo-ui-list-row-2`, `expo-ui-list-status`                                                             |
 | Skeleton                          | `skeleton-toggle-animation`, `skeleton-animation-state`                                                 |
+| Skeleton / Card                   | `skeleton-card`, `skeleton-card-avatar`, `skeleton-card-image`                                          |
 | Loading State                     | `loading-demo-title`, `loading-demo-content`, `loading-demo-complete`, `query-error`                    |
 | Toast                             | `toast-story-show`, `toast-story-state`, `toast-dismiss`                                                |
 | Login Form                        | `native-form-login`, `native-form-password`, `native-form-submit`, `native-form-submit-status`          |
@@ -27,3 +28,9 @@ Input validation errors append `-error`; hints append `-helper`. Closed sheets
 have no visible content selector. Native selector exposure must be verified on
 each platform. See the maintained `.maestro/components/` and `.maestro/forms/`
 flows for complete interaction sequences.
+
+Text exposes named typography and semantic tone stories. Button exposes Primary,
+Secondary, Tertiary, Link, Success, Warning, Destructive, Info and Glass, each using
+the existing `expo-ui-button` and `expo-ui-button-presses` selectors. Toast exposes
+Error, Success, Warning and Info with the same show/dismiss selectors. Use Controls
+to change theme and appearance within any variant.

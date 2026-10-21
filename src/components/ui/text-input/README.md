@@ -27,12 +27,16 @@ retain their surface and suppress editing and icon actions. Read-only editing
 and a separate icon action remain independent. Icon actions require an accessible
 label.
 
+The iOS icon action uses a plain SwiftUI Button with a fixed 48-point label and
+content shape. Its label retains its size next to the flexible editable field.
+Android uses the native 48dp Compose IconButton. Both suppress disabled actions.
+
 Native layout owns sizing. iOS uses plain TextField/SecureField styling and a
 48-point minimum surface; Android keeps its native minimum size. Password mode
 changes retain the same observable and ref. There is no width measurement,
 delayed rendering or remount to synchronize values.
 
-[Native stories](../../../../.rnstorybook/stories/expo-ui/text-input.stories.tsx)
+[Native stories](../../../../.rnstorybook/stories/components/text-input.stories.tsx)
 cover controlled strings, external updates/reset, default values, icons, focus,
 passwords, disabled/read-only states, themes and geometry. Standalone story
 previews supply a Host; the production input itself adds none. Existing Maestro

@@ -5,6 +5,7 @@ const titleKeys = {
   error: 'common.errorNotificationTitle',
   success: 'common.successNotificationTitle',
   warning: 'common.warningNotificationTitle',
+  info: 'common.infoNotificationTitle',
 } as const;
 
 /** All variants share geometry; only semantic feedback colors and heading change. */

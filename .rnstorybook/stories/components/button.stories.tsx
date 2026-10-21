@@ -55,7 +55,17 @@ const meta = {
     label: { control: 'text' },
     variant: {
       control: 'select',
-      options: ['primary', 'secondary', 'link', 'success', 'warning', 'destructive', 'glass'],
+      options: [
+        'primary',
+        'secondary',
+        'tertiary',
+        'link',
+        'success',
+        'warning',
+        'destructive',
+        'info',
+        'glass',
+      ],
     },
     fullWidth: { control: 'boolean' },
     borderRadius: { control: { type: 'number', min: 0 } },
@@ -91,6 +101,14 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Primary: Story = {};
+export const Secondary: Story = { args: { variant: 'secondary', label: 'Save for later' } };
+export const Tertiary: Story = { args: { variant: 'tertiary', label: 'Maybe later' } };
+export const Link: Story = { args: { variant: 'link', label: 'View details' } };
+export const Success: Story = { args: { variant: 'success', label: 'Confirm' } };
+export const Warning: Story = { args: { variant: 'warning', label: 'Review changes' } };
+export const Destructive: Story = { args: { variant: 'destructive', label: 'Delete recipe' } };
+export const Info: Story = { args: { variant: 'info', label: 'Learn more' } };
+export const Glass: Story = { args: { variant: 'glass', label: 'Open options' } };
 
 function InteractionDemo(args: UniversalButtonProps) {
   const [presses, setPresses] = useState(0);

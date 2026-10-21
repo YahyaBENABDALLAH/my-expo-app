@@ -7,45 +7,6 @@ env:
 - runFlow:
     file: ../helpers/open-story.yaml
     env:
-      STORY_ID: components-page-header--app-settings
-      READY_ID: app-settings-groups
-- assertVisible:
-    id: page-title
-- tapOn:
-    id: page-back
-- assertVisible:
-    id: settings-header-back-count
-    text: 'Back presses: 1'
-- swipe:
-    start: 50%, 70%
-    end: 50%, 35%
-- assertVisible:
-    id: page-title
-- tapOn:
-    id: page-back
-- assertVisible:
-    id: settings-header-back-count
-    text: 'Back presses: 2'
-- takeScreenshot: app-settings-header-blur-after-scroll
-- runFlow:
-    file: ../helpers/open-story.yaml
-    env:
-      STORY_ID: components-page-header--dark-app-settings
-      READY_ID: app-settings-groups
-- swipe:
-    start: 50%, 70%
-    end: 50%, 35%
-- assertVisible:
-    id: page-title
-- tapOn:
-    id: page-back
-- assertVisible:
-    id: settings-header-back-count
-    text: 'Back presses: 1'
-- takeScreenshot: dark-app-settings-header-blur-after-scroll
-- runFlow:
-    file: ../helpers/open-story.yaml
-    env:
       STORY_ID: components-page-header--default
       READY_ID: page-header-back-count
 - tapOn:

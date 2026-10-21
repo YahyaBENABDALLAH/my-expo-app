@@ -7,7 +7,7 @@ env:
 - runFlow:
     file: ../helpers/open-story.yaml
     env:
-      STORY_ID: components-bottom-sheet--closed
+      STORY_ID: components-bottom-sheet--fixed-content-height
       READY_ID: expo-ui-bottom-sheet-open
 - assertVisible:
     id: expo-ui-bottom-sheet-state

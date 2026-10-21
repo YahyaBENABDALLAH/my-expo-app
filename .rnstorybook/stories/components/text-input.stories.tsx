@@ -176,6 +176,8 @@ function IconInputDemo(args: TextInputProps) {
     <View style={{ gap: 20 }}>
       <InputPreview
         {...args}
+        leftIcon={searchIcon}
+        rightIcon={clearIcon}
         value={value}
         onChangeText={(text) => {
           setValue(text);
@@ -212,8 +214,6 @@ export const ClickableRightIcon: Story = {
     label: 'Search',
     placeholder: 'Search recipes',
     defaultValue: 'Soup',
-    leftIcon: searchIcon,
-    rightIcon: clearIcon,
     rightIconAccessibilityLabel: 'Clear search',
     helperText: 'Compact icon action: tap to clear. Disable the field to check action suppression.',
   },

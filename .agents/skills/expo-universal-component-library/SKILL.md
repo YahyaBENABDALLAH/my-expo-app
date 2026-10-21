@@ -19,7 +19,7 @@ Apply the sibling [mobile UI requirements](../expo-mobile-ui-only/SKILL.md): iOS
 ## Theme and Storybook contract
 
 - Follow [theme-token guidance](references/theme.md). Use existing semantic tokens, preserve native control geometry and feedback, and document differences between iOS and Android.
-- Require a semantic variant at every project button call. `UniversalButton` and `UniversalButtonContent` support `primary`, `secondary`, `link`, `success`, `warning` and `destructive`; never provide a fallback variant or revive legacy size/rounded props. Use native icon/navigation adapters for their specialized native controls.
+- Require a semantic variant at every project button call. Follow [the button skill](../foodiya-ui-button/SKILL.md) for current variants, props, Host ownership and composition examples; never provide a fallback variant or revive legacy size/rounded props. Use native icon/navigation adapters for their specialized native controls.
 - Let content inherit its owning `UniversalHost` color scheme through `useHostColorScheme`, with an explicit component override when requested. Deterministic light/dark stories must not silently read the device theme.
 - Loading uses native `LoadingIndicator` platform adapters, `LoadingContent` inside a Host and `LoadingScreen` at a route/Suspense boundary. Exercise disabled, offline, initial failure, empty success, cached refresh and refresh failure in composition stories.
 - Every new or changed reusable component must have a discoverable native Storybook story. Infrastructure and compound slots may use a focused composition story rather than standalone wrappers.

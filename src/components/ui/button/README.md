@@ -22,15 +22,17 @@ renderer.
 | `colorScheme`                    | Standalone Host appearance. Hosted content inherits its owning Host.                                                                   |
 | `cornerRadii`                    | Standalone physical corners: `topLeft`, `topRight`, `bottomLeft`, `bottomRight`. Overrides `borderRadius`; omitted corners are square. |
 
-`primary`, `success`, `warning` and `destructive` use filled/prominent buttons.
-`secondary` uses outlined/bordered and `link` uses text/plain. Destructive also
+`primary`, `success`, `warning`, `info` and `destructive` use filled/prominent buttons.
+`secondary` uses outlined/bordered; `tertiary` and `link` use text/plain.
+Tertiary uses the shared muted foreground when semantic colors are applied;
+link uses the theme tint. Info uses the existing info/onInfo token pair. Destructive also
 sets the native iOS role. `glass` uses
 [`buttonStyle('glass')`](https://docs.expo.dev/versions/v57.0.0/sdk/ui/swift-ui/button/)
 on iOS 26+, automatic native styling on older iOS, and outlined Material on Android.
 
 Brand themes retain native colors unless callers supply overrides. UX Template
 uses existing semantic token pairs when both color props are omitted: black/white
-primary, neutral secondary/link/glass, and paired status colors. Supplying either
+primary, neutral secondary/tertiary/link/glass, and paired status colors. Supplying either
 color prop skips those defaults. Hosted content follows `useHostColorScheme`;
 standalone controls use their explicit scheme. `semantic-button-colors.ts` shares
 the token mapping with previews. Native controls own feedback and disabled styling.
@@ -52,7 +54,7 @@ native button, without adding a surface or Host.
 />
 ```
 
-[Native stories](../../../../.rnstorybook/stories/expo-ui/button.stories.tsx)
+[Native stories](../../../../.rnstorybook/stories/components/button.stories.tsx)
 cover variants, appearance, disabled actions, rounding, diagonal corners and
 observable press counts. Controls expose width, radius, padding and colors.
 UX stories exercise component defaults; other theme previews pass semantic pairs

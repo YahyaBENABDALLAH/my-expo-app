@@ -15,6 +15,7 @@ const toastIcons = {
   error: require('@expo/material-symbols/error.xml'),
   success: require('@expo/material-symbols/check_circle.xml'),
   warning: require('@expo/material-symbols/warning.xml'),
+  info: require('@expo/material-symbols/info.xml'),
 };
 
 export function Toast({ variant, message, title, onDismiss, colorScheme }: ToastProps) {

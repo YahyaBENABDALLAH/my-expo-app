@@ -24,7 +24,7 @@ export function NativeButtonContent({
 }: UniversalButtonContentProps) {
   let NativeButton = Button;
   if (variant === 'secondary' || variant === 'glass') NativeButton = OutlinedButton;
-  if (variant === 'link') NativeButton = TextButton;
+  if (variant === 'tertiary' || variant === 'link') NativeButton = TextButton;
   const filled = NativeButton === Button;
   return (
     <NativeButton

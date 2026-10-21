@@ -157,9 +157,11 @@ for (const platform of ['ios', 'android']) {
       for (const variant of [
         'primary',
         'secondary',
+        'tertiary',
         'link',
         'success',
         'warning',
+        'info',
         'destructive',
         'glass',
       ]) {
@@ -167,15 +169,20 @@ for (const platform of ['ios', 'android']) {
         const button = s.buttons.at(-1);
         const color = accent(button, platform);
         const [, red, green, blue] = color.match(/^#(..)(..)(..)/);
-        const statusRole = { success: 'success', warning: 'warning', destructive: 'error' }[
-          variant
-        ];
+        const statusRole = {
+          success: 'success',
+          warning: 'warning',
+          info: 'info',
+          destructive: 'error',
+        }[variant];
         if (statusRole) {
           assert.equal(color, s.uxColors[scheme][statusRole]);
-          assert.ok(
-            red !== green || green !== blue,
-            `${scheme}/${variant} must have a status color`,
-          );
+          if (statusRole !== 'info') {
+            assert.ok(
+              red !== green || green !== blue,
+              `${scheme}/${variant} must have a status color`,
+            );
+          }
           const label =
             platform === 'android'
               ? button.colors.contentColor
@@ -189,10 +196,10 @@ for (const platform of ['ios', 'android']) {
         button[handler]();
       }
     }
-    assert.equal(presses, 14);
+    assert.equal(presses, 18);
     s.render({ variant: 'primary', disabled: true, onPress: () => presses++ });
     assert.equal(s.buttons.at(-1)[handler], undefined);
-    assert.equal(presses, 14);
+    assert.equal(presses, 18);
   });
 
   test(`${platform}: diagonal corners clip the existing Host and preserve native activation`, () => {
@@ -340,9 +347,11 @@ for (const platform of ['ios', 'android']) {
       'glass',
       'primary',
       'secondary',
+      'tertiary',
       'link',
       'success',
       'warning',
+      'info',
       'destructive',
     ]) {
       s.render({ variant });
@@ -350,7 +359,17 @@ for (const platform of ['ios', 'android']) {
     if (platform === 'android') {
       assert.deepEqual(
         s.buttons.map(({ kind }) => kind),
-        ['OutlinedButton', 'Button', 'OutlinedButton', 'TextButton', 'Button', 'Button', 'Button'],
+        [
+          'OutlinedButton',
+          'Button',
+          'OutlinedButton',
+          'TextButton',
+          'TextButton',
+          'Button',
+          'Button',
+          'Button',
+          'Button',
+        ],
       );
       assert.ok(s.buttons.every(({ colors }) => colors === undefined));
     } else {
@@ -363,6 +382,8 @@ for (const platform of ['ios', 'android']) {
           'borderedProminent',
           'bordered',
           'plain',
+          'plain',
+          'borderedProminent',
           'borderedProminent',
           'borderedProminent',
           'borderedProminent',

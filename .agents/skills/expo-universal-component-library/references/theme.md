@@ -19,7 +19,7 @@ application styling and compatibility, but standard controls no longer map them.
 - `src/components/ui/host/types.ts`: shared `colorScheme`, `seedColor`, and `testID` props.
 - `src/components/ui/host/universal-host.tsx`: native Host wrapper, scheme selection, and sizing defaults.
 
-Buttons use native colors and Host appearance by default. Callers can pass existing theme tokens as explicit color overrides; the button layer has no theme hook or token lookup.
+Brand-theme buttons retain native colors unless callers supply overrides. UX buttons resolve semantic token pairs through the existing button color hook. Follow [the button color contract](../../foodiya-ui-button/references/props-and-styling.md) for the exact mapping and override precedence.
 
 ## Token contract
 
@@ -29,9 +29,9 @@ Host `colorScheme` selects appearance. Host `seedColor` derives Android Material
 
 Buttons preserve native colors, shape, padding, clickable bounds, disabled treatment and feedback unless a caller supplies an override. Do not paint a larger outer background around a smaller native clickable control. Legacy size/rounded props have been removed.
 
-Every `UniversalButton` or `UniversalButtonContent` call requires `variant`: `primary` uses the native filled style, `secondary` uses outlined/bordered, and `link` uses text/plain. `success`, `warning`, and `destructive` use the filled style with semantic colors supplied explicitly by callers; iOS destructive buttons also have the native destructive role. Optional `color` and `contentColor` pass directly to native controls. Omitted colors, padding and radius retain native defaults. There is no button theme hook, palette context, token lookup, generated color, measurement or sizing calculation. Native disabled colors/opacity and press feedback remain platform-owned. Specialized icon and navigation buttons keep their explicitly selected native style.
+Every `UniversalButton` or `UniversalButtonContent` call requires `variant`. Use [the button skill](../../foodiya-ui-button/SKILL.md) for the current nine variants, native style mapping and supported geometry. Native disabled colors/opacity and press feedback remain platform-owned. Specialized icon and navigation buttons keep their explicitly selected native style.
 
-`UniversalHost` provides its resolved scheme through React context for styled text and loading content that use `useHostColorScheme`. Buttons inherit appearance directly from the native Host. `UniversalButton` owns a plain Expo UI Host at an RN boundary with an optional light/dark override; `UniversalButtonContent` composes within an existing Host and has no scheme prop. Full-width buttons make the label/native surface fill together; inline buttons keep native intrinsic size.
+`UniversalHost` provides its resolved scheme through React context for styled text, loading content and button token resolution through `useHostColorScheme`. Native appearance also follows the owning native Host. `UniversalButton` owns a plain Expo UI Host at an RN boundary with an optional light/dark override; `UniversalButtonContent` composes within an existing Host and has no scheme prop. Full-width buttons make the label/native surface fill together; inline buttons keep native intrinsic size.
 
 ## Documentation and story requirements
 

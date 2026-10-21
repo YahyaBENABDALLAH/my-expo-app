@@ -7,12 +7,16 @@ export function semanticButtonColors(variant: UniversalButtonVariant, colors: Co
       return { color: colors.primary, contentColor: colors.onPrimary };
     case 'secondary':
       return { color: colors.secondary, contentColor: colors.secondary };
+    case 'tertiary':
+      return { color: colors.muted, contentColor: colors.muted };
     case 'link':
       return { color: colors.tint, contentColor: colors.tint };
     case 'success':
       return { color: colors.success, contentColor: colors.onSuccess };
     case 'warning':
       return { color: colors.warning, contentColor: colors.onWarning };
+    case 'info':
+      return { color: colors.info, contentColor: colors.onInfo };
     case 'destructive':
       return { color: colors.error, contentColor: colors.onError };
     case 'glass':

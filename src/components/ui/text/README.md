@@ -5,12 +5,19 @@ Exports: `UniversalText`, `UniversalTextContent`, their public types and
 
 Implementation: `universal-text.tsx`. Use the standalone component at an RN
 boundary and content inside an existing Host. Supported semantic variants are
-`heading`, `title`, `body` and `caption`. Omit variant/font props to keep native typography; no line height is calculated. Text color still uses the shared theme, with explicit textStyle/lightColor/darkColor overrides.
+`heading`, `title`, `subtitle`, `body`, `label` and `caption`. Omit variant/font
+props to keep native typography; no line height is calculated.
+
+`tone` independently selects a semantic foreground: `default` (the `text` token),
+`muted`, `primary`, `secondary`, `success`, `warning`, `error` or `info`.
+Explicit `lightColor`/`darkColor` overrides take priority over the tone;
+`textStyle.color` takes priority over both. Font size and weight overrides retain
+their existing priority over the typography preset.
 
 Content inherits its Host's scheme unless explicitly overridden. Keep labels
 translated by callers and shared typography/theme roles in the existing tokens.
 
-Existing composition story: [text.stories.tsx](../../../../.rnstorybook/stories/expo-ui/text.stories.tsx).
+Named typography and semantic tone stories: [text.stories.tsx](../../../../.rnstorybook/stories/components/text.stories.tsx).
 
 Import public components from `@components/ui`; UI implementations import
 concrete files directly. [Back to the UI guide](../README.md).

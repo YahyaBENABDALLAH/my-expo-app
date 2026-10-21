@@ -15,10 +15,8 @@ import { useState } from 'react';
 import { View } from 'react-native';
 import { SafeAreaInsetsContext, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useThemeColors } from '@/hooks/use-theme';
-import { SettingsPage } from '@/features/settings/settings-screen';
 import { LayoutDirectionProvider } from '@/context/layout-direction.context';
 import { spacing, radii } from '@/constants/layout';
-import { useThemeSettings } from '@/context/theme.context';
 import { DEFAULT_HEADER_SHAPE, HEADER_SHAPES } from '@/constants/header-motion';
 
 function HeaderContent({
@@ -124,14 +122,13 @@ const meta = {
   decorators: [
     (Story, { args, parameters }) => {
       const colors = useThemeColors(args.colorScheme);
-      const { headerShape } = useThemeSettings();
       return (
         <LayoutDirectionProvider initialDirection={parameters.waveDirection ?? 'ltr'}>
           <SafeAreaInsetsContext.Provider value={{ top: 59, bottom: 34, left: 0, right: 0 }}>
             <View style={{ flex: 1, backgroundColor: colors.background }}>
               <PageMotionOverlay
                 colorScheme={args.colorScheme}
-                shape={parameters.settingsPreview ? headerShape : args.shape}
+                shape={args.shape}
                 animate={parameters.animateWaves !== false}
                 visible={!parameters.withoutWaves}
                 expanded={Boolean(parameters.expandedWaves)}
@@ -206,37 +203,3 @@ export const ExpandedLogin: Story = {
   args: { title: 'Login', showBack: false },
   parameters: { expandedWaves: true },
 };
-export const AnimatedLtr: Story = {
-  args: { title: 'Animated waves', scrollsBehindHeader: true },
-  parameters: { animateWaves: true, waveDirection: 'ltr' },
-};
-export const AnimatedRtl: Story = {
-  ...AnimatedLtr,
-  parameters: { animateWaves: true, waveDirection: 'rtl' },
-};
-
-function SettingsHeaderDemo() {
-  const [presses, setPresses] = useState(0);
-  return (
-    <View style={{ flex: 1 }}>
-      <SettingsPage language="fr" onBack={() => setPresses((value) => value + 1)} />
-      <UniversalHost ignoreSafeArea="all">
-        <Text testID="settings-header-back-count">{`Back presses: ${presses}`}</Text>
-      </UniversalHost>
-    </View>
-  );
-}
-
-export const AppSettings: Story = {
-  render: () => <SettingsHeaderDemo />,
-  parameters: {
-    settingsPreview: true,
-    docs: {
-      description: {
-        story:
-          'Scroll the native settings form beneath the wave-shaped blur. The initial title clearance scrolls with the account section; the title and back action stay sharp.',
-      },
-    },
-  },
-};
-export const DarkAppSettings: Story = { ...AppSettings, args: { colorScheme: 'dark' } };

@@ -33,7 +33,7 @@ export function NativeButtonContent({
 }: UniversalButtonContentProps) {
   let style: Parameters<typeof buttonStyle>[0] = 'borderedProminent';
   if (variant === 'secondary') style = 'bordered';
-  if (variant === 'link') style = 'plain';
+  if (variant === 'tertiary' || variant === 'link') style = 'plain';
   if (variant === 'glass') style = 'glass';
   const labelColor = contentColor ?? (style === 'borderedProminent' ? undefined : color);
   return (

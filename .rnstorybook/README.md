@@ -7,6 +7,10 @@ Two groups:
 
 Use **Controls** for theme, light/dark appearance, disabled states and other
 props. Separate stories are kept for interactions that need their own setup.
+Text, Button and Toast also expose named semantic variants for quick discovery.
+Skeleton includes line, avatar, image and card placeholders. Icon and Floating
+Action demos, the closed-only sheet, and Page Header's animated LTR/RTL and
+Settings previews are intentionally excluded.
 Forms use local fixtures and never send credentials to a backend.
 
 Run `npm run storybook` and open the app's Storybook tab. After adding or moving

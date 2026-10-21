@@ -97,6 +97,15 @@ export function DevelopmentPagesScreen() {
                 },
               ] as const)
             : []),
+          ...(appDevEnabled
+            ? ([
+                {
+                  label: t('showcase.buttons'),
+                  testID: 'page-action-buttons',
+                  href: { pathname: '/ui-component/[name]', params: { name: 'buttons' } },
+                },
+              ] as const)
+            : []),
           { label: t('common.home'), testID: 'page-action-home', href: '/' },
           { label: t('common.search'), testID: 'page-action-search', href: '/search' },
           {

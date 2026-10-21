@@ -35,11 +35,13 @@ static appearance.
 The development Home examples' static preview disappears ten seconds after mounting. That isolated
 timeout stays with the Home feature and does not restart on refresh/focus.
 
-Existing composition story: [skeleton.stories.tsx](../../../../.rnstorybook/stories/expo-ui/skeleton.stories.tsx).
+Native stories: [skeleton.stories.tsx](../../../../.rnstorybook/stories/components/skeleton.stories.tsx).
+`Line`, `Avatar` and `ImagePlaceholder` expose flat, circular and rectangular
+placeholders using the existing dimensions/radius API. `Card` composes a static
+avatar, image and text placeholders inside one Host.
 `AnimationControls` exercises standalone CSS pause/resume, custom opacity and fill
-width alongside static hosted content. `ReferenceCard` composes static native
-placeholders. The render regressions verify zero timers and time-driven renders;
-device rendering and timing must also be checked on iOS and Android.
+width alongside static hosted content. Device rendering and timing must also be
+checked on iOS and Android.
 
 The Home recipe-card composition story uses `HomeRecipeSkeletons` for two static
 cards inside its existing Host. Current product Home renders a sample catalog.

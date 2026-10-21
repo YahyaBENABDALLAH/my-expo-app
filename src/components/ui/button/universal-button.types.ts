@@ -3,9 +3,11 @@ import type { ReactNode } from 'react';
 export type UniversalButtonVariant =
   | 'primary'
   | 'secondary'
+  | 'tertiary'
   | 'link'
   | 'success'
   | 'warning'
+  | 'info'
   | 'destructive'
   /** Native glass on iOS 26+; native automatic on older iOS, outlined on Android. */
   | 'glass';

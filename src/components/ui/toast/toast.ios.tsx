@@ -26,6 +26,7 @@ const toastIcons = {
   error: 'exclamationmark.circle.fill',
   success: 'checkmark.circle.fill',
   warning: 'exclamationmark.triangle.fill',
+  info: 'info.circle.fill',
 } as const;
 
 export function Toast({ variant, message, title, onDismiss, colorScheme }: ToastProps) {

@@ -1,5 +1,9 @@
 # Universal component catalog
 
+For the current button API, variants, Host composition and examples, use
+[the authored button skill](../../foodiya-ui-button/SKILL.md) and current source.
+Older dated verification entries below describe their historical implementation.
+
 ## Home giveaway ribbon (2026-10-21)
 
 `HomeCatalogCard` keeps its universal Expo UI Column/Text composition. Its status

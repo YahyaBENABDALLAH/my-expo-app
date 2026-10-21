@@ -3,11 +3,15 @@ import type { TextProps, UniversalFontWeight } from '@expo/ui';
 import { useThemeColors } from '@/hooks/use-theme';
 import { UniversalHost, useHostColorScheme } from '../host/universal-host';
 
-export type UniversalTextVariant = 'heading' | 'title' | 'body' | 'caption';
+export type UniversalTextVariant = 'heading' | 'title' | 'subtitle' | 'body' | 'label' | 'caption';
+export type UniversalTextTone =
+  'default' | 'muted' | 'primary' | 'secondary' | 'success' | 'warning' | 'error' | 'info';
 export type UniversalTextColorScheme = 'light' | 'dark';
 
 export interface UniversalTextProps extends TextProps {
   variant?: UniversalTextVariant;
+  /** Semantic foreground from the active theme; independent of typography. */
+  tone?: UniversalTextTone;
   fontWeight?: UniversalFontWeight;
   fontSize?: number;
   lightColor?: string;
@@ -21,7 +25,9 @@ const variants: Record<
 > = {
   heading: { fontSize: 36, fontWeight: '700' },
   title: { fontSize: 26, fontWeight: '600' },
+  subtitle: { fontSize: 20, fontWeight: '500' },
   body: { fontSize: 16, fontWeight: '400' },
+  label: { fontSize: 14, fontWeight: '600' },
   caption: { fontSize: 13, fontWeight: '400' },
 };
 
@@ -39,6 +45,7 @@ export function UniversalText({ colorScheme, ...props }: UniversalTextProps) {
 /** Native text for composition inside an existing Host. */
 export function UniversalTextContent({
   variant,
+  tone = 'default',
   fontWeight,
   fontSize,
   lightColor,
@@ -59,7 +66,9 @@ export function UniversalTextContent({
       textStyle={{
         ...(size === undefined ? {} : { fontSize: size }),
         ...(weight === undefined ? {} : { fontWeight: weight }),
-        color: (activeColorScheme === 'dark' ? darkColor : lightColor) ?? colors.text,
+        color:
+          (activeColorScheme === 'dark' ? darkColor : lightColor) ??
+          colors[tone === 'default' ? 'text' : tone],
         ...textStyle,
       }}
     />
