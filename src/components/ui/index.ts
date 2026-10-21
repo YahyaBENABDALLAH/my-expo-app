@@ -16,6 +16,7 @@ export * from './appearance/color-scheme-control';
 export * from './appearance/language-picker';
 export * from './appearance/layout-direction-control';
 export * from './appearance/theme-picker';
+export * from './appearance/header-motion-picker';
 export * from './aurora-background/aurora-background';
 export * from './auth/auth-input-icons';
 export * from './auth/auth-screen-frame';

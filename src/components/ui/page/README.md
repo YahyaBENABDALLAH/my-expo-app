@@ -22,20 +22,27 @@ item starts below the title and can scroll behind it. Content mounts before the
 blur and supplies a `BlurTargetView` reference for Android that excludes the title
 and back button. The mask sits below those controls so they stay sharp.
 
-`PageMotionOverlay` wraps root navigation with `PageWaveContext`, sharing the same
-cached paths and UI-thread transforms between the visible artwork and the
-platform blur mask. Header artwork and both blur masks are absolutely positioned.
-SVG height, drift, expansion and visibility add no padding, margin, header height
-or content clearance. Only the actual title/back row and system safe area determine
-the measured header inset. The wave remains decorative when expanded on Login.
-The focused frame supplies its measured header height, including safe area and
-scaled title text. Collapsed artwork and SVG mask bounds match that height. Both
-paths keep their leading section at full header height; only their trailing
-curves vary in opposite phases. RTL mirrors the artwork so the steady section
-stays beneath the title and back button. No second animation loop or per-frame
-React updates are needed. Outside the two wave silhouettes the header is clear.
-The wave clock accumulates active frame time instead of restarting a repeating
-animation. Replacing a page's mask joins the current phase; backgrounding, Reduce
+`PageMotionOverlay` wraps root navigation with `PageWaveContext`. The header uses
+original cubic vector artwork with independently moving control points. The leading
+40% stays level beneath the title/back button; only the trailing surface deforms.
+Smoke has curling translucent wisps, water has traveling swells and fine highlights,
+and rain has twelve staggered falling drops with spreading impact ripples. Waves,
+ribbon and dunes use their own speeds and spatial deformation. Smoke is the default.
+The shared active-time clock drives all paths on the UI thread. Skia uses numeric
+`usePathValue` builders without SVG parsing; the iOS native material mask receives
+animated SVG `d` values from the same control points. Android uses the same Skia
+paths for its mask. No animation frame sets React state. RTL mirrors the whole
+artwork. The header stays within its measured bounds and adds no content spacing.
+Settings → Appearance → Header motion uses a native menu picker to select an effect.
+The change is immediate throughout the app and is saved in AsyncStorage. Restoration
+finishes beneath the launch screen; invalid/unavailable storage falls back to smoke.
+Storybook's local preference provider never reads or writes this saved preference.
+Static SVG counterparts are in `assets/images/header-motion/`; production animates
+those vector contours and details through the shared geometry helpers.
+`Components/Page Header` offers all six shapes in Controls. Its AppSettings story
+also exercises the picker against the local header. `animate={false}` freezes all
+surface and detail motion; the live accessibility/app-activity guards do the same.
+The clock accumulates active frame time and wraps seamlessly after 120 seconds. Replacing a page's mask joins the current phase; backgrounding, Reduce
 Motion, explicit pause and visibility changes retain that phase. Resume excludes
 paused time, and a delayed frame advances by at most 64 ms to avoid a sudden jump.
 The optional `children` slot supplies this context to local previews; `visible`
@@ -105,28 +112,14 @@ with the text. Long titles retain their natural height. Back actions keep their
 48-point native touch area. The Page Header
 story's `showBack` control compares both states; `Home` opens the Accueil case.
 `page-motion-overlay.tsx` contains the shared animated top-edge wave artwork.
-Its two SVG paths are cached for window/header size, shape and splash variant. Animation updates transforms,
-with no path parsing or React state update per frame.
-Its default `overlay` variant decorates headers; `variant="splash"` places the
-original moving paths in normal flow with opaque fills for the launch screen's bottom
-edge. The splash retains the exported 80-point `PAGE_WAVE_HEIGHT`; headers use
-their measured height. Both retain the same motion guards.
-The back wave resolves theme opacity first; the splash keeps full opacity.
-Header paths use a 1000-by-100 design space. The leading 40% sits at full height;
-the trailing cubic curves scale between 60% and 100% of their depth around that
-fixed baseline, in opposite phases on an 8-second cycle. Horizontal stretching
-is anchored to the 40% junction, so the animated curves never enter the leading
-section. Extended closing edges cover the full viewport. Artwork and both blur masks share these
-transforms, including both scales in the iOS SVG matrix. `AnimatedLtr`,
-`AnimatedRtl` and `LongTitle` in the header stories cover the new geometry;
-motion checks exercise resizing, fixed leading height, opposite depths,
-60/120-Hz timing, direction changes and pause/resume without per-frame React work.
-`PageMotionOverlay` accepts `shape="waves"` (default), `shape="ribbon"` or
-`shape="dunes"`. Waves have repeating crests/troughs; ribbon has broad flowing
-folds; dunes have gentle rolling contours. All variants share the measured header
-height, 40% junction, theme colors and motion guards. The Page Header story's
-`shape` control previews all three with the same title/back controls. Splash
-keeps its original paths regardless of `shape`.
+Its header geometry deforms on the UI thread; splash artwork alone retains its
+cached paths and original opposite drift. The default `overlay` variant is absolute,
+while `variant="splash"` keeps the 80-point launch reveal edge in normal flow.
+Both variants retain motion guards. Login expansion and its one-second collapse
+keep artwork and native masks aligned and release extended bounds on completion.
+The optional `shape` prop overrides the shared `DEFAULT_HEADER_SHAPE` in
+`src/constants/header-motion.ts`. Root navigation passes the saved preference.
+Splash retains its original artwork regardless of this preference.
 Header layers share the theme's tint with
 a gentle 20% gradient fade for a more consistent color across the filled area.
 `Pages/Shared Skia motion/NavigationContinuity` replaces Home, Search and Saved

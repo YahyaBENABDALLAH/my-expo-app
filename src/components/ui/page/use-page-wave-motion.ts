@@ -1,6 +1,7 @@
 import { useLayoutDirection } from '@/context/layout-direction.context';
 import { useMotionEnabled } from '@/hooks/use-motion-enabled';
-import { Skia, vec } from '@shopify/react-native-skia';
+import { DEFAULT_HEADER_SHAPE } from '@/constants/header-motion';
+import { Skia, usePathValue, vec } from '@shopify/react-native-skia';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useWindowDimensions } from 'react-native';
 import {
@@ -14,7 +15,14 @@ import {
   withTiming,
 } from 'react-native-reanimated';
 import { scheduleOnRN } from 'react-native-worklets';
-import { HEADER_CURVE_START, headerShapeCurves, type PageHeaderShape } from './page-header-shapes';
+import {
+  drawVectorPath,
+  headerContour,
+  HEADER_MOTION_PERIOD,
+  vectorPathToSvg,
+  type PageHeaderShape,
+} from './page-header-shapes';
+import { headerDetails } from './page-header-details';
 
 export const PAGE_WAVE_HEIGHT = 80;
 const HEADER_WAVE_WIDTH = 1000;
@@ -27,7 +35,7 @@ export function usePageWaveMotion({
   animate,
   expanded,
   splash,
-  shape = 'waves',
+  shape = DEFAULT_HEADER_SHAPE,
   onCollapseComplete,
 }: {
   animate: boolean;
@@ -48,27 +56,43 @@ export function usePageWaveMotion({
   const scaleY = splash ? SPLASH_SCALE_Y : waveHeight / HEADER_WAVE_HEIGHT;
   const expandedOffset = Math.max(0, height * 0.35 - waveHeight / 2);
   const target = expanded && !splash ? expandedOffset : 0;
-  const { frontWave, backWave, frontSvg, backSvg } = useMemo(() => {
-    // Each header path has a steady leading section and a variable trailing curve.
-    // Closing above the screen keeps expanded Login filled throughout the motion.
-    const fillEdge = -height / scaleY;
-    const curves = headerShapeCurves[shape];
-    const start = `M-100 100H${HEADER_CURVE_START}`;
-    const close = `V${fillEdge}H-100Z`;
-    const frontSvg = splash
-      ? 'M0-204c43 28 300-30 423 18s358 8 586 59 351 183 578 38V0H0Z'
-      : `${start}${curves.front}${close}`;
-    const backSvg = splash
-      ? 'M0-204c43 28 300-30 423 18s374-34 586 59 334-143 630-1V0H0Z'
-      : `${start}${curves.back}${close}`;
-    return {
-      frontSvg,
-      backSvg,
-      frontWave: Skia.Path.MakeFromSVGString(frontSvg)!,
-      backWave: Skia.Path.MakeFromSVGString(backSvg)!,
-    };
-  }, [height, scaleY, shape, splash]);
+  const splashPaths = useMemo(
+    () =>
+      splash
+        ? {
+            front: Skia.Path.MakeFromSVGString(
+              'M0-204c43 28 300-30 423 18s358 8 586 59 351 183 578 38V0H0Z',
+            )!,
+            back: Skia.Path.MakeFromSVGString(
+              'M0-204c43 28 300-30 423 18s374-34 586 59 334-143 630-1V0H0Z',
+            )!,
+          }
+        : null,
+    [splash],
+  );
   const phase = useSharedValue(0);
+  const fillEdge = -height / scaleY;
+  const frontContour = useDerivedValue(() => headerContour(shape, phase.get(), 0, fillEdge));
+  const backContour = useDerivedValue(() => headerContour(shape, phase.get(), 1, fillEdge));
+  const frontWave = usePathValue((builder) => {
+    'worklet';
+    if (splashPaths) builder.addPath(splashPaths.front);
+    else drawVectorPath(builder, frontContour.get());
+  });
+  const backWave = usePathValue((builder) => {
+    'worklet';
+    if (splashPaths) builder.addPath(splashPaths.back);
+    else drawVectorPath(builder, backContour.get());
+  });
+  const detailWave = usePathValue((builder) => {
+    'worklet';
+    if (!splash) drawVectorPath(builder, headerDetails(shape, phase.get()));
+  });
+  const detailOpacity = useDerivedValue(() =>
+    shape === 'smoke' ? 0.16 + 0.05 * Math.sin((phase.get() * Math.PI) / 6) : 0.28,
+  );
+  const frontSvg = useDerivedValue(() => vectorPathToSvg(frontContour.get()));
+  const backSvg = useDerivedValue(() => vectorPathToSvg(backContour.get()));
   const width = useSharedValue(0);
   const offset = useSharedValue(target);
 
@@ -105,7 +129,7 @@ export function usePageWaveMotion({
       // Activation starts with a null delta, so paused time never advances the wave.
       if (timeSincePreviousFrame === null) return;
       const elapsed = Math.min(timeSincePreviousFrame, 64);
-      phase.set((value) => (value + (elapsed / WAVE_DURATION_MS) * 2 * Math.PI) % (2 * Math.PI));
+      phase.set((value) => (value + elapsed / 1000) % HEADER_MOTION_PERIOD);
     },
     [phase],
   );
@@ -127,40 +151,31 @@ export function usePageWaveMotion({
   const gradientStart = useDerivedValue(() =>
     vec(0, splash ? -(offset.get() + PAGE_WAVE_HEIGHT) / scaleY : -offset.get() / scaleY),
   );
+  // Header paths deform locally. Only the splash retains its original rigid drift.
   const frontDrift = useDerivedValue(() => {
-    const movement = Math.sin(phase.get());
-    const depth = splash ? 1 : 0.8 + movement * 0.2;
-    const stretch = splash ? 1 : 1 + movement * 0.08;
+    const movement = Math.sin(((phase.get() * 1000) / WAVE_DURATION_MS) * 2 * Math.PI);
     return [
-      // Scale around the junction so motion cannot enter the leading 40%.
-      {
-        translateX: splash
-          ? movement * 40 * horizontalDirection
-          : HEADER_CURVE_START * (1 - stretch),
-      },
-      { translateY: splash ? movement * 2 : HEADER_WAVE_HEIGHT * (1 - depth) },
-      { scaleY: depth },
-      { scaleX: stretch },
+      { translateX: splash ? movement * 40 * horizontalDirection : 0 },
+      { translateY: splash ? movement * 2 : 0 },
+      { scaleY: 1 },
+      { scaleX: 1 },
     ];
   });
   const backDrift = useDerivedValue(() => {
-    const movement = Math.sin(phase.get());
-    const depth = splash ? 1 : 0.8 - movement * 0.2;
-    const stretch = splash ? 1 : 1 - movement * 0.1;
+    const movement = Math.sin(((phase.get() * 1000) / WAVE_DURATION_MS) * 2 * Math.PI);
     return [
-      {
-        translateX: splash
-          ? -movement * 50 * horizontalDirection
-          : HEADER_CURVE_START * (1 - stretch),
-      },
-      { translateY: splash ? -movement * 3 : HEADER_WAVE_HEIGHT * (1 - depth) },
-      { scaleY: depth },
-      { scaleX: stretch },
+      { translateX: splash ? -movement * 50 * horizontalDirection : 0 },
+      { translateY: splash ? -movement * 3 : 0 },
+      { scaleY: 1 },
+      { scaleX: 1 },
     ];
   });
 
   return useMemo(
     () => ({
+      shape,
+      detailWave,
+      detailOpacity,
       frontWave,
       backWave,
       frontSvg,
@@ -176,6 +191,9 @@ export function usePageWaveMotion({
       overlayHeight: waveHeight + (!splash && (expanded || expandedSurface) ? expandedOffset : 0),
     }),
     [
+      shape,
+      detailWave,
+      detailOpacity,
       frontWave,
       backWave,
       frontSvg,

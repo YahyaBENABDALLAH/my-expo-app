@@ -8,6 +8,7 @@ function setup(platform = 'ios') {
   const native = (type) => (props) => h(type, props, props.children);
   const SafeAreaInsetsContext = createContext({ top: 59, bottom: 34, left: 44, right: 0 });
   const PageWaveContext = createContext(null);
+  const DirectionContext = createContext('ltr');
   const listeners = new Set();
   const mocks = {
     'expo-router': {
@@ -15,6 +16,9 @@ function setup(platform = 'ios') {
       useFocusEffect: useEffect,
     },
     '@/constants/app-dev': { appDevEnabled: true },
+    '@/context/layout-direction.context': {
+      useLayoutDirection: () => useContext(DirectionContext),
+    },
     'react-native': {
       View: native('View'),
       Platform: { OS: platform },
@@ -64,11 +68,13 @@ function setup(platform = 'ios') {
     FieldGroup,
     Icon,
     BottomSheet: ({ isPresented, children, ...props }) =>
-      h('Sheet', props, isPresented ? children : null),
+      h('Sheet', { ...props, isPresented }, isPresented ? children : null),
+    PageSection: native('PageSection'),
     Column: native('Column'),
     Row: native('Row'),
     Switch: native('Switch'),
     ThemePicker: native('ThemePicker'),
+    HeaderMotionPicker: native('HeaderMotionPicker'),
     ColorSchemeControl: native('ColorSchemeControl'),
     UniversalButtonContent: native('Button'),
     UniversalHost: native('Host'),
@@ -85,6 +91,7 @@ function setup(platform = 'ios') {
     ...frame,
     load,
     SafeAreaInsetsContext,
+    DirectionContext,
     PageWaveContext,
     reduceTransparency: (value) => listeners.forEach((listener) => listener(value)),
   };
@@ -328,3 +335,73 @@ test('titleless auth frames keep their existing layout and explicit blur opt-out
     assert.equal(headerArea(fixture).props.style.position, undefined);
   }
 });
+
+for (const platform of ['ios', 'android']) {
+  test(`${platform}: language direction changes refresh only the affected Settings host and retain the page and language sheet`, (t) => {
+    const s = setup(platform);
+    const { SettingsPage } = s.load('features/settings/settings-screen.tsx');
+    let changeLanguage,
+      backs = 0;
+    function Screen() {
+      const [language, setLanguage] = useState('en');
+      changeLanguage = setLanguage;
+      return h(
+        s.DirectionContext.Provider,
+        { value: language === 'ar' ? 'rtl' : 'ltr' },
+        h(SettingsPage, { language, onLanguageChange: setLanguage, onBack: () => backs++ }),
+      );
+    }
+    const view = renderFixture(h(Screen));
+    t.after(() => view.unmount());
+    const contentHost = () =>
+      view.findAll('Host').find(({ props }) => props.testID === 'app-settings-content');
+    const presentationHost = view
+      .findAll('Host')
+      .find(({ props }) => props.testID === 'app-settings-language-presentation');
+    const frame = view.findAll('View')[0];
+    let previousHost = contentHost();
+    let previousDirection = 'ltr';
+    view.flush(() =>
+      view
+        .findAll('Button')
+        .find(({ props }) => props.testID === 'app-settings-language')
+        .props.onPress(),
+    );
+    assert.equal(view.findAll('Sheet')[0].props.isPresented, true);
+    for (const language of ['ar', 'en', 'fr', 'ar', 'fr']) {
+      view.flush(() => changeLanguage(language));
+      const direction = language === 'ar' ? 'rtl' : 'ltr';
+      assert.equal(
+        contentHost() === previousHost,
+        platform !== 'ios' || direction === previousDirection,
+      );
+      assert.equal(
+        view.findAll('View')[0],
+        frame,
+        'Keep navigation and the measured page mounted.',
+      );
+      assert.equal(
+        view
+          .findAll('Host')
+          .find(({ props }) => props.testID === 'app-settings-language-presentation'),
+        presentationHost,
+      );
+      assert.equal(
+        view.findAll('Sheet')[0].props.isPresented,
+        true,
+        'Only the grouped form refreshes.',
+      );
+      previousHost = contentHost();
+      previousDirection = direction;
+    }
+    view.flush(() =>
+      view
+        .findAll('Button')
+        .find(({ props }) => props.testID === 'app-settings-language-en')
+        .props.onPress(),
+    );
+    assert.equal(view.findAll('Sheet')[0].props.isPresented, false);
+    view.flush(() => view.findAll('Header')[0].props.onBack());
+    assert.equal(backs, 1);
+  });
+}

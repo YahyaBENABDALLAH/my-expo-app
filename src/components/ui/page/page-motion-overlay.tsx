@@ -1,5 +1,5 @@
 import { useThemeColors } from '@/hooks/use-theme';
-import { Canvas, Group, LinearGradient, Path } from '@shopify/react-native-skia';
+import { BlurMask, Canvas, Group, LinearGradient, Path } from '@shopify/react-native-skia';
 import type { ReactNode } from 'react';
 import { View } from 'react-native';
 import { useColorScheme } from '@/hooks/use-color-scheme';
@@ -15,7 +15,7 @@ export function PageMotionOverlay({
   animate = true,
   colorScheme,
   variant = 'overlay',
-  shape = 'waves',
+  shape,
   expanded = false,
   onCollapseComplete,
   children,
@@ -50,7 +50,11 @@ export function PageMotionOverlay({
     backDrift,
     width,
     overlayHeight,
+    detailWave,
+    detailOpacity,
   } = motion;
+  const smoke = !splash && motion.shape === 'smoke';
+  const water = !splash && motion.shape === 'water';
   const overlayBackOpacity = scheme === 'dark' ? 0.12 : 0.08;
   const overlayColors = [colors.tint, `${colors.tint}CC`];
 
@@ -88,21 +92,28 @@ export function PageMotionOverlay({
           </Group>
           <Group transform={frontDrift}>
             {splash ? <Path path={frontWave} color={colors.background} /> : null}
-            <Path path={frontWave} opacity={scheme === 'dark' ? 0.2 : 0.12}>
+            <Path path={frontWave} opacity={smoke ? 0.1 : scheme === 'dark' ? 0.2 : 0.12}>
               <LinearGradient
                 start={gradientStart}
                 end={gradientEnd}
                 colors={splash ? [colors.tint, `${colors.tint}00`] : overlayColors}
               />
             </Path>
-            <Path
-              path={frontWave}
-              color={colors.tint}
-              opacity={scheme === 'dark' ? 0.22 : 0.12}
-              style="stroke"
-              strokeWidth={2}
-            />
+            {!smoke ? (
+              <Path
+                path={frontWave}
+                color={colors.tint}
+                opacity={scheme === 'dark' ? 0.22 : 0.12}
+                style="stroke"
+                strokeWidth={water ? 1.5 : 1}
+              />
+            ) : null}
           </Group>
+          {!splash ? (
+            <Path path={detailWave} color={colors.tint} opacity={detailOpacity}>
+              {smoke ? <BlurMask blur={1.5} style="normal" /> : null}
+            </Path>
+          ) : null}
         </Group>
       </Canvas>
     </View>

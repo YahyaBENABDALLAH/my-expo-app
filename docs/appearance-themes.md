@@ -108,3 +108,16 @@ Selectors: `page-action-app-settings`, `app-settings-appearance`,
 `app-settings-color-scheme-picker`, `app-settings-theme-picker`, `app-settings-language`,
 `app-settings-language-sheet`, `app-settings-language-fr`, `app-settings-language-en`,
 `app-settings-language-ar`.
+
+On iOS, switching between Arabic and English/French refreshes only the native
+Host containing the App Settings grouped form. SwiftUI can retain mirrored cells
+when an existing form changes layout direction. The Settings screen keys this
+Host by the current LTR/RTL direction; the controls and FieldGroup remain universal
+`@expo/ui` components. Theme, appearance and header-motion preferences live above
+this Host and survive the refresh, as do the page, navigation and language-sheet
+presentation. The grouped form's scroll position resets on a direction change.
+English/French switches share LTR and retain the form. Android retains its Host.
+A native iPhone 18 Pro/iOS 27 check exercised English → Arabic → English and
+French → Arabic → French; returning to LTR no longer mirrored the labels.
+Portable checks cover both platform branches, repeated direction changes and
+language-sheet/back behavior. Android device rendering remains unverified.

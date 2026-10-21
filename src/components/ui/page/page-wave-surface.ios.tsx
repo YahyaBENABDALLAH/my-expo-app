@@ -2,11 +2,12 @@ import { Mask, Rectangle, RNHostView } from '@expo/ui/swift-ui';
 import { background, foregroundStyle, frame, shapes } from '@expo/ui/swift-ui/modifiers';
 import { View } from 'react-native';
 import Animated, { useAnimatedProps } from 'react-native-reanimated';
-import Svg, { G, Path, type GProps } from 'react-native-svg';
+import Svg, { G, Path, type GProps, type PathProps } from 'react-native-svg';
 import { UniversalHost } from '../host/universal-host';
 import type { PageWaveSurfaceProps } from './page-wave-surface.types';
 
 const AnimatedGroup = Animated.createAnimatedComponent(G);
+const AnimatedPath = Animated.createAnimatedComponent(Path);
 
 // SVG exposes transform publicly but its native view receives a six-value matrix.
 function svgMatrixAdapter(props: Record<string, unknown>) {
@@ -25,6 +26,8 @@ export function PageWaveSurface({
   reduceTransparency,
 }: PageWaveSurfaceProps) {
   const { fit, backDrift, frontDrift } = wave;
+  const frontPathProps = useAnimatedProps<PathProps>(() => ({ d: wave.frontSvg.get() }));
+  const backPathProps = useAnimatedProps<PathProps>(() => ({ d: wave.backSvg.get() }));
   const fitProps = useAnimatedProps<GProps>(
     () => {
       const transform = fit.get();
@@ -108,10 +111,10 @@ export function PageWaveSurface({
               <Svg width="100%" height={wave.overlayHeight}>
                 <AnimatedGroup animatedProps={fitProps}>
                   <AnimatedGroup animatedProps={backProps}>
-                    <Path d={wave.backSvg} fill="black" />
+                    <AnimatedPath animatedProps={backPathProps} fill="black" />
                   </AnimatedGroup>
                   <AnimatedGroup animatedProps={frontProps}>
-                    <Path d={wave.frontSvg} fill="black" />
+                    <AnimatedPath animatedProps={frontPathProps} fill="black" />
                   </AnimatedGroup>
                 </AnimatedGroup>
               </Svg>

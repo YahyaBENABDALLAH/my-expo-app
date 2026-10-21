@@ -4,7 +4,7 @@ import { createContext, createElement as h, useContext, useMemo, useRef, useStat
 import { createSourceLoader } from '../helpers/load-source.mjs';
 import { renderFixture } from '../helpers/render-fixture.mjs';
 
-function setup(initialDirection = 'ltr', options = {}) {
+function setup(initialDirection = 'ltr', { overlay = false, ...options } = {}) {
   const State = createContext({ direction: initialDirection, active: true });
   const callbacks = new Set();
   let motion,
@@ -13,7 +13,18 @@ function setup(initialDirection = 'ltr', options = {}) {
     renders = 0,
     parses = 0;
   const load = createSourceLoader({
-    'react-native': { useWindowDimensions: () => ({ width: 390, height: 844 }) },
+    'react-native': {
+      View: 'View',
+      useWindowDimensions: () => ({ width: 390, height: 844 }),
+    },
+    '@/hooks/use-color-scheme': { useColorScheme: () => 'light' },
+    '@/hooks/use-theme': {
+      useThemeColors: () => ({
+        tint: '#246BFD',
+        tabIconSelected: '#246BFD',
+        background: '#FFFFFF',
+      }),
+    },
     '@/context/layout-direction.context': { useLayoutDirection: () => useContext(State).direction },
     '@/hooks/use-motion-enabled': {
       useMotionEnabled: (animate) => {
@@ -22,6 +33,35 @@ function setup(initialDirection = 'ltr', options = {}) {
       },
     },
     '@shopify/react-native-skia': {
+      BlurMask: 'BlurMask',
+      usePathValue(callback) {
+        const latest = useRef(callback);
+        latest.current = callback;
+        return useMemo(
+          () => ({
+            get() {
+              const commands = [];
+              let svg;
+              const builder = {
+                moveTo: (...values) => commands.push(['M', ...values]),
+                lineTo: (...values) => commands.push(['L', ...values]),
+                cubicTo: (...values) => commands.push(['C', ...values]),
+                close: () => commands.push(['Z']),
+                addPath: (path) => {
+                  svg = path.svg;
+                },
+              };
+              latest.current(builder);
+              return { commands, svg };
+            },
+          }),
+          [],
+        );
+      },
+      Canvas: 'Canvas',
+      Group: 'Group',
+      Path: 'Path',
+      LinearGradient: 'LinearGradient',
       vec: (x, y) => ({ x, y }),
       Skia: {
         Path: {
@@ -72,7 +112,21 @@ function setup(initialDirection = 'ltr', options = {}) {
   const { usePageWaveMotion, PAGE_WAVE_HEIGHT } = load(
     'components/ui/page/use-page-wave-motion.ts',
   );
+  const { PageMotionOverlay } = load('components/ui/page/page-motion-overlay.tsx');
+  const { PageWaveContext } = load('components/ui/page/page-wave-context.ts');
+  function ReadOverlayMotion() {
+    renders++;
+    motion = useContext(PageWaveContext);
+    return null;
+  }
   function Wave() {
+    const state = useContext(State);
+    if (overlay) {
+      return h(PageMotionOverlay, { ...options, ...state }, h(ReadOverlayMotion));
+    }
+    return h(ReadHookMotion);
+  }
+  function ReadHookMotion() {
     renders++;
     const state = useContext(State);
     motion = usePageWaveMotion({
@@ -91,6 +145,7 @@ function setup(initialDirection = 'ltr', options = {}) {
   }
   const view = renderFixture(h(App));
   return {
+    ...load('components/ui/page/page-header-shapes.ts'),
     get motion() {
       return motion;
     },
@@ -118,152 +173,162 @@ function setup(initialDirection = 'ltr', options = {}) {
 
 const close = (actual, expected) =>
   assert.ok(Math.abs(actual - expected) < 1e-8, `${actual} should equal ${expected}`);
-const x = (drift) => drift.get()[0].translateX;
-const y = (drift) => drift.get()[1].translateY;
-const scale = (drift) => drift.get()[2].scaleY;
-const stretch = (drift) => drift.get()[3].scaleX;
+const shapes = ['waves', 'ribbon', 'dunes', 'smoke', 'water', 'rain'];
+const svg = (s, layer = 0) => (layer === 0 ? s.motion.frontSvg : s.motion.backSvg).get();
+const expected = (s, shape, time, layer = 0, height = 80) =>
+  s.vectorPathToSvg(s.headerContour(shape, time, layer, -844 / (height / 100)));
 
 for (const hz of [60, 120]) {
-  test(`${hz} Hz: opposite wave heights keep the leading section anchored through the 8-second cycle`, (t) => {
-    const ltr = setup('ltr');
-    const rtl = setup('rtl');
-    t.after(() => {
-      ltr.unmount();
-      rtl.unmount();
-    });
-    const initialRenders = ltr.renders;
-    for (let index = 0; index < hz * 2; index++) {
-      ltr.tick(1000 / hz);
-      rtl.tick(1000 / hz);
+  test(`${hz} Hz: all shapes deform their control points on the UI clock without React renders or SVG parsing`, (t) => {
+    const s = setup('ltr', { overlay: true, shape: 'waves' });
+    t.after(() => s.unmount());
+    const renders = s.renders;
+    const path = s.motion.frontWave;
+    const before = svg(s);
+    for (let index = 0; index < hz * 2; index++) s.tick(1000 / hz);
+    assert.notEqual(svg(s), before);
+    for (const shape of shapes) {
+      s.update({ shape });
+      assert.equal(svg(s), expected(s, shape, 2));
+      assert.equal(svg(s, 1), expected(s, shape, 2, 1));
+      assert.equal(s.vectorPathToSvg(s.motion.frontWave.get().commands), expected(s, shape, 2));
     }
-    close(stretch(ltr.motion.frontDrift), 1.08);
-    close(stretch(ltr.motion.backDrift), 0.9);
-    close(scale(ltr.motion.frontDrift), 1);
-    close(scale(ltr.motion.backDrift), 0.6);
-    close(y(ltr.motion.frontDrift) + 100 * scale(ltr.motion.frontDrift), 100);
-    close(y(ltr.motion.backDrift) + 100 * scale(ltr.motion.backDrift), 100);
-    close(x(rtl.motion.frontDrift), x(ltr.motion.frontDrift));
-    close(x(rtl.motion.backDrift), x(ltr.motion.backDrift));
-    close(y(rtl.motion.frontDrift), y(ltr.motion.frontDrift));
-    assert.equal(ltr.renders, initialRenders, 'Frame callbacks must not render React.');
-    assert.equal(ltr.parses, 2, 'Paths stay cached while transforms animate.');
-    assert.equal(ltr.height, 80);
-    assert.equal(ltr.motion.frontWave.svg, ltr.motion.frontSvg);
-    assert.equal(ltr.motion.backWave.svg, ltr.motion.backSvg);
+    // Only the six deliberate prop changes render the overlay's context consumer.
+    assert.equal(s.renders, renders + shapes.length);
+    assert.equal(s.motion.frontWave, path, 'Keep the UI-thread path value mounted.');
+    assert.equal(s.parses, 0, 'Header paths use numeric builders, never per-frame SVG parsing.');
   });
 }
 
-test('header measurements resize both SVGs without restarting phase or changing the fixed leading height', (t) => {
+test('every contour retains the protected title band, stays inside the header and loops without a seam', (t) => {
   const s = setup();
   t.after(() => s.unmount());
-  for (let index = 0; index < 20; index++) s.tick(50);
-  const before = x(s.motion.frontDrift);
+  for (const shape of shapes) {
+    for (const layer of [0, 1]) {
+      for (let time = 0; time < 120; time += 0.5) {
+        const commands = s.headerContour(shape, time, layer, -1055);
+        assert.deepEqual(commands.slice(0, 2), [
+          ['M', -100, 100],
+          ['L', 400, 100],
+        ]);
+        assert.equal(commands[2][2], 100, 'The curve leaves the junction horizontally.');
+        for (const command of commands.filter((c) => c[0] === 'C')) {
+          for (let i = 1; i < command.length; i += 2) {
+            assert.ok(command[i] >= 400 && command[i + 1] >= 0 && command[i + 1] <= 100);
+          }
+        }
+      }
+      assert.equal(expected(s, shape, 0, layer), expected(s, shape, 120, layer));
+    }
+  }
+});
+
+test('control points move independently instead of reproducing a uniform vertical stretch', (t) => {
+  const s = setup();
+  t.after(() => s.unmount());
+  for (const shape of shapes) {
+    const start = s.headerContour(shape, 0, 0, -1055).filter((c) => c[0] === 'C');
+    const end = s.headerContour(shape, 1, 0, -1055).filter((c) => c[0] === 'C');
+    const ratios = start.map((c, i) => (100 - end[i][6]) / (100 - c[6]));
+    assert.ok(Math.max(...ratios) - Math.min(...ratios) > 0.01, shape);
+  }
+});
+
+test('header resizing and RTL retain phase, mirror the artwork and preserve measured content clearance', (t) => {
+  const s = setup('ltr', { shape: 'smoke' });
+  t.after(() => s.unmount());
+  s.motion.width.set(390);
+  for (let i = 0; i < 20; i++) s.tick(50);
   for (const height of [115, 163]) {
-    // This is the same setter supplied to the focused PageFrame.
     s.setHeaderHeight(height);
     assert.equal(s.motion.waveHeight, height);
-    assert.equal(s.motion.overlayHeight, height, 'Collapsed SVG bounds match the header.');
-    close(s.motion.fit.get()[3].scaleY, height / 100);
-    close(x(s.motion.frontDrift), before);
-  }
-  const renders = s.renders;
-  const parses = s.parses;
-  for (let index = 0; index < 160; index++) {
-    s.tick(50);
-    for (const drift of [s.motion.frontDrift, s.motion.backDrift]) {
-      close(y(drift) + 100 * scale(drift), 100);
-      close(x(drift) + 400 * stretch(drift), 400);
-      assert.ok(scale(drift) >= 0.6 && scale(drift) <= 1);
+    assert.equal(s.motion.overlayHeight, height);
+    assert.equal(svg(s), expected(s, 'smoke', 1, 0, height));
+    for (const direction of ['rtl', 'ltr']) {
+      const before = svg(s);
+      s.update({ direction });
+      assert.equal(svg(s), before);
+      const fit = s.motion.fit.get();
+      close(fit[0].scaleX * (fit[2].translateX + 400), 390 * (direction === 'rtl' ? 0.6 : 0.4));
+      close(fit[3].scaleY, height / 100);
     }
-    close(scale(s.motion.frontDrift) + scale(s.motion.backDrift), 1.6);
   }
-  assert.equal(s.renders, renders);
-  assert.equal(s.parses, parses);
 });
 
-test('expanded Login centers its band and static mode snaps back to the measured header', async (t) => {
-  const s = setup('ltr', { expanded: true });
+test('pause, Reduce Motion and hidden/app-inactive motion guards freeze contours and details; resume excludes paused time', (t) => {
+  const s = setup('ltr', { overlay: true, shape: 'rain' });
   t.after(() => s.unmount());
-  s.setHeaderHeight(115);
-  close(s.motion.fit.get()[1].translateY, 844 * 0.35 - 115 / 2);
-  close(s.motion.overlayHeight, 115 + 844 * 0.35 - 115 / 2);
-  s.update({ expanded: false, active: false });
-  await new Promise((resolve) => setImmediate(resolve));
-  close(s.motion.fit.get()[1].translateY, 0);
-  assert.equal(s.motion.overlayHeight, 115);
+  for (let i = 0; i < 20; i++) s.tick(50);
+  const before = svg(s);
+  const details = s.motion.detailWave.get().commands;
+  s.update({ active: false });
+  s.tick(10000);
+  assert.equal(svg(s), before);
+  assert.deepEqual(s.motion.detailWave.get().commands, details);
+  s.update({ active: true });
+  s.tick(null);
+  assert.equal(svg(s), before);
+  s.tick(10000);
+  assert.equal(svg(s), expected(s, 'rain', 1.064));
+  s.update({ animate: false });
+  const paused = svg(s);
+  s.tick(5000);
+  assert.equal(svg(s), paused);
 });
 
-test('collapse releases extra SVG bounds and navigation only after successful completion', (t) => {
+test('expanded Login centers its band; collapse releases bounds and navigation only on completion', (t) => {
   let completions = 0;
   const s = setup('ltr', { expanded: true, onCollapseComplete: () => completions++ });
   t.after(() => s.unmount());
   s.setHeaderHeight(115);
+  close(s.motion.fit.get()[1].translateY, 844 * 0.35 - 115 / 2);
   s.update({ expanded: false });
-  assert.ok(s.motion.overlayHeight > 115, 'Keep space for the moving edge during collapse.');
-  s.finishTiming(false);
-  assert.equal(completions, 0, 'Cancellation cannot release navigation.');
   assert.ok(s.motion.overlayHeight > 115);
+  s.finishTiming(false);
+  assert.equal(completions, 0);
   s.update({ expanded: true });
   s.update({ expanded: false });
   s.finishTiming(true);
   assert.equal(completions, 1);
   assert.equal(s.motion.overlayHeight, 115);
+  s.update({ expanded: true });
+  s.update({ expanded: false, active: false });
+  close(s.motion.fit.get()[1].translateY, 0);
+  assert.equal(s.motion.overlayHeight, 115);
 });
 
-test('splash keeps its original 80-point size and reveal orientation', (t) => {
+test('splash retains its cached artwork, 80-point size and opposite reveal drift', (t) => {
   const s = setup('ltr', { splash: true });
   t.after(() => s.unmount());
   s.setHeaderHeight(163);
   assert.equal(s.motion.waveHeight, 80);
   assert.equal(s.motion.overlayHeight, 80);
+  for (let i = 0; i < 40; i++) s.tick(50);
   close(s.motion.fit.get()[3].scaleY, 80 / 210);
   close(s.motion.fit.get()[1].translateY, 80);
-  close(scale(s.motion.frontDrift), 1);
-  close(scale(s.motion.backDrift), 1);
-});
-
-test('changing direction retains phase and cached paths; pause/resume and frame stalls stay bounded', (t) => {
-  const s = setup();
-  t.after(() => s.unmount());
-  for (let index = 0; index < 20; index++) s.tick(50);
-  const before = x(s.motion.frontDrift);
-  const path = s.motion.frontWave;
-  s.update({ direction: 'rtl' });
-  close(x(s.motion.frontDrift), before);
-  assert.equal(s.motion.frontWave, path);
+  close(s.motion.frontDrift.get()[0].translateX, 40);
+  close(s.motion.backDrift.get()[0].translateX, -50);
   assert.equal(s.parses, 2);
-  s.update({ active: false });
-  s.tick(10000);
-  close(x(s.motion.frontDrift), before);
-  s.update({ active: true });
-  s.tick(null);
-  close(x(s.motion.frontDrift), before);
-  s.tick(10000);
-  close(x(s.motion.frontDrift), -Math.sin((1064 / 8000) * 2 * Math.PI) * 32);
+  assert.ok(s.motion.frontWave.get().svg.startsWith('M0-204'));
+  assert.deepEqual(s.motion.detailWave.get().commands, []);
 });
 
-test('all header shapes pin the junction to 40% in LTR and RTL; changing shape retains motion phase', (t) => {
-  const s = setup();
-  t.after(() => s.unmount());
-  s.motion.width.set(390);
-  for (let index = 0; index < 20; index++) s.tick(50);
-  const before = stretch(s.motion.frontDrift);
-  const shapes = new Set();
-  for (const shape of ['waves', 'ribbon', 'dunes']) {
+test('switching among all shapes retains the clock; clearing an override restores the shared default', (t) => {
+  const s = setup('ltr', { overlay: true });
+  const direct = setup();
+  t.after(() => {
+    s.unmount();
+    direct.unmount();
+  });
+  assert.equal(svg(s), svg(direct));
+  for (let i = 0; i < 20; i++) s.tick(50);
+  const contours = new Set();
+  for (const shape of shapes) {
     s.update({ shape });
-    shapes.add(s.motion.frontSvg);
-    close(stretch(s.motion.frontDrift), before);
-    for (const direction of ['ltr', 'rtl']) {
-      s.update({ direction });
-      const fit = s.motion.fit.get();
-      for (const drift of [s.motion.frontDrift, s.motion.backDrift]) {
-        const junction = x(drift) + 400 * stretch(drift);
-        const pixel = fit[0].scaleX * (fit[2].translateX + junction);
-        close(pixel, 390 * (direction === 'rtl' ? 0.6 : 0.4));
-        close(y(drift) + 100 * scale(drift), 100);
-      }
-    }
+    assert.equal(svg(s), expected(s, shape, 1));
+    contours.add(svg(s));
   }
-  assert.equal(shapes.size, 3, 'Each variant supplies a different SVG contour.');
-  assert.equal(s.parses, 6, 'Only a shape change parses a new pair of paths.');
+  assert.equal(contours.size, 6);
+  s.update({ shape: undefined });
+  assert.equal(svg(s), expected(s, 'smoke', 1));
 });

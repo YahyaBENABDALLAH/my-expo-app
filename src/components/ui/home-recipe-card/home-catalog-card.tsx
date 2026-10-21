@@ -159,7 +159,7 @@ export function HomeCatalogCard({
         ...(hero ? { backgroundColor: colors.warningContainer, borderRadius: radii.card } : {}),
       }}
     >
-      <Column modifiers={nativeFillWidth}>
+      <Column spacing={spacing.none} modifiers={nativeFillWidth}>
         <HomeCatalogArtwork
           source={item.image}
           testID={`home-card-${item.id}-artwork`}
@@ -170,10 +170,19 @@ export function HomeCatalogCard({
         {ribbon ? (
           <Column
             alignment="center"
-            modifiers={nativeFillWidth}
-            style={{ backgroundColor: colors.info, paddingVertical: spacing.sm }}
+            spacing={spacing.none}
+            style={{
+              width,
+              backgroundColor: colors.info,
+              paddingVertical: spacing.sm,
+              paddingHorizontal: spacing.md,
+            }}
           >
-            <Text fontSize={14} fontWeight="600" textStyle={{ color: colors.onInfo }}>
+            <Text
+              fontSize={14}
+              fontWeight="600"
+              textStyle={{ color: colors.onInfo, textAlign: 'center' }}
+            >
               {ribbon}
             </Text>
           </Column>

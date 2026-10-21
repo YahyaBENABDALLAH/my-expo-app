@@ -15,7 +15,11 @@ store-style home compositions: `hero`, `landscape`, `artwork`, `compact` and
 `giveaway`. Explicit widths size photos; compact rows share a
 thumbnail, title, duration badge and the existing secondary Button. Hero cards
 add a tinted footer and an optional save action. Giveaway artwork can include a
-status ribbon. Actions are callbacks supplied by the screen; no queries or
+status ribbon. The ribbon uses the card's explicit width so its background fills
+the band on iOS and Android, with centered wrapping text and shared padding.
+Artwork and ribbon have zero spacing between them. The Page Section interaction
+story includes the French giveaway ribbon and a text control for longer labels.
+Actions are callbacks supplied by the screen; no queries or
 navigation live in the card. Each item supplies an `image` source. Artwork hosts
 passive `expo-image` content in Expo UI `RNHostView`, with explicit dimensions,
 cover cropping, corners and memory/disk caching. Native Columns, text and controls

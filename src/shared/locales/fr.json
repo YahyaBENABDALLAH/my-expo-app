@@ -285,7 +285,16 @@
     "openSourceLicenses": "Licences open source",
     "licensesDescription": "Détails des licences du logiciel open source",
     "legalInformation": "Informations légales",
-    "legalDescription": "Accord de licence d’utilisateur final"
+    "legalDescription": "Accord de licence d’utilisateur final",
+    "headerMotion": "Animation de l’en-tête",
+    "headerShapes": {
+      "waves": "Vagues",
+      "ribbon": "Ruban",
+      "dunes": "Dunes",
+      "smoke": "Fumée",
+      "water": "Eau",
+      "rain": "Pluie"
+    }
   },
   "appearance": {
     "dark": "Sombre",

@@ -18,6 +18,8 @@ import { useThemeColors } from '@/hooks/use-theme';
 import { SettingsPage } from '@/features/settings/settings-screen';
 import { LayoutDirectionProvider } from '@/context/layout-direction.context';
 import { spacing, radii } from '@/constants/layout';
+import { useThemeSettings } from '@/context/theme.context';
+import { DEFAULT_HEADER_SHAPE, HEADER_SHAPES } from '@/constants/header-motion';
 
 function HeaderContent({
   colorScheme,
@@ -99,23 +101,28 @@ const meta = {
     colorScheme: 'light',
     scrollsBehindHeader: false,
     showBack: true,
-    shape: 'waves',
+    shape: DEFAULT_HEADER_SHAPE,
   },
   argTypes: {
     showBack: { control: 'boolean' },
-    shape: { control: 'select', options: ['waves', 'ribbon', 'dunes'] },
+    shape: {
+      control: 'select',
+      options: HEADER_SHAPES,
+      description: 'Header contour, shared by the artwork and native blur mask.',
+    },
   },
   decorators: [
     (Story, { args, parameters }) => {
       const colors = useThemeColors(args.colorScheme);
+      const { headerShape } = useThemeSettings();
       return (
         <LayoutDirectionProvider initialDirection={parameters.waveDirection ?? 'ltr'}>
           <SafeAreaInsetsContext.Provider value={{ top: 59, bottom: 34, left: 0, right: 0 }}>
             <View style={{ flex: 1, backgroundColor: colors.background }}>
               <PageMotionOverlay
                 colorScheme={args.colorScheme}
-                shape={args.shape}
-                animate={Boolean(parameters.animateWaves)}
+                shape={parameters.settingsPreview ? headerShape : args.shape}
+                animate={parameters.animateWaves !== false}
                 visible={!parameters.withoutWaves}
                 expanded={Boolean(parameters.expandedWaves)}
               >
@@ -173,6 +180,7 @@ function SettingsHeaderDemo() {
 export const AppSettings: Story = {
   render: () => <SettingsHeaderDemo />,
   parameters: {
+    settingsPreview: true,
     docs: {
       description: {
         story:

@@ -2,13 +2,15 @@
 
 Navigation themes, root/authentication/onboarding stack content and tab scenes use the active theme's opaque `background` token. Each incoming route covers the outgoing route's text during transitions. Page frames, headers, auth forms, loading and recovery content reveal their owning scene's background. Cards, fields and native controls keep their semantic surfaces. The full-screen `AuroraBackground` remains available in the launch screen, dedicated Skia demo and Storybook previews; the root does not render a hidden shader behind opaque navigation scenes.
 
-`PageMotionOverlay` wraps navigation and draws its artwork above it and below the splash. Its two translucent Skia waves fit the focused frame's measured header height, including safe area and scaled text. The leading 40% stays at full height; the trailing cubic curves vary in opposite phases around that baseline on the 8-second cycle. Horizontal stretching is anchored at the 40% junction, keeping that boundary fixed throughout the loop. The optional shape prop selects repeating waves (default), ribbon folds or gentle dunes. RTL mirrors the steady section beneath the title and back control while retaining phase. Artwork and native blur masks share the same paths and transforms. Login expansion, the one-second collapse and the navigation handoff are retained; extra drawing bounds are released after collapse. The overlay ignores touches and accessibility, pauses while the splash covers it, and respects app lifecycle and live Reduce Motion changes.
+`PageMotionOverlay` wraps navigation and draws original vector artwork above it and below the splash. Header control points deform independently on one UI-thread active-time clock: waves travel, ribbon folds flow, dunes shift slowly, smoke curls with translucent wisps, water rolls with fine highlights, and rain falls in twelve staggered drops with impact ripples. Smoke is the default. The leading 40% stays level beneath the title/back control and RTL mirrors the full artwork. Skia's numeric path builders and the iOS animated SVG mask consume the same control points; Android masks with the same Skia paths. There is no header SVG parsing or React update per animation frame. The 120-second clock wrap is seamless, pauses retain phase, and frame stalls advance at most 64 ms. Login expansion/collapse, absolute bounds, theme tint and reduced-motion/app-activity guards remain. Splash retains its cached artwork and original drift.
 
-Its context shares cached paths and UI-thread transforms with the native blur mask
+Settings → Appearance → Header motion switches the root effect immediately and saves it under `appHeaderMotion`. Invalid or unavailable storage keeps the default; readiness joins the existing launch prerequisites. Storybook uses isolated unsaved preferences. The AppSettings header story previews this control against its local overlay. `assets/images/header-motion/` contains static smoke/water/rain SVG counterparts.
+
+Its context shares deforming paths and UI-thread transforms with the native blur mask
 in scrolling page frames. Android uses Expo UI's `MaskedView` to clip `expo-blur`
 to the union of the two wave silhouettes. iOS uses a SwiftUI `ultraThin` material
 and native SwiftUI mask with an animated SVG, keeping UIKit blur and a Metal canvas
-out of that mask's render tree. SVG paths come from the same source strings and
+out of that mask's render tree. SVG paths serialize the same numeric control points and
 use the same shared motion as the artwork. The rest of the header remains transparent. The blur
 samples each frame's content target and sits below its title/back controls, so
 those controls remain sharp. A single wave loop drives both artwork and mask;
@@ -55,3 +57,10 @@ Run the focused native interaction flow with a connected development build:
 ```sh
 maestro test .maestro/storybook/aurora-background.yaml
 ```
+
+On 2026-10-21, the iPhone 18 Pro simulator on iOS 27 was used to open the actual
+Settings → Appearance → Header motion menu and select Water, Rain and Smoke.
+The selected native label and the corresponding header artwork updated immediately;
+water highlights, rain streaks and smoke curls were visible in the RTL dark layout.
+This is manual native verification, not a screenshot regression or frame-rate profile.
+Android native appearance and release-device performance remain unverified.

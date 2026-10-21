@@ -285,7 +285,16 @@
     "openSourceLicenses": "تراخيص المصادر المفتوحة",
     "licensesDescription": "تفاصيل تراخيص البرمجيات مفتوحة المصدر",
     "legalInformation": "المعلومات القانونية",
-    "legalDescription": "اتفاقية ترخيص المستخدم النهائي"
+    "legalDescription": "اتفاقية ترخيص المستخدم النهائي",
+    "headerMotion": "حركة الترويسة",
+    "headerShapes": {
+      "waves": "أمواج",
+      "ribbon": "شريط",
+      "dunes": "كثبان",
+      "smoke": "دخان",
+      "water": "ماء",
+      "rain": "مطر"
+    }
   },
   "appearance": {
     "dark": "داكن",

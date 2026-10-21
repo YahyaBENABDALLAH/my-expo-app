@@ -17,9 +17,15 @@ import { useState } from 'react';
 import { spacing } from '@/constants/layout';
 import { useThemeColors } from '@/hooks/use-theme';
 
-const image = require('../../../../assets/images/recipe-examples/salad.jpg');
+const image = require('../../../assets/images/recipe-examples/salad.jpg');
 
-function SectionDemo({ colorScheme }: { colorScheme: 'light' | 'dark' }) {
+function SectionDemo({
+  colorScheme,
+  ribbonLabel,
+}: {
+  colorScheme: 'light' | 'dark';
+  ribbonLabel: string;
+}) {
   const colors = useThemeColors(colorScheme);
   const [value, setValue] = useState('Shared section');
   const [presses, setPresses] = useState(0);
@@ -92,6 +98,22 @@ function SectionDemo({ colorScheme }: { colorScheme: 'light' | 'dark' }) {
                   width={260}
                   onPress={open}
                 />
+                <HomeCatalogCard
+                  item={{
+                    id: 'section-giveaway',
+                    image,
+                    title: 'Salade de pois chiches',
+                    duration: '15 min',
+                    category: 'Frais et coloré',
+                    description: 'Fresh ingredients',
+                    chef: 'Chef',
+                  }}
+                  variant="giveaway"
+                  width={260}
+                  ribbon={ribbonLabel}
+                  actionLabel="Détails"
+                  onPress={open}
+                />
               </Row>
             </ScrollView>
           </PageSection>
@@ -104,8 +126,11 @@ function SectionDemo({ colorScheme }: { colorScheme: 'light' | 'dark' }) {
 const meta = {
   title: 'Components/Page Section',
   component: SectionDemo,
-  args: { colorScheme: 'light' },
-  argTypes: { colorScheme: { control: 'radio', options: ['light', 'dark'] } },
+  args: { colorScheme: 'light', ribbonLabel: 'Gratuit maintenant' },
+  argTypes: {
+    colorScheme: { control: 'radio', options: ['light', 'dark'] },
+    ribbonLabel: { control: 'text' },
+  },
   render: (args) => <SectionDemo {...args} />,
 } satisfies Meta<typeof SectionDemo>;
 export default meta;

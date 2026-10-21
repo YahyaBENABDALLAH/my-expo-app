@@ -48,3 +48,11 @@ semantic palette. Native menu geometry and touch targets require device checks.
 
 Import public components from `@components/ui`; UI implementations import
 concrete files directly. [Back to the UI guide](../README.md).
+
+`HeaderMotionPicker` renders in Settings → Appearance and offers Waves, Ribbon,
+Dunes, Smoke, Water and Rain with translated labels. It updates the shared header
+immediately. The root ThemePreferencesProvider opts into saved header preferences;
+restoration disables selection until ready, validates stored values and falls back
+to smoke on storage failure. Writes are serialized. Local Storybook providers
+keep selection in memory and never modify the saved app effect. The Page Header
+AppSettings story covers this control and previews its local header.

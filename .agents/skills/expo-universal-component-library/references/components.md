@@ -1,5 +1,19 @@
 # Universal component catalog
 
+## Home giveaway ribbon (2026-10-21)
+
+`HomeCatalogCard` keeps its universal Expo UI Column/Text composition. Its status
+ribbon uses the card's explicit width in style, which applies the iOS frame before
+the background; a trailing fill-width modifier previously left the background at
+text width. Text centers and wraps with shared vertical/horizontal padding, and
+the artwork/ribbon stack has explicit zero spacing on both platforms. Semantic
+`info`/`onInfo` colors still follow the owning Host.
+`Components/Page Section/Interaction` includes a giveaway card with the French
+label and an editable `ribbonLabel` control, alongside its existing light/dark
+control and counted actions. Native iPhone 18 Pro/iOS 27 verification in French,
+UX Template dark mode showed the ribbon filling the artwork width with centered
+text. Android native rendering remains unverified. Lint and typecheck pass.
+
 ## Header touch blocking (2026-10-20)
 
 `PageFrame` places an absolute, accessibility-hidden touch shield above content
@@ -19,28 +33,48 @@ its weighted column. Native form gutters, row controls and header clearance are
 unchanged. `Components/Page Header/AppSettings` and `DarkAppSettings` cover the
 production form; native iOS appearance still needs a device check.
 
-## Page wave paths (2026-10-20)
+## Settings language direction (2026-10-21)
 
-`PageMotionOverlay` fits two cached SVG paths to the focused frame's measured
-header height, including safe area and scaled text. Each leading 40% section stays at
-full height while the trailing curve changes depth in opposite phases on the
-8-second UI-thread loop. RTL mirrors the steady section beneath the title/back
-control. Horizontal stretching stays anchored at the 40% junction. The iOS SVG
-mask includes the same horizontal and vertical scale as the Skia artwork.
-The optional `shape` prop selects `waves` (default, repeating crests/troughs),
-`ribbon` (broad flowing folds) or `dunes` (gentle rolling contours).
-The Page Header story's `shape` control previews all three with shared theme roles.
-Login expansion/collapse retains its filled upper area and releases the extra
-drawing bounds after collapse. Splash retains its original paths and 80-point size.
-Header artwork and blur masks stay absolute: SVG size, expansion and visibility
-never add header/content spacing. Only the measured title/back row and safe area
-determine clearance. Page-frame checks vary wave height and visibility while
-asserting unchanged header geometry, content padding and retained content.
-The artwork and both platform blur masks share this fit. Theme roles and props
-are unchanged. `Components/Page Header` (`Default`, `Dark`, `AnimatedLtr` and
-`AnimatedRtl`, `LongTitle`, `ExpandedLogin`) previews the production paths.
-Motion/frame checks cover measured sizing, fixed leading height/junction, shape changes, opposite depths,
-phase continuity and header touch blocking. Native appearance remains unverified.
+App Settings keeps the universal `@expo/ui` FieldGroup, controls and shared Host.
+Only its main form Host is keyed by LTR/RTL direction on iOS, avoiding mirrored
+native cells after Arabic → English/French changes. Preferences, navigation,
+measured page geometry and the separate language presentation remain outside
+this refresh. Same-direction languages retain the Host; Android retains it for
+all language changes. The iOS form scroll position resets when direction flips.
+Native iPhone 18 Pro/iOS 27 verification covered English → Arabic → English and
+French → Arabic → French with readable LTR labels and retained theme/motion
+selections. Page-frame fixtures cover both platforms and continued sheet/back
+behavior; Android device rendering remains unverified. No platform-specific form
+adapter or replacement controls were added.
+
+## Header vector motion and Settings (2026-10-21)
+
+`PageMotionOverlay` deforms individual cubic control points on one UI-thread
+active-time clock. Smoke (default) has curling contours and soft vector wisps;
+water has traveling swells and highlights; rain has twelve falling drops and
+impact ripples. Waves, ribbon and dunes have distinct motion speeds. Original
+static SVGs live in `assets/images/header-motion/`. Skia uses numeric
+`usePathValue` builders without SVG parsing per frame; iOS animates SVG `d` from
+the same control points for its material mask. The leading 40% stays level, RTL
+mirrors artwork and all paths stay within the measured header band. Splash alone
+retains cached paths and its original drift. Login expansion/collapse, touch
+shielding, theme tint, absolute geometry and motion guards are preserved.
+`shape` overrides the shared default in `src/constants/header-motion.ts`.
+
+`HeaderMotionPicker` (`appearance/header-motion-picker.tsx`) uses the existing
+native Picker adapters in Settings → Appearance. It offers all six translated
+options and updates the root overlay immediately. ThemePreferencesProvider opts
+into AsyncStorage persistence only at the app root; it validates restoration,
+serializes writes and exposes readiness. Storybook uses local unsaved preferences.
+`Components/Page Header` has shape Controls; AppSettings/DarkAppSettings render
+the real picker against the local header. Native controls retain platform colors
+and geometry. Motion tests cover nonuniform deformation, 60/120-Hz timing, bounds,
+seamless loops, RTL, pause/resume, shape changes and collapse. Preference tests
+cover restoration, ordered saves, invalid values, storage failures and story
+isolation. The actual iOS Settings picker was used to select Water, Rain and
+Smoke on an iPhone 18 Pro simulator (iOS 27); labels and corresponding vector
+artwork changed immediately in dark RTL. Native Android rendering/performance
+still requires a device.
 
 ## Page title alignment (2026-10-20)
 
@@ -600,7 +634,7 @@ The following top-edge wave is mounted above root navigation alongside the full-
 aurora behind navigation. Both layers pause while the splash covers them. The aurora
 composition stories also include the header wave; focused wave stories remain available:
 
-`PageMotionOverlay` (`src/components/ui/page/page-motion-overlay.tsx`) provides one Skia canvas above root navigation, sized to the focused header's measured height. Two cached paths keep their leading section at full height and animate trailing depth in opposite phases on an 8-second UI-thread loop. Horizontal stretching stays anchored to the 40% junction. The optional shape prop selects waves (default), ribbon or dunes. Artwork and native blur masks share the fit; RTL mirrors the steady section beneath the leading title/back controls. `animate` defaults to true; optional `colorScheme` supplies deterministic light/dark previews. Existing `tint` and `tabIconSelected` theme roles remain. Width follows the wrapper's `onLayout`; header height updates on focus/layout without per-frame measurement or React updates. `useMotionEnabled` pauses motion during background/inactive states, live Reduce Motion changes, and explicit static mode. The root keeps it static beneath the launch screen.
+`PageMotionOverlay` (`src/components/ui/page/page-motion-overlay.tsx`) renders two deforming vector surfaces and one bounded detail path above navigation. See Header vector motion and Settings above for the shape, persistence and verification contract. Header geometry and iOS SVG masks share control points; no per-frame React state or header SVG parsing is used.
 
 Both wrapper and canvas ignore touches, and the decorative wrapper is hidden from accessibility. `AnimatedLtr` and `AnimatedRtl` in `.rnstorybook/stories/components/page-header.stories.tsx` preview the taller waves above scrolling content with a counted back action. `tests/components/page-wave-motion.test.mjs` checks 60/120-Hz timing, mirrored direction, phase retention and pause/resume using mocked native boundaries. These fixtures do not prove native stacking, screen-reader behavior, rotation, or device performance; see [shared motion verification](../../../../docs/shared-skia-motion.md).
 
@@ -808,7 +842,7 @@ and recovery screens. `headerBlur={false}` opts out. Default frames reserve the
 measured title height; `PageScreen`, Home and Settings use `scrollsBehindHeader` with
 `usePageHeaderInset()` inside their scrolling content. Blur stays inside the two
 wave shapes, below the sharp title and back button.
-`PageMotionOverlay` wraps root navigation and supplies cached paths and shared
+`PageMotionOverlay` wraps root navigation and supplies deforming paths and shared
 UI-thread transforms through `PageWaveContext` to the platform mask; artwork
 and mask use one motion loop. Its `children` slot supports local compositions and
 `visible` hides the artwork/mask without remounting navigation. The iOS surface

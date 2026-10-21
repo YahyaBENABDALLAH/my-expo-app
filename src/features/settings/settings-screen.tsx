@@ -19,12 +19,14 @@ import {
   Row,
   Switch,
   ThemePicker,
+  HeaderMotionPicker,
   UniversalButtonContent,
   UniversalHost,
   UniversalTextContent as Text,
   usePageHeaderInset,
 } from '@components/ui';
 import { useLanguage } from '@/context/language.context';
+import { useLayoutDirection } from '@/context/layout-direction.context';
 import { useThemeColors } from '@/hooks/use-theme';
 import { screenInsets } from '@/lib/screen-insets';
 import i18n, { SUPPORTED_LANGUAGES, type Language } from '@/lib/i18n';
@@ -55,6 +57,7 @@ export function SettingsPage({
   onBack?: () => void;
 }) {
   const { t } = useTranslation();
+  const direction = useLayoutDirection();
   const colors = useThemeColors();
   const [languageOpen, setLanguageOpen] = useState(false);
   const back = onBack ?? (() => (router.canGoBack() ? router.back() : router.replace('/')));
@@ -82,6 +85,8 @@ export function SettingsPage({
     <PageFrame title={t('settings.title')} onBack={back} scrollsBehindHeader>
       <SettingsViewport>
         <UniversalHost
+          // Recreate only this iOS form host when direction flips; reused native cells mirror text.
+          key={Platform.OS === 'ios' ? direction : undefined}
           matchContents={false}
           ignoreSafeArea="all"
           style={{ flex: 1 }}
@@ -138,6 +143,7 @@ export function SettingsPage({
             >
               <SettingsRow label={t('common.theme')} trailing={<ThemePicker />} />
               <SettingsRow label={t('common.colorScheme')} trailing={<ColorSchemeControl />} />
+              <SettingsRow label={t('settings.headerMotion')} trailing={<HeaderMotionPicker />} />
               <SettingsRow
                 label={t('common.language')}
                 testID="app-settings-language"

@@ -68,7 +68,7 @@ export default function RootLayout() {
   return (
     <LayoutDirectionProvider>
       <LanguageProvider>
-        <ThemePreferencesProvider>
+        <ThemePreferencesProvider persistHeaderMotion>
           <AppQueryProvider>
             <OnboardingProvider>
               <AuthProvider>
@@ -83,7 +83,11 @@ export default function RootLayout() {
 }
 
 function RootLayoutContent() {
-  const { colorScheme: appearancePreference } = useThemeSettings();
+  const {
+    colorScheme: appearancePreference,
+    headerShape,
+    headerMotionReady = true,
+  } = useThemeSettings();
   useEffect(() => {
     Appearance.setColorScheme(
       appearancePreference === 'system' ? 'unspecified' : appearancePreference,
@@ -104,7 +108,8 @@ function RootLayoutContent() {
   const { ready: onboardingReady, completed: onboardingCompleted } = useOnboarding();
   const animatePageArtwork = !showBrandScreen;
   // Restoration failures must expose their retry UI instead of keeping the launch overlay.
-  const ready = languageReady && onboardingReady && (!restoring || Boolean(error));
+  const ready =
+    languageReady && onboardingReady && headerMotionReady && (!restoring || Boolean(error));
   const finishBrandScreen = useCallback(() => setShowBrandScreen(false), []);
   const revealBrandScreen = useCallback(() => {
     SplashScreen.hide();
@@ -119,6 +124,7 @@ function RootLayoutContent() {
       >
         <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
         <PageMotionOverlay
+          shape={headerShape}
           visible={onboardingCompleted}
           animate={animatePageArtwork}
           expanded={expanded}
