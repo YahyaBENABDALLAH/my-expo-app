@@ -12,7 +12,6 @@ import type { Meta, StoryObj } from '@storybook/react-native';
 import { useRef, useState } from 'react';
 import { View } from 'react-native';
 import { action } from 'storybook/actions';
-import { authInputIcons } from '@/components/ui/auth/auth-input-icons';
 
 const searchIcon = Icon.select({
   ios: 'magnifyingglass',
@@ -258,8 +257,16 @@ function PasswordVisibilityDemo(args: TextInputProps) {
             args.onChangeText?.(text);
           }}
           secureTextEntry={!shown}
-          leftIcon={authInputIcons.password}
-          rightIcon={shown ? authInputIcons.hidePassword : authInputIcons.showPassword}
+          leftIcon={Icon.select({
+            ios: 'lock',
+            android: require('@expo/material-symbols/lock.xml'),
+          })}
+          rightIcon={Icon.select({
+            ios: shown ? 'eye.slash' : 'eye',
+            android: shown
+              ? require('@expo/material-symbols/visibility_off.xml')
+              : require('@expo/material-symbols/visibility.xml'),
+          })}
           rightIconAccessibilityLabel={shown ? 'Hide password' : 'Show password'}
           onRightIconPress={() => {
             setShown((current) => !current);

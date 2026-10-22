@@ -1,9 +1,7 @@
 import { spacing } from '@/constants/layout';
 import {
-  AuthIconButton,
   BottomSheet,
   ColorSchemeControl,
-  Icon,
   nativeFillWidth,
   PageSection,
   Row,
@@ -17,19 +15,15 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useLanguage } from '@/context/language.context';
-import { useAppTheme } from '@/hooks/use-theme';
 import i18n, { SUPPORTED_LANGUAGES } from '@/lib/i18n';
 
-const icons = {
-  language: Icon.select({ ios: 'globe', android: require('@expo/material-symbols/language.xml') }),
-};
 const languageLabels = { fr: 'common.french', en: 'common.english', ar: 'common.arabic' } as const;
 
 /** Login's fixed native top bar; the language sheet follows the app's own direction. */
 export function LoginPreferences() {
   const { t } = useTranslation();
   const { language, setLanguage, ready } = useLanguage();
-  const { scheme, colors } = useAppTheme(useHostColorScheme());
+  const scheme = useHostColorScheme();
   const insets = useSafeAreaInsets();
   const [languageOpen, setLanguageOpen] = useState(false);
   const languageDisabled = !ready || !setLanguage;
@@ -51,10 +45,9 @@ export function LoginPreferences() {
             paddingRight: insets.right + spacing.lg,
           }}
         >
-          <AuthIconButton
-            icon={icons.language}
-            color={colors.tint}
-            accessibilityLabel={t('common.language')}
+          <UniversalButtonContent
+            variant="link"
+            label={t('common.language')}
             testID="auth-login-language"
             disabled={languageDisabled}
             onPress={() => setLanguageOpen(true)}

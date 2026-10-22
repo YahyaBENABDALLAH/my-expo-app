@@ -1,14 +1,13 @@
 import { spacing } from '@/constants/layout';
 import { translateValidationMessage } from '@/lib/i18n';
 import { useTranslation } from 'react-i18next';
-import { Column } from '@expo/ui';
+import { Column, Icon } from '@expo/ui';
 import { nativeFillWidth, nativeFillWidthEnd } from '../native/native-fill-width';
 import { useEffect, useRef, useState } from 'react';
 import { useController, type Control, type FieldPath, type FieldValues } from 'react-hook-form';
 
 import { UniversalButtonContent } from '../button/universal-button-content';
 import { UniversalTextContent as Text } from '../text/universal-text';
-import { authInputIcons } from '../auth/auth-input-icons';
 import { TextInput, type TextInputProps } from '../text-input/text-input';
 import { useHostColorScheme } from '../host/universal-host';
 import { useThemeColors } from '@/hooks/use-theme';
@@ -37,7 +36,12 @@ function passwordInputOverrides(
   if (toggle === 'button') return { secureTextEntry };
   return {
     secureTextEntry,
-    rightIcon: shown ? authInputIcons.hidePassword : authInputIcons.showPassword,
+    rightIcon: Icon.select({
+      ios: shown ? 'eye.slash' : 'eye',
+      android: shown
+        ? require('@expo/material-symbols/visibility_off.xml')
+        : require('@expo/material-symbols/visibility.xml'),
+    }),
     onRightIconPress: onToggle,
     rightIconAccessibilityLabel: actionLabel,
   };

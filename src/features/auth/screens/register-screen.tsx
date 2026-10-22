@@ -1,6 +1,6 @@
 import { spacing } from '@/constants/layout';
 import {
-  authInputIcons,
+  Icon,
   AuthScreenFrame,
   Column,
   FieldGroup,
@@ -56,7 +56,10 @@ export function RegisterScreen() {
           name="userName"
           testID="auth-register-username"
           label={t('auth.username')}
-          leftIcon={authInputIcons.person}
+          leftIcon={Icon.select({
+            ios: 'person',
+            android: require('@expo/material-symbols/person.xml'),
+          })}
           placeholder={t('auth.usernamePlaceholder')}
           autoComplete="username"
           autoCapitalize="none"
@@ -69,7 +72,10 @@ export function RegisterScreen() {
           name="firstName"
           testID="auth-register-first-name"
           label={t('auth.firstName')}
-          leftIcon={authInputIcons.person}
+          leftIcon={Icon.select({
+            ios: 'person',
+            android: require('@expo/material-symbols/person.xml'),
+          })}
           placeholder={t('auth.firstName')}
           autoComplete="given-name"
           autoCapitalize="words"
@@ -81,7 +87,10 @@ export function RegisterScreen() {
           name="lastName"
           testID="auth-register-last-name"
           label={t('auth.lastName')}
-          leftIcon={authInputIcons.person}
+          leftIcon={Icon.select({
+            ios: 'person',
+            android: require('@expo/material-symbols/person.xml'),
+          })}
           placeholder={t('auth.lastName')}
           autoComplete="family-name"
           autoCapitalize="words"
@@ -100,7 +109,10 @@ export function RegisterScreen() {
           name="email"
           testID="auth-register-email"
           label={t('auth.email')}
-          leftIcon={authInputIcons.email}
+          leftIcon={Icon.select({
+            ios: 'envelope',
+            android: require('@expo/material-symbols/mail.xml'),
+          })}
           placeholder={t('auth.emailPlaceholder')}
           keyboardType="email-address"
           autoComplete="email"
@@ -114,7 +126,10 @@ export function RegisterScreen() {
           name="password"
           testID="auth-register-password"
           label={t('auth.password')}
-          leftIcon={authInputIcons.password}
+          leftIcon={Icon.select({
+            ios: 'lock',
+            android: require('@expo/material-symbols/lock.xml'),
+          })}
           passwordToggle="icon"
           placeholder={t('auth.createPassword')}
           helperText={t('auth.passwordMinLength')}
@@ -130,7 +145,10 @@ export function RegisterScreen() {
           name="confirmPassword"
           testID="auth-register-confirm-password"
           label={t('auth.confirmPassword')}
-          leftIcon={authInputIcons.password}
+          leftIcon={Icon.select({
+            ios: 'lock',
+            android: require('@expo/material-symbols/lock.xml'),
+          })}
           passwordToggle="icon"
           placeholder={t('auth.repeatPassword')}
           password

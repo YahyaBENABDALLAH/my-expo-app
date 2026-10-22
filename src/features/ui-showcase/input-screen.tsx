@@ -10,7 +10,6 @@ import {
   TextInput,
   UniversalButtonContent,
   UniversalTextContent as Text,
-  authInputIcons,
   nativeFillWidth,
   nativeRowWeight,
   type InputStatus,
@@ -225,8 +224,16 @@ function PasswordInputDemo() {
         autoCapitalize="none"
         autoCorrect={false}
         autoComplete="off"
-        leftIcon={authInputIcons.password}
-        rightIcon={shown ? authInputIcons.hidePassword : authInputIcons.showPassword}
+        leftIcon={Icon.select({
+          ios: 'lock',
+          android: require('@expo/material-symbols/lock.xml'),
+        })}
+        rightIcon={Icon.select({
+          ios: shown ? 'eye.slash' : 'eye',
+          android: shown
+            ? require('@expo/material-symbols/visibility_off.xml')
+            : require('@expo/material-symbols/visibility.xml'),
+        })}
         rightIconAccessibilityLabel={t(shown ? 'auth.hidePassword' : 'auth.showPassword')}
         onRightIconPress={() => setShown((current) => !current)}
         testID="demo-input-password"
@@ -312,7 +319,10 @@ function InputKeyboardDemo() {
         autoComplete="off"
         returnKeyType="next"
         onSubmitEditing={() => notesRef.current?.focus()}
-        leftIcon={authInputIcons.email}
+        leftIcon={Icon.select({
+          ios: 'envelope',
+          android: require('@expo/material-symbols/mail.xml'),
+        })}
         testID="demo-input-email"
       />
       <TextInput

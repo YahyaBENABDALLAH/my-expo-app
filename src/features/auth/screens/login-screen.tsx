@@ -8,7 +8,7 @@ import {
   AuthScreenFrame,
   FormSubmit,
   FormTextInput,
-  authInputIcons,
+  Icon,
 } from '@components/ui';
 import { router } from 'expo-router';
 
@@ -43,7 +43,10 @@ export function LoginScreen() {
           name="login"
           testID="auth-login-email"
           label={t('auth.identity')}
-          leftIcon={authInputIcons.person}
+          leftIcon={Icon.select({
+            ios: 'person',
+            android: require('@expo/material-symbols/person.xml'),
+          })}
           placeholder={t('auth.emailPlaceholder')}
           autoComplete="username"
           autoCapitalize="none"
@@ -58,7 +61,10 @@ export function LoginScreen() {
             name="password"
             testID="auth-login-password"
             label={t('auth.password')}
-            leftIcon={authInputIcons.password}
+            leftIcon={Icon.select({
+              ios: 'lock',
+              android: require('@expo/material-symbols/lock.xml'),
+            })}
             passwordToggle="icon"
             placeholder={t('auth.enterPassword')}
             password

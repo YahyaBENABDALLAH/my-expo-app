@@ -78,7 +78,7 @@ hidden password out of visible draft previews.
 ```tsx
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { TextInput, authInputIcons } from '@components/ui';
+import { Icon, TextInput } from '@components/ui';
 
 export function DemoPasswordField() {
   const { t } = useTranslation();
@@ -94,8 +94,16 @@ export function DemoPasswordField() {
       autoCapitalize="none"
       autoCorrect={false}
       autoComplete="off"
-      leftIcon={authInputIcons.password}
-      rightIcon={shown ? authInputIcons.hidePassword : authInputIcons.showPassword}
+      leftIcon={Icon.select({
+        ios: 'lock',
+        android: require('@expo/material-symbols/lock.xml'),
+      })}
+      rightIcon={Icon.select({
+        ios: shown ? 'eye.slash' : 'eye',
+        android: shown
+          ? require('@expo/material-symbols/visibility_off.xml')
+          : require('@expo/material-symbols/visibility.xml'),
+      })}
       rightIconAccessibilityLabel={t(shown ? 'auth.hidePassword' : 'auth.showPassword')}
       onRightIconPress={() => setShown((current) => !current)}
       testID="demo-password"

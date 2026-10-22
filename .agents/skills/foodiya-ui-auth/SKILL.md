@@ -1,12 +1,12 @@
 ---
 name: foodiya-ui-auth
-description: 'Compose Foodiya native authentication frames, fields, icon actions and preference controls using their existing Host.'
+description: 'Compose Foodiya native authentication frames and login preference controls using their existing Host.'
 ---
 
 # Authentication frame
 
-Shared exports: `AuthScreenFrame`, `AuthIconButton`, `AuthIconButtonProps` and
-`authInputIcons`. [LoginPreferences](../../../src/features/auth/login-preferences.tsx)
+Shared export: `AuthScreenFrame`.
+[LoginPreferences](../../../src/features/auth/login-preferences.tsx)
 belongs to the auth feature and is imported locally by Login.
 
 `auth-screen-frame.tsx` owns keyboard/safe-area layout, the full-width native
@@ -19,7 +19,7 @@ SwiftUI/Compose modifiers center the padded content without fixing its height.
 Its optional `topBar` slot renders outside the scrolling
 form, below the frame's top safe area. Read shared colors with `useThemeColors`
 and the owning `useHostColorScheme`; use `useAppTheme` when both scheme and colors
-are needed. `auth-input-icons.ts` holds native symbol choices.
+are needed. Consumers select input symbols directly with `Icon.select`.
 
 `grouped` selects a native `FieldGroup` instead of the regular refreshable scroll
 container. Registration supplies sections directly to this mode and shares the
@@ -39,9 +39,9 @@ Heading font selection preserves the native Android/iOS font names and leaves
 Arabic to its existing font fallback. Keyboard and safe-area layout stay in the
 same frame.
 
-Login supplies `LoginPreferences` in the top bar: a globe icon on the physical
-left and the shared System/Light Mode/Dark Mode native picker on the physical
-right. The top-bar Host explicitly
+Login supplies `LoginPreferences` in the top bar: a labeled language button on
+the physical left and the shared System/Light Mode/Dark Mode native picker on
+the physical right. The top-bar Host explicitly
 uses LTR to preserve these positions in Arabic. The language sheet is outside
 that Host and uses Expo UI's own native hosting. Choosing French,
 English or Arabic updates the existing language provider and closes the sheet.
@@ -53,18 +53,14 @@ device appearance; Light Mode and Dark Mode stay fixed until another choice is
 selected. Choosing System again resumes automatic detection. Brand selection
 stays in App Settings.
 
-The shared `auth-icon-button.*` adapters use a native 48-point plain SwiftUI
-button or Material IconButton with translated accessibility labels. Icon/tint
-colors come from the caller's shared theme. `AuthIconButton` requires `icon`,
-`color`, `accessibilityLabel`, `testID` and `onPress`; `disabled` is optional.
-It reuses the owning Host. Disabled language controls suppress activation
-until language restoration is ready. No new UI dependency is needed.
+The language action uses the shared `UniversalButtonContent` with `variant="link"`
+and a translated label. It reuses the owning Host and disables activation until
+language restoration is ready.
 
 `Forms/Login Form` covers the native frame, grouped forms, pending state and
 an editable draft. `HostSchemeOverride` gives the form a dark Host while app
 preferences stay light; fields and feedback must inherit that Host.
-`IconAction` exposes an activation count; its Pending control disables the native
-icon action. Automated suites have been removed. Check saved language, all three
+Automated suites have been removed. Check saved language, all three
 appearance choices, live device changes, translated options, draft retention, placement and
 dismissal manually. Touch targets, keyboard layout and sheet accessibility require
 device checks. Existing test IDs are retained for future tests.

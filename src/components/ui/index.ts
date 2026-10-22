@@ -13,9 +13,6 @@ export {
 } from '@expo/ui';
 
 export * from './appearance/color-scheme-control';
-export * from './auth/auth-icon-button';
-export type { AuthIconButtonProps } from './auth/auth-icon-button.types';
-export * from './auth/auth-input-icons';
 export * from './auth/auth-screen-frame';
 export * from './bottom-sheet/bottom-sheet';
 export * from './button/universal-button';

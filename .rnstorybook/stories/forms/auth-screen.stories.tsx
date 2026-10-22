@@ -5,12 +5,7 @@ import {
   AuthScreenFrame,
   FormSubmit,
   FormTextInput,
-  authInputIcons,
-  AuthIconButton,
-  Row,
-  UniversalHost,
-  UniversalTextContent as Text,
-  useHostColorScheme,
+  Icon,
 } from '@components/ui';
 import type { Meta, StoryObj } from '@storybook/react-native';
 import { useState } from 'react';
@@ -18,7 +13,6 @@ import { View } from 'react-native';
 import { useForm } from 'react-hook-form';
 import { loginResolver } from '@/validation/resolvers/auth';
 import type { LoginFormValues } from '@/validation/schemas/auth';
-import { useThemeColors } from '@/hooks/use-theme';
 
 function NativeFormDemo({
   pending = false,
@@ -51,7 +45,11 @@ function NativeFormDemo({
         name="login"
         label="Email or username"
         helperText={loginHelperText}
-        leftIcon={icons ? authInputIcons.person : undefined}
+        leftIcon={
+          icons
+            ? Icon.select({ ios: 'person', android: require('@expo/material-symbols/person.xml') })
+            : undefined
+        }
         testID="native-form-login"
         disabled={pending}
         autoCapitalize="none"
@@ -63,7 +61,11 @@ function NativeFormDemo({
         control={form.control}
         name="password"
         label="Password"
-        leftIcon={icons ? authInputIcons.password : undefined}
+        leftIcon={
+          icons
+            ? Icon.select({ ios: 'lock', android: require('@expo/material-symbols/lock.xml') })
+            : undefined
+        }
         passwordToggle={icons ? 'icon' : 'button'}
         testID="native-form-password"
         password
@@ -91,26 +93,6 @@ function NativeFormDemo({
         {grouped ? <FieldGroup.Section title="Account">{fields}</FieldGroup.Section> : fields}
       </AuthScreenFrame>
     </View>
-  );
-}
-
-function NativeIconActionDemo({ disabled = false }: { disabled?: boolean }) {
-  const [activations, setActivations] = useState(0);
-  const colors = useThemeColors(useHostColorScheme());
-  return (
-    <UniversalHost>
-      <Row alignment="center" spacing={12}>
-        <AuthIconButton
-          icon={authInputIcons.person}
-          color={colors.tint}
-          accessibilityLabel="Test icon action"
-          testID="auth-icon-action"
-          disabled={disabled}
-          onPress={() => setActivations((count) => count + 1)}
-        />
-        <Text testID="auth-icon-action-count">{`Activations: ${activations}`}</Text>
-      </Row>
-    </UniversalHost>
   );
 }
 
@@ -153,8 +135,4 @@ export const HostSchemeOverride: Story = {
     frameColorScheme: 'dark',
     loginHelperText: 'Fields and validation feedback follow the dark form Host.',
   },
-};
-
-export const IconAction: Story = {
-  render: ({ pending }) => <NativeIconActionDemo disabled={pending} />,
 };

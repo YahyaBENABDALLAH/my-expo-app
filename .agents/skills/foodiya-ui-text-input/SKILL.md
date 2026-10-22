@@ -101,8 +101,9 @@ Compose's initial unfocused notification and repeated focus transitions.
 
 For password visibility, keep one wrapper and string state; toggle
 `secureTextEntry`, the named eye icon and its translated accessibility label.
-Reuse public `authInputIcons`. The native value and public ref stay coordinated,
-but iOS switches between native TextField/SecureField internally: check focus
+Select symbols with `Icon.select` in the consuming component. The native value
+and public ref stay coordinated, but iOS switches between native
+TextField/SecureField internally: check focus
 and keyboard behavior on device rather than promising identical selection.
 For actual form passwords, prefer `FormTextInput`'s existing password options.
 Do not echo a hidden password in helper text, debug counters or logs.

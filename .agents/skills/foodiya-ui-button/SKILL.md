@@ -98,7 +98,7 @@ confirmation or deletion by itself.
 
 Generic icon-only buttons are not fully exposed by this public API: there is no
 button-level `accessibilityLabel` prop, and `label` is ignored with custom
-children. Use an existing matching native icon-control adapter for auth,
+children. Use an existing matching native icon-control adapter for
 navigation, input, or floating actions. If a new generic icon-only action is
 requested, extend the shared contract and both adapters with accessible naming;
 do not invent an unsupported prop or rely on an unlabeled icon. Icon-and-text

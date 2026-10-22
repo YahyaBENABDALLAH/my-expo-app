@@ -2,8 +2,8 @@
 
 The iOS/Android auth screens adapt `Reference/`'s palette, spacing, decorative heading font, and form layout. Each `AuthScreenFrame` owns one `@expo/ui` Host with the app scheme and seed color. Native ScrollView and Column layouts contain host-free UniversalTextContent, UniversalButtonContent, FormTextInput, and FormSubmit content. React Native keyboard avoidance stays outside the Host. The Likan brand stays in the screen header.
 
-The shared [auth UI family](../src/components/ui/auth/) owns the frame, native icon
-action and input icons. Login owns its [preferences bar](../src/features/auth/login-preferences.tsx)
+The shared [auth UI family](../src/components/ui/auth/) owns the screen frame.
+Login owns its [preferences bar](../src/features/auth/login-preferences.tsx)
 in the auth feature. The [auth UI skill](../.agents/skills/foodiya-ui-auth/SKILL.md)
 defines their composition contract.
 
