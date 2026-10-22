@@ -25,7 +25,7 @@ Android uses Expo UI's native Compose `SnackbarHost`; iOS uses a SwiftUI text/bu
 
 Screens retain drafts, client-side field validation, cached content, and retry controls. `QueryContent` keeps persistent failure context beside Retry after a toast disappears, with separate initial-load and saved-content messages. Avoid reporting the same error again in consumer callbacks. When an imperative operation runs outside the shared query client, catch it with `reportErrorToast(error)`; do not add notification effects to entity transport methods. Local collection failures handled by the shared cache also use toasts.
 
-The Components/Toast story exposes notification props through Controls; `.maestro/components/error-toast.yaml` covers dismissal and reopening when a native device is available. The maintained JS suite is limited to components and forms.
+The Components/Toast story exposes notification props through Controls. Check dismissal and reopening manually on a native device; existing selectors remain available for future tests.
 
 ## Module responsibilities
 
@@ -236,4 +236,4 @@ The chef-by-user helper scans documented profile list pages because the backend 
 
 ## Verification
 
-The service-specific test suite was removed during the component/form cleanup. Run `npm test` for the maintained suites; service integration and backend behavior need separate verification.
+Automated suites have been removed. Run `npm run check` for TypeScript, lint and formatting; verify service integration and backend behavior against the app and backend.

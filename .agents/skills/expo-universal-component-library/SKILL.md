@@ -11,14 +11,14 @@ Apply the sibling [mobile UI requirements](../expo-mobile-ui-only/SKILL.md): iOS
 
 1. Read the installed Expo and `@expo/ui` versions. Follow `AGENTS.md` for versioned documentation.
 2. Read [the component catalog](references/components.md) to find every universal component, its official documentation, local wrapper, story coverage, and useful test scenarios. Read only the relevant component's API page and installed types before writing code.
-3. Reuse `src/components/ui/` wrappers. Keep each component family's implementation, platform adapters, types and private helpers in its existing folder, with a short README. Use the root public barrel; avoid additional folder levels and barrels. Add a wrapper only when it supplies project behavior, theme, or a necessary platform adaptation; do not wrap exports merely to rename them.
+3. Reuse `src/components/ui/` wrappers. Keep each component family's implementation, platform adapters, types and private helpers in its existing folder. Maintain its contract in the matching component skill. Use the root public barrel; avoid additional folder levels and barrels. Add a wrapper only when it supplies project behavior, theme, or a necessary platform adaptation; do not wrap exports merely to rename them.
 4. Prefer root imports from `@expo/ui`. Isolate necessary SwiftUI/Compose implementations in platform files outside `src/app/`. Preserve a common public contract.
-5. When changing a component, update its catalog entry with supported props, limitations, theme roles, story file, and behavioral verification. Refresh the inventory after SDK/package upgrades.
+5. When changing a component, update its catalog entry and matching skill with supported props, limitations, theme roles, current story paths, and verification. Refresh the inventory after SDK/package upgrades.
 6. Ordinary layout uses Expo UI `Row`, `Column` and `Spacer`; RN geometry is reserved for a documented infrastructure or specialized rendering boundary. Use a content component within an existing Host and a standalone hosted wrapper only when embedding in RN.
 
 ## Theme and Storybook contract
 
-- Follow [theme-token guidance](references/theme.md). Use existing semantic tokens, preserve native control geometry and feedback, and document differences between iOS and Android.
+- Follow [theme-token guidance](references/theme.md) and [palette ownership](references/theme-palettes.md). Use existing semantic tokens, preserve native control geometry and feedback, and document differences between iOS and Android.
 - Require a semantic variant at every project button call. Follow [the button skill](../foodiya-ui-button/SKILL.md) for current variants, props, Host ownership and composition examples; never provide a fallback variant or revive legacy size/rounded props. Use native icon/navigation adapters for their specialized native controls.
 - Let content inherit its owning `UniversalHost` color scheme through `useHostColorScheme`, with an explicit component override when requested. Deterministic light/dark stories must not silently read the device theme.
 - Loading uses native `LoadingIndicator` platform adapters, `LoadingContent` inside a Host and `LoadingScreen` at a route/Suspense boundary. Exercise disabled, offline, initial failure, empty success, cached refresh and refresh failure in composition stories.

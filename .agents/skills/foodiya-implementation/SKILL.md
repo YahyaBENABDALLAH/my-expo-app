@@ -20,11 +20,10 @@ packages and current source determine available APIs.
 | Find a component's skill and source                     | The relevant row in [component skills](references/component-skills.md)                                                          |
 | Backend entity, response validation, query, or mutation | [API services](../expo-api-services/SKILL.md)                                                                                   |
 
-The component index distinguishes authored guidance from empty reservations.
-Read the relevant authored skill, such as [buttons](../foodiya-ui-button/SKILL.md),
-when its component is involved. Empty skills supply no additional behavior or API
-guidance; use the component's current source, README, and shared skills until its
-instructions are authored. Do not load every component skill for a single change.
+Read the relevant component skill, such as [buttons](../foodiya-ui-button/SKILL.md),
+when its family is involved. Each skill owns its component guidance; longer
+contracts use linked references. Use [the documentation index](../../../docs/index.md)
+for project guides. Do not duplicate this material in source-folder READMEs.
 
 ## Implementation contract
 

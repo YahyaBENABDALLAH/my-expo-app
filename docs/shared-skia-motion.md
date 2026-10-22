@@ -24,10 +24,10 @@ the drift to zero. Resuming excludes paused time; a delayed frame advances by at
 most 64 ms. Page-local masks join the existing root phase when they mount. The
 memoized frame callback is retained through root updates and navigation changes.
 `Pages/Shared Skia motion/NavigationContinuity` replaces page frames beneath a
-single overlay and offers pause/resume and back actions. Its Maestro flow checks
-those controls; the JS geometry suite checks continuity at 60/120 Hz through page
-replacement and lifecycle pauses on both platform adapters. Native visual
-continuity remains unverified without a connected device.
+single overlay and offers pause/resume and back actions. Automated suites have
+been removed; existing test IDs remain for future tests. Check these controls,
+continuity through page replacement and lifecycle pauses manually on both
+platforms with a connected device.
 
 The splash's bottom edge uses this same component with `variant="splash"`. This variant keeps its original wave paths, opposite drift and lit crest, with opaque theme fills and normal-flow placement to form the moving reveal edge. The waves continue animating throughout the 300-ms upward exit. The 80-point `PAGE_WAVE_HEIGHT` keeps splash artwork and exit geometry consistent; titled headers use their own measurements.
 
@@ -39,11 +39,11 @@ The root hides the native splash once the animated launch screen receives native
 
 Root, authentication and onboarding stacks share `stackMotionOptions` from `src/constants/navigation-motion.ts`. Android uses `slide_from_right` so route text does not cross-fade together. iOS uses `simple_push` with a 220-ms duration and matching dismissal gesture. Reduced Motion disables stack animation. Android retains `freezeOnBlur` to avoid updates to covered screens. [Expo's stack options](https://docs.expo.dev/router/advanced/stack/) document the supported transitions and the iOS-only duration setting.
 
-`Pages/Skia background` stories cover the combined aurora and header wave in Light, Dark, Static and NarrowPhone with page content, native action buttons, an action counter and pause/resume controls. `.maestro/storybook/aurora-background.yaml` checks one action per tap and those control states across light/dark/static compositions. `Pages/Animated splash/Ready` and `Waiting` preview the production launch artwork and support replay. `Pages/Shared Skia motion` retains focused previews of the top-edge wave.
+`Pages/Skia background` stories cover the combined aurora and header wave in Light, Dark, Static and NarrowPhone with page content, native action buttons, an action counter and pause/resume controls. Check one action per tap and those control states manually across light/dark/static compositions. `Pages/Animated splash/Ready` and `Waiting` preview the production launch artwork and support replay. `Pages/Shared Skia motion` retains focused previews of the top-edge wave.
 
 ## Verification
 
-Completed checks:
+Historical checks, recorded before automated suites were removed:
 
 - `npm run typecheck` and `npm run lint` pass.
 - Focused checks across `geometry-stability`, `layout-direction`, `motion-enabled` and navigation cover startup readiness, the header wave resuming after launch, opaque navigation surfaces, platform transition choices, direction changes, accessibility/activity guards and route behavior. Simulated 60/120-Hz frame callbacks verify 30 shader updates per second on Android, unchanged motion speed, pause/resume without a jump and unmount cleanup.
@@ -52,11 +52,7 @@ Completed checks:
 
 An iPhone 18 Pro simulator on iOS 27 was checked by opening History from My Recipes and returning with the page back button. Both destinations rendered with opaque backgrounds and the header wave remained visible. Frame-by-frame transition analysis and native performance remain unverified; Android device and Maestro tooling are unavailable. The portable checks mock native boundaries and cannot establish device frame rate or touch delivery. For broader native coverage, cold-launch the app and inspect the Lottie/Skia presentation and transition. Inspect light/dark auth, tab, detail, map and tool pages; confirm native headers, buttons and inputs remain readable and interactive. Enable Reduce Motion while open, background/resume the app, push/pop screens and resize/rotate on supported devices. Check the native splash handoff and smoothness in a release build on the slowest supported device.
 
-Run the focused native interaction flow with a connected development build:
-
-```sh
-maestro test .maestro/storybook/aurora-background.yaml
-```
+Use the native stories for manual interaction checks with a connected development build.
 
 On 2026-10-21, the iPhone 18 Pro simulator on iOS 27 was used to open the actual
 Settings → Appearance → Header motion menu and select Water, Rain and Smoke.

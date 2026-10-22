@@ -10,24 +10,15 @@ import {
 import type { Meta, StoryObj } from '@storybook/react-native';
 import { useState } from 'react';
 import { action } from 'storybook/actions';
-import { useAppTheme } from '@/hooks/use-theme';
 import { NativeStoryFrame } from '../../components/native-story-frame';
-import { semanticButtonColors } from '../../components/semantic-button-colors';
 import type { StoryThemeProps } from '../../components/story-theme';
 
 function ButtonDemo(args: UniversalButtonProps) {
-  const theme = useAppTheme(args.colorScheme);
-  const colors =
-    theme.themeId === 'ux' || args.color !== undefined || args.contentColor !== undefined
-      ? {}
-      : semanticButtonColors(args.variant, theme.colors);
   const [presses, setPresses] = useState(0);
   return (
     <NativeStoryFrame colorScheme={args.colorScheme}>
       <UniversalButton
         {...args}
-        color={args.color ?? colors.color}
-        contentColor={args.contentColor ?? colors.contentColor}
         onPress={() => {
           setPresses((value) => value + 1);
           args.onPress?.();
@@ -112,14 +103,11 @@ export const Glass: Story = { args: { variant: 'glass', label: 'Open options' } 
 
 function InteractionDemo(args: UniversalButtonProps) {
   const [presses, setPresses] = useState(0);
-  const theme = useAppTheme(args.colorScheme);
-  const colors = theme.themeId === 'ux' ? {} : semanticButtonColors(args.variant, theme.colors);
   return (
     <NativeStoryFrame colorScheme={args.colorScheme}>
       <UniversalHost colorScheme={args.colorScheme}>
         <Column spacing={16}>
           <UniversalButtonContent
-            {...colors}
             variant={args.variant}
             label="Count press"
             testID="button-count"
@@ -149,3 +137,65 @@ function InteractionDemo(args: UniversalButtonProps) {
 }
 
 export const Interaction: Story = { render: (args) => <InteractionDemo {...args} /> };
+
+/** Use component defaults so a preview cannot hide a missing semantic color mapping. */
+function SemanticVariantsDemo({ colorScheme }: Pick<UniversalButtonProps, 'colorScheme'>) {
+  const [presses, setPresses] = useState(0);
+  return (
+    <NativeStoryFrame colorScheme={colorScheme}>
+      <UniversalHost colorScheme={colorScheme}>
+        <Column spacing={16}>
+          {(
+            [
+              'primary',
+              'secondary',
+              'tertiary',
+              'link',
+              'success',
+              'warning',
+              'info',
+              'destructive',
+              'glass',
+            ] as const
+          ).map((variant) => (
+            <UniversalButtonContent
+              key={variant}
+              variant={variant}
+              label={variant}
+              fullWidth
+              testID={`button-semantic-${variant}`}
+              onPress={() => setPresses((value) => value + 1)}
+            />
+          ))}
+          <UniversalButtonContent
+            variant="warning"
+            label="Disabled warning"
+            disabled
+            fullWidth
+            testID="button-semantic-disabled"
+            onPress={() => setPresses((value) => value + 1)}
+          />
+          <UniversalTextContent testID="button-semantic-presses">
+            {`Presses: ${presses}`}
+          </UniversalTextContent>
+          <UniversalButtonContent
+            variant="link"
+            label="Reset count"
+            testID="button-semantic-reset"
+            onPress={() => setPresses(0)}
+          />
+        </Column>
+      </UniversalHost>
+    </NativeStoryFrame>
+  );
+}
+
+export const SemanticVariantsLight: Story = {
+  args: { colorScheme: 'light' },
+  render: (args) => <SemanticVariantsDemo colorScheme={args.colorScheme} />,
+};
+
+export const SemanticVariantsDark: Story = {
+  args: { colorScheme: 'dark' },
+  render: (args) => <SemanticVariantsDemo colorScheme={args.colorScheme} />,
+};

@@ -94,15 +94,13 @@ contrast on filled actions, page surfaces and matching feedback containers;
 and RTL fixtures. `Expo UI/Theme Tokens` displays semantic buttons, native controls
 and 13 core semantic color roles in light/dark fixtures. Both default to UX Template;
 all native stories now share themeId and colorScheme Controls through one isolated
-preview provider. See [native Storybook](../.rnstorybook/README.md). JS fixture tests exercise live changes,
-draft preservation, preferences across pages, safe-area ownership and text/action
-contrast. The Maestro `pages/app-settings.yaml` flow checks theme selection,
-including UX Template retained across navigation,
-mode changes (including returning to System), language sheet selection/dismissal and preferences retained after leaving and reopening settings.
-JS tests cover live device changes, manual overrides, returning to System and
-the light fallback when native appearance is unavailable. Native OS appearance
-changes, menu appearance, focus, touch targets and cutouts still require
-iOS/Android device verification.
+preview provider. See [native Storybook](storybook.md). Automated suites
+have been removed; existing test IDs remain for future tests. Check live theme
+changes, draft preservation, preferences across pages, safe-area ownership and
+text/action contrast manually. Include UX Template retained across navigation,
+returning to System, language sheet selection/dismissal and preferences retained
+after reopening settings. Verify native OS appearance changes, menus, focus,
+touch targets and cutouts on iOS and Android devices.
 
 Selectors: `page-action-app-settings`, `app-settings-appearance`,
 `app-settings-color-scheme-picker`, `app-settings-theme-picker`, `app-settings-language`,

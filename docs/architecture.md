@@ -17,12 +17,12 @@ This app uses feature modules with explicit responsibilities. Expo Router files 
 
 Dependencies flow from screens/workflows toward domain rules, feature adapters, and shared infrastructure. Services never import feature UI. Domain modules do not import React, Expo, cache libraries, or services. Feature operations import exact modules directly. Screens import shared presentation through `@components/ui`; UI implementations import siblings directly to avoid cycles.
 
-The [components guide](../src/components/README.md) explains placement. Shared UI
+The [components guide](ui.md) explains placement. Shared UI
 uses one folder per component or small family, with native adapters, types,
 private helpers and a README together. The public `@components/ui` API stays
 stable; implementations import concrete files directly without extra barrels.
 
-The [shared UI guide](../src/components/ui/README.md) lists controls, fields, screen
+The [shared UI guide](ui.md) lists controls, fields, screen
 frames, loading states, toast hosts and navigation presentation. Auth actions use
 the universal button implementation with the auth Host palette. Storybook-only
 hosted showcase wrappers live in `.rnstorybook/components/showcase/`. ESLint rejects

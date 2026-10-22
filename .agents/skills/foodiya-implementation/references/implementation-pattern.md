@@ -36,7 +36,7 @@ adding another transport path. See the maintained
 ## Implement a coherent feature slice
 
 1. Locate the current screen, route, workflow, UI consumers, schemas, and relevant
-   tests with `rg`. Read the nearest README and installed types. Establish the
+   tests with `rg`. Read the relevant component skill and installed types. Establish the
    observable result, affected states, and existing public contract.
 2. Start at the changed contract. For a UI-only change, stay in presentation. For
    a data change, confirm the backend contract, update schemas/DTOs and transport,
@@ -94,8 +94,7 @@ behavior, and alignment between visible surfaces and touch targets.
 For detailed library requirements, use
 [the component-library skill](../../expo-universal-component-library/SKILL.md).
 Find the family's skill through [the component index](component-skills.md) and
-read its authored guidance when available. Reserved skills with an empty body
-add no constraints.
+read its canonical component guidance and only the references needed for the task.
 
 ## Preserve product states and localization
 
@@ -125,16 +124,16 @@ change; reuse the live providers rather than introducing reload-based switching.
 - Always run `npm run typecheck` and `npm run lint`. Check formatting on edited
   files, without rewriting unrelated working-tree changes.
 - Read current `package.json` scripts and existing tests before choosing targeted
-  checks. `npm test` currently covers component and form suites; do not assume it
-  runs every test directory or that older documented script names still exist.
+  checks. automated suites and Maestro flows have been removed. Do not restore old
+  test commands from historical guides; use current package scripts.
 - For reusable UI behavior, update a discoverable native story or focused
   composition story with deterministic fixtures and stable selectors. Regenerate
   registration after story changes. Use affected tests for meaningful behavior,
   not new tests that only assert documentation wording or file placement.
 - On available native devices, exercise the affected iOS and Android interactions,
   relevant light/dark and RTL states, keyboard, large text, and touch targets.
-  Existing Maestro flows may help. Static checks and JS fixtures do not prove
+  Use current native compositions for manual checks. Static checks and JS fixtures do not prove
   native rendering, interaction, or performance.
-- Update the existing component README, catalog, or architecture guide only when
+- Update the canonical component skill, catalog, or architecture guide only when
   its contract changed. Report implementation, validation results, and remaining
   verification limits without claiming device or live-backend checks from mocks.

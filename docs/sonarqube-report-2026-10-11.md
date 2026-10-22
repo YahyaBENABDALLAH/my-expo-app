@@ -47,9 +47,9 @@ from the legacy vulnerability/bug/code-smell categories above.
    [Sonar issue](http://localhost:9000/project/issues?id=my-app-expo&issues=a987dbb2-b462-4ddd-907b-2e281b417862).
 
 2. **All three reported bugs are Storybook export names.**
-   `Error` in [loading-state.stories.tsx](../.rnstorybook/stories/expo-ui/loading-state.stories.tsx),
+   `Error` in [loading-state.stories.tsx](../.rnstorybook/stories/components/loading-state.stories.tsx),
    line 110; `Error` and `Number` in
-   [text-input.stories.tsx](../.rnstorybook/stories/expo-ui/text-input.stories.tsx),
+   [text-input.stories.tsx](../.rnstorybook/stories/components/text-input.stories.tsx),
    lines 270 and 414, rule `typescript:S2137`. These names shadow built-in
    constructors. The loading fixture explicitly uses `globalThis.Error`, and the
    text-input fixture does not call either shadowed constructor. No runtime failure

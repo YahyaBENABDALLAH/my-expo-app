@@ -42,15 +42,15 @@ spread arbitrary upstream Button or RN Pressable props into these wrappers.
 
 The current [semantic mapping](../../../../src/components/ui/button/semantic-button-colors.ts)
 and [color resolver](../../../../src/components/ui/button/use-wireframe-button-colors.ts)
-are the source of truth. UX maps primary to primary/onPrimary, secondary to
+are the source of truth. Every theme maps primary to primary/onPrimary, secondary to
 secondary, tertiary to muted, link to tint, success/warning/info to their paired
 status tokens, destructive to error/onError, and glass to surfaceVariant/text.
-Brand themes leave native colors intact unless a caller supplies overrides.
+These pairs apply automatically unless a caller supplies color overrides.
 
-Supplying either `color` or `contentColor` skips automatic UX pairs entirely.
+Supplying either `color` or `contentColor` skips automatic semantic pairs entirely.
 Supply a coherent pair from existing semantic tokens when a specific foreground
-and accent are required. Do not assume setting only one preserves the other UX
-default, or that status variants automatically become red/green in brand themes.
+and accent are required. Do not assume setting only one preserves the other
+default. Status hues come from the active theme rather than fixed color names.
 
 On iOS, `color` is a tint; `contentColor` becomes the label foreground. For plain
 or bordered buttons, `color` also supplies the label foreground when no explicit
@@ -60,7 +60,7 @@ expose an Android outline-color override. Native controls own pressed and
 disabled treatments. Custom-colored children can override inherited label color.
 
 `UniversalButton` owns a raw Expo `Host`, not `UniversalHost`. It forwards its
-explicit `colorScheme`, sets intrinsic/full-width sizing, and resolves UX colors
+explicit `colorScheme`, sets intrinsic/full-width sizing, and resolves semantic colors
 once. It does not independently provide the project's Host React contexts or
 explicit layout-direction/seed-color props. For a group requiring shared app
 scheme, tint, and live direction, prefer `UniversalHost` with content buttons;

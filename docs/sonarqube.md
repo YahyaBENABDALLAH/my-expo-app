@@ -13,8 +13,8 @@ only on `127.0.0.1`. Its data, logs, and extensions use dedicated Docker volumes
 This is a local evaluation instance with an embedded database.
 
 `sonar-project.properties` scans application code, maintained Storybook code,
-GitHub workflows, and app/build configuration. Tests and their helpers are
-classified as test code. Generated `storybook.requires.ts` is excluded.
+GitHub workflows, and app/build configuration. Automated tests and their helpers
+have been removed. Generated `storybook.requires.ts` is excluded.
 Dependencies, native build output, assets, and documentation are outside the
 configured source roots. Scanner output and local credentials are Git-ignored.
 
@@ -75,7 +75,6 @@ Run from the project root:
 ```powershell
 npm run typecheck
 npm run lint
-npm test
 $env:SONAR_HOST_URL = 'http://localhost:9000'
 $token = Get-Content .sonarqube-local/token.dpapi | ConvertTo-SecureString
 $sonarCredential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList 'token', $token

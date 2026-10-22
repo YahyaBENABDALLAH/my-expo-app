@@ -14,7 +14,7 @@ Use the shared native buttons from `@components/ui`. Follow the project's
 
 Before choosing props, read the current
 [types](../../../src/components/ui/button/universal-button.types.ts) and
-[button guide](../../../src/components/ui/button/README.md). For native behavior,
+[button guide](references/component-guide.md). For native behavior,
 check both platform adapters. For Expo API changes, read the installed Expo
 major and matching documentation as required by `AGENTS.md`. The reference links
 below were checked against SDK 57 and `@expo/ui` 57.0.21; recheck after upgrades.
@@ -62,9 +62,8 @@ values; never substitute upstream `filled`, `outlined`, or `text` strings.
 | `destructive` | Delete/remove action                     | Bordered prominent plus destructive role          | Filled Button   |
 | `glass`       | Requested native glass treatment         | Glass on iOS 26+, automatic fallback on older iOS | OutlinedButton  |
 
-Intent does not guarantee a particular status color in every theme. Brand themes
-retain native defaults unless callers supply semantic pairs; UX applies the
-project's semantic pairs automatically. Read
+Every theme applies its semantic color pairs by default. Primary and success
+can share a hue when the active theme deliberately assigns the same token. Read
 [props and styling](references/props-and-styling.md) before overriding colors or
 geometry. A `link` variant supplies appearance only: invoke Expo Router from the
 consumer's `onPress` for navigation. A destructive variant does not perform
@@ -112,12 +111,11 @@ and disabled activation, pending recovery, readable labels, and RTL/large text.
 For geometry or custom content, check visible bounds and edge taps on native
 iOS and Android; JS mocks do not establish native accessibility or touch targets.
 
-For changes to button behavior, use
-[existing regression tests](../../../tests/components/universal-button.test.mjs),
-[native stories](../../../.rnstorybook/stories/components/button.stories.tsx), and
-[the button Maestro flow](../../../.maestro/components/button.yaml). Confirm
-current paths rather than copying older guides. Run `npm run typecheck` and
-`npm run lint`; run `node --test tests/components/universal-button.test.mjs`
-when behavior changes, and regenerate registration if stories change.
+For button behavior changes, use the
+[native stories](../../../.rnstorybook/stories/components/button.stories.tsx),
+including SemanticVariantsLight and SemanticVariantsDark. Run `npm run typecheck`
+and `npm run lint`; regenerate registration with `npm run storybook:generate`
+when stories change. Automated suites and Maestro flows have been removed;
+keep existing selectors and report native device verification separately.
 For skill-only changes, validate metadata, links, and examples against the current
 types without claiming native device verification.

@@ -5,15 +5,15 @@ import type { UniversalButtonProps } from './universal-button.types';
 
 type ColorProps = Pick<UniversalButtonProps, 'variant' | 'color' | 'contentColor' | 'colorScheme'>;
 
-/** UX keeps exact primary and semantic pairs; a native seed can change their contrast. */
+/** Every theme supplies semantic intent colors instead of reusing the Host's accent. */
 export function useWireframeButtonColors({
   variant,
   color,
   contentColor,
   colorScheme,
 }: ColorProps) {
-  const { themeId, colors } = useAppTheme(useHostColorScheme(colorScheme));
-  if (themeId !== 'ux' || color !== undefined || contentColor !== undefined) {
+  const { colors } = useAppTheme(useHostColorScheme(colorScheme));
+  if (color !== undefined || contentColor !== undefined) {
     return { color, contentColor };
   }
   return semanticButtonColors(variant, colors);

@@ -56,7 +56,6 @@ module.exports = defineConfig([
       '.expo/**',
       '.scannerwork/**',
       '.sonarqube-local/**',
-      '.maestro/results/**',
       '.rnstorybook/storybook.requires.ts',
       '.husky/_/**',
     ],

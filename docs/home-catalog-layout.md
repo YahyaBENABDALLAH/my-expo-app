@@ -52,11 +52,10 @@ The Node fixtures run production components and hooks with native view boundarie
 mocked. They verify state, layout inputs and callbacks; they cannot establish native
 rendering, touch behavior, gestures or absence of flicker.
 
-`npm run test:e2e:home` runs `.maestro/storybook/home-catalog.yaml`. It reuses the
-Storybook bootstrap, opens/closes Details three times, dismisses with Android back,
-selects a different recipe after swiping the hero rail, and opens the last item
-after scrolling the page vertically. Selectors are independent of translated
-wording. The flow is automatically included in the existing `.maestro` Storybook suite.
+The former native flow opened/closed Details three times, dismissed with Android
+back, selected a different recipe after swiping the hero rail, and opened the last
+item after scrolling the page vertically. Automated suites have been removed;
+selectors remain independent of translated wording for future tests.
 The horizontal gesture begins at the hero Save control so it follows the card's
 native geometry on each phone and avoids the floating developer controls.
 

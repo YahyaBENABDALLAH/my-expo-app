@@ -1,35 +1,22 @@
-# Native stories and tests
+# Native stories and verification
 
-Keep two groups: **Components** and **Forms**. Stories live in
-`.rnstorybook/stories/components/` and `.rnstorybook/stories/forms/`.
-Use one interactive story per component; add a separate story only when behavior
-needs a different harness. Use Controls for appearance, disabled states and minor
-prop variations. Do not recreate page, onboarding, service or decorative demos.
+Keep two groups: Components and Forms. Current discovery and source live in
+[the Storybook guide](../../../../docs/storybook.md),
+[component stories](../../../../.rnstorybook/stories/components/) and
+[form stories](../../../../.rnstorybook/stories/forms/).
 
-Use typed CSF stories from `@storybook/react-native`, production UI wrappers,
-local state and deterministic fixtures. Forms must not call the backend. Reuse
-the shared preview theme and `NativeStoryFrame` where appropriate. Native
-composition uses an owning Host with Row/Column; keep development imports out of
-production code. This project has no web Storybook.
+Use typed stories, public production UI, local state and deterministic fixtures.
+Forms do not call the backend. NativeStoryFrame provides the finite RN bridge
+width needed by standalone controls; content controls reuse their owning Host.
+The shared preview owns the theme. Use Controls for appearance and simple prop
+variations, with separate fixtures only when behavior needs a different setup.
+Keep Storybook imports out of production code.
 
-After story changes, run `npm run storybook:generate`, lint and typecheck.
+After story changes, run npm run storybook:generate, lint and typecheck.
+Automated suites and Maestro flows have been removed; read package.json before
+choosing commands. Keep existing selectors and manually exercise activation,
+disabled suppression, value retention, validation, dismissal and retry on devices.
 
-## Verification
-
-- `npm test` runs `tests/components/` and `tests/forms/`.
-- `npm run test:components` or `npm run test:forms` runs one JS suite.
-- `npm run test:e2e` runs the native component/form flows.
-
-Retain meaningful behavior checks: value/reset, disabled suppression, validation,
-submission, dismissal and retry. Avoid source-shape assertions and duplicate
-permutations. Shared JS helpers live in `tests/helpers/`.
-
-Native flows live in `.maestro/components/` and `.maestro/forms/`. Reuse
-`.maestro/helpers/open-story.yaml` with `STORY_ID` and `READY_ID`; assert a
-visible result after interacting. Use native target selectors and readiness
-conditions. See [device setup](../../../../docs/native-ui-tests.md) and
-[selectors](../../../../docs/storybook-test-ids.md).
-
-JS fixtures mock native boundaries. They do not prove SwiftUI/Compose layout,
-keyboard, accessibility, colors or touch geometry. Report native execution
-separately; do not claim device verification from registration or screenshots.
+JS mocks do not establish SwiftUI/Compose layout, keyboard behavior, accessibility,
+colors or touch geometry. Report native execution separately. Registration or
+a screenshot alone does not prove those behaviors.

@@ -19,7 +19,6 @@ import {
   type UniversalButtonVariant,
 } from '@components/ui';
 import { radii, spacing } from '@/constants/layout';
-import { themes } from '@/constants/themes';
 import { useAppTheme, useThemeColors } from '@/hooks/use-theme';
 
 const variants = [
@@ -273,7 +272,7 @@ export default function ButtonsScreen() {
       </GallerySection>
 
       <SemanticColorButtons onPress={recordPress} />
-      <StandaloneButtons onPress={recordPress} />
+      <StandaloneButton onPress={recordPress} />
 
       <PageSection>
         <UniversalTextContent testID="demo-button-count-footer">
@@ -357,42 +356,28 @@ function SemanticColorButtons({ onPress }: { onPress: (labelKey: string) => void
   );
 }
 
-function StandaloneButtons({ onPress }: { onPress: (labelKey: string) => void }) {
+function StandaloneButton({ onPress }: { onPress: (labelKey: string) => void }) {
   const { t } = useTranslation();
-  const { themeId } = useAppTheme();
+  const { colors } = useAppTheme('light');
   return (
     <GallerySection
       title={t('showcase.buttonGallery.standalone')}
       description={t('showcase.buttonGallery.standaloneHint')}
     >
       <RNHostView matchContents>
-        <View style={{ width: '100%', gap: spacing.md }}>
-          {(['light', 'dark'] as const).map((colorScheme) => {
-            const colors = themes[themeId].colors[colorScheme];
-            return (
-              <View
-                key={colorScheme}
-                style={{ backgroundColor: colors.background, padding: spacing.lg }}
-              >
-                <UniversalButton
-                  variant="primary"
-                  label={t(`showcase.buttonGallery.${colorScheme}Corners`)}
-                  colorScheme={colorScheme}
-                  color={colors.primary}
-                  contentColor={colors.onPrimary}
-                  contentPadding={spacing.lg}
-                  cornerRadii={
-                    colorScheme === 'light'
-                      ? { topLeft: radii.card, bottomRight: radii.card }
-                      : { topRight: radii.card, bottomLeft: radii.card }
-                  }
-                  fullWidth
-                  testID={`demo-button-standalone-${colorScheme}`}
-                  onPress={() => onPress(`showcase.buttonGallery.${colorScheme}Corners`)}
-                />
-              </View>
-            );
-          })}
+        <View style={{ width: '100%', backgroundColor: colors.background, padding: spacing.lg }}>
+          <UniversalButton
+            variant="primary"
+            label={t('showcase.buttonGallery.lightCorners')}
+            colorScheme="light"
+            color={colors.primary}
+            contentColor={colors.onPrimary}
+            contentPadding={spacing.lg}
+            cornerRadii={{ topLeft: radii.card, bottomRight: radii.card }}
+            fullWidth
+            testID="demo-button-standalone-light"
+            onPress={() => onPress('showcase.buttonGallery.lightCorners')}
+          />
         </View>
       </RNHostView>
     </GallerySection>

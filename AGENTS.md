@@ -4,7 +4,11 @@ This is an Expo/React Native mobile application. Prioritize mobile-first pattern
 
 For application features and component work, use [Foodiya implementation](.agents/skills/foodiya-implementation/SKILL.md). It defines the project implementation pattern and routes to the existing Expo, UI, and API skills.
 
-Find component-specific skills through its [component index](.agents/skills/foodiya-implementation/references/component-skills.md). Read authored component guidance when available, including [buttons](.agents/skills/foodiya-ui-button/SKILL.md). Skills marked empty contain discovery metadata only; follow shared skills and current source for those placeholders.
+Find component-specific skills through its [component index](.agents/skills/foodiya-implementation/references/component-skills.md). Read the relevant component guidance, including [buttons](.agents/skills/foodiya-ui-button/SKILL.md). Component contracts live in these skills and their linked references. Keep source folders focused on implementation.
+
+Use [the documentation index](docs/index.md) for project guides and follow
+[documentation ownership](docs/documentation.md) when updating guidance. Do not
+add per-component READMEs or duplicate a contract across docs and skills.
 
 ## Expo has changed — do not trust your training data
 

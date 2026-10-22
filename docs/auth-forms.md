@@ -14,7 +14,7 @@ a `UniversalHost` explicitly. Native width modifiers stretch the form within
 the available Host width. Follow the [SDK 57 Host boundary rules](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/host/#placing-components-inside-react-native-views).
 The session-restoration panel owns its own Host rather than adding one to each auth control.
 
-Storybook's Forms/Login Form stories exercise the actual frame, fields, password button, submit states, and text with one Host and no backend calls. Run `.maestro/forms/auth-screen.yaml` on both platforms to check validation, editing, one callback per press, and pending-state suppression. Repeat with the device in light/dark appearance; story registration alone does not verify native layout or interactions.
+Storybook's Forms/Login Form stories exercise the actual frame, fields, password button, submit states, and text with one Host and no backend calls. Check validation, editing, one callback per press, and pending-state suppression manually on both platforms. Repeat with the device in light/dark appearance; story registration alone does not verify native layout or interactions.
 
 Auth buttons use native SwiftUI/Compose controls with colors from `authButtonTokens`. They retain native shapes, padding, typography, disabled states, and press feedback. Full-width sizing happens natively inside the interactive surface; no JavaScript width measurements, custom painted background, or custom press animation is used.
 
@@ -55,8 +55,8 @@ API failures use the app's shared Expo UI toast flow, including login, registrat
 
 ## Verification
 
-Run `npm run typecheck`, `npm run lint`, and `npm run test:forms`. The focused suite covers validation, registration, password-reset drafts and OTP behavior.
+Run `npm run check` for TypeScript, lint and formatting. Automated form suites have been removed; component and story test IDs are retained for future coverage.
 
-Run `maestro test .maestro/forms` with a development build connected to Metro for local form and OTP fixtures. Live authentication, recovery delivery, keyboard layout and accessibility still require device verification. See [native testing](native-ui-tests.md).
+Use Storybook's local form and OTP fixtures for manual interaction checks. Verify live authentication, recovery delivery, keyboard layout and accessibility on iOS and Android devices.
 
 Selectors retain `auth-login-email` for the email-or-username field. Registration uses `auth-register-username`, `auth-register-first-name`, `auth-register-last-name`, `auth-register-email`, `auth-register-password`, and `auth-register-confirm-password`. Field errors append `-error`. Login and registration have person/mail/lock left icons; password and confirmation use an inline eye action (`-right-icon`) with Show password / Hide password accessibility labels. Each field keeps independent visibility state, starts masked, and disables its action while pending. `FormTextInput.passwordToggle="icon"` selects this composition; other forms retain the existing text button (`-visibility`). Use the Login Form story with the icons/pending Controls for password visibility and disabled states; device execution remains pending. Verification uses `auth-verify-code`, `auth-verify-submit`, and `auth-verify-resend`. API notifications use the root `error-toast` overlay; iOS text and dismissal selectors are `error-toast-message` and `error-toast-dismiss`, while Android uses native Snackbar accessibility. Account uses `auth-account` and `auth-logout`.

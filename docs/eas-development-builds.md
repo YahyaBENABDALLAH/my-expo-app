@@ -55,3 +55,87 @@ The remote development environment now provides `EXPO_PUBLIC_API_URL`. The dev
 client's Metro server also loads the project's local development environment
 when serving JavaScript. See [the 2026-10-10 cleanup verification](build-verification.md)
 for fresh builds of the unpatched dependency set and runtime verification limits.
+
+## iPhone Duo display support — 2026-10-21
+
+All iOS build profiles pin `macos-tahoe-26.6-xcode-27.1` so builds use the
+iOS 27.1 SDK. SDK 57's default Xcode 26 image leaves the app in iPhone Duo's
+compatibility window. Building with iOS 27.1 opts the app into using the full
+display; setting `ios.requireFullScreen` does not select that SDK.
+
+`app.json` enables `expo-build-properties`' `ios.enableSceneSupport` option.
+The locked Expo `57.0.27` and build-properties `57.0.22` support this SDK 57
+migration. Prebuild generates the scene manifest and moves React Native startup
+to Expo's scene delegate, which creates its window from `UIWindowScene` instead
+of `UIScreen.main.bounds`. Keep these changes in config rather than editing
+generated iOS files. The minimum supported iOS version remains unchanged.
+
+Create and install a new iOS binary after this change. Metro reloads and EAS
+Update cannot change an installed binary's build SDK or native scene lifecycle:
+
+```sh
+# Simulator development client
+npx eas-cli@latest build --platform ios --profile development
+
+# Signed physical-device preview
+npx eas-cli@latest build --platform ios --profile preview
+```
+
+After installation, verify a cold launch, folding/unfolding, rotation, keyboard
+access, navigation and asymmetric safe areas on iPhone Duo. Full display rendering
+and native compilation still require verification with the new binary.
+
+References: [Apple's iPhone Duo preparation guide](https://developer.apple.com/iphone-duo/prepare/),
+[Expo SDK 57 scene support](https://docs.expo.dev/versions/v57.0.0/sdk/build-properties/#pluginconfigtypeios),
+and [EAS build images](https://docs.expo.dev/build-reference/infrastructure/#ios-server-images).
+
+Local verification passed: TypeScript, zero-warning lint, Expo config introspection
+and the scene-startup transformation applied to the installed SDK template. No new
+cloud build or native device test was run for this change.
+
+## Google Play store updates
+
+The root layout enables `useStoreUpdates` after the launch screen exits. On
+Android release builds, it checks Google Play once per mounted app session and
+starts the native update flow when an update is available. The package chooses
+a permitted flexible/immediate flow from Play's update priority (4 or higher
+prefers immediate). The user accepts the Google Play prompt before updating.
+The package completes a flexible update after its download, which can restart
+the app. No OTA update service is involved.
+
+Debug builds and iOS skip the hook. Loading the native module is deferred and
+guarded so missing modules, offline checks and installs that are not eligible
+for Play updates do not block startup. A dismissed prompt or failed check is
+not retried on every foreground event; a new cold launch tries again. If a
+check finishes while the app is in the background, it waits for foreground
+before checking again or presenting an update.
+
+`expo-in-app-updates` is pinned to `0.13.0`. The app remains on Expo SDK 57.
+The package's release was developed with SDK 58 and Expo Modules 2.0; its peer
+dependencies accept this installation, but native compatibility still requires
+verification in a new Android build. The native module is autolinked;
+no config plugin, App Store ID or generated native source edits are needed for
+this Android integration. iOS autolinking explicitly excludes the package while
+App Store update support is disabled. Build and install a new Android binary to include it. Existing
+development clients cannot acquire native modules through a Metro reload.
+
+For device testing, use a release build installed through Google Play or its
+internal app sharing flow. A sideloaded development APK is not sufficient:
+
+1. Install an older release containing this integration through internal app
+   sharing. The tester must own the app in Google Play.
+2. Upload a build with the same application ID/signing key and a higher
+   `versionCode`. Open its sharing link without installing the newer build.
+3. Cold-launch the older app and accept the update prompt. Check dismissal,
+   offline startup and returning from the background as well.
+
+Internal app sharing does not support `inAppUpdatePriority`; use a Play test
+track when verifying priority-based immediate updates. Native compilation and
+the actual Play download/install flow still require a new build and device
+verification. See the [package documentation](https://github.com/SohelIslamImran/expo-in-app-updates)
+and [Google's testing guide](https://developer.android.com/guide/playcore/in-app-updates/test).
+
+Local verification passed: typecheck, zero-warning lint, formatting, all 135
+tests (including nine store-update lifecycle tests), Android Hermes production
+export and Android/iOS autolinking checks. These checks do not verify native
+compilation or a live Google Play installation.

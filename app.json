@@ -31,6 +31,14 @@
     "plugins": [
       "expo-router",
       [
+        "expo-build-properties",
+        {
+          "ios": {
+            "enableSceneSupport": true
+          }
+        }
+      ],
+      [
         "expo-font",
         {
           "fonts": ["./assets/fonts/Inter-Black.otf"]

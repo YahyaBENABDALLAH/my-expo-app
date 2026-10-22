@@ -9,12 +9,16 @@
       "distribution": "internal",
       "environment": "development",
       "ios": {
+        "image": "macos-tahoe-26.6-xcode-27.1",
         "simulator": true
       }
     },
     "preview": {
       "distribution": "internal",
       "environment": "preview",
+      "ios": {
+        "image": "macos-tahoe-26.6-xcode-27.1"
+      },
       "env": {
         "EXPO_PUBLIC_ENABLE_DEV_SCREENS": "true"
       }
@@ -22,6 +26,9 @@
     "production": {
       "autoIncrement": true,
       "environment": "production",
+      "ios": {
+        "image": "macos-tahoe-26.6-xcode-27.1"
+      },
       "env": {
         "EXPO_PUBLIC_ENABLE_DEV_SCREENS": "false"
       }

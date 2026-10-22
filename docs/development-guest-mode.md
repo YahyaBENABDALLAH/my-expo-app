@@ -12,4 +12,4 @@ For OTA preview updates, also set this flag to `true` in the EAS `preview` envir
 
 Exit from the page directory, Account, or More to return to signed-out routing. Restarting the app clears guest mode. Recipe publication and account-specific actions require a real login; backend endpoints may show authorization errors in guest mode. Detail buttons use a real loaded ID when available, otherwise an explicitly disclosed preview ID.
 
-Access regression tests cover production rejection, development and preview browsing, restoration, guest exit, screen links, and real-session routing. `.maestro/pages/development-guest.yaml` covers login entry, the directory, Home navigation, and exit. Native execution of this flow remains unverified.
+Automated suites have been removed; existing test IDs remain for future tests. Manually verify production rejection, development and preview browsing, guest exit, screen links and real-session routing, including Login entry, the directory and Home navigation.

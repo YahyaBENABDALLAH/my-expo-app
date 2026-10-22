@@ -33,6 +33,7 @@ import { AppQueryProvider } from '@/context/query-provider';
 import { ThemePreferencesProvider, useThemeSettings } from '@/context/theme.context';
 import { useAuthGuards } from '@/guards/auth-guards';
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import { useStoreUpdates } from '@/hooks/use-store-updates';
 import { useThemeColors } from '@/hooks/use-theme';
 import { screenInsets } from '@/lib/screen-insets';
 
@@ -114,6 +115,7 @@ function RootLayoutContent() {
   const revealBrandScreen = useCallback(() => {
     SplashScreen.hide();
   }, []);
+  useStoreUpdates(!showBrandScreen);
 
   return (
     <LoginTransitionContext.Provider value={holdLogin}>

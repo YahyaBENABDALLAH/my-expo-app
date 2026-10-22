@@ -55,7 +55,7 @@ Controlled evidence:
 | Last subscriber unmounts                     | Both native subscriptions released                                     |
 
 The fixtures do not run Reanimated's native animation engine. The updated
-[skeleton stories](../.rnstorybook/stories/expo-ui/skeleton.stories.tsx) include
+[skeleton stories](../.rnstorybook/stories/components/skeleton.stories.tsx) include
 `CSSAnimationControls` for fixed/flexible width, custom opacity and pause/resume,
 alongside the existing native-content examples.
 

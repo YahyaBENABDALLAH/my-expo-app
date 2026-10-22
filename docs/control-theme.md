@@ -1,11 +1,15 @@
 # Native control themes
 
-UX Template button exception (2026-10-16): when both button color props are omitted,
-the existing semantic pairs supply exact theme colors. Primary uses black
-with white labels in both appearances. This fixes a native white fill with an
-unreadable white label observed in the production Buttons page in dark mode.
-Explicit caller colors and brand-theme native defaults retain their behavior.
+Buttons use semantic colors in every theme when both color props are omitted.
+Primary, secondary, tertiary, link and status variants resolve their respective
+theme tokens rather than all inheriting the Host's primary accent. Explicit
+caller colors retain their existing override behavior. The native button stories
+use these same defaults and provide light/dark comparisons of all nine variants.
 Native geometry, disabled suppression and feedback remain platform-owned.
+
+The original UX Template correction (2026-10-16) supplies a black primary with
+white labels in both appearances. It fixed a native white fill with an unreadable
+white label observed in the production Buttons page in dark mode.
 At the user's request, the neutral UX foundations now pair with restrained red
 danger, green success and amber warning accents, plus matching light/dark
 containers. Only feedback accents are colored; primary remains black.
@@ -46,4 +50,4 @@ Context7 was consulted for Host theme propagation and native glass styles. Its r
 
 References: [Expo SDK 57 universal UI](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/), [SwiftUI modifiers](https://docs.expo.dev/versions/v57.0.0/sdk/ui/swift-ui/modifiers/), [Apple’s native Liquid Glass adoption](https://developer.apple.com/documentation/technologyoverviews/adopting-liquid-glass).
 
-The text-input follow-up was manually checked in the iOS 27 iPhone 18 Pro simulator: empty/filled password toggles kept the same visible field height and retained the value. Its native Storybook height assertions are saved. The duplicate RNCSafeAreaProvider dependency was removed by the Storybook update; architecture checks now guard shared native module resolution. Android and full large-text native checks remain pending. See the [input guide](../src/components/ui/text-input/README.md).
+The text-input follow-up was manually checked in the iOS 27 iPhone 18 Pro simulator: empty/filled password toggles kept the same visible field height and retained the value. Its native Storybook height assertions are saved. The duplicate RNCSafeAreaProvider dependency was removed by the Storybook update; architecture checks now guard shared native module resolution. Android and full large-text native checks remain pending. See the [input guide](../.agents/skills/foodiya-ui-text-input/SKILL.md).

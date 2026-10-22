@@ -40,9 +40,6 @@ yarn-error.*
 .scannerwork/
 .sonarqube-local/
 
-# Native UI test artifacts
-.maestro/results/
-
 # generated native folders
 /ios
 /android

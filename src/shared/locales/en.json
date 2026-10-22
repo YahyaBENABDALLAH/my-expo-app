@@ -581,10 +581,9 @@
       "roomyPadding": "Roomy padding · 24",
       "colors": "Explicit semantic colors",
       "colorsHint": "Accent and label colors use matching pairs from the active theme.",
-      "standalone": "Standalone buttons · light and dark",
-      "standaloneHint": "Independent appearance with opposite diagonal corners. The other two corners stay square.",
-      "lightCorners": "Light · diagonal corners",
-      "darkCorners": "Dark · opposite corners"
+      "standalone": "Standalone button · light",
+      "standaloneHint": "Independent light appearance with diagonal corners. The other two corners stay square.",
+      "lightCorners": "Light · diagonal corners"
     },
     "checkboxDescription": "Selected and disabled native checkbox states.",
     "savePreference": "Save this preference",

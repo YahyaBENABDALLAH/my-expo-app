@@ -32,12 +32,11 @@ Storybook **Pages / Layout direction** includes light, dark and initial RTL
 fixtures, a draft field, leading/trailing actions, a stepper and an open-sheet
 switch. Its direction-only frame lives in
 [`LayoutDirectionFrame`](../.rnstorybook/components/layout-direction-frame.tsx),
-outside the production UI API. `.maestro/storybook/layout-direction.yaml` checks draft preservation and
-open-sheet updates. Native appearance, text cursor/focus and back gestures still
-require iOS and Android verification; JS fixture tests cannot prove those.
-The `appearance-controls-removed.yaml` flows under `.maestro/auth/` and
-`.maestro/pages/` check that production pages no longer expose the footer.
-The page flow requires a signed-in or development guest session.
+outside the production UI API. Automated suites have been removed; existing
+test IDs remain for future tests. Check draft preservation, open-sheet updates,
+native appearance, text cursor/focus and back gestures manually on iOS and Android.
+Confirm that production pages no longer expose the footer using a signed-in or
+development guest session.
 
 Sources: [Expo localization](https://docs.expo.dev/guides/localization/),
 [SDK 57 Host](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/host/),
