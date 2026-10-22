@@ -22,7 +22,6 @@ import {
 } from '@components/ui';
 import { radii, spacing } from '@/constants/layout';
 import { useAppTheme, useThemeColors } from '@/hooks/use-theme';
-import { useIsFocused } from 'expo-router';
 
 const variants = [
   'primary',
@@ -111,7 +110,6 @@ function GallerySection({
 
 export default function ButtonsScreen() {
   const { t } = useTranslation();
-  const focused = useIsFocused();
   const [presses, setPresses] = useState(0);
   const [lastAction, setLastAction] = useState<string>();
 
@@ -126,7 +124,6 @@ export default function ButtonsScreen() {
         <RNHostView matchContents>
           <View style={{ height: 84, alignItems: 'center', justifyContent: 'center' }}>
             <FloatingAction
-              animate={focused}
               kind="create"
               label={t('showcase.floatingActions')}
               onPress={() => recordPress('showcase.floatingActions')}

@@ -1,40 +1,42 @@
-import { Icon } from '@expo/ui';
 import { Button, HStack } from '@expo/ui/swift-ui';
 import {
   accessibilityLabel,
+  background,
   buttonStyle,
   contentShape,
   disabled as nativeDisabled,
+  fixedSize,
   frame,
   shapes,
 } from '@expo/ui/swift-ui/modifiers';
-import { useThemeColors } from '@/hooks/use-theme';
-import { useHostColorScheme } from '../host/universal-host';
-import type { FloatingActionButtonProps } from './floating-action-button.types';
-import { floatingActionIcons, FLOATING_ACTION_ICON_SIZE } from './floating-action-icons';
-export function FloatingActionButton({
-  kind,
+import type { NativeFloatingActionButtonProps } from './floating-action-button';
+
+export function NativeFloatingActionButton({
+  children,
+  color,
   label,
   onPress,
   disabled,
-}: FloatingActionButtonProps) {
-  const colors = useThemeColors(useHostColorScheme());
+}: NativeFloatingActionButtonProps) {
   return (
     <Button
       testID="tab-context-action"
-      onPress={onPress}
+      onPress={disabled ? undefined : onPress}
       modifiers={[
         buttonStyle('plain'),
         nativeDisabled(Boolean(disabled)),
+        fixedSize({ horizontal: true, vertical: true }),
         accessibilityLabel(label),
       ]}
     >
-      <HStack modifiers={[frame({ width: 76, height: 76 }), contentShape(shapes.circle())]}>
-        <Icon
-          name={floatingActionIcons[kind]}
-          size={FLOATING_ACTION_ICON_SIZE}
-          color={colors.onPrimary}
-        />
+      <HStack
+        modifiers={[
+          frame({ width: 76, height: 76 }),
+          background(color, shapes.circle()),
+          contentShape(shapes.circle()),
+        ]}
+      >
+        {children}
       </HStack>
     </Button>
   );

@@ -26,7 +26,7 @@ joins launch readiness, validates stored values and defaults removed effects to
 Dunes. Writes are serialized. Local Storybook providers remain in memory.
 
 Settings has a labeled native `Switch` with selector `app-settings-reduce-motion`.
-On freezes custom header, Lottie, floating-action, skeleton and OTP artwork and
+On freezes custom header, Lottie, skeleton and OTP artwork and
 disables stack motion; Off enables custom animation. Until explicitly selected,
 the system setting is observed live. `useAppReducedMotion` and `useMotionEnabled`
 are the shared readers; activity/visibility checks remain in force. Root config
@@ -38,7 +38,8 @@ navigation and app version. Placeholder notification/account/legal rows are gone
 The FieldGroup component showcase may still demonstrate local draft controls.
 
 Native `Components/Page Header` Settings compositions cover both appearances;
-`Components/Launch Screen` and `Components/Floating Action` cover reduced motion.
+`Components/Launch Screen` covers reduced motion. Floating actions are static
+native circles and do not depend on the motion preference.
 See [theme ownership](../../../docs/appearance-themes.md) and the
 [implementation pattern](../foodiya-implementation/SKILL.md). Verify live settings,
 sheet hit-testing, RTL and saved motion on both native platforms.

@@ -26,8 +26,6 @@ export * from './toast/toast-host';
 export * from './toast/toast.types';
 export * from './field-group/field-group';
 export * from './floating-action/floating-action';
-export * from './floating-action/floating-action-button';
-export * from './floating-action/floating-action-button.types';
 export * from './form/form-submit';
 export * from './form/form-text-input';
 export * from './host/types';
