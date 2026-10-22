@@ -17,6 +17,7 @@ import {
 } from '@/constants/header-motion';
 
 const HEADER_STORAGE_KEY = 'appHeaderMotion';
+const REDUCED_MOTION_STORAGE_KEY = 'appReducedMotion';
 let headerPersistence = Promise.resolve();
 
 export type ColorSchemePreference = AppColorScheme | 'system';
@@ -29,6 +30,8 @@ interface ThemeSettings {
   headerShape: PageHeaderShape;
   setHeaderShape: (shape: PageHeaderShape) => void;
   headerMotionReady: boolean;
+  reducedMotion: boolean | null;
+  setReducedMotion: (reduced: boolean) => void;
 }
 
 const ThemeContext = createContext<ThemeSettings | undefined>(undefined);
@@ -36,26 +39,34 @@ const ThemeContext = createContext<ThemeSettings | undefined>(undefined);
 /** Preferences belong to the app; each page only renders its own controls. */
 export function ThemePreferencesProvider({
   children,
-  initialTheme = 'whatsapp',
+  initialTheme = 'ux',
   initialColorScheme = 'system',
   initialHeaderShape = DEFAULT_HEADER_SHAPE,
+  initialReducedMotion = null,
   persistHeaderMotion = false,
 }: PropsWithChildren<{
   initialTheme?: ThemeId;
   initialColorScheme?: ColorSchemePreference;
   initialHeaderShape?: PageHeaderShape;
+  initialReducedMotion?: boolean | null;
   persistHeaderMotion?: boolean;
 }>) {
   const [themeId, setThemeId] = useState(initialTheme);
   const [colorScheme, setColorScheme] = useState(initialColorScheme);
   const [headerShape, updateHeaderShape] = useState(initialHeaderShape);
+  const [reducedMotion, updateReducedMotion] = useState(initialReducedMotion);
   const [headerMotionReady, setHeaderMotionReady] = useState(!persistHeaderMotion);
   useEffect(() => {
     if (!persistHeaderMotion) return;
     let active = true;
-    void AsyncStorage.getItem(HEADER_STORAGE_KEY)
-      .then((stored) => {
-        if (active && isHeaderShape(stored)) updateHeaderShape(stored);
+    void Promise.all([
+      AsyncStorage.getItem(HEADER_STORAGE_KEY),
+      AsyncStorage.getItem(REDUCED_MOTION_STORAGE_KEY),
+    ])
+      .then(([stored, reduced]) => {
+        if (!active) return;
+        if (isHeaderShape(stored)) updateHeaderShape(stored);
+        if (reduced === 'true' || reduced === 'false') updateReducedMotion(reduced === 'true');
       })
       .catch(() => {
         /* Retain the default when local storage is unavailable. */
@@ -81,6 +92,20 @@ export function ThemePreferencesProvider({
     },
     [headerMotionReady, persistHeaderMotion],
   );
+  const setReducedMotion = useCallback(
+    (reduced: boolean) => {
+      if (!headerMotionReady) return;
+      updateReducedMotion(reduced);
+      if (persistHeaderMotion) {
+        headerPersistence = headerPersistence
+          .then(() => AsyncStorage.setItem(REDUCED_MOTION_STORAGE_KEY, String(reduced)))
+          .catch(() => {
+            /* Retain the preference for this session when storage is unavailable. */
+          });
+      }
+    },
+    [headerMotionReady, persistHeaderMotion],
+  );
   const value = useMemo(
     () => ({
       themeId,
@@ -90,8 +115,18 @@ export function ThemePreferencesProvider({
       headerShape,
       setHeaderShape,
       headerMotionReady,
+      reducedMotion,
+      setReducedMotion,
     }),
-    [themeId, colorScheme, headerShape, setHeaderShape, headerMotionReady],
+    [
+      themeId,
+      colorScheme,
+      headerShape,
+      setHeaderShape,
+      headerMotionReady,
+      reducedMotion,
+      setReducedMotion,
+    ],
   );
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
 }

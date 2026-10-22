@@ -1,16 +1,15 @@
 import { useTranslation } from 'react-i18next';
 import { useThemeColors } from '@/hooks/use-theme';
 import { Column, RNHostView, Spacer } from '@expo/ui';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import LottieView from 'lottie-react-native';
 import { View, useWindowDimensions } from 'react-native';
 import Animated, {
   Easing,
   cancelAnimation,
   useAnimatedStyle,
-  useReducedMotion,
+  ReduceMotion,
   useSharedValue,
-  withDelay,
   withTiming,
 } from 'react-native-reanimated';
 import { scheduleOnRN } from 'react-native-worklets';
@@ -19,7 +18,7 @@ import { screenInsets } from '@/lib/screen-insets';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 
 import bluePepe from '@assets/animations/blue-pepe.lottie';
-import { AuroraBackground } from '../aurora-background/aurora-background';
+import { useAppReducedMotion, useMotionEnabled } from '@/hooks/use-motion-enabled';
 import { UniversalHost } from '../host/universal-host';
 import { UniversalTextContent } from '../text/universal-text';
 import { nativeFillSize } from '../native/native-fill-width';
@@ -40,7 +39,9 @@ export function LaunchScreen({
   const { t } = useTranslation();
   const scheme = useColorScheme();
   const colors = useThemeColors(scheme);
-  const reducedMotion = useReducedMotion();
+  const reducedMotion = useAppReducedMotion();
+  const animate = useMotionEnabled();
+  const artwork = useRef<LottieView>(null);
   const { width, height } = useWindowDimensions();
   const insets = useSafeAreaInsets();
   const artworkSize = Math.max(
@@ -54,26 +55,37 @@ export function LaunchScreen({
   const offsetY = useSharedValue(0);
 
   useEffect(() => {
+    if (animate) artwork.current?.play();
+    else artwork.current?.pause();
+  }, [animate]);
+
+  useEffect(() => {
     if (!exiting) return;
 
-    if (reducedMotion) {
-      onExitComplete();
-      return;
-    }
-
-    offsetY.set(
-      withDelay(
-        2_000,
+    // The launch hold also applies when artwork is static.
+    const hold = setTimeout(() => {
+      if (reducedMotion) {
+        onExitComplete();
+        return;
+      }
+      offsetY.set(
         withTiming(
           -(height + WAVE_HEIGHT),
-          { duration: 2_000, easing: Easing.bezier(0.77, 0, 0.175, 1) },
+          {
+            duration: 2_000,
+            easing: Easing.bezier(0.77, 0, 0.175, 1),
+            reduceMotion: ReduceMotion.Never,
+          },
           (finished) => {
             if (finished) scheduleOnRN(onExitComplete);
           },
         ),
-      ),
-    );
-    return () => cancelAnimation(offsetY);
+      );
+    }, 2_000);
+    return () => {
+      clearTimeout(hold);
+      cancelAnimation(offsetY);
+    };
   }, [exiting, height, offsetY, onExitComplete, reducedMotion]);
 
   const exitStyle = useAnimatedStyle(() => ({
@@ -105,10 +117,6 @@ export function LaunchScreen({
           backgroundColor: colors.background,
         }}
       >
-        <AuroraBackground
-          colorScheme={scheme}
-          style={{ position: 'absolute', top: 0, right: 0, bottom: 0, left: 0 }}
-        />
         <UniversalHost
           colorScheme={scheme}
           matchContents={false}
@@ -119,9 +127,10 @@ export function LaunchScreen({
             <Spacer flexible />
             <RNHostView matchContents>
               <LottieView
+                ref={artwork}
                 source={bluePepeSource}
-                autoPlay={!reducedMotion}
-                loop={!reducedMotion}
+                autoPlay={false}
+                loop={animate}
                 style={{ width: artworkSize, height: artworkSize }}
               />
             </RNHostView>

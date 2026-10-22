@@ -1,6 +1,6 @@
 ---
 name: foodiya-ui-field-group
-description: Compose or maintain Foodiya FieldGroup forms with bounded native scrolling, sections, custom header/footer slots and existing form controls. Use for grouped form composition and its in-app showcase.
+description: Compose or maintain Foodiya FieldGroup settings pages with native rows, trailing controls, bounded scrolling and section slots. Use for App Settings-style composition and its in-app showcase.
 ---
 
 # FieldGroup
@@ -56,6 +56,31 @@ the view background alone does not hide Form's system canvas. Reuse page/auth
 safe-area and keyboard infrastructure. Do not duplicate header clearance or
 section gutters, or add a Host around every row.
 
+## Match the App Settings page
+
+Use the [App Settings screen](../../../src/features/settings/settings-screen.tsx)
+as the full-page reference. Reuse its
+[SettingsRow](../../../src/features/settings/settings-row.tsx) for label/detail
+columns, leading icons, trailing controls and native action rows. Keep a row
+containing a trailing picker/switch passive; do not wrap that independent control
+in another clickable row. A row with `onPress` already owns its native button.
+
+Use `PageFrame scrollsBehindHeader`, a clipped bounded viewport with the page's
+safe areas, and one fill Host. Put `usePageHeaderInset()` padding on a Column
+inside the **first** section header so the initial content clears the header
+and can scroll beneath its blur. Do not add the same padding to the viewport
+or every section. Preserve keyboard avoidance when editable fields are present.
+
+App Settings recreates only its iOS form Host on direction changes because
+reused native cells can retain old direction. Keep controlled form state above
+that Host so values survive this targeted remount. Ordinary edits and appearance
+changes must not remount the form.
+
+Production preference controls use their existing providers. A showcase uses
+local values and an explicit Host/PageFrame scheme for appearance previews;
+do not wire a demo picker to stored app preferences just to match the layout.
+Shared row colors resolve their owning Host's scheme.
+
 ## Controls and verification
 
 The owning Host supplies appearance/tint; native form sections own grouping,
@@ -64,9 +89,11 @@ workflow. FieldGroup itself supplies no schema, submit state or validation.
 Use [FormTextInput](../foodiya-ui-form/SKILL.md) for React Hook Form binding.
 
 [UI showcase → Field group](../../../src/features/ui-showcase/field-group-screen.tsx),
-route `/ui-component/field-group`, demonstrates titles, custom slots, editable
-state and reset. Check scrolling to the final action, keyboard reachability,
-helper wrapping, RTL and large text on iOS/Android.
+route `/ui-component/field-group`, uses the App Settings layout: account header,
+appearance picker, notification rows, editable display name, About rows and reset.
+Appearance and values stay local; a named row opens `/settings` for comparison.
+Check scrolling beneath the header, the final action, keyboard reachability,
+row/switch accessible names, wrapping, RTL and large text on iOS/Android.
 
 API reference checked for SDK 57 / `@expo/ui` 57.0.21:
 [FieldGroup](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/fieldgroup/).

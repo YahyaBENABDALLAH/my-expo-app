@@ -1,13 +1,7 @@
 # Brand themes
 
-`index.ts` exports the five named themes and their stable IDs. The WhatsApp
-palette keeps its existing brand and feedback choices in `whatsapp.ts`.
-
-`brand-palettes.json` contains the explicit light/dark color values for Facebook,
-Instagram and TikTok. Their existing modules export the resolved palettes through
-`createBrandTheme` in `tokens.ts`. Its typed input requires every brand role in
-both appearances; shared feedback defaults and derived UI roles are assembled
-in one place. JSON is bundled as static configuration, with no runtime fetch.
+`index.ts` exports UX Template (`ux`) and Instagram (`instagram`).
+`brand-palettes.json` contains only Instagram light/dark colors, resolved through `createBrandTheme`.
 
 `ux.ts` defines **UX Template** using the stable `ux` ID. Its primary fill is
 `#000000` with `#FFFFFF` labels in both appearances. Foundations, navigation and
@@ -19,7 +13,6 @@ Dark appearance uses a white tint for readable links; the primary fill stays bla
 Native button adapters apply semantic pairs for every theme when both color
 props are omitted, including standalone controls and their explicit scheme.
 Storybook reuses the same semantic pairs. Explicit caller colors retain priority.
-Aurora becomes flat and pauses its animation for this wireframe theme.
 The existing ID preserves the selected theme across the update.
 
 Keep brand-specific colors explicit. `createColorTokens` owns the derived

@@ -3,6 +3,7 @@ import { useWindowDimensions } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import {
   BottomSheet,
+  OtpBottomSheet,
   Column,
   PageScreen,
   PageSection,
@@ -30,6 +31,7 @@ export default function BottomSheetScreen() {
   const { height } = useWindowDimensions();
   const contentHeight = Math.min(420, height * 0.6);
   const [activeSheet, setActiveSheet] = useState<Sheet | null>(null);
+  const [otpOpen, setOtpOpen] = useState(false);
   const [preferences, setPreferences] = useState({ vegetarian: false, quickMeals: true });
   const [draft, setDraft] = useState(preferences);
 
@@ -43,6 +45,25 @@ export default function BottomSheetScreen() {
       title={t('showcase.bottomSheet')}
       description={t('showcase.sheetGallery.description')}
     >
+      <PageSection>
+        <Text variant="title">{t('otp.openDemo')}</Text>
+        <Text>{t('otp.demoHint')}</Text>
+        <UniversalButtonContent
+          variant="secondary"
+          label={t('otp.openDemo')}
+          testID="demo-sheet-open-otp"
+          onPress={() => setOtpOpen(true)}
+        />
+      </PageSection>
+      <OtpBottomSheet
+        isPresented={otpOpen}
+        onDismiss={() => setOtpOpen(false)}
+        recipient="hello@example.com"
+        hint={t('otp.demoHint')}
+        onVerify={(code) => code === '123456'}
+        onResend={() => undefined}
+        testID="demo-sheet-otp"
+      />
       <PageSection>
         <Text variant="title">{t('showcase.sheetGallery.details')}</Text>
         <Text>{t('showcase.sheetGallery.detailsHint')}</Text>

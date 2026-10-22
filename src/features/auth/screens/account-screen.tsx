@@ -8,6 +8,7 @@ import {
   UniversalButtonContent,
 } from '@components/ui';
 import { useMutation, useQuery } from '@tanstack/react-query';
+import { router } from 'expo-router';
 
 import { useScreenRefresh } from '@/hooks/use-screen-refresh';
 import { useAuthContext } from '@/context/auth.context';
@@ -15,12 +16,12 @@ import { currentIdentityQuery } from '@/services/auth/auth.queries';
 
 export function AccountScreen() {
   const { t } = useTranslation();
-  const { user, signOut, developmentGuest } = useAuthContext();
+  const { user, signOut } = useAuthContext();
   const options = currentIdentityQuery(user?.uuid);
   const identity = useQuery(options);
   const onRefresh = useScreenRefresh([options.queryKey]);
   const logout = useMutation({ mutationFn: signOut, networkMode: 'always', retry: 0 });
-  const signOutLabel = developmentGuest ? t('tools.exitGuest') : t('common.signOut');
+  const signOutLabel = t('common.signOut');
   const name = identity.data
     ? `${identity.data.firstName} ${identity.data.lastName}`.trim()
     : `${user?.firstName ?? ''} ${user?.lastName ?? ''}`.trim();
@@ -28,9 +29,8 @@ export function AccountScreen() {
     <AuthScreenFrame
       testID="auth-account"
       onRefresh={user?.uuid && !logout.isPending ? onRefresh : undefined}
-      title={developmentGuest ? t('tools.guest') : name || t('common.account')}
-      description={developmentGuest ? t('account.guestDescription') : t('account.signedIn')}
-      tab
+      title={name || t('common.account')}
+      description={t('account.signedIn')}
     >
       <Column spacing={spacing.lg} modifiers={nativeFillWidth}>
         <AuthText>{identity.data?.email ?? user?.email ?? ''}</AuthText>
@@ -56,6 +56,11 @@ export function AccountScreen() {
           onPress={() => logout.mutate()}
         />
         {logout.error ? <AuthText>{t('account.signOutFailed')}</AuthText> : null}
+        <UniversalButtonContent
+          variant="link"
+          label={t('common.home')}
+          onPress={() => router.replace('/')}
+        />
       </Column>
     </AuthScreenFrame>
   );

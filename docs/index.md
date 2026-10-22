@@ -26,10 +26,7 @@ skills; [documentation ownership](documentation.md) explains where to update eac
 
 - [App Settings and appearance themes](appearance-themes.md)
 - [Native control themes](control-theme.md)
-- [WhatsApp light and dark theme](whatsapp-theme.md)
 - [Shared Skia page motion](shared-skia-motion.md)
-- [Home catalog layout](home-catalog-layout.md)
-- [Home recipe card examples](home-recipe-card-examples.md)
 
 ## Builds and engineering
 
@@ -40,6 +37,10 @@ skills; [documentation ownership](documentation.md) explains where to update eac
 - [Local SonarQube analysis](sonarqube.md)
 
 ## Historical reports and investigations
+
+- [Former Home catalog](home-catalog-layout.md)
+- [Former Home cards](home-recipe-card-examples.md)
+- [Former WhatsApp theme](whatsapp-theme.md)
 
 These describe earlier project states and verification limits. Use the current
 guides and source for implementation decisions.

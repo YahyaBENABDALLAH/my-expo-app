@@ -24,18 +24,13 @@ Native activation delivers the action; artwork remains passive. Android and iOS
 both animate while focused, active and enabled, respecting reduced motion. Static
 mode pauses visual motion without disabling activation.
 
-`ReferenceTabBar` forwards each enabled native activation to the current action.
-Do not add a shared timed lockout: it discards valid taps after the visual feedback
-and can block a different action after switching tabs or recipe steps. Publishing
-keeps its own pending/submitting guard in `useRecipeCreation`.
+The starter Buttons showcase renders the retained FloatingAction and counts presses. Route-specific actions stay in the consumer. Removed recipe navigation does not own this component.
 
 See [navbar verification](../../../docs/navbar-wave-verification.md) for
 geometry, touch coverage and native verification limits.
 
-Interactive composition story: floating-action.stories.tsx (retired fixture).
-It includes all seven action kinds, a press counter, disabled and motion toggles,
-and the production navigation bar. A separate production counter registers the
-Storybook route's action through the real `ReferenceTabBar` dispatcher.
+Interactive composition story: `.rnstorybook/stories/components/floating-action.stories.tsx`.
+Controls select all seven action kinds; Interactive, Disabled and ReducedMotion exercise counted activation and static artwork.
 Automated suites have been removed; existing test IDs remain for future tests.
 Manually check upper/lower edge taps, single activation, disabled suppression,
 icon changes, rapid actions, focus, keyboard visibility and route changes on both

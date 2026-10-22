@@ -207,63 +207,6 @@
     "themeHint": "Appuyez pour basculer entre le mode clair et sombre.",
     "languageHint": "Appuyez pour faire défiler Français, English et العربية."
   },
-  "chefProfile": {
-    "cardTitle": "Devenir Chef",
-    "cardDescription": "Partagez vos recettes avec la communauté.",
-    "becomeChef": "Commencer",
-    "pageTitle": "Profil Chef",
-    "heroTitle": "Devenir Chef",
-    "heroDescription": "Créez votre profil de chef pour commencer à partager vos créations culinaires avec le monde.",
-    "formTitle": "Votre profil Chef",
-    "formDescription": "Parlez-nous de votre parcours culinaire.",
-    "displayName": "Nom affiché",
-    "displayNamePlaceholder": "Chef Yahya",
-    "specialty": "Spécialité",
-    "specialtyPlaceholder": "ex. Cuisine marocaine",
-    "yearsOfExperience": "Années d'expérience",
-    "yearsOfExperiencePlaceholder": "ex. 5",
-    "bio": "Bio",
-    "bioPlaceholder": "Parlez-nous de votre passion pour la cuisine...",
-    "submit": "Créer le profil Chef",
-    "submitting": "Création...",
-    "nameRequired": "Le nom affiché est requis.",
-    "successTitle": "Bienvenue, Chef !",
-    "successMessage": "Votre profil de chef a été créé avec succès.",
-    "errorTitle": "Impossible de continuer",
-    "forbiddenError": "Votre compte n'a pas l'autorisation d'effectuer cette action. Veuillez vous assurer que votre utilisateur de base de données a le rôle approprié (ex. 'Chef' ou 'Admin').",
-    "nameTooLong": "Le nom affiché ne peut pas dépasser 120 caractères.",
-    "specialtyTooLong": "La spécialité ne peut pas dépasser 150 caractères.",
-    "bioTooLong": "La biographie ne peut pas dépasser 1000 caractères.",
-    "experienceInvalid": "Les années d'expérience doivent être un nombre entre 0 et 100."
-  },
-  "onboarding": {
-    "discover": {
-      "title": "Le plaisir commence ici.",
-      "subtitle": "Des idées fraîches pour vos repas du quotidien et vos prochaines découvertes.",
-      "category": "TROUVEZ L’INSPIRATION",
-      "detail": "Des idées fraîches. Des ingrédients simples."
-    },
-    "save": {
-      "title": "Gardez vos coups de cœur.",
-      "subtitle": "Gardez les recettes que vous aimez. L’inspiration vous attend quand vous en avez envie.",
-      "category": "À VOTRE GOÛT",
-      "detail": "Une collection de ce que vous aimez."
-    },
-    "cook": {
-      "title": "À vous de jouer.",
-      "subtitle": "Suivez les étapes, ajoutez votre touche et partagez un moment gourmand.",
-      "category": "DE L’IDÉE À L’ASSIETTE",
-      "detail": "Votre cuisine. Votre inspiration."
-    },
-    "start": "C’est parti",
-    "next": "Suivant",
-    "saveFailed": "Impossible d’enregistrer votre progression. Veuillez réessayer.",
-    "skip": "Passer à la connexion",
-    "skipShort": "Passer",
-    "page": "{{current}} sur {{total}}",
-    "back": "Précédent",
-    "progress": "Progression de la présentation"
-  },
   "settings": {
     "title": "Paramètres de l’application",
     "description": "Gérez vos préférences d’apparence et de langue.",
@@ -289,13 +232,11 @@
     "legalDescription": "Accord de licence d’utilisateur final",
     "headerMotion": "Animation de l’en-tête",
     "headerShapes": {
-      "waves": "Vagues",
-      "ribbon": "Ruban",
       "dunes": "Dunes",
-      "smoke": "Fumée",
-      "water": "Eau",
+      "ribbon": "Ruban",
       "rain": "Pluie"
-    }
+    },
+    "reduceMotion": "Réduire les animations"
   },
   "appearance": {
     "dark": "Sombre",
@@ -332,46 +273,6 @@
     "offlineCached": "Hors ligne. Affichage du contenu enregistré.",
     "waiting": "Le contenu est en attente de chargement."
   },
-  "home": {
-    "description": "Découvrez des recettes et parcourez les catégories.",
-    "search": "Trouver une recette",
-    "popular": "Recettes populaires",
-    "trending": "Tendances de la semaine",
-    "viewAll": "Tout voir",
-    "editorsChoice": "Sélection de la rédaction",
-    "catalog": {
-      "featured": "À la une",
-      "fromOurKitchen": "De notre cuisine",
-      "experiences": "Inspiration cuisine",
-      "freeRecipes": "Recettes gratuites",
-      "weeklyPicks": "De nouvelles idées chaque semaine",
-      "freeNow": "Gratuit maintenant",
-      "quickMeals": "Repas rapides",
-      "chefPicks": "Sélection des chefs",
-      "save": "Enregistrer"
-    },
-    "cards": {
-      "title": "Exemples de cartes recettes",
-      "sampleHint": "{{count}} cartes d’exemple dans chaque liste. Touchez une carte pour l’aperçu.",
-      "numberedTitle": "{{title}} · {{index}}",
-      "samplePreview": "Recette d’exemple",
-      "minutes": "{{count}} min",
-      "breakfast": "Petit-déjeuner",
-      "fresh": "Frais et coloré",
-      "easy": "Facile",
-      "vegetarian": "Végétarien",
-      "chefsPick": "CHOIX DU CHEF",
-      "chefLina": "Chef Lina",
-      "chefAdil": "Chef Adil",
-      "pestoPasta": "Pâtes au pesto",
-      "toastDescription": "De l’avocat crémeux sur du pain grillé, avec un œuf au plat et une pincée de piment.",
-      "saladDescription": "Pois chiches, avocat et légumes croquants avec une vinaigrette au citron.",
-      "pastaDescription": "Pesto au basilic, tomates cerises et pâtes fondantes. Un dîner frais et simple en 25 minutes."
-    },
-    "categories": "Parcourir les catégories",
-    "discover": "Recettes à découvrir",
-    "empty": "Aucune recette pour le moment. Revenez bientôt."
-  },
   "search": {
     "description": "Trouvez votre prochaine recette par nom, catégorie, cuisine ou difficulté.",
     "recipes": "Rechercher des recettes",
@@ -386,47 +287,6 @@
     "noResults": "Aucune recette ne correspond à cette recherche. Essayez un autre nom ou réinitialisez les filtres.",
     "resetSearch": "Réinitialiser la recherche",
     "applyFilters": "Appliquer les filtres"
-  },
-  "recipes": {
-    "openLiked": "Ouvrir les recettes aimées et favorites",
-    "categoryDescription": "Parcourez les recettes de cette catégorie.",
-    "invalidCategory": "Lien de catégorie invalide",
-    "ingredientDescription": "Parcourez le catalogue d’ingrédients.",
-    "searchIngredients": "Rechercher des ingrédients",
-    "savedDescription": "Les recettes que vous avez enregistrées.",
-    "collectionsDescription": "Vos recettes enregistrées, votre historique et vos créations.",
-    "likedFavorites": "Recettes aimées et favorites",
-    "collectionCounts": "Favoris : {{favorites}} · Vues récemment : {{history}}",
-    "likedCount": "Recettes aimées : {{count}}",
-    "loginSaved": "Connectez-vous pour voir vos recettes enregistrées.",
-    "loginFavorites": "Connectez-vous pour voir vos favoris.",
-    "loginLiked": "Connectez-vous pour voir les recettes aimées.",
-    "openRecipe": "Ouvrir la recette",
-    "historyDescription": "Recettes récemment consultées sur cet appareil.",
-    "loginHistory": "Connectez-vous pour voir votre historique.",
-    "clearHistory": "Effacer l’historique",
-    "clearingHistory": "Suppression de l’historique…",
-    "clearHistoryFailed": "L’historique n’a pas pu être effacé. Réessayez.",
-    "creationsDescription": "Vos recettes publiées.",
-    "creationsLimit": "Vos créations parmi les 100 premières recettes publiques.",
-    "createChefToPublish": "Créez un profil de chef pour publier des recettes.",
-    "loginCreations": "Connectez-vous pour voir vos créations.",
-    "loginSave": "Connectez-vous pour enregistrer des recettes.",
-    "invalidLink": "Lien de recette invalide",
-    "invalidLinkDescription": "Ce lien de recette est invalide.",
-    "details": "Détails de la recette",
-    "facts": "Durée : {{minutes}} min · Portions : {{servings}}",
-    "cardFacts": "{{minutes}} min · {{difficulty}} · J’aime : {{likes}}",
-    "loginLike": "Connectez-vous pour enregistrer ou aimer cette recette.",
-    "saving": "Enregistrement…",
-    "removeFavorite": "Retirer des favoris",
-    "saveFavorite": "Ajouter aux favoris",
-    "favoriteFailed": "Vos favoris n’ont pas pu être mis à jour. Réessayez.",
-    "liking": "Envoi du J’aime…",
-    "like": "Aimer la recette",
-    "likeFailed": "Le J’aime n’a pas pu être confirmé. Actualisez la recette avant de réessayer.",
-    "optional": " (facultatif)",
-    "instructions": "Instructions"
   },
   "recipeForm": {
     "description": "Partagez votre recette en quatre étapes.",
@@ -504,13 +364,6 @@
     "storybook": "Storybook",
     "skia": "Skia"
   },
-  "map": {
-    "label": "Carte centrée sur Casablanca",
-    "city": "Casablanca",
-    "exploreCity": "Explorez la ville",
-    "title": "EXPLOREZ LA CARTE",
-    "instructions": "Pincez pour zoomer, faites glisser pour explorer ou touchez le repère."
-  },
   "recovery": {
     "title": "Récupération",
     "failed": "Cet écran n’a pas pu être chargé",
@@ -523,6 +376,16 @@
     "loading": "Chargement de Likan"
   },
   "showcase": {
+    "fieldGroupGallery": {
+      "description": "Sections, lignes et accessoires comme dans les réglages. Les valeurs de démo restent sur cette page.",
+      "demoName": "Chef démo",
+      "demoAccount": "Compte de démonstration local",
+      "followApp": "Par défaut",
+      "appearanceHint": "Modifie uniquement l’apparence de cet aperçu.",
+      "displayName": "Nom affiché",
+      "nameHint": "Modifiez le nom de démo pour actualiser la ligne du compte ci-dessus. Rien n’est enregistré.",
+      "openSettings": "Ouvrir les vrais réglages pour comparer."
+    },
     "gallery": {
       "interaction": "Essayer les contrôles",
       "localOnly": "Ces exemples modifient uniquement les valeurs locales de la démo.",
@@ -806,7 +669,8 @@
     "swipeTips": "Faites défiler les conseils de cuisine vers le haut.",
     "tip": "Conseil {{index}}",
     "homeExamples": "Exemples d’interface de recettes",
-    "homeExamplesDescription": "Cartes locales, squelettes et contrôles interactifs pour le développement. Ces exemples ne modifient pas vos préférences de recettes."
+    "homeExamplesDescription": "Cartes locales, squelettes et contrôles interactifs pour le développement. Ces exemples ne modifient pas vos préférences de recettes.",
+    "floatingActions": "Actions flottantes"
   },
   "examples": {
     "toast": "Tartine d’avocat",
@@ -821,15 +685,6 @@
     "tip4": "Préchauffez votre poêle ou votre four.",
     "tip5": "Goûtez et ajustez l’assaisonnement au fur et à mesure.",
     "tip6": "Laissez reposer votre plat avant de servir."
-  },
-  "canvas": {
-    "live": "CANEVAS ANIMÉ",
-    "title": "Lumière en mouvement",
-    "description": "Un shader Skia animé avec Reanimated. Changez les couleurs et observez le canevas.",
-    "palette": "Palette : {{palette}}",
-    "aurora": "Aurore",
-    "prism": "Prisme",
-    "tidal": "Marée"
   },
   "api": {
     "network": "Impossible de joindre le serveur. Vérifiez votre connexion et réessayez.",
@@ -870,5 +725,8 @@
   "brand": {
     "name": "Likan",
     "wordmark": "LIKAN"
+  },
+  "starter": {
+    "homeDescription": "Le point de départ de votre application. Explorez les composants natifs, ajustez vos préférences ou connectez-vous à votre serveur."
   }
 }

@@ -19,7 +19,7 @@ export type StoryThemeProps = {
 /** One isolated set of app preferences for every native story. */
 export function StoryTheme({
   children,
-  themeId = 'whatsapp',
+  themeId = 'ux',
   colorScheme = 'light',
 }: PropsWithChildren<StoryThemeProps>) {
   const appColorScheme = useThemePreferences()?.colorScheme ?? 'system';

@@ -251,12 +251,10 @@ export function FavoriteAction(props: { label: string; disabled?: boolean; onPre
 }
 ```
 
-For a whole-card action, follow the current
-[RecipeCard](../../../../src/components/ui/recipe-card/recipe-card.tsx): a
-full-width content button with deliberate padding/radius and native content;
-necessary RN artwork is bridged by `RNHostView`. Reuse the card component instead
-of duplicating its action tree. Do not nest interactive save/menu buttons inside
-the outer action; use siblings as in the existing home catalog card.
+For custom action content, follow the native compositions in the
+[Buttons showcase](../../../../src/features/ui-showcase/buttons-screen.tsx).
+Bridge necessary RN artwork with `RNHostView`. Keep independent interactive
+controls beside the outer action rather than nesting them in a button.
 
 ## Action inside the shared bottom sheet
 

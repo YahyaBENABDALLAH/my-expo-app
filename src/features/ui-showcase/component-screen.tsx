@@ -16,7 +16,6 @@ import TextScreen from './text-screen';
 import SkeletonScreen from './skeleton-screen';
 import ListScreen from './list-screen';
 import TokensScreen from './tokens-screen';
-import HomeExamplesScreen from './home-examples-screen';
 
 const screens = {
   switch: SwitchScreen,
@@ -35,7 +34,6 @@ const screens = {
   skeleton: SkeletonScreen,
   list: ListScreen,
   tokens: TokensScreen,
-  'home-examples': HomeExamplesScreen,
 };
 
 export function ComponentScreen({ name }: { name?: string }) {

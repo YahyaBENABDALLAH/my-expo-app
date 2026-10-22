@@ -1,5 +1,4 @@
 import {
-  AuroraBackground,
   Column,
   FieldGroup,
   nativeFillWidth,
@@ -101,13 +100,8 @@ const meta = {
   },
   parameters: { layout: 'fullscreen' },
   decorators: [
-    (Story, { args }) => (
+    (Story) => (
       <View style={{ flex: 1 }}>
-        <AuroraBackground
-          colorScheme={args.colorScheme}
-          animate={false}
-          style={{ position: 'absolute', top: 0, right: 0, bottom: 0, left: 0 }}
-        />
         <Story />
       </View>
     ),

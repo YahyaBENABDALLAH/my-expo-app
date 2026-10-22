@@ -88,9 +88,7 @@ export function usePageWaveMotion({
     'worklet';
     if (!splash) drawVectorPath(builder, headerDetails(shape, phase.get()));
   });
-  const detailOpacity = useDerivedValue(() =>
-    shape === 'smoke' ? 0.16 + 0.05 * Math.sin((phase.get() * Math.PI) / 6) : 0.28,
-  );
+  const detailOpacity = useDerivedValue(() => 0.28);
   const frontSvg = useDerivedValue(() => vectorPathToSvg(frontContour.get()));
   const backSvg = useDerivedValue(() => vectorPathToSvg(backContour.get()));
   const width = useSharedValue(0);

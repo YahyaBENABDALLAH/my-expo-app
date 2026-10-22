@@ -1,7 +1,7 @@
 # Component skills
 
 Use this index to select only the component families involved in the change.
-The 40 skills below cover 34 shared UI families and six native primitives.
+The 33 skills below cover 27 shared UI families and six native primitives.
 Each family skill owns its current component contract. Short guidance stays in
 SKILL.md; the longer page and button guides use linked references. Read only
 the relevant family and shared rules. Source folders contain code, not duplicate
@@ -57,20 +57,13 @@ READMEs. The text skill covers native Text and the project text wrappers.
 
 ## App compositions
 
-| Component or family              | Skill                                                                       | Source / current guidance                                              |
-| -------------------------------- | --------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
-| Appearance and language controls | [foodiya-ui-appearance](../../foodiya-ui-appearance/SKILL.md)               | [appearance/](../../../../src/components/ui/appearance/)               |
-| Auth frame and controls          | [foodiya-ui-auth](../../foodiya-ui-auth/SKILL.md)                           | [auth/](../../../../src/components/ui/auth/)                           |
-| Aurora background                | [foodiya-ui-aurora-background](../../foodiya-ui-aurora-background/SKILL.md) | [aurora-background/](../../../../src/components/ui/aurora-background/) |
-| Floating action                  | [foodiya-ui-floating-action](../../foodiya-ui-floating-action/SKILL.md)     | [floating-action/](../../../../src/components/ui/floating-action/)     |
-| Home recipe and catalog cards    | [foodiya-ui-home-recipe-card](../../foodiya-ui-home-recipe-card/SKILL.md)   | [home-recipe-card/](../../../../src/components/ui/home-recipe-card/)   |
-| Launch screen                    | [foodiya-ui-launch-screen](../../foodiya-ui-launch-screen/SKILL.md)         | [launch-screen/](../../../../src/components/ui/launch-screen/)         |
-| Map experience                   | [foodiya-ui-map-experience](../../foodiya-ui-map-experience/SKILL.md)       | [map-experience/](../../../../src/components/ui/map-experience/)       |
-| Navigation presentation          | [foodiya-ui-navigation](../../foodiya-ui-navigation/SKILL.md)               | [navigation/](../../../../src/components/ui/navigation/)               |
-| Onboarding page and pager        | [foodiya-ui-onboarding](../../foodiya-ui-onboarding/SKILL.md)               | [onboarding/](../../../../src/components/ui/onboarding/)               |
-| OTP bottom sheet                 | [foodiya-ui-otp-bottom-sheet](../../foodiya-ui-otp-bottom-sheet/SKILL.md)   | [otp-bottom-sheet/](../../../../src/components/ui/otp-bottom-sheet/)   |
-| Recipe card                      | [foodiya-ui-recipe-card](../../foodiya-ui-recipe-card/SKILL.md)             | [recipe-card/](../../../../src/components/ui/recipe-card/)             |
-| Recipe stepper                   | [foodiya-ui-recipe-stepper](../../foodiya-ui-recipe-stepper/SKILL.md)       | [recipe-stepper/](../../../../src/components/ui/recipe-stepper/)       |
+| Component or family              | Skill                                                                     | Source / current guidance                                            |
+| -------------------------------- | ------------------------------------------------------------------------- | -------------------------------------------------------------------- |
+| Appearance and language controls | [foodiya-ui-appearance](../../foodiya-ui-appearance/SKILL.md)             | [appearance/](../../../../src/components/ui/appearance/)             |
+| Auth frame and controls          | [foodiya-ui-auth](../../foodiya-ui-auth/SKILL.md)                         | [auth/](../../../../src/components/ui/auth/)                         |
+| Floating action                  | [foodiya-ui-floating-action](../../foodiya-ui-floating-action/SKILL.md)   | [floating-action/](../../../../src/components/ui/floating-action/)   |
+| Launch screen                    | [foodiya-ui-launch-screen](../../foodiya-ui-launch-screen/SKILL.md)       | [launch-screen/](../../../../src/components/ui/launch-screen/)       |
+| OTP bottom sheet                 | [foodiya-ui-otp-bottom-sheet](../../foodiya-ui-otp-bottom-sheet/SKILL.md) | [otp-bottom-sheet/](../../../../src/components/ui/otp-bottom-sheet/) |
 
 ## Maintain the component contract
 

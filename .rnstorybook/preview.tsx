@@ -3,7 +3,7 @@ import { themeIds } from '@/constants/themes/index';
 import { StoryTheme } from './components/story-theme';
 
 const preview: Preview = {
-  args: { themeId: 'whatsapp', colorScheme: 'light' },
+  args: { themeId: 'ux', colorScheme: 'light' },
   argTypes: {
     themeId: { control: 'select', options: themeIds },
     colorScheme: { control: 'select', options: ['light', 'dark'] },

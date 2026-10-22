@@ -23,16 +23,14 @@ Host and the same input implementation. At an RN boundary, supply a
 | Screen composition      | [page](../.agents/skills/foodiya-ui-page/references/page-guide.md), [auth](../.agents/skills/foodiya-ui-auth/SKILL.md), [refreshable-scroll-view](../.agents/skills/foodiya-ui-refreshable-scroll-view/SKILL.md)                                                                                                 |
 | Theme and native layout | [host](../.agents/skills/foodiya-ui-host/SKILL.md), [text](../.agents/skills/foodiya-ui-text/SKILL.md), [native](../.agents/skills/foodiya-ui-native/SKILL.md), [appearance](../.agents/skills/foodiya-ui-appearance/SKILL.md)                                                                                   |
 | Feedback and overlays   | [loading](../.agents/skills/foodiya-ui-loading/SKILL.md), [toast](../.agents/skills/foodiya-ui-toast/SKILL.md), [bottom-sheet](../.agents/skills/foodiya-ui-bottom-sheet/SKILL.md), [skeleton](../.agents/skills/foodiya-ui-skeleton/SKILL.md)                                                                   |
-| Recipe presentation     | [recipe-card](../.agents/skills/foodiya-ui-recipe-card/SKILL.md), [home-recipe-card](../.agents/skills/foodiya-ui-home-recipe-card/SKILL.md), [recipe-stepper](../.agents/skills/foodiya-ui-recipe-stepper/SKILL.md)                                                                                             |
-| Navigation and artwork  | [navigation](../.agents/skills/foodiya-ui-navigation/SKILL.md), [aurora-background](../.agents/skills/foodiya-ui-aurora-background/SKILL.md), [launch-screen](../.agents/skills/foodiya-ui-launch-screen/SKILL.md), [map-experience](../.agents/skills/foodiya-ui-map-experience/SKILL.md)                       |
+| Launch artwork          | [launch-screen](../.agents/skills/foodiya-ui-launch-screen/SKILL.md)                                                                                                                                                                                                                                             |
 
 ## Keep it simple
 
 - Use descriptive kebab-case filenames. A small component needs its implementation
   and canonical skill guidance; split out files only for a real platform difference or private helper.
 - Export public components from the existing `index.ts`. Additional folder
-  barrels are unnecessary. The existing skeleton entry point and lazy map entry
-  point retain their imports.
+  barrels are unnecessary. The existing skeleton entry point retains its imports.
 - Inside UI, import implementation files directly, including across component
   folders. Importing the public barrel from an implementation creates cycles.
 - Keep queries, mutations, form state and workflow hooks in `src/features/`.
@@ -62,7 +60,7 @@ automatic style on older iOS, and an outlined button on Android.
 ```tsx
 import { PageScreen, UniversalButtonContent } from '@components/ui';
 
-<PageScreen title="Recipes" description="Your saved recipes.">
+<PageScreen title="Account" description="Your profile.">
   <UniversalButtonContent variant="primary" label="Save" onPress={save} disabled={pending} />
 </PageScreen>;
 ```

@@ -5,7 +5,7 @@ import { useColorScheme } from './use-color-scheme';
 export function useAppTheme(preferredScheme?: 'light' | 'dark') {
   const preferences = useThemePreferences();
   const scheme = useColorScheme(preferredScheme);
-  const themeId = preferences?.themeId ?? 'whatsapp';
+  const themeId = preferences?.themeId ?? 'ux';
   return { themeId, scheme, colors: themes[themeId].colors[scheme] };
 }
 

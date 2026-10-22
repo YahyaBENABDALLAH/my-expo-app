@@ -1,25 +1,16 @@
-# Storybook
+# Component previews
 
-Two groups:
+The application component browser is `/ui`, with individual examples under
+`/ui-component/[name]`. The Bottom Sheet page includes the retained local OTP demo;
+the Buttons page includes a counted floating action. Demo data stays in showcase
+code and does not replace production auth requests.
 
-- **Components** — reusable controls, layout, loading and feedback.
-- **Forms** — a login form, field groups and OTP verification.
+The Storybook route and default Metro integration have been removed. Storybook
+packages, scripts and `.rnstorybook/` fixtures remain installed for maintenance.
+The existing start script starts Metro; it does not expose an application route.
+Do not reintroduce Storybook into production imports.
 
-Use **Controls** for theme, light/dark appearance, disabled states and other
-props. Separate stories are kept for interactions that need their own setup.
-Text, Button and Toast also expose named semantic variants for quick discovery.
-Skeleton includes line, avatar, image and card placeholders. Icon and Floating
-Action demos, the closed-only sheet, and Page Header's animated LTR/RTL and
-Settings previews are intentionally excluded.
-Forms use local fixtures and never send credentials to a backend.
-
-Run `npm run storybook` and open the app's Storybook tab. After adding or moving
-a story, run `npm run storybook:generate`.
-
-The shared preview owns the story theme. `NativeStoryFrame` supplies the finite
-native bridge width required by standalone controls. Keep stories outside
-production imports and use the wrappers exported from `src/components/ui`.
-
-Automated suites have been removed. Keep existing component and story `testID`
-values for future tests. Use the native stories for manual device checks on iOS
-and Android.
+Update native stories for shared UI changes and run `npm run storybook:generate`.
+Launch Screen has Ready, Waiting and ReducedMotion fixtures. Floating Action has
+Interactive, Disabled and ReducedMotion fixtures. Typechecking includes stories,
+but fixture registration does not prove native behavior.

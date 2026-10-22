@@ -8,7 +8,6 @@ import {
   type PropsWithChildren,
 } from 'react';
 import { AUTH_STATUS, type AuthStatus } from '@/constants/auth.constant';
-import { appDevEnabled } from '@/constants/app-dev';
 import { restoreSession, signOut } from '@/services/auth/auth.lifecycle';
 import { getSessionVersion, subscribeAuthSession } from '@/services/auth/auth.session';
 import type { AuthUser } from '@/types/auth-session.types';
@@ -30,9 +29,6 @@ const AuthContext = createContext<
   | (AuthState & {
       signOut: typeof signOut;
       retryRestore: () => void;
-      developmentGuest: boolean;
-      enterDevelopmentGuest: () => void;
-      exitDevelopmentGuest: () => void;
     })
   | null
 >(null);
@@ -40,7 +36,6 @@ const AuthContext = createContext<
 export function AuthProvider({ children }: PropsWithChildren) {
   const { t } = useTranslation();
   const [attempt, setAttempt] = useState(0);
-  const [guestEnabled, setGuestEnabled] = useState(false);
   const [state, setState] = useState<AuthSnapshot>({
     status: AUTH_STATUS.UNKNOWN,
     user: null,
@@ -89,16 +84,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
       status: state.status,
       user: state.user,
       error: state.error ? t(state.error) : null,
-      developmentGuest:
-        appDevEnabled && guestEnabled && state.status === AUTH_STATUS.UNAUTHENTICATED,
-      enterDevelopmentGuest: () => {
-        if (appDevEnabled && state.status === AUTH_STATUS.UNAUTHENTICATED) setGuestEnabled(true);
-      },
-      exitDevelopmentGuest: () => setGuestEnabled(false),
-      signOut: async () => {
-        setGuestEnabled(false);
-        await signOut();
-      },
+      signOut,
       retryRestore: () => {
         setState({
           status: AUTH_STATUS.UNKNOWN,
@@ -109,7 +95,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
         setAttempt((value) => value + 1);
       },
     }),
-    [state, guestEnabled, t],
+    [state, t],
   );
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

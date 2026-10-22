@@ -22,6 +22,7 @@ export function PageScreen({
   onRefresh,
   colorScheme,
   onBack,
+  showBack = true,
 }: {
   title: string;
   description: string;
@@ -30,6 +31,7 @@ export function PageScreen({
   onRefresh?: () => Promise<void>;
   colorScheme?: 'light' | 'dark';
   onBack?: () => void;
+  showBack?: boolean;
   actions?: { label: string; href: Href; testID?: string }[];
 }) {
   const scheme = useColorScheme(colorScheme);
@@ -37,7 +39,7 @@ export function PageScreen({
   return (
     <PageFrame
       title={title}
-      onBack={tab ? undefined : goBack}
+      onBack={tab || !showBack ? undefined : goBack}
       colorScheme={scheme}
       scrollsBehindHeader
     >

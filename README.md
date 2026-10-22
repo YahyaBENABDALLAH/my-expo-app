@@ -1,7 +1,11 @@
 # Likan Expo app
 
-An iOS and Android application built with Expo SDK 57, Expo Router and native
+An iOS and Android bootstrap application built with Expo SDK 57, Expo Router and native
 Expo UI.
+
+Home, native component showcase, authentication, Account and Settings form the
+starting point. UX Template and Instagram themes are included. All installed
+packages are retained for future features.
 
 ## Get started
 
@@ -19,7 +23,7 @@ Run `npm run typecheck` and `npm run lint` before finishing a change.
 ## Find the guidance
 
 - [Documentation index](docs/index.md): setup, architecture, UI, releases and reports.
-- [Development](docs/development.md): commands, Storybook, guest browsing and environment.
+- [Development](docs/development.md): commands, retained component fixtures and environment.
 - [Architecture](docs/architecture.md): routes, features, services and shared boundaries.
 - [Native UI](docs/ui.md): component selection and canonical skill links.
 - [Documentation ownership](docs/documentation.md): where to maintain each kind of guidance.

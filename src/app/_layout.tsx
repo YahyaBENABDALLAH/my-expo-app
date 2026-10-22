@@ -19,7 +19,8 @@ import { StatusBar } from 'expo-status-bar';
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Appearance, Platform, View } from 'react-native';
-import { useReducedMotion } from 'react-native-reanimated';
+import { ReducedMotionConfig, ReduceMotion } from 'react-native-reanimated';
+import { useAppReducedMotion } from '@/hooks/use-motion-enabled';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { navigationTheme } from '@/constants/navigation-theme';
@@ -28,7 +29,6 @@ import { AuthProvider, useAuthContext } from '@/context/auth.context';
 import { LanguageProvider, useLanguage } from '@/context/language.context';
 import { LoginTransitionContext } from '@/context/login-transition.context';
 import { LayoutDirectionProvider, useLayoutDirection } from '@/context/layout-direction.context';
-import { OnboardingProvider, useOnboarding } from '@/context/onboarding.context';
 import { AppQueryProvider } from '@/context/query-provider';
 import { ThemePreferencesProvider, useThemeSettings } from '@/context/theme.context';
 import { useAuthGuards } from '@/guards/auth-guards';
@@ -43,7 +43,7 @@ export {
 } from 'expo-router';
 
 export const unstable_settings = {
-  initialRouteName: '(tabs)',
+  initialRouteName: 'index',
 };
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
@@ -71,11 +71,9 @@ export default function RootLayout() {
       <LanguageProvider>
         <ThemePreferencesProvider persistHeaderMotion>
           <AppQueryProvider>
-            <OnboardingProvider>
-              <AuthProvider>
-                <RootLayoutContent />
-              </AuthProvider>
-            </OnboardingProvider>
+            <AuthProvider>
+              <RootLayoutContent />
+            </AuthProvider>
           </AppQueryProvider>
         </ThemePreferencesProvider>
       </LanguageProvider>
@@ -106,11 +104,10 @@ function RootLayoutContent() {
   const finishLoginWave = useCallback(() => setLoginWaveComplete(true), []);
   const { error } = useAuthContext();
   const { ready: languageReady } = useLanguage();
-  const { ready: onboardingReady, completed: onboardingCompleted } = useOnboarding();
   const animatePageArtwork = !showBrandScreen;
+  const reducedMotion = useAppReducedMotion();
   // Restoration failures must expose their retry UI instead of keeping the launch overlay.
-  const ready =
-    languageReady && onboardingReady && headerMotionReady && (!restoring || Boolean(error));
+  const ready = languageReady && headerMotionReady && (!restoring || Boolean(error));
   const finishBrandScreen = useCallback(() => setShowBrandScreen(false), []);
   const revealBrandScreen = useCallback(() => {
     SplashScreen.hide();
@@ -124,10 +121,10 @@ function RootLayoutContent() {
         collapsable={false}
         style={{ flex: 1, backgroundColor: colors.background }}
       >
+        <ReducedMotionConfig mode={reducedMotion ? ReduceMotion.Always : ReduceMotion.Never} />
         <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
         <PageMotionOverlay
           shape={headerShape}
-          visible={onboardingCompleted}
           animate={animatePageArtwork}
           expanded={expanded}
           onCollapseComplete={finishLoginWave}
@@ -153,10 +150,9 @@ function RootLayoutNav({ holdLogin }: { holdLogin: boolean }) {
   const colorScheme = useColorScheme();
   const colors = useThemeColors(colorScheme);
   const direction = useLayoutDirection();
-  const reducedMotion = useReducedMotion();
+  const reducedMotion = useAppReducedMotion();
   const { requireAuth, requireNoAuth, restoring } = useAuthGuards();
   const { error, retryRestore } = useAuthContext();
-  const { completed } = useOnboarding();
 
   if (restoring)
     return (
@@ -208,36 +204,17 @@ function RootLayoutNav({ holdLogin }: { holdLogin: boolean }) {
           headerShadowVisible: false,
         }}
       >
-        <Stack.Protected guard={!completed}>
-          <Stack.Screen name="(onboarding)" options={{ headerShown: false }} />
+        <Stack.Screen name="index" />
+        <Stack.Screen name="ui" />
+        <Stack.Screen name="ui-component/[name]" />
+        <Stack.Screen name="settings" />
+        <Stack.Protected guard={requireNoAuth || holdLogin}>
+          <Stack.Screen name="(auth)" />
         </Stack.Protected>
-        <Stack.Protected guard={completed && (requireNoAuth || holdLogin)}>
-          <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+        <Stack.Protected guard={requireAuth && !holdLogin}>
+          <Stack.Screen name="account" />
         </Stack.Protected>
-        <Stack.Protected guard={completed && requireAuth && !holdLogin}>
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          <Stack.Screen name="recipe/[uuid]" options={{ title: t('common.recipeLabel') }} />
-          <Stack.Screen name="category/[uuid]" options={{ title: t('common.category') }} />
-          <Stack.Screen
-            name="my-recipes/liked-favorites"
-            options={{ title: t('common.savedRecipes') }}
-          />
-          <Stack.Screen name="my-recipes/history" options={{ title: t('common.recipeHistory') }} />
-          <Stack.Screen name="my-recipes/creations" options={{ title: t('common.creations') }} />
-          <Stack.Screen name="ingredients" options={{ title: t('common.ingredients') }} />
-          <Stack.Screen name="settings" options={{ title: t('settings.title') }} />
-          <Stack.Screen name="become-chef" options={{ title: t('chefProfile.heroTitle') }} />
-          <Stack.Screen name="device-info" options={{ title: t('tools.deviceInfo') }} />
-          <Stack.Screen name="health-check" options={{ title: t('common.healthCheck') }} />
-          <Stack.Screen name="ui" options={{ title: t('tools.showcase') }} />
-          <Stack.Screen name="ui-component/[name]" options={{ title: t('tools.component') }} />
-          <Stack.Screen name="development-pages" options={{ title: t('tools.allPages') }} />
-          <Stack.Screen name="main" options={{ headerShown: false }} />
-        </Stack.Protected>
-        <Stack.Protected guard={completed}>
-          <Stack.Screen name="sign-up" options={{ headerShown: false }} />
-          <Stack.Screen name="+not-found" />
-        </Stack.Protected>
+        <Stack.Screen name="+not-found" />
       </Stack>
     </ThemeProvider>
   );

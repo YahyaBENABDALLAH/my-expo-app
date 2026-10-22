@@ -25,7 +25,7 @@ Theme roles: native light/dark appearance for the sheet shell, plus `surfaceVari
 
 Native stories expose Light, Dark, ResendCountdown, RequestFailure and ResendFailure with isolated English copy. Automated suites have been removed; existing test IDs remain for future tests. Check input readiness on opening and reopening, incomplete and duplicate submissions, request failure, resend reset and stale completion manually. Native keyboard/autofill, narrow widths, large fonts, screen-reader traversal, hit-area edges and motion require device verification; story registration and typechecking alone do not prove them.
 
-The Development screen opens a local UI demo. Only `123456` succeeds; other complete codes demonstrate rejection. Resend is simulated and sends no message.
+The Bottom Sheet component showcase (`/ui-component/bottom-sheet`) opens a local UI demo. Only `123456` succeeds; other complete codes demonstrate rejection. Resend is simulated and sends no message.
 
 The 2026-10-13 performance changes pass lint, typecheck and the layout regression
 suite. Android Maestro reached the OTP story but did not complete its first

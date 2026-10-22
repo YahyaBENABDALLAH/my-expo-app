@@ -1,5 +1,4 @@
 import {
-  AuroraBackground,
   Column,
   ScrollView,
   UniversalHost,
@@ -90,13 +89,8 @@ const meta = {
   },
   render: (args) => <LoadingDemo key={args.state} {...args} />,
   decorators: [
-    (Story, { args }) => (
+    (Story) => (
       <View style={{ flex: 1 }}>
-        <AuroraBackground
-          colorScheme={args.colorScheme}
-          animate={false}
-          style={{ position: 'absolute', top: 0, right: 0, bottom: 0, left: 0 }}
-        />
         <Story />
       </View>
     ),

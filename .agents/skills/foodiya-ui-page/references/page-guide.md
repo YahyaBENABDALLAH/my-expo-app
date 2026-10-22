@@ -38,9 +38,7 @@ native boundaries; device layout and transition appearance remain manual checks.
 `PageMotionOverlay` wraps root navigation with `PageWaveContext`. The header uses
 original cubic vector artwork with independently moving control points. The leading
 40% stays level beneath the title/back button; only the trailing surface deforms.
-Smoke has curling translucent wisps, water has traveling swells and fine highlights,
-and rain has twelve staggered falling drops with spreading impact ripples. Waves,
-ribbon and dunes use their own speeds and spatial deformation. Smoke is the default.
+Dunes (the default), Ribbon and Rain are the supported effects. Rain adds twelve staggered falling drops and impact ripples.
 The shared active-time clock drives all paths on the UI thread. Skia uses numeric
 `usePathValue` builders without SVG parsing; the iOS native material mask receives
 animated SVG `d` values from the same control points. Android uses the same Skia
@@ -48,11 +46,11 @@ paths for its mask. No animation frame sets React state. RTL mirrors the whole
 artwork. The header stays within its measured bounds and adds no content spacing.
 Settings → Appearance → Header motion uses a native menu picker to select an effect.
 The change is immediate throughout the app and is saved in AsyncStorage. Restoration
-finishes beneath the launch screen; invalid/unavailable storage falls back to smoke.
+finishes beneath the launch screen; invalid/unavailable storage falls back to Dunes.
 Storybook's local preference provider never reads or writes this saved preference.
 Static SVG counterparts are in `assets/images/header-motion/`; production animates
 those vector contours and details through the shared geometry helpers.
-`Components/Page Header` offers all six shapes in Controls. Its AppSettings story
+`Components/Page Header` offers the three shapes in Controls. Its AppSettings story
 also exercises the picker against the local header. `animate={false}` freezes all
 surface and detail motion; the live accessibility/app-activity guards do the same.
 The clock accumulates active frame time and wraps seamlessly after 120 seconds. Replacing a page's mask joins the current phase; backgrounding, Reduce
@@ -100,7 +98,7 @@ live Reduce Transparency and native blur manually on a device. Verify that an
 uncovered content button works, a button beneath the title cannot be activated
 through it, and Back remains usable before and after scrolling.
 
-`page-screen.tsx` composes scrolling content and actions.
+`page-screen.tsx` composes scrolling content and actions. Its optional `showBack={false}` hides the back control without applying tab-bar insets; standalone Home uses this mode.
 `page-frame.tsx` handles the header's safe area and leaves other edges to content.
 Its optional `headerOverlay` floats the blurred header above full-height content,
 as used by Cartes. Overlay content retains the top device inset for native map controls;
@@ -171,3 +169,7 @@ including `FullHeightOverlay` with a simulated notch.
 
 Import public components from `@components/ui`; UI implementations import
 concrete files directly. [Back to the UI guide](../../../../docs/ui.md).
+
+The saved app Reduce Motion switch overrides the system preference for custom motion. Before an override is selected, the live system preference applies. Backgrounding still pauses animation. See the appearance skill for preference ownership.
+
+`Components/Page Screen/StandaloneHome` and `BackAction` exercise the `showBack` prop with counted content/back actions and the same native page Host.

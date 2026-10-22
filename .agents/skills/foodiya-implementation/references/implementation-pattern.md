@@ -53,24 +53,20 @@ adding another transport path. See the maintained
 5. Extend the relevant story and behavioral coverage where behavior changed.
    Verify the result through the same public entry point used by the feature.
 
-Useful existing examples, read only when their responsibility matches the task:
-
-- [Recipe creation screen](../../../../src/features/recipes/create-screen.tsx),
-  [workflow](../../../../src/features/recipes/use-recipe-creation.ts), and
-  [draft rules](../../../../src/features/recipes/recipe-draft.ts).
-- [Read-only entity](../../../../src/services/cuisine/cuisine.queries.ts) and
-  [entity writes](../../../../src/services/recipe/recipe.mutations.ts).
-- [Page composition](../../../../src/components/ui/page/page-screen.tsx) and
-  [form field adapter](../../../../src/components/ui/form/form-text-input.tsx).
+Use the existing authentication workflow in
+`src/features/auth/auth-flow.context.tsx`, transport in `src/services/auth/`,
+and `currentIdentityQuery` for current examples. Recipe-specific workflows and
+entity services have been removed from this starter. Generic query, mutation,
+pagination and invalidation utilities remain available for future backend work.
 
 ## Compose native UI without duplicating infrastructure
 
-Keep each shared component's implementation, private helpers, types, README, and
+Keep each shared component's implementation, private helpers, types, and
 necessary `.ios` / `.android` adapters in one existing family folder. Add files
 only for an actual responsibility or native difference. A common type contract
 must continue to work on both platforms; changing one adapter requires checking
 the other and any declaration file. Export public additions through
-`src/components/ui/index.ts`; preserve deliberate lazy entry points such as maps.
+`src/components/ui/index.ts`; preserve deliberate lazy entry points only when a retained feature requires them.
 
 Use `@components/ui` from screens and exact implementation paths inside the UI
 library. Native primitives already re-exported by the public entry point do not

@@ -1,20 +1,14 @@
-import { AUTH_STATUS } from '@/constants/auth.constant';
-import { appDevEnabled } from '@/constants/app-dev';
+import { AUTH_STATUS, type AuthStatus } from '@/constants/auth.constant';
 import { useAuthContext } from '@/context/auth.context';
-import type { AuthStatus } from '@/constants/auth.constant';
 
-export function authAccess(status: AuthStatus, appDev: boolean, guest: boolean) {
+export function authAccess(status: AuthStatus) {
   return {
-    requireAuth:
-      status === AUTH_STATUS.AUTHENTICATED ||
-      (appDev && guest && status === AUTH_STATUS.UNAUTHENTICATED),
+    requireAuth: status === AUTH_STATUS.AUTHENTICATED,
     requireNoAuth: status === AUTH_STATUS.UNAUTHENTICATED,
     restoring: status === AUTH_STATUS.UNKNOWN,
   };
 }
 
-/** Shared predicates for Expo Router's native protected route groups. */
 export function useAuthGuards() {
-  const { status, developmentGuest } = useAuthContext();
-  return authAccess(status, appDevEnabled, developmentGuest);
+  return authAccess(useAuthContext().status);
 }

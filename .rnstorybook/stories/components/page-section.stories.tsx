@@ -1,10 +1,7 @@
 import {
   Column,
-  HomeCatalogCard,
-  HomeRecipeCard,
   nativeFillWidth,
   PageSection,
-  RecipeCard,
   Row,
   ScrollView,
   TextInput,
@@ -17,19 +14,10 @@ import { useState } from 'react';
 import { spacing } from '@/constants/layout';
 import { useThemeColors } from '@/hooks/use-theme';
 
-const image = require('../../../assets/images/recipe-examples/salad.jpg');
-
-function SectionDemo({
-  colorScheme,
-  ribbonLabel,
-}: {
-  colorScheme: 'light' | 'dark';
-  ribbonLabel: string;
-}) {
+function SectionDemo({ colorScheme }: { colorScheme: 'light' | 'dark' }) {
   const colors = useThemeColors(colorScheme);
   const [value, setValue] = useState('Shared section');
   const [presses, setPresses] = useState(0);
-  const [saved, setSaved] = useState(false);
   const open = () => setPresses((count) => count + 1);
   return (
     <UniversalHost
@@ -46,18 +34,6 @@ function SectionDemo({
             <Text testID="page-section-value">{value}</Text>
             <Text testID="page-section-presses">{`Actions: ${presses}`}</Text>
             <UniversalButtonContent variant="primary" label="Count action" onPress={open} />
-            <RecipeCard
-              recipe={{
-                uuid: 'section-example',
-                title: 'Seasonal salad',
-                coverImageUrl: null,
-                totalTimeMinutes: 20,
-                likesCount: 4,
-                difficultyName: 'Easy',
-                chefDisplayName: 'Chef',
-              }}
-              onPress={open}
-            />
           </PageSection>
           <PageSection inset={false} style={{ backgroundColor: colors.infoContainer }}>
             <Column modifiers={nativeFillWidth} style={{ paddingHorizontal: spacing.lg }}>
@@ -65,55 +41,16 @@ function SectionDemo({
             </Column>
             <ScrollView direction="horizontal" showsIndicators={false}>
               <Row style={{ paddingHorizontal: spacing.lg }} spacing={spacing.lg}>
-                <HomeCatalogCard
-                  item={{
-                    id: 'section-example',
-                    image,
-                    title: 'Seasonal salad',
-                    duration: '20 min',
-                    category: 'Lunch',
-                    description: 'Fresh ingredients',
-                    chef: 'Chef',
-                  }}
-                  variant="hero"
-                  width={260}
-                  actionLabel="Details"
-                  onPress={open}
-                  saved={saved}
-                  saveLabel={saved ? 'Saved' : 'Save'}
-                  onSave={() => setSaved((current) => !current)}
-                />
-                <HomeRecipeCard
-                  recipe={{
-                    image,
-                    title: 'Seasonal salad',
-                    description: 'Fresh ingredients',
-                    duration: '20 min',
-                    category: 'Lunch',
-                    chef: 'Chef',
-                    likes: '4',
-                    secondaryMeta: 'Easy',
-                  }}
-                  variant="editorial"
-                  width={260}
-                  onPress={open}
-                />
-                <HomeCatalogCard
-                  item={{
-                    id: 'section-giveaway',
-                    image,
-                    title: 'Salade de pois chiches',
-                    duration: '15 min',
-                    category: 'Frais et coloré',
-                    description: 'Fresh ingredients',
-                    chef: 'Chef',
-                  }}
-                  variant="giveaway"
-                  width={260}
-                  ribbon={ribbonLabel}
-                  actionLabel="Détails"
-                  onPress={open}
-                />
+                {[1, 2, 3].map((item) => (
+                  <Column key={item} spacing={spacing.md} style={{ width: 260 }}>
+                    <Text variant="title">{`Example ${item}`}</Text>
+                    <UniversalButtonContent
+                      variant="secondary"
+                      label="Count action"
+                      onPress={open}
+                    />
+                  </Column>
+                ))}
               </Row>
             </ScrollView>
           </PageSection>
@@ -126,10 +63,9 @@ function SectionDemo({
 const meta = {
   title: 'Components/Page Section',
   component: SectionDemo,
-  args: { colorScheme: 'light', ribbonLabel: 'Gratuit maintenant' },
+  args: { colorScheme: 'light' },
   argTypes: {
     colorScheme: { control: 'radio', options: ['light', 'dark'] },
-    ribbonLabel: { control: 'text' },
   },
   render: (args) => <SectionDemo {...args} />,
 } satisfies Meta<typeof SectionDemo>;

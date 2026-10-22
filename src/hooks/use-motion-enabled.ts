@@ -1,6 +1,7 @@
 import { useSyncExternalStore } from 'react';
 import { AccessibilityInfo, AppState } from 'react-native';
 import { useReducedMotion } from 'react-native-reanimated';
+import { useThemePreferences } from '@/context/theme.context';
 
 type MotionState = { active: boolean; reducedMotion: boolean | undefined };
 let snapshot: MotionState = {
@@ -61,7 +62,7 @@ const getSnapshot = () => snapshot;
 const getStaticSnapshot = () => staticSnapshot;
 const subscribeStatic = () => () => {};
 
-export function useMotionEnabled(visible = true) {
+function useMotionState(visible: boolean) {
   // Synchronous startup fallback; live setting changes come from the shared store.
   const initialReducedMotion = useReducedMotion();
   const state = useSyncExternalStore(
@@ -69,5 +70,19 @@ export function useMotionEnabled(visible = true) {
     visible ? getSnapshot : getStaticSnapshot,
     getStaticSnapshot,
   );
-  return visible && state.active && !(state.reducedMotion ?? initialReducedMotion);
+  const preferences = useThemePreferences();
+  return {
+    active: state.active,
+    ready: preferences?.headerMotionReady ?? true,
+    reducedMotion: preferences?.reducedMotion ?? state.reducedMotion ?? initialReducedMotion,
+  };
+}
+
+export function useAppReducedMotion() {
+  return useMotionState(true).reducedMotion;
+}
+
+export function useMotionEnabled(visible = true) {
+  const state = useMotionState(visible);
+  return visible && state.ready && state.active && !state.reducedMotion;
 }

@@ -207,63 +207,6 @@
     "themeHint": "Tap to switch between light and dark mode.",
     "languageHint": "Tap to cycle through Français, English, and العربية."
   },
-  "chefProfile": {
-    "cardTitle": "Become a Chef",
-    "cardDescription": "Share your recipes with the community.",
-    "becomeChef": "Get Started",
-    "pageTitle": "Chef Profile",
-    "heroTitle": "Become a Chef",
-    "heroDescription": "Create your chef profile to start sharing your culinary creations with the world.",
-    "formTitle": "Your Chef Profile",
-    "formDescription": "Tell us about your culinary journey.",
-    "displayName": "Display Name",
-    "displayNamePlaceholder": "Chef Yahya",
-    "specialty": "Specialty",
-    "specialtyPlaceholder": "e.g. Moroccan Cuisine",
-    "yearsOfExperience": "Years of Experience",
-    "yearsOfExperiencePlaceholder": "e.g. 5",
-    "bio": "Bio",
-    "bioPlaceholder": "Tell us about your cooking passion...",
-    "submit": "Create Chef Profile",
-    "submitting": "Creating...",
-    "nameRequired": "Display name is required.",
-    "successTitle": "Welcome, Chef!",
-    "successMessage": "Your chef profile has been created successfully.",
-    "errorTitle": "Unable to continue",
-    "forbiddenError": "Your account does not have permission to perform this action. Please make sure your database user has the correct role (e.g., 'Chef' or 'Admin').",
-    "nameTooLong": "Display name cannot exceed 120 characters.",
-    "specialtyTooLong": "Specialty cannot exceed 150 characters.",
-    "bioTooLong": "Bio cannot exceed 1000 characters.",
-    "experienceInvalid": "Years of experience must be a number between 0 and 100."
-  },
-  "onboarding": {
-    "discover": {
-      "title": "Good food starts here.",
-      "subtitle": "Find fresh ideas for everyday meals and your next kitchen adventure.",
-      "category": "FIND YOUR INSPIRATION",
-      "detail": "Fresh ideas. Everyday ingredients."
-    },
-    "save": {
-      "title": "Keep the good ones.",
-      "subtitle": "Save the recipes you love. A little inspiration, ready whenever you are.",
-      "category": "MADE FOR YOUR TASTE",
-      "detail": "A little collection of what you love."
-    },
-    "cook": {
-      "title": "Make it your own.",
-      "subtitle": "Follow the steps, add your own twist, and share something delicious.",
-      "category": "FROM IDEA TO YOUR TABLE",
-      "detail": "Your kitchen. Your inspiration."
-    },
-    "start": "Let’s get started",
-    "next": "Next",
-    "saveFailed": "We couldn’t save your progress. Please try again.",
-    "skip": "Skip to sign in",
-    "skipShort": "Skip",
-    "page": "{{current}} of {{total}}",
-    "back": "Previous",
-    "progress": "Introduction progress"
-  },
   "settings": {
     "title": "App Settings",
     "description": "Manage your appearance and language preferences.",
@@ -289,13 +232,11 @@
     "legalDescription": "End user license agreement",
     "headerMotion": "Header motion",
     "headerShapes": {
-      "waves": "Waves",
-      "ribbon": "Ribbon",
       "dunes": "Dunes",
-      "smoke": "Smoke",
-      "water": "Water",
+      "ribbon": "Ribbon",
       "rain": "Rain"
-    }
+    },
+    "reduceMotion": "Reduce motion"
   },
   "appearance": {
     "dark": "Dark",
@@ -332,46 +273,6 @@
     "offlineCached": "Offline. Showing your saved content.",
     "waiting": "Content is waiting to load."
   },
-  "home": {
-    "description": "Discover recipes and browse categories.",
-    "search": "Find a recipe",
-    "popular": "Popular recipes",
-    "trending": "Trending this week",
-    "viewAll": "View all",
-    "editorsChoice": "Editor’s choice",
-    "catalog": {
-      "featured": "Featured",
-      "fromOurKitchen": "From our kitchen",
-      "experiences": "Cooking inspiration",
-      "freeRecipes": "Free recipes",
-      "weeklyPicks": "Fresh picks every week",
-      "freeNow": "Free now",
-      "quickMeals": "Quick meals",
-      "chefPicks": "Chef picks",
-      "save": "Save"
-    },
-    "cards": {
-      "title": "Recipe card examples",
-      "sampleHint": "{{count}} sample cards in each list. Tap a card to preview it.",
-      "numberedTitle": "{{title}} · {{index}}",
-      "samplePreview": "Sample recipe",
-      "minutes": "{{count}} min",
-      "breakfast": "Breakfast",
-      "fresh": "Fresh & colorful",
-      "easy": "Easy",
-      "vegetarian": "Vegetarian",
-      "chefsPick": "CHEF’S PICK",
-      "chefLina": "Chef Lina",
-      "chefAdil": "Chef Adil",
-      "pestoPasta": "Pesto pasta",
-      "toastDescription": "Creamy avocado on crisp toast, topped with a fried egg and a pinch of chili.",
-      "saladDescription": "Chickpeas, avocado and crunchy vegetables with a bright lemon dressing.",
-      "pastaDescription": "Basil pesto, cherry tomatoes and tender pasta. A fresh, simple dinner in 25 minutes."
-    },
-    "categories": "Browse categories",
-    "discover": "Recipes to try",
-    "empty": "No recipes yet. Check back soon."
-  },
   "search": {
     "description": "Find your next recipe by name, category, cuisine, or difficulty.",
     "recipes": "Search recipes",
@@ -386,47 +287,6 @@
     "noResults": "No recipes match this search. Try another name or reset your filters.",
     "resetSearch": "Reset search",
     "applyFilters": "Apply filters"
-  },
-  "recipes": {
-    "openLiked": "Open liked recipes and favorites",
-    "categoryDescription": "Browse recipes in this category.",
-    "invalidCategory": "Invalid category link",
-    "ingredientDescription": "Browse the ingredient catalog.",
-    "searchIngredients": "Search ingredients",
-    "savedDescription": "Recipes you have saved.",
-    "collectionsDescription": "Your saved recipes, viewing history, and creations.",
-    "likedFavorites": "Liked and favorite recipes",
-    "collectionCounts": "Favorites: {{favorites}} · Recently viewed: {{history}}",
-    "likedCount": "Liked recipes: {{count}}",
-    "loginSaved": "Sign in to view your saved recipes.",
-    "loginFavorites": "Sign in to view your favorites.",
-    "loginLiked": "Sign in to view your liked recipes.",
-    "openRecipe": "Open recipe",
-    "historyDescription": "Recently viewed recipes on this device.",
-    "loginHistory": "Sign in to view your history.",
-    "clearHistory": "Clear history",
-    "clearingHistory": "Clearing history…",
-    "clearHistoryFailed": "History couldn’t clear. Please try again.",
-    "creationsDescription": "Your published recipes.",
-    "creationsLimit": "Showing your creations from the first 100 public recipes.",
-    "createChefToPublish": "Create a chef profile to publish recipes.",
-    "loginCreations": "Sign in to view your creations.",
-    "loginSave": "Sign in to save recipes.",
-    "invalidLink": "Invalid recipe link",
-    "invalidLinkDescription": "This recipe link is invalid.",
-    "details": "Recipe details",
-    "facts": "Time: {{minutes}} min · Servings: {{servings}}",
-    "cardFacts": "{{minutes}} min · {{difficulty}} · Likes: {{likes}}",
-    "loginLike": "Sign in to save or like this recipe.",
-    "saving": "Saving…",
-    "removeFavorite": "Remove favorite",
-    "saveFavorite": "Save favorite",
-    "favoriteFailed": "Your favorites couldn’t update. Please try again.",
-    "liking": "Liking…",
-    "like": "Like recipe",
-    "likeFailed": "The like couldn’t be confirmed. Refresh this recipe before trying again.",
-    "optional": " (optional)",
-    "instructions": "Instructions"
   },
   "recipeForm": {
     "description": "Share your recipe in four steps.",
@@ -504,13 +364,6 @@
     "storybook": "Storybook",
     "skia": "Skia"
   },
-  "map": {
-    "label": "Map centered on Casablanca",
-    "city": "Casablanca",
-    "exploreCity": "Explore the city",
-    "title": "EXPLORE THE MAP",
-    "instructions": "Pinch to zoom, drag to explore, or tap the marker."
-  },
   "recovery": {
     "title": "Recovery",
     "failed": "This screen couldn’t load",
@@ -523,6 +376,16 @@
     "loading": "Likan is loading"
   },
   "showcase": {
+    "fieldGroupGallery": {
+      "description": "Settings-style sections, rows and accessories. Demo values stay on this page.",
+      "demoName": "Demo chef",
+      "demoAccount": "Local demo account",
+      "followApp": "App default",
+      "appearanceHint": "Changes this preview’s appearance only.",
+      "displayName": "Display name",
+      "nameHint": "Edit the demo name to update the account row above. Nothing is saved.",
+      "openSettings": "Open the real settings page for comparison."
+    },
     "gallery": {
       "interaction": "Try the controls",
       "localOnly": "These examples only change local demo values.",
@@ -806,7 +669,8 @@
     "swipeTips": "Swipe up inside the cooking tips.",
     "tip": "Tip {{index}}",
     "homeExamples": "Recipe UI examples",
-    "homeExamplesDescription": "Local sample cards, skeletons, and interactive controls for development. These examples do not change your recipe preferences."
+    "homeExamplesDescription": "Local sample cards, skeletons, and interactive controls for development. These examples do not change your recipe preferences.",
+    "floatingActions": "Floating actions"
   },
   "examples": {
     "toast": "Avocado toast",
@@ -821,15 +685,6 @@
     "tip4": "Preheat your pan or oven.",
     "tip5": "Taste and adjust seasoning as you go.",
     "tip6": "Let your dish rest before serving."
-  },
-  "canvas": {
-    "live": "LIVE CANVAS",
-    "title": "Light in motion",
-    "description": "A Skia shader animated with Reanimated. Change the colors and watch the canvas respond.",
-    "palette": "Palette: {{palette}}",
-    "aurora": "Aurora",
-    "prism": "Prism",
-    "tidal": "Tidal"
   },
   "api": {
     "network": "Unable to reach the server. Check your connection and try again.",
@@ -870,5 +725,8 @@
   "brand": {
     "name": "Likan",
     "wordmark": "LIKAN"
+  },
+  "starter": {
+    "homeDescription": "A starting point for your app. Explore the native components, adjust your preferences, or sign in to your backend."
   }
 }

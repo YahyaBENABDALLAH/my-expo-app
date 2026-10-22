@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { View } from 'react-native';
 import {
   Column,
+  FloatingAction,
   Icon,
   LoadingContent,
   PageScreen,
@@ -21,6 +22,7 @@ import {
 } from '@components/ui';
 import { radii, spacing } from '@/constants/layout';
 import { useAppTheme, useThemeColors } from '@/hooks/use-theme';
+import { useIsFocused } from 'expo-router';
 
 const variants = [
   'primary',
@@ -109,6 +111,7 @@ function GallerySection({
 
 export default function ButtonsScreen() {
   const { t } = useTranslation();
+  const focused = useIsFocused();
   const [presses, setPresses] = useState(0);
   const [lastAction, setLastAction] = useState<string>();
 
@@ -119,6 +122,18 @@ export default function ButtonsScreen() {
 
   return (
     <PageScreen title={t('showcase.buttons')} description={t('showcase.buttonDescription')}>
+      <GallerySection title={t('showcase.floatingActions')}>
+        <RNHostView matchContents>
+          <View style={{ height: 84, alignItems: 'center', justifyContent: 'center' }}>
+            <FloatingAction
+              animate={focused}
+              kind="create"
+              label={t('showcase.floatingActions')}
+              onPress={() => recordPress('showcase.floatingActions')}
+            />
+          </View>
+        </RNHostView>
+      </GallerySection>
       <GallerySection
         title={t('showcase.buttonGallery.interaction')}
         description={t('showcase.buttonGallery.interactionHint')}

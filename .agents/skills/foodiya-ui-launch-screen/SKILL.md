@@ -7,12 +7,11 @@ description: 'Use or maintain the Foodiya launch-screen presentation, readiness 
 
 Export: `LaunchScreen`. Implementation: `launch-screen.tsx`.
 
-Native startup presentation combines Expo UI content, Lottie and Skia artwork.
+Native startup presentation combines Expo UI content, Lottie artwork and a Skia reveal edge; Aurora has been removed.
 The root owns font/session/language readiness. `onReady` fires when the animated
 screen has native layout and the root hides the native splash. When `exiting` is
-ready, one Reanimated animation waits two seconds and then slides upward over
-two seconds. `onExitComplete` ends the overlay. Reduce Motion keeps the artwork
-static and completes immediately. No timer or additional React state is needed.
+ready, a cancellable two-second timer holds the presentation, then Reanimated slides it upward over two seconds. `onExitComplete` ends the overlay. Reduce Motion keeps the artwork
+static, retains the two-second hold and skips the slide. Lottie pauses while the app is inactive. The saved app motion preference overrides the live system preference after a choice is made.
 
 Keep startup state in the root. This component owns presentation.
 
@@ -22,7 +21,7 @@ opaque foreground matching the splash background. It replaces the fixed quadrati
 curves and continues moving during the two-second upward exit. Both placements
 share `PAGE_WAVE_HEIGHT` and respect live reduced motion and app activity.
 
-`Pages/Animated splash/Ready` and `Waiting` preview the production artwork and
+`Components/Launch Screen/Ready`, `Waiting` and `ReducedMotion` preview the production artwork and
 resource-dependent exit. Root fixtures cover restoration, language readiness and
 readiness after exit.
 These JS checks do not establish native rendering or timing. Inspect startup,

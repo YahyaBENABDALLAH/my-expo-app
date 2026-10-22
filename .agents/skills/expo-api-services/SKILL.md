@@ -19,7 +19,7 @@ Use Context7 for TanStack Query or Axios API syntax when needed: resolve the lib
 
 ## Add an entity
 
-Use the existing catalog modules in `src/services/cuisine/` for reads and `src/services/recipe/` for creation. Use `src/services/recipe-like/` for composite identifiers and deletion, or `src/services/chef-profile/` for PATCH and additional endpoints. Copy their structure only after checking the new contract.
+The starter retains authentication in `src/services/auth/` and generic request/query/mutation/invalidation helpers in `src/services/`. Recipe-specific services and DTOs have been removed. Use `auth.api.ts`, `auth.queries.ts` and the generic helpers as current examples; add a feature entity only for a real backend contract.
 
 | Location                                    | Responsibility                                                     |
 | ------------------------------------------- | ------------------------------------------------------------------ |
@@ -45,10 +45,10 @@ Create the mutation module only when there are supported writes. Keep services i
 - Reuse `request-utils.ts` for normalized list parameters and encoded identifier segments. Use the same normalized parameter snapshot for the request and cache key. Preserve explicit `false` filters and valid default pagination.
 - Reuse `query-utils.ts` for typed options. Forward its `AbortSignal` on every read, including additional endpoints. Disable incomplete detail reads with `skipToken`; composite details need every identifier.
 - Keep finite lists and infinite lists in separate key namespaces. Infinite reads follow the backend metadata and stop on the final, empty or repeated page; preserve the shared pagination safeguards.
-- Match query and service defaults. Use existing freshness conventions as a starting point: five minutes for catalogs and one minute for profiles/recipes/activity, adjusting when the entity's behavior warrants it.
+- Match query and service defaults. Use existing freshness conventions as a starting point: five minutes for catalogs and one minute for user data, adjusting when the entity's behavior warrants it.
 - Use `useQueryClient()` in hooks and an explicit client in imperative mutation factories. Reuse `useEntityInvalidation` and `query-invalidation.ts`; specify the identifier tuple for composite detail invalidators.
 - For a screen's pull-to-refresh, reuse `useScreenRefresh` with exact keys from its query-options factories and the shared screen's async `onRefresh` prop. Include only displayed reads; keep selected filters/pages and draft values. Preserve completion, error, offline and disabled-query behavior in `query-refresh.ts` rather than broadly invalidating every entity.
-- Use `QueryContent` for recipe query presentation: distinguish disabled prerequisites, paused connectivity, fetching, persistent errors and successful empty results. Preserve cached content during refresh/failure, disable retry during fetching/offline/disabled states, and keep persistent failure context even when a shared toast announces the error.
+- Use `QueryContent` for query presentation: distinguish disabled prerequisites, paused connectivity, fetching, persistent errors and successful empty results. Preserve cached content during refresh/failure, disable retry during fetching/offline/disabled states, and keep persistent failure context even when a shared toast announces the error.
 
 ## Preserve mutation behavior
 
@@ -60,7 +60,7 @@ Cancel an in-flight detail read before replacing or removing that entry. Call th
 
 Compose hook callbacks with `withMutationCallbacks`. Spreading a mutation and replacing `onSuccess` discards mandatory maintenance unless the original callback is explicitly awaited. Keep navigation in the consumer.
 
-Retain special session effects only where required by the entity workflow. Chef creation persists the returned profile UUID through the existing serialized auth adapter. Keep token rotation and secure storage in the auth module.
+Retain special session effects only where required by the entity workflow. Keep token rotation and secure storage in the auth module.
 
 Do not add optimistic writes by default. If requested, define cancellation, snapshots, rollback, account ownership and reconciliation before applying them. Distinguish server-write failures from callback or refetch failures before offering a repeated POST.
 
@@ -70,14 +70,10 @@ Search with `rg` for its DTOs, exported methods, hook names, key factory, featur
 
 When fields or filters change, update DTO nullability, normalized request parameters, query keys and invalidation predicates together. For a new endpoint, add its own read options/key/hook or write factory/hook as appropriate. Avoid implementing a second transport in a feature adapter. Keep the existing auth client/interceptor/session architecture.
 
-Update the API guide's entity matrix and examples when exposed capabilities or behavior change.
+Update the API guide when exposed capabilities change.
 
 ## Validate the affected behavior
 
-Use `tests/helpers/api-harness.mjs` and the existing `tests/services/` patterns to exercise real Axios and TanStack caches with mocked network/storage boundaries. Add or adjust tests for meaningful changed behavior: endpoint/body correctness, normalization, pagination termination, cancellation, affected/unaffected cache entries, callback ordering or session races. Avoid tests that only assert generated file names or mirror unchanged helpers.
-
-Use complete deterministic fixtures from `tests/helpers/api-fixtures.mjs` when a valid response is needed. Never silently fill missing network fields in the harness: malformed payload tests must reach the actual parser. Cover malformed lists, pagination, nested details, auth responses, write-cache preservation and corrupt saved sessions when changing their schemas.
-
-For service changes, run `npm run test:services` and relevant consumer regressions. Run `npm run typecheck` and `npm run lint` before completion, plus formatting checks for edited files; `npm run check` runs the full project suite when warranted. Follow the repository's package-manager commands if they change.
+This checkout has no automated service test runner. Do not restore historical test commands. Run `npm run typecheck`, `npm run lint` and formatting checks for edited files. Exercise changed auth/contracts with the actual backend and report that verification separately.
 
 Report supported operations, integration changes and validation results. Distinguish mocked contract/cache tests from live backend or device verification; do not claim production verification from local checks.
