@@ -22,3 +22,16 @@ and [architecture](architecture.md). No automated service runner is configured;
 use current package scripts and distinguish native/live-backend verification from
 static checks. Historical reports listing sixteen entity services no longer
 describe the current starter.
+
+## Error notifications
+
+Query and mutation cache failures and imperative auth lifecycle failures call
+`reportErrorAlert` from `src/lib/error-alerts.ts`. It preserves auth error
+translation and ignores cancellations and stale-session work. The shared
+`showAlert` queue coalesces duplicate notifications and retains them until the
+root `AlertHost` can present them after launch.
+
+Feedback uses Expo UI's native iOS Alert and Android AlertDialog with an OK
+action. Alerts remain until dismissed; there is no timed toast overlay. Keep
+persistent failure context and retry controls on the affected screen. See the
+[alert skill](../.agents/skills/foodiya-ui-alert/SKILL.md) for native composition.

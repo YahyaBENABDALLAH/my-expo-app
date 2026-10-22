@@ -1,7 +1,7 @@
 # Component skills
 
 Use this index to select only the component families involved in the change.
-The 33 skills below cover 27 shared UI families and six native primitives.
+The 32 skills below cover 26 shared UI families and six native primitives.
 Each family skill owns its current component contract. Short guidance stays in
 SKILL.md; the longer page and button guides use linked references. Read only
 the relevant family and shared rules. Source folders contain code, not duplicate
@@ -52,8 +52,7 @@ READMEs. The text skill covers native Text and the project text wrappers.
 | Bottom sheet                       | [foodiya-ui-bottom-sheet](../../foodiya-ui-bottom-sheet/SKILL.md) | [bottom-sheet/](../../../../src/components/ui/bottom-sheet/) |
 | Loading, query content, and errors | [foodiya-ui-loading](../../foodiya-ui-loading/SKILL.md)           | [loading/](../../../../src/components/ui/loading/)           |
 | Skeleton                           | [foodiya-ui-skeleton](../../foodiya-ui-skeleton/SKILL.md)         | [skeleton/](../../../../src/components/ui/skeleton/)         |
-| Toast                              | [foodiya-ui-toast](../../foodiya-ui-toast/SKILL.md)               | [toast/](../../../../src/components/ui/toast/)               |
-| Error toast                        | [foodiya-ui-error-toast](../../foodiya-ui-error-toast/SKILL.md)   | [error-toast/](../../../../src/components/ui/error-toast/)   |
+| Alert                              | [foodiya-ui-alert](../../foodiya-ui-alert/SKILL.md)               | [alert/](../../../../src/components/ui/alert/)               |
 
 ## App compositions
 

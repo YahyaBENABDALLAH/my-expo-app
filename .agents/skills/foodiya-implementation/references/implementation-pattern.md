@@ -98,7 +98,7 @@ For data-backed presentation, distinguish missing prerequisites, offline/paused
 reads, initial fetching, initial failure, successful empty data, populated data,
 and refresh. Reuse `QueryContent`, shared loading/error presentation, and
 `useScreenRefresh` where appropriate. Keep cached content during refresh or
-refresh failure. Do not replace persistent failure/retry context with a toast.
+refresh failure. Do not replace persistent failure/retry context with an alert.
 
 Reuse existing form submission guards. Preserve draft values on errors and
 language changes. When a field or response changes, update the real validation

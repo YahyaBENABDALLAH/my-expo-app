@@ -1,5 +1,6 @@
-import { Switch as NativeSwitch } from '@expo/ui';
-import type { SwitchProps } from './switch.types';
+import { Switch as NativeSwitch, type SwitchProps } from '@expo/ui';
+
+export type { SwitchProps } from '@expo/ui';
 
 /** Native appearance and glass feedback come from the owning Host and OS. */
 export function Switch({ disabled, onValueChange, ...props }: SwitchProps) {

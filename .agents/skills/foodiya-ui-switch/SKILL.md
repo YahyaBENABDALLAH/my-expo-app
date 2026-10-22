@@ -12,11 +12,14 @@ Follow [Foodiya implementation](../foodiya-implementation/SKILL.md) and
 
 ## Contract
 
-Read the [wrapper](../../../src/components/ui/switch/switch.tsx),
-[public type](../../../src/components/ui/switch/switch.types.ts) and
+Read the [wrapper and public type export](../../../src/components/ui/switch/switch.tsx) and
 [installed props](../../../node_modules/@expo/ui/src/universal/Switch/types.ts).
 Required: `value: boolean`, `onValueChange(next: boolean)`.
 Optional: translated `label`, `disabled`, `testID` and native `modifiers`.
+
+Keep this family in `switch.tsx`: it re-exports Expo's `SwitchProps` and adds
+only the disabled callback guard. It does not need a separate types file or
+platform adapters.
 
 ```tsx
 <Switch

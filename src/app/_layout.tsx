@@ -1,7 +1,7 @@
 import {
   UniversalTextContent as Text,
   Column,
-  ToastHost,
+  AlertHost,
   UniversalHost as Host,
   LaunchScreen,
   LoadingContent,
@@ -138,7 +138,7 @@ function RootLayoutContent() {
             onExitComplete={finishBrandScreen}
           />
         )}
-        {!showBrandScreen && <ToastHost />}
+        {!showBrandScreen && <AlertHost />}
       </View>
     </LoginTransitionContext.Provider>
   );

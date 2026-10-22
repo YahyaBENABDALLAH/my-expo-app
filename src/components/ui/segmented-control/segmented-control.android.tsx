@@ -1,6 +1,6 @@
 import { SegmentedButton, SingleChoiceSegmentedButtonRow, Text } from '@expo/ui/jetpack-compose';
 import { fillMaxWidth, testID } from '@expo/ui/jetpack-compose/modifiers';
-import type { SegmentedControlProps } from './segmented-control.types';
+import type { SegmentedControlProps } from './segmented-control';
 
 export function SegmentedControl({ options, selectedValue, onValueChange }: SegmentedControlProps) {
   return (

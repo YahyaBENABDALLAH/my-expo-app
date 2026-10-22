@@ -1,13 +1,13 @@
 import { MutationCache, QueryCache, QueryClient } from '@tanstack/react-query';
-import { reportErrorToast } from '@/lib/error-toasts';
+import { reportErrorAlert } from '@/lib/error-alerts';
 import { ApiError } from '@/services/api.error';
 
 const ONE_MINUTE_MS = 60 * 1000;
 const THIRTY_MINUTES_MS = 30 * ONE_MINUTE_MS;
 
 export const queryClient = new QueryClient({
-  queryCache: new QueryCache({ onError: reportErrorToast }),
-  mutationCache: new MutationCache({ onError: reportErrorToast }),
+  queryCache: new QueryCache({ onError: reportErrorAlert }),
+  mutationCache: new MutationCache({ onError: reportErrorAlert }),
   defaultOptions: {
     queries: {
       gcTime: THIRTY_MINUTES_MS,

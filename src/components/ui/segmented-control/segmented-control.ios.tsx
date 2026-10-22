@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { Picker, Text } from '@expo/ui/swift-ui';
 import { pickerStyle, tag } from '@expo/ui/swift-ui/modifiers';
-import type { SegmentedControlProps } from './segmented-control.types';
+import type { SegmentedControlProps } from './segmented-control';
 
 export function SegmentedControl({
   options,

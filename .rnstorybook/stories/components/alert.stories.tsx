@@ -1,17 +1,17 @@
-import { Toast, type ToastProps, UniversalButton, UniversalText } from '@components/ui';
+import { Alert, type AlertProps, UniversalButton, UniversalText } from '@components/ui';
 import type { Meta, StoryObj } from '@storybook/react-native';
 import { useCallback, useState } from 'react';
 import { View } from 'react-native';
 import { NativeStoryFrame } from '../../components/native-story-frame';
 import { LayoutDirectionProvider } from '@/context/layout-direction.context';
 
-function ToastDemo({
+function AlertDemo({
   variant,
   message,
   title,
   colorScheme,
   direction = 'ltr',
-}: Omit<ToastProps, 'onDismiss'> & { direction?: 'ltr' | 'rtl' }) {
+}: Omit<AlertProps, 'onDismiss'> & { direction?: 'ltr' | 'rtl' }) {
   const [visible, setVisible] = useState(false);
   const [shown, setShown] = useState(0);
   const [dismissals, setDismissals] = useState(0);
@@ -25,8 +25,8 @@ function ToastDemo({
         <View style={{ gap: 16 }}>
           <UniversalButton
             variant="secondary"
-            testID="toast-story-show"
-            label="Show toast"
+            testID="alert-story-show"
+            label="Show alert"
             colorScheme={colorScheme}
             disabled={visible}
             onPress={() => {
@@ -34,11 +34,11 @@ function ToastDemo({
               setVisible(true);
             }}
           />
-          <UniversalText testID="toast-story-state" colorScheme={colorScheme}>
+          <UniversalText testID="alert-story-state" colorScheme={colorScheme}>
             {`State: ${visible ? 'Visible' : 'Hidden'}. Dismissals: ${dismissals}`}
           </UniversalText>
           {visible && (
-            <Toast
+            <Alert
               key={shown}
               variant={variant}
               title={title}
@@ -54,8 +54,8 @@ function ToastDemo({
 }
 
 const meta = {
-  title: 'Components/Toast',
-  component: ToastDemo,
+  title: 'Components/Alert',
+  component: AlertDemo,
   args: {
     variant: 'error',
     message: 'The email, username, or password is incorrect.',
@@ -68,12 +68,12 @@ const meta = {
     direction: { control: 'select', options: ['ltr', 'rtl'] },
   },
   render: (args) => (
-    <ToastDemo
+    <AlertDemo
       key={`${args.variant}-${args.title}-${args.message}-${args.colorScheme}-${args.direction}`}
       {...args}
     />
   ),
-} satisfies Meta<typeof ToastDemo>;
+} satisfies Meta<typeof AlertDemo>;
 
 export default meta;
 

@@ -12,7 +12,6 @@ types define supported props; dated history is in [the archived catalog](../../.
 | button                  | [Skill](../../foodiya-ui-button/SKILL.md)                  | [Implementation](../../../../src/components/ui/button/)                                                                |
 | checkbox                | [Skill](../../foodiya-ui-checkbox/SKILL.md)                | [Implementation](../../../../src/components/ui/checkbox/)                                                              |
 | collapsible             | [Skill](../../foodiya-ui-collapsible/SKILL.md)             | [Implementation](../../../../src/components/ui/collapsible/)                                                           |
-| error-toast             | [Skill](../../foodiya-ui-error-toast/SKILL.md)             | [Implementation](../../../../src/components/ui/error-toast/)                                                           |
 | field-group             | [Skill](../../foodiya-ui-field-group/SKILL.md)             | [Implementation](../../../../src/components/ui/field-group/)                                                           |
 | floating-action         | [Skill](../../foodiya-ui-floating-action/SKILL.md)         | [Implementation](../../../../src/components/ui/floating-action/)                                                       |
 | form                    | [Skill](../../foodiya-ui-form/SKILL.md)                    | [Implementation](../../../../src/components/ui/form/)                                                                  |
@@ -32,7 +31,7 @@ types define supported props; dated history is in [the archived catalog](../../.
 | switch                  | [Skill](../../foodiya-ui-switch/SKILL.md)                  | [Implementation](../../../../src/components/ui/switch/)                                                                |
 | text                    | [Skill](../../foodiya-ui-text/SKILL.md)                    | [Implementation](../../../../src/components/ui/text/)                                                                  |
 | text-input              | [Skill](../../foodiya-ui-text-input/SKILL.md)              | [Implementation](../../../../src/components/ui/text-input/)                                                            |
-| toast                   | [Skill](../../foodiya-ui-toast/SKILL.md)                   | [Implementation](../../../../src/components/ui/toast/)                                                                 |
+| alert                   | [Skill](../../foodiya-ui-alert/SKILL.md)                   | [Implementation](../../../../src/components/ui/alert/)                                                                 |
 
 ## Direct native exports
 

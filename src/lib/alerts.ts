@@ -1,24 +1,24 @@
-export type ToastVariant = 'error' | 'success' | 'warning' | 'info';
+export type AlertVariant = 'error' | 'success' | 'warning' | 'info';
 
-export interface ToastOptions {
-  variant: ToastVariant;
+export interface AlertOptions {
+  variant: AlertVariant;
   message: string;
   title?: string;
 }
 
-export interface ToastNotification extends ToastOptions {
+interface AlertNotification extends AlertOptions {
   id: number;
 }
 
 let nextId = 0;
-let queue: ToastNotification[] = [];
+let queue: AlertNotification[] = [];
 const listeners = new Set<() => void>();
 
-export function getToast() {
+export function getAlert() {
   return queue[0] ?? null;
 }
 
-export function subscribeToasts(listener: () => void) {
+export function subscribeAlerts(listener: () => void) {
   listeners.add(listener);
   return () => {
     listeners.delete(listener);
@@ -26,14 +26,14 @@ export function subscribeToasts(listener: () => void) {
 }
 
 /** Queue feedback above navigation without repeating identical notifications. */
-export function showToast(options: ToastOptions) {
+export function showAlert(options: AlertOptions) {
   const message = options.message.trim();
   if (!message) return;
   const title = options.title?.trim() || undefined;
   if (
     queue.some(
-      (toast) =>
-        toast.variant === options.variant && toast.message === message && toast.title === title,
+      (alert) =>
+        alert.variant === options.variant && alert.message === message && alert.title === title,
     )
   ) {
     return;
@@ -42,7 +42,7 @@ export function showToast(options: ToastOptions) {
   listeners.forEach((listener) => listener());
 }
 
-export function dismissToast(id: number) {
+export function dismissAlert(id: number) {
   // A late native dismissal must never remove the next notification.
   if (queue[0]?.id !== id) return;
   queue = queue.slice(1);

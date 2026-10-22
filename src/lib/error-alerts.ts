@@ -3,18 +3,10 @@ import { isAxiosError, isCancel } from 'axios';
 import { SessionChangedError } from '@/services/auth/auth.errors';
 import { getAuthErrorMessage } from '@/services/auth/auth.service';
 import i18n from '@/lib/i18n';
-import { showToast } from './toasts';
-
-// Existing integrations share the same queue as success and warning notifications.
-export {
-  getToast as getErrorToast,
-  subscribeToasts as subscribeErrorToasts,
-  dismissToast as dismissErrorToast,
-} from './toasts';
-export type { ToastNotification as ErrorToast } from './toasts';
+import { showAlert } from './alerts';
 
 /** Shared by cache callbacks and imperative auth work; contains no rendering code. */
-export function reportErrorToast(error: unknown) {
+export function reportErrorAlert(error: unknown) {
   if (
     error instanceof SessionChangedError ||
     isCancelledError(error) ||
@@ -25,5 +17,5 @@ export function reportErrorToast(error: unknown) {
     return;
   }
   const message = getAuthErrorMessage(error).trim() || i18n.t('auth.requestFailed');
-  showToast({ variant: 'error', message });
+  showAlert({ variant: 'error', message });
 }

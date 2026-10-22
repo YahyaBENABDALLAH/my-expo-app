@@ -6,7 +6,7 @@ import {
 } from './auth.session';
 import { requestNewToken } from './auth.refresh';
 import { logout } from './auth.api';
-import { reportErrorToast } from '@/lib/error-toasts';
+import { reportErrorAlert } from '@/lib/error-alerts';
 
 export { establishAuthSession as establishSession };
 
@@ -17,7 +17,7 @@ export function signOut(): Promise<void> {
   const version = getSessionVersion();
   if (pendingLogout?.version === version) return pendingLogout.promise;
   const promise = logout()
-    .catch(reportErrorToast)
+    .catch(reportErrorAlert)
     .then(() => clearAuthSession(version))
     .finally(() => {
       if (pendingLogout?.promise === promise) pendingLogout = null;
@@ -33,7 +33,7 @@ export async function restoreSession() {
     const accessTokenValid = Date.parse(session.expiresAtUtc ?? '') > Date.now();
     if (!accessTokenValid) {
       // Keep the cached identity during temporary network failures.
-      void requestNewToken(version).catch(reportErrorToast);
+      void requestNewToken(version).catch(reportErrorAlert);
     }
   }
   return session;

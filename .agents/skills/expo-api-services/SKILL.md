@@ -48,7 +48,7 @@ Create the mutation module only when there are supported writes. Keep services i
 - Match query and service defaults. Use existing freshness conventions as a starting point: five minutes for catalogs and one minute for user data, adjusting when the entity's behavior warrants it.
 - Use `useQueryClient()` in hooks and an explicit client in imperative mutation factories. Reuse `useEntityInvalidation` and `query-invalidation.ts`; specify the identifier tuple for composite detail invalidators.
 - For a screen's pull-to-refresh, reuse `useScreenRefresh` with exact keys from its query-options factories and the shared screen's async `onRefresh` prop. Include only displayed reads; keep selected filters/pages and draft values. Preserve completion, error, offline and disabled-query behavior in `query-refresh.ts` rather than broadly invalidating every entity.
-- Use `QueryContent` for query presentation: distinguish disabled prerequisites, paused connectivity, fetching, persistent errors and successful empty results. Preserve cached content during refresh/failure, disable retry during fetching/offline/disabled states, and keep persistent failure context even when a shared toast announces the error.
+- Use `QueryContent` for query presentation: distinguish disabled prerequisites, paused connectivity, fetching, persistent errors and successful empty results. Preserve cached content during refresh/failure, disable retry during fetching/offline/disabled states, and keep persistent failure context even when a native alert announces the error.
 
 ## Preserve mutation behavior
 
