@@ -44,12 +44,17 @@ for project guides. Do not duplicate this material in source-folder READMEs.
 
 ## Verify and finish
 
-Run `npm run typecheck` and `npm run lint` for this checkout, which uses
-`package-lock.json`. Recheck the lockfile if the package manager changes. Format
-the edited files with the installed Prettier. Read `package.json` before selecting
-additional checks; some older documentation names scripts that no longer exist.
+Run `npm run check` for this npm-lockfile checkout: typecheck, zero-warning lint
+and formatting of maintained files. The format commands use explicit source,
+documentation, skill and configuration scopes to avoid generated-folder traversal;
+keep both scopes aligned when adding a source root. Format edited files with the
+installed Prettier rather than rewriting unrelated changes.
 
-Run affected behavioral tests when behavior changes. Update native stories for
-reusable UI changes and run `npm run storybook:generate` when story files change.
-Document relevant public API or placement changes in the existing guides. Report
-the checks actually run and any native behavior that still needs device testing.
+Automated suites and Maestro flows are absent. Keep stable native selectors and
+do not add a test runner or restore historical test commands unless requested.
+Update native examples for reusable UI changes and run
+`npm run storybook:generate` when story files change. Follow the current
+[preview workflow](../../../docs/storybook.md); registration alone does not make
+retained fixtures runnable. Report static checks, live-backend verification and
+native device observations separately. Update the existing guide or component
+skill when its implemented contract changes.

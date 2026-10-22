@@ -13,7 +13,32 @@ including packages for future features; unused packages are not a reason to remo
 - `npm run typecheck` checks application and retained native story sources.
 - `npm run lint` checks with zero warnings allowed.
 - `npm run check` additionally checks formatting.
+- `npm run format:check` checks maintained source, docs, skills, configuration and
+  native stories. `npm run format` writes formatting to the same scopes. Both
+  avoid traversing generated folders such as `.expo/`; keep their scopes aligned
+  when adding a new source root. New files inside these scopes are included even
+  before they are tracked by Git. Existing `.prettierignore` exclusions still apply.
 - `npm run storybook:generate` updates native story registration.
+
+The GitHub quality workflow runs the same `npm run check` after installing locked
+dependencies and generating native story registration. Automated suites and
+Maestro flows are absent. Keep stable native selectors and verify changed
+interactions through the existing native examples; do not restore historical
+test commands as part of normal feature work.
+
+## SDK and native verification baseline
+
+Keep the current Expo SDK 57, `@expo/ui` 57.0.21 and Expo Router 57.0.24 pins while
+implementing the white-label changes. The UI/Router pairing and install exclusions
+are intentional native compatibility choices; the original evidence is in
+[build verification](build-verification.md#expo-ui-version). Reassess them together
+in a dedicated upgrade with current SDK documentation and native verification.
+
+Before changing startup or header motion, record the existing behavior on the
+same release-like native builds/devices used for the comparison. Record device,
+OS, configuration and sample count. Static checks and exports establish neither
+frame rates nor native interaction. If devices are unavailable, leave that
+comparison pending in the [implementation plan](white-label-template-plan.md).
 
 ## Starter screens
 

@@ -34,6 +34,7 @@ skills; [documentation ownership](documentation.md) explains where to update eac
 - [EAS development builds](eas-development-builds.md)
 - [Cleanup and build verification — 2026-10-10](build-verification.md)
 - [Engineering quality and product cleanup](engineering-quality.md)
+- [White-label template implementation plan](white-label-template-plan.md)
 - [Local SonarQube analysis](sonarqube.md)
 
 ## Historical reports and investigations

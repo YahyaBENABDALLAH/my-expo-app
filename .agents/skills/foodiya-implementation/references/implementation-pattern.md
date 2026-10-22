@@ -17,7 +17,7 @@ shape; this is a responsibility pattern, not a request to restructure the app.
 | Remote-state policy                   | Entity `.queries.ts`, `.mutations.ts`, `.hooks.ts`; existing feature adapters | Own keys, cancellation, pagination, session guards, and successful cache maintenance                               |
 | Shared native presentation            | `src/components/ui/<family>/`                                                 | Own rendering, controlled interactions, theme and platform adapters; leave feature orchestration with the consumer |
 | Shared preferences and infrastructure | Existing `src/context/`, `src/hooks/`, `src/lib/`, `src/services/auth/`       | Extend the current owner rather than creating a second theme, session, HTTP, or preference system                  |
-| Stories and native flows              | `.rnstorybook/`, `.maestro/`                                                  | Keep fixtures and development wrappers outside production imports                                                  |
+| Native component examples             | `.rnstorybook/`, `src/features/ui-showcase/`                                  | Keep story tooling outside production imports; distinguish starter showcase routes from isolated native fixtures   |
 
 The normal dependency direction is:
 
@@ -36,7 +36,7 @@ adding another transport path. See the maintained
 ## Implement a coherent feature slice
 
 1. Locate the current screen, route, workflow, UI consumers, schemas, and relevant
-   tests with `rg`. Read the relevant component skill and installed types. Establish the
+   native examples with `rg`. Read the relevant component skill and installed types. Establish the
    observable result, affected states, and existing public contract.
 2. Start at the changed contract. For a UI-only change, stay in presentation. For
    a data change, confirm the backend contract, update schemas/DTOs and transport,
@@ -50,7 +50,7 @@ adding another transport path. See the maintained
    and actions. Pass values and callbacks to presentation. Keep navigation in the
    route or feature consumer; preserve mandatory mutation callbacks before
    navigating on success.
-5. Extend the relevant story and behavioral coverage where behavior changed.
+5. Extend the relevant native example and manual verification where behavior changed.
    Verify the result through the same public entry point used by the feature.
 
 Use the existing authentication workflow in
@@ -117,15 +117,15 @@ change; reuse the live providers rather than introducing reload-based switching.
 
 ## Match verification to the change
 
-- Always run `npm run typecheck` and `npm run lint`. Check formatting on edited
-  files, without rewriting unrelated working-tree changes.
-- Read current `package.json` scripts and existing tests before choosing targeted
-  checks. automated suites and Maestro flows have been removed. Do not restore old
-  test commands from historical guides; use current package scripts.
+- Run `npm run check` for typecheck, lint and maintained-file formatting. Format
+  edited files without rewriting unrelated working-tree changes.
+- Read current `package.json` scripts before choosing additional checks. Automated
+  suites and Maestro flows have been removed. Do not add a runner or restore old
+  test commands unless requested; preserve stable native selectors.
 - For reusable UI behavior, update a discoverable native story or focused
   composition story with deterministic fixtures and stable selectors. Regenerate
-  registration after story changes. Use affected tests for meaningful behavior,
-  not new tests that only assert documentation wording or file placement.
+  registration after story changes. Follow the current preview workflow; source
+  fixtures and registration alone do not establish a runnable native preview.
 - On available native devices, exercise the affected iOS and Android interactions,
   relevant light/dark and RTL states, keyboard, large text, and touch targets.
   Use current native compositions for manual checks. Static checks and JS fixtures do not prove

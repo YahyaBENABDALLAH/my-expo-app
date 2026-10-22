@@ -1,6 +1,6 @@
 ---
 name: expo-universal-component-library
-description: Build and maintain this project's universal Expo UI component library, theme tokens, documentation, native Storybook stories, and meaningful component tests. Use when adding or changing reusable UI components or their stories and theme.
+description: Build and maintain this project's native Expo UI component library, theme tokens, component contracts, examples and stable selectors. Use when changing reusable UI components, their native adapters, stories or theme.
 ---
 
 # Universal Expo UI component library
@@ -23,10 +23,14 @@ Apply the sibling [mobile UI requirements](../expo-mobile-ui-only/SKILL.md): iOS
 - Let content inherit its owning `UniversalHost` color scheme through `useHostColorScheme`, with an explicit component override when requested. Deterministic light/dark stories must not silently read the device theme.
 - Loading uses native `LoadingIndicator` platform adapters, `LoadingContent` inside a Host and `LoadingScreen` at a route/Suspense boundary. Exercise disabled, offline, initial failure, empty success, cached refresh and refresh failure in composition stories.
 - Every new or changed reusable component must have a discoverable native Storybook story. Infrastructure and compound slots may use a focused composition story rather than standalone wrappers.
-- Follow [native stories and testing](references/storybook-testing.md): deterministic fixtures, explicit state, stable selectors, meaningful interaction assertions, and native verification.
+- Follow [native stories and verification](references/storybook-testing.md): deterministic fixtures, explicit state, stable actionable selectors and manual native verification. Automated suites are absent; do not add a runner or restore old test commands unless requested.
 - Keep stories and development tooling out of production imports. Inspect the existing Metro/Storybook setup before changing bundle selection.
 - Do not claim a story proves device behavior or that a screenshot is an automated regression test without a comparison mechanism.
 
 ## Completion
 
-Run lint and typecheck. Regenerate Storybook registration when stories change. Run affected behavioral checks when available and report unverified native cases. For a documentation-only change, validate the skill and its local references; a catalog entry is not a completed story or test.
+Run `npm run check` for typecheck, lint and maintained-file formatting. Regenerate
+Storybook registration when stories change. Follow the current preview workflow
+and report unverified native cases; fixture registration does not prove a runnable
+preview or native interaction. For a documentation-only change, validate the skill
+and its local references.

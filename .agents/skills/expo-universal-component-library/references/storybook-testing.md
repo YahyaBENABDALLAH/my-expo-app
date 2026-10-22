@@ -13,10 +13,12 @@ variations, with separate fixtures only when behavior needs a different setup.
 Keep Storybook imports out of production code.
 
 After story changes, run npm run storybook:generate, lint and typecheck.
-Automated suites and Maestro flows have been removed; read package.json before
-choosing commands. Keep existing selectors and manually exercise activation,
+Automated suites and Maestro flows have been removed; do not add a runner or
+restore historical test commands unless requested. Read package.json before
+choosing commands. Keep stable selectors on actual native controls and manually exercise activation,
 disabled suppression, value retention, validation, dismissal and retry on devices.
 
 JS mocks do not establish SwiftUI/Compose layout, keyboard behavior, accessibility,
 colors or touch geometry. Report native execution separately. Registration or
-a screenshot alone does not prove those behaviors.
+a screenshot alone does not prove those behaviors. Follow the current preview
+workflow: retained Storybook registration does not itself expose a native route.
