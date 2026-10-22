@@ -1,4 +1,9 @@
-import { Picker as UniversalPicker, type PickerProps, type PickerItemValue } from '@expo/ui';
+import {
+  Picker as UniversalPicker,
+  type PickerProps,
+  type PickerItemProps,
+  type PickerItemValue,
+} from '@expo/ui';
 import {
   DropdownMenuItem,
   ExposedDropdownMenu,
@@ -8,8 +13,8 @@ import {
   useNativeState,
 } from '@expo/ui/jetpack-compose';
 import { menuAnchor, testID as nativeTestID } from '@expo/ui/jetpack-compose/modifiers';
-import { useEffect, useState } from 'react';
-import { pickerItems } from './picker-items';
+import { isValidElement, useEffect, useState } from 'react';
+import { flattenNativeChildren } from '../native/native-children';
 
 export function Picker<T extends PickerItemValue>({
   selectedValue,
@@ -18,7 +23,11 @@ export function Picker<T extends PickerItemValue>({
   children,
   testID,
 }: PickerProps<T>) {
-  const items = pickerItems<T>(children);
+  const items = flattenNativeChildren(children).flatMap((child) =>
+    isValidElement<PickerItemProps<T>>(child) && child.type === UniversalPicker.Item
+      ? [child.props]
+      : [],
+  );
   const [expanded, setExpanded] = useState(false);
   const selectedLabel = items.find((item) => item.value === selectedValue)?.label ?? '';
   const labelState = useNativeState(selectedLabel);

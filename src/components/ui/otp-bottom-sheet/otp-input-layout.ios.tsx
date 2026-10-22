@@ -9,7 +9,7 @@ import {
   shapes,
   textFieldStyle,
 } from '@expo/ui/swift-ui/modifiers';
-import type { OtpInputLayoutProps } from './otp-input-layout.types';
+import type { OtpInputLayoutProps } from './otp-input-layout';
 
 /** The native field stays above the decorative slots and owns the whole tap target. */
 export function OtpInputLayout({

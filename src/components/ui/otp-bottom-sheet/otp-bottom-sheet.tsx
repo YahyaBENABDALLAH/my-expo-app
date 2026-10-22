@@ -1,6 +1,7 @@
 import { spacing, radii } from '@/constants/layout';
 import {
   Column,
+  Icon,
   RNHostView,
   Row,
   ScrollView,
@@ -8,7 +9,9 @@ import {
   useNativeState,
   type TextInputRef,
 } from '@expo/ui';
-import { useLayoutEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState, type ComponentProps } from 'react';
+import Animated, { cubicBezier } from 'react-native-reanimated';
+import { useMotionEnabled } from '@/hooks/use-motion-enabled';
 import { AccessibilityInfo, Platform, useWindowDimensions } from 'react-native';
 import { onSizeChanged } from '@expo/ui/jetpack-compose/modifiers';
 import { onGeometryChange } from '@expo/ui/swift-ui/modifiers';
@@ -21,10 +24,21 @@ import { UniversalHost, useHostColorScheme } from '../host/universal-host';
 import { LoadingContent } from '../loading/loading-state';
 import { nativeFillWidth } from '../native/native-fill-width';
 import { UniversalTextContent } from '../text/universal-text';
-import { normalizeOtpCode, OTP_LENGTH } from './otp-code';
-import { OtpFeedback } from './otp-feedback';
 import { OtpInputLayout } from './otp-input-layout';
-import { OtpResendButton } from './otp-resend-button';
+
+const OTP_LENGTH = 6;
+
+/** Accept pasted separators and the numeric scripts used by our supported locales. */
+function normalizeOtpCode(value: string) {
+  return value
+    .replace(/[\u0660-\u0669\u06f0-\u06f9\uff10-\uff19]/g, (digit) => {
+      const point = digit.charCodeAt(0);
+      const zero = point >= 0xff10 ? 0xff10 : point >= 0x06f0 ? 0x06f0 : 0x0660;
+      return String(point - zero);
+    })
+    .replace(/[^0-9]/g, '')
+    .slice(0, OTP_LENGTH);
+}
 
 export interface OtpBottomSheetProps {
   isPresented: boolean;
@@ -368,5 +382,140 @@ function OtpForm({
         )}
       </Column>
     </ScrollView>
+  );
+}
+
+/** Only the resend label updates each second; the native form and input stay untouched. */
+function OtpResendButton({
+  deadline,
+  isPresented,
+  busy,
+  onPress,
+  testID,
+}: {
+  deadline: number;
+  isPresented: boolean;
+  busy: boolean;
+  onPress: () => void;
+  testID: string;
+}) {
+  const { t } = useTranslation();
+  const [countdown, setCountdown] = useState(() => ({
+    deadline,
+    remaining: Math.max(0, Math.ceil((deadline - Date.now()) / 1000)),
+  }));
+  if (countdown.deadline !== deadline) {
+    setCountdown(() => ({
+      deadline,
+      remaining: Math.max(0, Math.ceil((deadline - Date.now()) / 1000)),
+    }));
+  }
+  const { remaining } = countdown;
+  useEffect(() => {
+    const secondsLeft = () => Math.max(0, Math.ceil((deadline - Date.now()) / 1000));
+    if (!isPresented || secondsLeft() === 0) return;
+    const timer = setInterval(() => {
+      const next = secondsLeft();
+      setCountdown((previous) =>
+        previous.remaining === next ? previous : { deadline, remaining: next },
+      );
+      if (next === 0) clearInterval(timer);
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [deadline, isPresented]);
+
+  return (
+    <UniversalButtonContent
+      variant="link"
+      testID={testID}
+      label={remaining > 0 ? t('otp.resendIn', { seconds: remaining }) : t('otp.resend')}
+      disabled={!isPresented || remaining > 0 || busy}
+      onPress={onPress}
+    />
+  );
+}
+
+const fadeIn = {
+  animationName: {
+    from: { opacity: 0.4, transform: [{ scale: 0.92 }] },
+    to: { opacity: 1, transform: [{ scale: 1 }] },
+  },
+  animationDuration: 180,
+  animationTimingFunction: cubicBezier(0.23, 1, 0.32, 1),
+} satisfies ComponentProps<typeof Animated.View>['style'];
+
+const shake = {
+  animationName: {
+    from: { transform: [{ translateX: 0 }] },
+    '25%': { transform: [{ translateX: -6 }] },
+    '50%': { transform: [{ translateX: 6 }] },
+    '75%': { transform: [{ translateX: -3 }] },
+    to: { transform: [{ translateX: 0 }] },
+  },
+  animationDuration: 200,
+  animationTimingFunction: cubicBezier(0.77, 0, 0.175, 1),
+} satisfies ComponentProps<typeof Animated.View>['style'];
+
+function OtpFeedback({
+  status,
+  visible,
+}: {
+  status: 'idle' | 'verifying' | 'resending' | 'error' | 'success';
+  visible: boolean;
+}) {
+  if (!visible) return null;
+  return <AnimatedOtpFeedback status={status} />;
+}
+
+function AnimatedOtpFeedback({
+  status,
+}: {
+  status: 'idle' | 'verifying' | 'resending' | 'error' | 'success';
+}) {
+  const scheme = useHostColorScheme();
+  const colors = useThemeColors(scheme);
+  const motion = useMotionEnabled(true);
+  const success = status === 'success';
+  const error = status === 'error';
+  return (
+    // A fixed-size RN boundary is needed only to animate the native status artwork.
+    <RNHostView matchContents>
+      <Animated.View
+        key={status}
+        pointerEvents="none"
+        accessibilityElementsHidden
+        importantForAccessibility="no-hide-descendants"
+        style={[
+          {
+            width: 80,
+            height: 80,
+            alignItems: 'center',
+            justifyContent: 'center',
+            borderRadius: radii.pill,
+            backgroundColor: error ? colors.errorContainer : colors.successContainer,
+          },
+          motion ? (error ? shake : fadeIn) : undefined,
+        ]}
+      >
+        <UniversalHost inline colorScheme={scheme} ignoreSafeArea="all">
+          <Icon
+            name={Icon.select({
+              ios: success
+                ? 'checkmark.shield.fill'
+                : error
+                  ? 'exclamationmark.shield.fill'
+                  : 'lock.shield.fill',
+              android: success
+                ? require('@expo/material-symbols/verified_user.xml')
+                : error
+                  ? require('@expo/material-symbols/gpp_maybe.xml')
+                  : require('@expo/material-symbols/shield_lock.xml'),
+            })}
+            size={36}
+            color={error ? colors.error : colors.success}
+          />
+        </UniversalHost>
+      </Animated.View>
+    </RNHostView>
   );
 }

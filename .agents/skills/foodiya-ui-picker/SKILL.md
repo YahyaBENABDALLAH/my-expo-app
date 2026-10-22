@@ -17,6 +17,16 @@ both [iOS](../../../src/components/ui/picker/picker.ios.tsx) /
 Supported props are `selectedValue`, `onValueChange`, `children`,
 `appearance`, `enabled` and `testID`.
 
+Keep this family to the two native implementations and the public declaration.
+The small item extraction stays inside each adapter; it does not need its own
+helper or types file. Recheck both adapters when changing item handling.
+
+The adapters supply behavior missing from the installed `@expo/ui` 57.0.21:
+Android label synchronization, closing on disable and test selectors; iOS glass
+menu styling and callback guards. Both retain fragment support and distinct
+string/number keys. Recheck these differences before replacing them with a
+direct package export.
+
 ```tsx
 <Picker selectedValue={servings} onValueChange={setServings} testID="recipe-servings">
   <Picker.Item label={t('showcase.gallery.servings', { value: 1 })} value={1} />

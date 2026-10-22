@@ -6,7 +6,7 @@ import {
   height as nativeHeight,
   semantics,
 } from '@expo/ui/jetpack-compose/modifiers';
-import type { OtpInputLayoutProps } from './otp-input-layout.types';
+import type { OtpInputLayoutProps } from './otp-input-layout';
 
 /** The topmost BasicTextField handles native typing, paste, selection and backspace. */
 export function OtpInputLayout({ slots, input, accessibilityLabel, height }: OtpInputLayoutProps) {
