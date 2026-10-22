@@ -5,7 +5,9 @@ description: 'Compose Foodiya native authentication frames, fields, icon actions
 
 # Authentication frame
 
-Exports: `AuthScreenFrame`, `LoginPreferences`, `authInputIcons` and the existing auth theme helpers.
+Shared exports: `AuthScreenFrame`, `AuthIconButton`, `AuthIconButtonProps` and
+`authInputIcons`. [LoginPreferences](../../../src/features/auth/login-preferences.tsx)
+belongs to the auth feature and is imported locally by Login.
 
 `auth-screen-frame.tsx` owns keyboard/safe-area layout, the full-width native
 Host and scrolling. The screen adds only device safe areas; an inner
@@ -15,8 +17,9 @@ short forms center vertically; longer forms grow and scroll from the top. This
 uses the available layout, without device detection or breakpoints. Native
 SwiftUI/Compose modifiers center the padded content without fixing its height.
 Its optional `topBar` slot renders outside the scrolling
-form, below the frame's top safe area. `auth-theme.ts` supplies the shared
-palette; `auth-input-icons.ts` holds native symbol choices.
+form, below the frame's top safe area. Read shared colors with `useThemeColors`
+and the owning `useHostColorScheme`; use `useAppTheme` when both scheme and colors
+are needed. `auth-input-icons.ts` holds native symbol choices.
 
 `grouped` selects a native `FieldGroup` instead of the regular refreshable scroll
 container. Registration supplies sections directly to this mode and shares the
@@ -27,9 +30,8 @@ side safe-area insets. Expo's universal FieldGroup owns the native form
 section row colors and scroll indicators. Like Settings, the grouped form hides
 its system canvas so the page's theme background remains visible between groups.
 
-Compose `AuthText` and `UniversalButtonContent` inside the frame. `AuthText`
-aliases `UniversalTextContent`; buttons use the shared theme tokens and
-still require an explicit `variant`.
+Compose `UniversalTextContent` and `UniversalButtonContent` inside the frame.
+Buttons use the shared theme tokens and still require an explicit `variant`.
 
 Keep session operations, validation and form state in the auth feature.
 
@@ -51,26 +53,31 @@ device appearance; Light Mode and Dark Mode stay fixed until another choice is
 selected. Choosing System again resumes automatic detection. Brand selection
 stays in App Settings.
 
-The private `auth-icon-button.*` adapters use a native 48-point plain SwiftUI
+The shared `auth-icon-button.*` adapters use a native 48-point plain SwiftUI
 button or Material IconButton with translated accessibility labels. Icon/tint
-colors follow the auth palette. Disabled language controls suppress activation
+colors come from the caller's shared theme. `AuthIconButton` requires `icon`,
+`color`, `accessibilityLabel`, `testID` and `onPress`; `disabled` is optional.
+It reuses the owning Host. Disabled language controls suppress activation
 until language restoration is ready. No new UI dependency is needed.
 
-`Pages/Login preferences` exposes System/light/dark fixtures and an editable draft.
-Automated suites have been removed. Check saved language, all three appearance
-choices, live device changes, translated options, draft retention, placement and
+`Forms/Login Form` covers the native frame, grouped forms, pending state and
+an editable draft. `HostSchemeOverride` gives the form a dark Host while app
+preferences stay light; fields and feedback must inherit that Host.
+`IconAction` exposes an activation count; its Pending control disables the native
+icon action. Automated suites have been removed. Check saved language, all three
+appearance choices, live device changes, translated options, draft retention, placement and
 dismissal manually. Touch targets, keyboard layout and sheet accessibility require
 device checks. Existing test IDs are retained for future tests.
 
 Existing composition story: [auth-screen.stories.tsx](../../../.rnstorybook/stories/forms/auth-screen.stories.tsx).
-`CompactViewport` exercises overflow in a 360-point/dp viewport; `GroupedForm`
-exercises the registration container. Existing light/dark and helper/error
-fixtures exercise the same centered frame.
+The `viewportHeight` Control exercises overflow in a 360-point/dp viewport;
+`GroupedForm` exercises the registration container. Appearance and helper text
+Controls exercise the same centered frame.
 
 Manual iPad Pro 13-inch / iPadOS 27 checks verified centered Login and Register's
 scrolling through to both actions. Full software-keyboard, narrow-window and
-Android behavior remain unverified. Lint, typecheck and the auth/layout suites
-pass; these source checks do not establish native geometry.
+Android behavior remain unverified. Run lint and typecheck; source checks do not
+establish native geometry.
 
 Import public components from `@components/ui`; UI implementations import
 concrete files directly. [Back to the UI guide](../../../docs/ui.md).

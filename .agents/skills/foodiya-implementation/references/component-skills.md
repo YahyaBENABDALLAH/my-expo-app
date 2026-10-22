@@ -57,13 +57,13 @@ READMEs. The text skill covers native Text and the project text wrappers.
 
 ## App compositions
 
-| Component or family              | Skill                                                                     | Source / current guidance                                            |
-| -------------------------------- | ------------------------------------------------------------------------- | -------------------------------------------------------------------- |
-| Appearance and language controls | [foodiya-ui-appearance](../../foodiya-ui-appearance/SKILL.md)             | [appearance/](../../../../src/components/ui/appearance/)             |
-| Auth frame and controls          | [foodiya-ui-auth](../../foodiya-ui-auth/SKILL.md)                         | [auth/](../../../../src/components/ui/auth/)                         |
-| Floating action                  | [foodiya-ui-floating-action](../../foodiya-ui-floating-action/SKILL.md)   | [floating-action/](../../../../src/components/ui/floating-action/)   |
-| Launch screen                    | [foodiya-ui-launch-screen](../../foodiya-ui-launch-screen/SKILL.md)       | [launch-screen/](../../../../src/components/ui/launch-screen/)       |
-| OTP bottom sheet                 | [foodiya-ui-otp-bottom-sheet](../../foodiya-ui-otp-bottom-sheet/SKILL.md) | [otp-bottom-sheet/](../../../../src/components/ui/otp-bottom-sheet/) |
+| Component or family     | Skill                                                                     | Source / current guidance                                                                                                           |
+| ----------------------- | ------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| Appearance preferences  | [foodiya-ui-appearance](../../foodiya-ui-appearance/SKILL.md)             | [Shared color-scheme control](../../../../src/components/ui/appearance/) and [Settings pickers](../../../../src/features/settings/) |
+| Auth frame and controls | [foodiya-ui-auth](../../foodiya-ui-auth/SKILL.md)                         | [Shared UI](../../../../src/components/ui/auth/) and [Login preferences](../../../../src/features/auth/)                            |
+| Floating action         | [foodiya-ui-floating-action](../../foodiya-ui-floating-action/SKILL.md)   | [floating-action/](../../../../src/components/ui/floating-action/)                                                                  |
+| Launch screen           | [foodiya-ui-launch-screen](../../foodiya-ui-launch-screen/SKILL.md)       | [launch-screen/](../../../../src/components/ui/launch-screen/)                                                                      |
+| OTP bottom sheet        | [foodiya-ui-otp-bottom-sheet](../../foodiya-ui-otp-bottom-sheet/SKILL.md) | [otp-bottom-sheet/](../../../../src/components/ui/otp-bottom-sheet/)                                                                |
 
 ## Maintain the component contract
 

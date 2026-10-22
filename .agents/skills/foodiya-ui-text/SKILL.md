@@ -16,7 +16,6 @@ Read the [implementation and types](../../../src/components/ui/text/universal-te
 | ---------------------- | ------------------------------------------------------------------------------------ |
 | `UniversalTextContent` | Themed text inside PageScreen, native groups and existing Hosts.                     |
 | `UniversalText`        | Standalone text at an RN boundary; owns a UniversalHost.                             |
-| `AuthText`             | Direct alias of UniversalTextContent, not another Host.                              |
 | `Text`                 | Raw Expo UI native export; useful when native foreground inheritance is intentional. |
 
 Do not put hosted standalone text inside ordinary native layout. Use native

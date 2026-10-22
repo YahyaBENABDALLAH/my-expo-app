@@ -6,7 +6,6 @@ import {
   nativeFillWidthEnd,
   UniversalButtonContent,
   AuthScreenFrame,
-  LoginPreferences,
   FormSubmit,
   FormTextInput,
   authInputIcons,
@@ -15,6 +14,7 @@ import { router } from 'expo-router';
 
 import { useAuthForm } from '../hooks/use-auth-form';
 import { useAuthFlow } from '../auth-flow.context';
+import { LoginPreferences } from '../login-preferences';
 import { loginResolver } from '@/validation/resolvers/auth';
 import type { LoginFormValues } from '@/validation/schemas/auth';
 import { LoginTransitionContext } from '@/context/login-transition.context';

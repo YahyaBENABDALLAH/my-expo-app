@@ -240,10 +240,7 @@
   },
   "appearance": {
     "dark": "Dark",
-    "light": "Light",
-    "rtl": "RTL",
-    "rtlLayout": "RTL layout",
-    "direction": "Layout direction"
+    "light": "Light"
   },
   "account": {
     "signedIn": "You are logged in. Welcome to Likan.",

@@ -3,8 +3,9 @@ import { useTranslation } from 'react-i18next';
 import { Column } from '@expo/ui';
 import { nativeFillWidth } from '../native/native-fill-width';
 import { UniversalButtonContent } from '../button/universal-button-content';
-import { UniversalTextContent as AuthText } from '../text/universal-text';
-import { useAuthTheme } from '../auth/auth-theme';
+import { UniversalTextContent as Text } from '../text/universal-text';
+import { useHostColorScheme } from '../host/universal-host';
+import { useThemeColors } from '@/hooks/use-theme';
 
 export function FormSubmit({
   testID,
@@ -22,7 +23,7 @@ export function FormSubmit({
   notice?: string;
 }) {
   const { t } = useTranslation();
-  const { colors } = useAuthTheme();
+  const colors = useThemeColors(useHostColorScheme());
   return (
     <Column spacing={spacing.lg} modifiers={nativeFillWidth}>
       <UniversalButtonContent
@@ -34,14 +35,14 @@ export function FormSubmit({
         onPress={onPress}
       />
       {error ? (
-        <AuthText testID={`${testID}-error`} textStyle={{ color: colors.error }}>
+        <Text testID={`${testID}-error`} textStyle={{ color: colors.error }}>
           {error}
-        </AuthText>
+        </Text>
       ) : null}
       {notice ? (
-        <AuthText testID={`${testID}-status`} textStyle={{ color: colors.success }}>
+        <Text testID={`${testID}-status`} textStyle={{ color: colors.success }}>
           {notice}
-        </AuthText>
+        </Text>
       ) : null}
     </Column>
   );

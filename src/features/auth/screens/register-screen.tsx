@@ -11,13 +11,14 @@ import {
   Picker,
   UniversalTextContent as Text,
   UniversalButtonContent,
-  useAuthTheme,
+  useHostColorScheme,
 } from '@components/ui';
 import { router } from 'expo-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { useLanguage } from '@/context/language.context';
+import { useThemeColors } from '@/hooks/use-theme';
 import i18n, { SUPPORTED_LANGUAGES, type Language } from '@/lib/i18n';
 import { registerResolver } from '@/validation/resolvers/auth';
 import type { RegisterFormValues } from '@/validation/schemas/auth';
@@ -34,7 +35,7 @@ export function RegisterScreen() {
   const { t } = useTranslation();
   const { language } = useLanguage();
   const [preferredLanguage, setPreferredLanguage] = useState<Language>(language);
-  const { colors } = useAuthTheme();
+  const colors = useThemeColors(useHostColorScheme());
   const { register } = useAuthFlow();
   const { form, submit, pending } = useAuthForm<RegisterFormValues>(
     registerResolver,

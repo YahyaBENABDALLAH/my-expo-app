@@ -4,7 +4,7 @@ import {
   Column,
   nativeFillWidth,
   AuthScreenFrame,
-  AuthText,
+  UniversalTextContent as Text,
   UniversalButtonContent,
 } from '@components/ui';
 import { useMutation, useQuery } from '@tanstack/react-query';
@@ -33,12 +33,12 @@ export function AccountScreen() {
       description={t('account.signedIn')}
     >
       <Column spacing={spacing.lg} modifiers={nativeFillWidth}>
-        <AuthText>{identity.data?.email ?? user?.email ?? ''}</AuthText>
-        {identity.isLoading ? <AuthText>{t('account.loadingProfile')}</AuthText> : null}
-        {identity.fetchStatus === 'paused' ? <AuthText>{t('account.offline')}</AuthText> : null}
+        <Text>{identity.data?.email ?? user?.email ?? ''}</Text>
+        {identity.isLoading ? <Text>{t('account.loadingProfile')}</Text> : null}
+        {identity.fetchStatus === 'paused' ? <Text>{t('account.offline')}</Text> : null}
         {identity.error ? (
           <>
-            <AuthText>{t('account.refreshFailed')}</AuthText>
+            <Text>{t('account.refreshFailed')}</Text>
             <UniversalButtonContent
               variant="secondary"
               disabled={identity.isFetching || identity.fetchStatus === 'paused'}
@@ -55,7 +55,7 @@ export function AccountScreen() {
           disabled={logout.isPending}
           onPress={() => logout.mutate()}
         />
-        {logout.error ? <AuthText>{t('account.signOutFailed')}</AuthText> : null}
+        {logout.error ? <Text>{t('account.signOutFailed')}</Text> : null}
         <UniversalButtonContent
           variant="link"
           label={t('common.home')}

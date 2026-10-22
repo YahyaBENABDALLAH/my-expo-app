@@ -13,14 +13,10 @@ export {
 } from '@expo/ui';
 
 export * from './appearance/color-scheme-control';
-export * from './appearance/language-picker';
-export * from './appearance/layout-direction-control';
-export * from './appearance/theme-picker';
-export * from './appearance/header-motion-picker';
+export * from './auth/auth-icon-button';
+export type { AuthIconButtonProps } from './auth/auth-icon-button.types';
 export * from './auth/auth-input-icons';
 export * from './auth/auth-screen-frame';
-export * from './auth/auth-theme';
-export * from './auth/login-preferences';
 export * from './bottom-sheet/bottom-sheet';
 export * from './button/universal-button';
 export { UniversalButtonContent } from './button/universal-button-content';
@@ -65,5 +61,4 @@ export * from './slider/slider';
 export * from './switch/switch';
 export * from './switch/switch.types';
 export * from './text/universal-text';
-export { UniversalTextContent as AuthText } from './text/universal-text';
 export * from './text-input/text-input';

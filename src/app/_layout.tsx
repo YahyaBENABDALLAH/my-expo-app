@@ -1,5 +1,5 @@
 import {
-  AuthText,
+  UniversalTextContent as Text,
   Column,
   ToastHost,
   UniversalHost as Host,
@@ -173,11 +173,7 @@ function RootLayoutNav({ holdLogin }: { holdLogin: boolean }) {
             <Column spacing={16} alignment="center" modifiers={nativeFillSize}>
               <Spacer flexible />
               <PageSection alignment="center">
-                {error ? (
-                  <AuthText>{error}</AuthText>
-                ) : (
-                  <LoadingContent label={t('session.restoring')} />
-                )}
+                {error ? <Text>{error}</Text> : <LoadingContent label={t('session.restoring')} />}
                 {error ? (
                   <UniversalButtonContent
                     variant="secondary"

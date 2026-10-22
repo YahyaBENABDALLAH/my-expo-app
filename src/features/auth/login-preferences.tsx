@@ -1,19 +1,24 @@
 import { spacing } from '@/constants/layout';
-import { Icon, Row, Spacer } from '@expo/ui';
+import {
+  AuthIconButton,
+  BottomSheet,
+  ColorSchemeControl,
+  Icon,
+  nativeFillWidth,
+  PageSection,
+  Row,
+  Spacer,
+  UniversalButtonContent,
+  UniversalHost,
+  UniversalTextContent as Text,
+  useHostColorScheme,
+} from '@components/ui';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useLanguage } from '@/context/language.context';
+import { useAppTheme } from '@/hooks/use-theme';
 import i18n, { SUPPORTED_LANGUAGES } from '@/lib/i18n';
-import { ColorSchemeControl } from '../appearance/color-scheme-control';
-import { BottomSheet } from '../bottom-sheet/bottom-sheet';
-import { UniversalButtonContent } from '../button/universal-button-content';
-import { UniversalHost } from '../host/universal-host';
-import { nativeFillWidth } from '../native/native-fill-width';
-import { UniversalTextContent as Text } from '../text/universal-text';
-import { AuthIconButton } from './auth-icon-button';
-import { useAuthTheme } from './auth-theme';
-import { PageSection } from '../page/page-section';
 
 const icons = {
   language: Icon.select({ ios: 'globe', android: require('@expo/material-symbols/language.xml') }),
@@ -24,7 +29,7 @@ const languageLabels = { fr: 'common.french', en: 'common.english', ar: 'common.
 export function LoginPreferences() {
   const { t } = useTranslation();
   const { language, setLanguage, ready } = useLanguage();
-  const { scheme, colors } = useAuthTheme();
+  const { scheme, colors } = useAppTheme(useHostColorScheme());
   const insets = useSafeAreaInsets();
   const [languageOpen, setLanguageOpen] = useState(false);
   const languageDisabled = !ready || !setLanguage;

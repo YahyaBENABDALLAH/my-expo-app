@@ -16,8 +16,6 @@ import {
   pageFormModifiers,
   Row,
   Switch,
-  ThemePicker,
-  HeaderMotionPicker,
   UniversalButtonContent,
   UniversalHost,
   UniversalTextContent as Text,
@@ -32,7 +30,9 @@ import { useThemeColors } from '@/hooks/use-theme';
 import { screenInsets } from '@/lib/screen-insets';
 import i18n, { SUPPORTED_LANGUAGES, type Language } from '@/lib/i18n';
 import { version as appVersion } from '../../../package.json';
+import { HeaderMotionPicker } from './header-motion-picker';
 import { SettingsRow } from './settings-row';
+import { ThemePicker } from './theme-picker';
 
 const languageKeys: Record<Language, string> = {
   fr: 'common.french',

@@ -1,6 +1,6 @@
 import { themeIds, themes, type ThemeId } from '@/constants/themes/index';
 import { useThemeSettings } from '@/context/theme.context';
-import { Picker } from '../picker/picker';
+import { Picker } from '@components/ui';
 
 export function ThemePicker() {
   const { themeId, setThemeId } = useThemeSettings();

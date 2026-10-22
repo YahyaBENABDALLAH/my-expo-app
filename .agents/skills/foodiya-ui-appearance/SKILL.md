@@ -5,10 +5,13 @@ description: Compose the starter theme, language, color scheme, header and reduc
 
 # Appearance and language
 
-Use `ThemePicker`, `ColorSchemeControl`, `LanguagePicker`, `LayoutDirectionControl`
-and `HeaderMotionPicker` from `@components/ui`. These controls reuse the owning
-Host. Settings uses the native FieldGroup and a separate language-sheet Host so
-closed presentation does not cover form controls.
+Use the shared `ColorSchemeControl` from `@components/ui` in Settings and login.
+Settings owns its local [ThemePicker](../../../src/features/settings/theme-picker.tsx)
+and [HeaderMotionPicker](../../../src/features/settings/header-motion-picker.tsx);
+they are not public UI exports. These controls reuse the owning Host. Settings
+and login own their language sheets; the language provider updates layout direction.
+Settings uses the native FieldGroup and a separate language-sheet Host so closed
+presentation does not cover form controls.
 
 Only UX Template (`ux`, the default) and Instagram (`instagram`) are supported,
 both in light and dark appearance. Color scheme offers System, Light and Dark.

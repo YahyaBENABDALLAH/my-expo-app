@@ -240,10 +240,7 @@
   },
   "appearance": {
     "dark": "Sombre",
-    "light": "Clair",
-    "rtl": "Droite à gauche",
-    "rtlLayout": "Disposition de droite à gauche",
-    "direction": "Sens de lecture"
+    "light": "Clair"
   },
   "account": {
     "signedIn": "Vous êtes connecté. Bienvenue sur Likan.",

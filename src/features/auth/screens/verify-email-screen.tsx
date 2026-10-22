@@ -3,9 +3,9 @@ import { useTranslation } from 'react-i18next';
 import {
   Column,
   nativeFillWidth,
-  useAuthTheme,
+  useHostColorScheme,
   UniversalButtonContent,
-  AuthText,
+  UniversalTextContent as Text,
   AuthScreenFrame,
   FormSubmit,
   FormTextInput,
@@ -13,6 +13,7 @@ import {
 import { useMutation } from '@tanstack/react-query';
 import { Redirect, router } from 'expo-router';
 import { useEffect, useState } from 'react';
+import { useThemeColors } from '@/hooks/use-theme';
 
 import { useAuthFlow } from '../auth-flow.context';
 
@@ -33,7 +34,7 @@ export function VerifyEmailScreen() {
     canResendRegistration,
     clearChallenge,
   } = useAuthFlow();
-  const { colors } = useAuthTheme();
+  const colors = useThemeColors(useHostColorScheme());
   const [now, setNow] = useState(() => Date.now());
   const resendAt = Date.parse(challenge?.otpResendAvailableAtUtc ?? '');
   const expiresAt = Date.parse(challenge?.otpExpiresAtUtc ?? '');
@@ -98,7 +99,7 @@ export function VerifyEmailScreen() {
           }}
         />
         {expired ? (
-          <AuthText textStyle={{ color: colors.error }}>{t('auth.codeExpired')}</AuthText>
+          <Text textStyle={{ color: colors.error }}>{t('auth.codeExpired')}</Text>
         ) : (
           <FormSubmit
             testID="auth-verify-submit"
@@ -115,7 +116,7 @@ export function VerifyEmailScreen() {
           disabled={busy || seconds > 0 || !canResendRegistration}
           onPress={() => resend.mutate()}
         />
-        {!canResendRegistration ? <AuthText>{t('auth.loginForCode')}</AuthText> : null}
+        {!canResendRegistration ? <Text>{t('auth.loginForCode')}</Text> : null}
       </Column>
       <UniversalButtonContent
         variant="link"

@@ -15,7 +15,7 @@ application styling and compatibility, but standard controls no longer map them.
 ## Existing sources
 
 - `src/constants/colors.ts`: shared light/dark app palette and `buttonSeedColors` semantic seeds.
-- `src/components/ui/auth/auth-theme.ts`: access to the same shared theme tokens for auth controls.
+- `src/hooks/use-theme.ts`: shared theme colors; compose with `useHostColorScheme` for controls inside a native Host.
 - `src/components/ui/host/types.ts`: shared `colorScheme`, `seedColor`, and `testID` props.
 - `src/components/ui/host/universal-host.tsx`: native Host wrapper, scheme selection, and sizing defaults.
 

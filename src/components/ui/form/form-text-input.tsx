@@ -7,10 +7,11 @@ import { useEffect, useRef, useState } from 'react';
 import { useController, type Control, type FieldPath, type FieldValues } from 'react-hook-form';
 
 import { UniversalButtonContent } from '../button/universal-button-content';
-import { UniversalTextContent as AuthText } from '../text/universal-text';
+import { UniversalTextContent as Text } from '../text/universal-text';
 import { authInputIcons } from '../auth/auth-input-icons';
 import { TextInput, type TextInputProps } from '../text-input/text-input';
-import { useAuthTheme } from '../auth/auth-theme';
+import { useHostColorScheme } from '../host/universal-host';
+import { useThemeColors } from '@/hooks/use-theme';
 import { notifyValidationError } from '@/lib/validation-feedback';
 
 type Props<T extends FieldValues> = Omit<
@@ -56,7 +57,7 @@ export function FormTextInput<T extends FieldValues>({
   const { field, fieldState } = useController({ control, name });
   const value = typeof field.value === 'string' ? field.value : '';
   const [showPassword, setShowPassword] = useState(false);
-  const { colors } = useAuthTheme();
+  const colors = useThemeColors(useHostColorScheme());
   const invalid = Boolean(fieldState.error);
   const wasInvalid = useRef(false);
   const message = translateValidationMessage(fieldState.error?.message) ?? helperText;
@@ -92,13 +93,13 @@ export function FormTextInput<T extends FieldValues>({
         status={invalid ? 'error' : 'default'}
       />
       {message ? (
-        <AuthText
+        <Text
           testID={testID ? `${testID}-${messageSuffix}` : undefined}
           modifiers={nativeFillWidth}
           textStyle={{ color: invalid ? colors.error : colors.muted, fontSize: 14, lineHeight: 20 }}
         >
           {message}
-        </AuthText>
+        </Text>
       ) : null}
       {password && passwordToggle === 'button' ? (
         <Column alignment="end" modifiers={nativeFillWidthEnd}>

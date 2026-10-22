@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { HEADER_SHAPES, type PageHeaderShape } from '@/constants/header-motion';
 import { useThemeSettings } from '@/context/theme.context';
-import { Picker } from '../picker/picker';
+import { Picker } from '@components/ui';
 
 export function HeaderMotionPicker() {
   const { t } = useTranslation();

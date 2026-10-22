@@ -1,6 +1,11 @@
 # Native authentication
 
-The iOS/Android auth screens adapt `Reference/`'s palette, spacing, decorative heading font, and form layout. Each `AuthScreenFrame` owns one `@expo/ui` Host with the auth scheme and seed color. Native ScrollView and Column layouts contain host-free AuthText, UniversalButtonContent, FormTextInput, and FormSubmit content. React Native keyboard avoidance stays outside the Host. The Likan brand stays in the screen header.
+The iOS/Android auth screens adapt `Reference/`'s palette, spacing, decorative heading font, and form layout. Each `AuthScreenFrame` owns one `@expo/ui` Host with the app scheme and seed color. Native ScrollView and Column layouts contain host-free UniversalTextContent, UniversalButtonContent, FormTextInput, and FormSubmit content. React Native keyboard avoidance stays outside the Host. The Likan brand stays in the screen header.
+
+The shared [auth UI family](../src/components/ui/auth/) owns the frame, native icon
+action and input icons. Login owns its [preferences bar](../src/features/auth/login-preferences.tsx)
+in the auth feature. The [auth UI skill](../.agents/skills/foodiya-ui-auth/SKILL.md)
+defines their composition contract.
 
 All auth screens share `AuthScreenFrame` and automatically fill the available width with safe gutters and keyboard avoidance. There is no maximum content width. Short forms center vertically within the Host's actual available height; longer content grows and scrolls. The native minimum-height modifiers preserve natural content height, including validation messages and larger text. No device checks or tablet breakpoints are needed.
 
@@ -16,7 +21,7 @@ The session-restoration panel owns its own Host rather than adding one to each a
 
 Storybook's Forms/Login Form stories exercise the actual frame, fields, password button, submit states, and text with one Host and no backend calls. Check validation, editing, one callback per press, and pending-state suppression manually on both platforms. Repeat with the device in light/dark appearance; story registration alone does not verify native layout or interactions.
 
-Auth buttons use native SwiftUI/Compose controls with colors from `authButtonTokens`. They retain native shapes, padding, typography, disabled states, and press feedback. Full-width sizing happens natively inside the interactive surface; no JavaScript width measurements, custom painted background, or custom press animation is used.
+Auth buttons use native SwiftUI/Compose controls with shared semantic button tokens. They retain native shapes, padding, typography, disabled states, and press feedback. Full-width sizing happens natively inside the interactive surface; no JavaScript width measurements, custom painted background, or custom press animation is used.
 
 ## Configuration
 

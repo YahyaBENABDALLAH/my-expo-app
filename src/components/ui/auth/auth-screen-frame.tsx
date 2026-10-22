@@ -3,7 +3,7 @@ import { Column } from '@expo/ui';
 import { useState, type PropsWithChildren, type ReactNode } from 'react';
 import { KeyboardAvoidingView, Platform } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useAuthTheme } from './auth-theme';
+import { useAppTheme } from '@/hooks/use-theme';
 import {
   nativeCenteredMinHeight,
   nativeFillSize,
@@ -12,8 +12,8 @@ import {
 import { FieldGroup } from '../field-group/field-group';
 import { PageFrame } from '../page/page-frame';
 import { RefreshableScrollView } from '../refreshable-scroll-view/refreshable-scroll-view';
-import { UniversalHost } from '../host/universal-host';
-import { UniversalTextContent as AuthText } from '../text/universal-text';
+import { UniversalHost, useHostColorScheme } from '../host/universal-host';
+import { UniversalTextContent as Text } from '../text/universal-text';
 import { useLanguage } from '@/context/language.context';
 import { spacing } from '@/constants/layout';
 import { PageSection } from '../page/page-section';
@@ -55,22 +55,19 @@ function AuthScreenContent({
   const insets = useSafeAreaInsets();
   const { language } = useLanguage();
   const { t } = useTranslation();
-  const { colors, scheme } = useAuthTheme(colorScheme);
+  const { colors, scheme } = useAppTheme(useHostColorScheme(colorScheme));
   const [viewportHeight, setViewportHeight] = useState(0);
   const platformHeadingFont = Platform.OS === 'android' ? 'Inter-Black' : 'InterBlack';
   const headingFont = language === 'ar' ? undefined : platformHeadingFont;
   const heading = (
     <Column spacing={spacing.md} modifiers={nativeFillWidth}>
-      <AuthText variant="caption" fontWeight="700" textStyle={{ color: colors.tint }}>
+      <Text variant="caption" fontWeight="700" textStyle={{ color: colors.tint }}>
         {t('brand.wordmark')}
-      </AuthText>
-      <AuthText
-        variant="heading"
-        textStyle={{ fontFamily: headingFont, fontSize: 32, lineHeight: 38 }}
-      >
+      </Text>
+      <Text variant="heading" textStyle={{ fontFamily: headingFont, fontSize: 32, lineHeight: 38 }}>
         {title}
-      </AuthText>
-      <AuthText textStyle={{ color: colors.muted, lineHeight: 24 }}>{description}</AuthText>
+      </Text>
+      <Text textStyle={{ color: colors.muted, lineHeight: 24 }}>{description}</Text>
     </Column>
   );
   return (

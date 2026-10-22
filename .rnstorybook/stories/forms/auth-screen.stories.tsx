@@ -6,6 +6,11 @@ import {
   FormSubmit,
   FormTextInput,
   authInputIcons,
+  AuthIconButton,
+  Row,
+  UniversalHost,
+  UniversalTextContent as Text,
+  useHostColorScheme,
 } from '@components/ui';
 import type { Meta, StoryObj } from '@storybook/react-native';
 import { useState } from 'react';
@@ -13,12 +18,14 @@ import { View } from 'react-native';
 import { useForm } from 'react-hook-form';
 import { loginResolver } from '@/validation/resolvers/auth';
 import type { LoginFormValues } from '@/validation/schemas/auth';
+import { useThemeColors } from '@/hooks/use-theme';
 
 function NativeFormDemo({
   pending = false,
   icons = false,
   loginHelperText,
   colorScheme = 'dark',
+  frameColorScheme,
   grouped = false,
   viewportHeight,
 }: {
@@ -26,6 +33,7 @@ function NativeFormDemo({
   icons?: boolean;
   loginHelperText?: string;
   colorScheme?: 'light' | 'dark';
+  frameColorScheme?: 'light' | 'dark';
   grouped?: boolean;
   viewportHeight?: number;
 }) {
@@ -75,7 +83,7 @@ function NativeFormDemo({
     <View style={viewportHeight === undefined ? { flex: 1 } : { height: viewportHeight }}>
       <AuthScreenFrame
         testID="native-form"
-        colorScheme={colorScheme}
+        colorScheme={frameColorScheme ?? colorScheme}
         grouped={grouped}
         title="One native Host"
         description="Fields reserve no empty message space. Errors and hints wrap below their input when present; validation provides error haptics."
@@ -83,6 +91,26 @@ function NativeFormDemo({
         {grouped ? <FieldGroup.Section title="Account">{fields}</FieldGroup.Section> : fields}
       </AuthScreenFrame>
     </View>
+  );
+}
+
+function NativeIconActionDemo({ disabled = false }: { disabled?: boolean }) {
+  const [activations, setActivations] = useState(0);
+  const colors = useThemeColors(useHostColorScheme());
+  return (
+    <UniversalHost>
+      <Row alignment="center" spacing={12}>
+        <AuthIconButton
+          icon={authInputIcons.person}
+          color={colors.tint}
+          accessibilityLabel="Test icon action"
+          testID="auth-icon-action"
+          disabled={disabled}
+          onPress={() => setActivations((count) => count + 1)}
+        />
+        <Text testID="auth-icon-action-count">{`Activations: ${activations}`}</Text>
+      </Row>
+    </UniversalHost>
   );
 }
 
@@ -95,6 +123,7 @@ const meta = {
     icons: { control: 'boolean' },
     loginHelperText: { control: 'text' },
     colorScheme: { control: 'select', options: ['light', 'dark'] },
+    frameColorScheme: { control: 'select', options: ['light', 'dark'] },
     grouped: { control: 'boolean' },
     viewportHeight: { control: 'number' },
   },
@@ -117,3 +146,15 @@ export const SharedHost: Story = {};
 export const Pending: Story = { args: { pending: true } };
 
 export const GroupedForm: Story = { args: { grouped: true } };
+
+export const HostSchemeOverride: Story = {
+  args: {
+    colorScheme: 'light',
+    frameColorScheme: 'dark',
+    loginHelperText: 'Fields and validation feedback follow the dark form Host.',
+  },
+};
+
+export const IconAction: Story = {
+  render: ({ pending }) => <NativeIconActionDemo disabled={pending} />,
+};
