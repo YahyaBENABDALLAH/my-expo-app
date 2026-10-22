@@ -19,7 +19,7 @@ application styling and compatibility, but standard controls no longer map them.
 - `src/components/ui/host/types.ts`: shared `colorScheme`, `seedColor`, and `testID` props.
 - `src/components/ui/host/universal-host.tsx`: native Host wrapper, scheme selection, and sizing defaults.
 
-Brand-theme buttons retain native colors unless callers supply overrides. UX buttons resolve semantic token pairs through the existing button color hook. Follow [the button color contract](../../foodiya-ui-button/references/props-and-styling.md) for the exact mapping and override precedence.
+All themes resolve semantic button token pairs in the [shared button implementation](../../../../src/components/ui/button/universal-button.tsx). Caller colors retain their existing override behavior. Follow [the button color contract](../../foodiya-ui-button/references/props-and-styling.md) for the exact mapping and override precedence.
 
 ## Token contract
 

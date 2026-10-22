@@ -2,7 +2,7 @@
 
 Read this reference for exact props, color behavior, geometry, or troubleshooting.
 The canonical contract is
-[universal-button.types.ts](../../../../src/components/ui/button/universal-button.types.ts).
+[universal-button.tsx](../../../../src/components/ui/button/universal-button.tsx).
 
 ## Public props
 
@@ -40,9 +40,9 @@ spread arbitrary upstream Button or RN Pressable props into these wrappers.
 
 ## Colors and native differences
 
-The current [semantic mapping](../../../../src/components/ui/button/semantic-button-colors.ts)
-and [color resolver](../../../../src/components/ui/button/use-wireframe-button-colors.ts)
-are the source of truth. Every theme maps primary to primary/onPrimary, secondary to
+The [shared button implementation](../../../../src/components/ui/button/universal-button.tsx)
+owns the semantic mapping and private `useButtonColors` resolver. Every theme
+maps primary to primary/onPrimary, secondary to
 secondary, tertiary to muted, link to tint, success/warning/info to their paired
 status tokens, destructive to error/onError, and glass to surfaceVariant/text.
 These pairs apply automatically unless a caller supplies color overrides.

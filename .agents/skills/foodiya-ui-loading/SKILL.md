@@ -8,9 +8,16 @@ description: 'Compose Foodiya loading, query content and error states while pres
 Exports: `LoadingContent`, `LoadingScreen`, `QueryContent`, `ContentQuery`
 and `ScreenError`.
 
-`loading-state.tsx` composes native progress and text. `loading-indicator.*`
-keeps the iOS/Android progress adapters private to this family.
-`query-content.tsx` chooses a state; `screen-error.tsx` presents route recovery.
+Keep this family in four files. `loading-state.tsx` owns all public components,
+the `ContentQuery` type and the private resolved-content helper.
+`loading-indicator.ios.tsx` renders native SwiftUI progress;
+`loading-indicator.android.tsx` renders native Compose circular progress.
+`loading-indicator.d.ts` supplies their shared private props and signature.
+Extend these existing owners when adding a loading or recovery presentation.
+
+`LoadingContent` is used by session restoration, OTP requests and the button
+showcase. `QueryContent` has the native state fixtures below. `LoadingScreen`
+and `ScreenError` remain available for route/Suspense and route-error consumers.
 
 Use `LoadingContent` inside a Host and `LoadingScreen` at a route/Suspense
 boundary. A disabled query waits for a prerequisite; an offline paused query

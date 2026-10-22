@@ -36,8 +36,9 @@ status colors, and surfaceVariant/text for glass. This prevents secondary and
 status actions from inheriting the Host's primary accent. UX Template retains
 its black/white primary in both appearances. Supplying either color prop skips
 those defaults. Hosted content follows `useHostColorScheme`;
-standalone controls use their explicit scheme. `semantic-button-colors.ts` shares
-the token mapping with previews. Native controls own feedback and disabled styling.
+standalone controls use their explicit scheme. Both public controls and their
+types live in `universal-button.tsx`, alongside their private color resolver.
+Native controls own feedback and disabled styling.
 
 Platform adapters are needed because the installed universal Expo Button lacks
 native color, content-padding, shape and destructive-role props. iOS uses native

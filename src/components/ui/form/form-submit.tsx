@@ -2,7 +2,7 @@ import { spacing } from '@/constants/layout';
 import { useTranslation } from 'react-i18next';
 import { Column } from '@expo/ui';
 import { nativeFillWidth } from '../native/native-fill-width';
-import { UniversalButtonContent } from '../button/universal-button-content';
+import { UniversalButtonContent } from '../button/universal-button';
 import { UniversalTextContent as Text } from '../text/universal-text';
 import { useHostColorScheme } from '../host/universal-host';
 import { useThemeColors } from '@/hooks/use-theme';

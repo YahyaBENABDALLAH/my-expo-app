@@ -4,7 +4,6 @@ import {
   ListItem,
   UniversalTextContent as Text,
   UniversalText as RNText,
-  UniversalListItem,
 } from '@components/ui';
 import { UniversalList, type UniversalListProps } from '../../components/showcase/universal-list';
 import type { Meta, StoryObj } from '@storybook/react-native';
@@ -61,12 +60,12 @@ function ListDemo({
         }
       >
         {itemCount === 0 ? (
-          <UniversalListItem testID={`${args.testID}-empty`}>
+          <ListItem testID={`${args.testID}-empty`}>
             <Text testID={`${args.testID}-empty-text`}>No items available</Text>
-          </UniversalListItem>
+          </ListItem>
         ) : null}
         {Array.from({ length: itemCount }, (_, i) => (
-          <UniversalListItem
+          <ListItem
             key={i}
             testID={`${args.testID}-row-${i + 1}`}
             supportingText={supportingText ? `Supporting details for item ${i + 1}` : undefined}
@@ -97,7 +96,7 @@ function ListDemo({
                 </Text>
               </ListItem.Trailing>
             ) : null}
-          </UniversalListItem>
+          </ListItem>
         ))}
       </UniversalList>
     </View>

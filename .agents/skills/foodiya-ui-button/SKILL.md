@@ -13,7 +13,7 @@ Use the shared native buttons from `@components/ui`. Follow the project's
 ## Check the actual button contract
 
 Before choosing props, read the current
-[types](../../../src/components/ui/button/universal-button.types.ts) and
+[shared implementation and types](../../../src/components/ui/button/universal-button.tsx) and
 [button guide](references/component-guide.md). For native behavior,
 check both platform adapters. For Expo API changes, read the installed Expo
 major and matching documentation as required by `AGENTS.md`. The reference links
@@ -24,6 +24,21 @@ Screens and feature components import public buttons and types from
 barrel cycles. `NativeButtonContent` is an internal renderer, not a screen API.
 Keep the existing adapters: the upstream universal Button has a different public
 contract and does not replace the project's semantic variants and geometry.
+
+## Keep the implementation together
+
+The button family has four source files:
+
+- `universal-button.tsx` owns both public components, their exported prop types
+  and the private semantic color resolver.
+- `universal-button-content.ios.tsx` owns SwiftUI rendering.
+- `universal-button-content.android.tsx` owns Compose rendering.
+- `universal-button-content.d.ts` supplies the native renderer's TypeScript
+  signature; Metro selects the matching platform implementation.
+
+Keep shared props and color handling beside the public components. Extend these
+existing owners when adding a variant or prop. Native files import shared props
+with `import type` and receive already resolved colors.
 
 ## Choose the button by its immediate rendering boundary
 

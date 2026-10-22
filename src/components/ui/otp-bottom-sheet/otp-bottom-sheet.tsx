@@ -16,7 +16,7 @@ import { useTranslation } from 'react-i18next';
 import { useThemeColors } from '@/hooks/use-theme';
 import { useMeasuredWidth } from '@/hooks/use-measured-width';
 import { BottomSheet } from '../bottom-sheet/bottom-sheet';
-import { UniversalButtonContent } from '../button/universal-button-content';
+import { UniversalButtonContent } from '../button/universal-button';
 import { UniversalHost, useHostColorScheme } from '../host/universal-host';
 import { LoadingContent } from '../loading/loading-state';
 import { nativeFillWidth } from '../native/native-fill-width';

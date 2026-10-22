@@ -6,7 +6,7 @@ import { nativeFillWidth, nativeFillWidthEnd } from '../native/native-fill-width
 import { useEffect, useRef, useState } from 'react';
 import { useController, type Control, type FieldPath, type FieldValues } from 'react-hook-form';
 
-import { UniversalButtonContent } from '../button/universal-button-content';
+import { UniversalButtonContent } from '../button/universal-button';
 import { UniversalTextContent as Text } from '../text/universal-text';
 import { TextInput, type TextInputProps } from '../text-input/text-input';
 import { useHostColorScheme } from '../host/universal-host';

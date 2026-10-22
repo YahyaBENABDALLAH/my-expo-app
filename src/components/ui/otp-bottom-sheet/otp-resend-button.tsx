@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { UniversalButtonContent } from '../button/universal-button-content';
+import { UniversalButtonContent } from '../button/universal-button';
 
 /** Only the resend label updates each second; the native form and input stay untouched. */
 export function OtpResendButton({

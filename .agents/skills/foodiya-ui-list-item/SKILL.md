@@ -5,11 +5,28 @@ description: 'Compose Foodiya native list rows using headline, supporting text a
 
 # List item
 
-`list-item.tsx` forwards the universal Expo UI props and Leading, Supporting and Trailing slots. UniversalListItem is a direct compatibility alias. Native row colors and supporting/accessory typography inherit the Host. Caller colors/modifiers pass through. The only platform adaptation adds the actual Android row testID missing in the installed universal implementation. iOS props pass through unchanged.
+Import `ListItem` and `ListItemProps` from `@components/ui`. Keep this family in
+two files: `list-item.tsx` directly re-exports Expo UI, while
+`list-item.android.tsx` adds the actual Android row `testID` missing in the
+installed universal implementation. Metro selects the Android override. Shared
+types come directly from Expo UI; no declaration or appearance helpers are needed.
+
+Keep `Leading`, `Supporting` and `Trailing` slots attached to the original native
+markers. Caller props, colors and modifier order pass through; the Android test
+selector is appended after caller modifiers. Native row colors and
+supporting/accessory typography inherit the Host.
+
+Registration uses two informational rows in
+[register-screen.tsx](../../../src/features/auth/screens/register-screen.tsx).
+The [list showcase](../../../src/features/ui-showcase/list-screen.tsx) also uses
+the same component. Settings uses its own `SettingsRow` composition.
 
 Import from `@components/ui` and compose inside `UniversalHost`. The Host uses the shared light/dark scheme and theme tint; Host seedColor overrides remain available; use native modifiers only where exposed by the component API. No custom glass layer or Android glass imitation is added.
 
-Native story: [expo-ui/list.stories.tsx](../../../.rnstorybook/stories/components/list.stories.tsx). Light/dark and interaction fixtures remain available. JS checks cover public behavior and native module resolution; device appearance, glass and touch behavior still need iOS/Android verification.
+Native story: [list.stories.tsx](../../../.rnstorybook/stories/components/list.stories.tsx).
+Default and compound-slot fixtures retain controls for appearance, row actions
+and refresh. Run lint and typecheck; regenerate registration when stories change.
+Check native row selectors, slots, appearance and touch behavior on iOS/Android.
 
 See [native control themes](../../../docs/control-theme.md) and [UI guide](../../../docs/ui.md).
 

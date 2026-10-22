@@ -1,5 +1,5 @@
 import { Column } from '@expo/ui';
-import { UniversalButtonContent } from '../button/universal-button-content';
+import { UniversalButtonContent } from '../button/universal-button';
 import { router, type Href } from 'expo-router';
 import { KeyboardAvoidingView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';

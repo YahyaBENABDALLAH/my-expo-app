@@ -9,13 +9,7 @@ import {
   padding,
   tint,
 } from '@expo/ui/swift-ui/modifiers';
-import type { UniversalButtonContentProps } from './universal-button.types';
-import { useWireframeButtonColors } from './use-wireframe-button-colors';
-
-export function UniversalButtonContent(props: UniversalButtonContentProps) {
-  const colors = useWireframeButtonColors(props);
-  return <NativeButtonContent {...props} {...colors} />;
-}
+import type { UniversalButtonContentProps } from './universal-button';
 
 /** Internal renderer; callers resolve theme colors before reaching the native control. */
 export function NativeButtonContent({
