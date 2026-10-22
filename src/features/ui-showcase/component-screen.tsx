@@ -2,6 +2,7 @@ import { useTranslation } from 'react-i18next';
 import { PageScreen } from '@components/ui';
 import SwitchScreen from './switch-screen';
 import ButtonsScreen from './buttons-screen';
+import BottomSheetScreen from './bottom-sheet-screen';
 import InputScreen from './input-screen';
 import CheckboxScreen from './checkbox-screen';
 import SliderScreen from './slider-screen';
@@ -15,6 +16,7 @@ import HomeExamplesScreen from './home-examples-screen';
 const screens = {
   switch: SwitchScreen,
   buttons: ButtonsScreen,
+  'bottom-sheet': BottomSheetScreen,
   input: InputScreen,
   checkbox: CheckboxScreen,
   slider: SliderScreen,

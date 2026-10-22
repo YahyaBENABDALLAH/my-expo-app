@@ -16,6 +16,7 @@ import {
   nativeFillWidth,
   nativeRowWeight,
   useHostColorScheme,
+  type UniversalButtonContentProps,
   type UniversalButtonVariant,
 } from '@components/ui';
 import { radii, spacing } from '@/constants/layout';
@@ -41,6 +42,41 @@ const checkIcon = Icon.select({
   ios: 'checkmark',
   android: import('@expo/material-symbols/check.xml'),
 });
+
+const iconPlacements = [
+  { placement: 'leading', label: 'leadingIcon' },
+  { placement: 'trailing', label: 'trailingIcon' },
+  { placement: 'both', label: 'bothIcons' },
+  { placement: 'above', label: 'aboveIcon' },
+] as const;
+
+type IconPlacement = (typeof iconPlacements)[number]['placement'];
+
+function IconButtonExample({
+  placement = 'leading',
+  label,
+  ...props
+}: Omit<UniversalButtonContentProps, 'children' | 'label'> & {
+  label: string;
+  placement?: IconPlacement;
+}) {
+  return (
+    <UniversalButtonContent {...props}>
+      {placement === 'above' ? (
+        <Column spacing={spacing.sm} alignment="center">
+          <Icon name={starIcon} size={24} />
+          <Text>{label}</Text>
+        </Column>
+      ) : (
+        <Row spacing={spacing.sm} alignment="center">
+          {placement !== 'trailing' && <Icon name={starIcon} size={18} />}
+          <Text>{label}</Text>
+          {placement !== 'leading' && <Icon name={checkIcon} size={18} />}
+        </Row>
+      )}
+    </UniversalButtonContent>
+  );
+}
 
 const geometryExamples = [
   { name: 'native', borderRadius: undefined },
@@ -136,14 +172,16 @@ export default function ButtonsScreen() {
         </UniversalTextContent>
       </GallerySection>
 
+      <IconVariantButtons onPress={recordPress} />
+
       <GallerySection title={t('showcase.buttonGallery.widths')}>
-        <UniversalButtonContent
+        <IconButtonExample
           variant="primary"
           label={t('showcase.buttonGallery.fitContent')}
           testID="demo-button-fit"
           onPress={() => recordPress('showcase.buttonGallery.fitContent')}
         />
-        <UniversalButtonContent
+        <IconButtonExample
           variant="primary"
           label={t('showcase.buttonGallery.fullWidth')}
           fullWidth
@@ -152,7 +190,7 @@ export default function ButtonsScreen() {
         />
         <Row spacing={spacing.md} modifiers={nativeFillWidth}>
           <Column modifiers={nativeRowWeight}>
-            <UniversalButtonContent
+            <IconButtonExample
               variant="secondary"
               label={t('showcase.buttonGallery.cancel')}
               fullWidth
@@ -161,7 +199,7 @@ export default function ButtonsScreen() {
             />
           </Column>
           <Column modifiers={nativeRowWeight}>
-            <UniversalButtonContent
+            <IconButtonExample
               variant="primary"
               label={t('showcase.buttonGallery.save')}
               fullWidth
@@ -180,37 +218,26 @@ export default function ButtonsScreen() {
       </GallerySection>
 
       <GallerySection title={t('showcase.buttonGallery.content')}>
-        <UniversalButtonContent
+        <IconButtonExample
           variant="primary"
+          label={t('showcase.buttonGallery.leadingIcon')}
           testID="demo-button-leading-icon"
           onPress={() => recordPress('showcase.buttonGallery.leadingIcon')}
-        >
-          <Row spacing={spacing.sm} alignment="center">
-            <Icon name={starIcon} size={18} />
-            <Text>{t('showcase.buttonGallery.leadingIcon')}</Text>
-          </Row>
-        </UniversalButtonContent>
-        <UniversalButtonContent
+        />
+        <IconButtonExample
           variant="secondary"
+          placement="trailing"
+          label={t('showcase.buttonGallery.trailingIcon')}
           testID="demo-button-trailing-icon"
           onPress={() => recordPress('showcase.buttonGallery.trailingIcon')}
-        >
-          <Row spacing={spacing.sm} alignment="center">
-            <Text>{t('showcase.buttonGallery.trailingIcon')}</Text>
-            <Icon name={checkIcon} size={18} />
-          </Row>
-        </UniversalButtonContent>
-        <UniversalButtonContent
+        />
+        <IconButtonExample
           variant="secondary"
+          label={t('showcase.disabledAction')}
           disabled
           testID="demo-button-icon-disabled"
           onPress={() => recordPress('showcase.disabledAction')}
-        >
-          <Row spacing={spacing.sm} alignment="center">
-            <Icon name={starIcon} size={18} />
-            <Text>{t('showcase.disabledAction')}</Text>
-          </Row>
-        </UniversalButtonContent>
+        />
         <UniversalButtonContent
           variant="primary"
           fullWidth
@@ -233,7 +260,10 @@ export default function ButtonsScreen() {
           onPress={() => recordPress('showcase.buttonGallery.cardTitle')}
         >
           <Column spacing={spacing.sm} modifiers={nativeFillWidth} style={{ padding: spacing.xl }}>
-            <Text>{t('showcase.buttonGallery.cardTitle')}</Text>
+            <Row spacing={spacing.sm} alignment="center">
+              <Icon name={starIcon} size={18} />
+              <Text>{t('showcase.buttonGallery.cardTitle')}</Text>
+            </Row>
             <Text>{t('showcase.buttonGallery.cardDetail')}</Text>
           </Column>
         </UniversalButtonContent>
@@ -241,7 +271,7 @@ export default function ButtonsScreen() {
 
       <GallerySection title={t('showcase.buttonGallery.geometry')}>
         {geometryExamples.map(({ name, borderRadius }) => (
-          <UniversalButtonContent
+          <IconButtonExample
             key={name}
             variant="primary"
             label={t(`showcase.buttonGallery.${name}`)}
@@ -259,7 +289,7 @@ export default function ButtonsScreen() {
           { name: 'regularPadding', contentPadding: spacing.md },
           { name: 'roomyPadding', contentPadding: spacing.xl },
         ].map(({ name, contentPadding }) => (
-          <UniversalButtonContent
+          <IconButtonExample
             key={name}
             variant="secondary"
             label={t(`showcase.buttonGallery.${name}`)}
@@ -302,7 +332,7 @@ function PendingButtonDemo({ onComplete }: { onComplete: () => void }) {
 
   return (
     <Column spacing={spacing.md} modifiers={nativeFillWidth}>
-      <UniversalButtonContent
+      <IconButtonExample
         variant="primary"
         label={t(pending ? 'common.wait' : 'showcase.buttonGallery.pendingAction')}
         fullWidth
@@ -320,6 +350,41 @@ function PendingButtonDemo({ onComplete }: { onComplete: () => void }) {
       />
       {pending && <LoadingContent label={t('common.wait')} testID="demo-button-progress" />}
     </Column>
+  );
+}
+
+function IconVariantButtons({ onPress }: { onPress: (labelKey: string) => void }) {
+  const { t } = useTranslation();
+  return (
+    <GallerySection
+      title={t('showcase.buttonGallery.iconVariants')}
+      description={t('showcase.buttonGallery.iconVariantsHint')}
+    >
+      {variants.map((variant) => (
+        <Column key={variant} spacing={spacing.md} modifiers={nativeFillWidth}>
+          <UniversalTextContent variant="label">{t(`showcase.${variant}`)}</UniversalTextContent>
+          {iconPlacements.map(({ placement, label }) => (
+            <IconButtonExample
+              key={placement}
+              variant={variant}
+              placement={placement}
+              label={t(`showcase.buttonGallery.${label}`)}
+              fullWidth
+              testID={`demo-button-icon-${variant}-${placement}`}
+              onPress={() => onPress(`showcase.${variant}`)}
+            />
+          ))}
+          <IconButtonExample
+            variant={variant}
+            label={t('showcase.disabledAction')}
+            disabled
+            fullWidth
+            testID={`demo-button-icon-${variant}-disabled`}
+            onPress={() => onPress(`showcase.${variant}`)}
+          />
+        </Column>
+      ))}
+    </GallerySection>
   );
 }
 
@@ -341,7 +406,7 @@ function SemanticColorButtons({ onPress }: { onPress: (labelKey: string) => void
           { variant: 'destructive', color: colors.error, contentColor: colors.onError },
         ] as const
       ).map(({ variant, color, contentColor }) => (
-        <UniversalButtonContent
+        <IconButtonExample
           key={variant}
           variant={variant}
           color={color}
@@ -368,7 +433,6 @@ function StandaloneButton({ onPress }: { onPress: (labelKey: string) => void }) 
         <View style={{ width: '100%', backgroundColor: colors.background, padding: spacing.lg }}>
           <UniversalButton
             variant="primary"
-            label={t('showcase.buttonGallery.lightCorners')}
             colorScheme="light"
             color={colors.primary}
             contentColor={colors.onPrimary}
@@ -377,7 +441,12 @@ function StandaloneButton({ onPress }: { onPress: (labelKey: string) => void }) 
             fullWidth
             testID="demo-button-standalone-light"
             onPress={() => onPress('showcase.buttonGallery.lightCorners')}
-          />
+          >
+            <Row spacing={spacing.sm} alignment="center">
+              <Icon name={starIcon} size={18} />
+              <Text>{t('showcase.buttonGallery.lightCorners')}</Text>
+            </Row>
+          </UniversalButton>
         </View>
       </RNHostView>
     </GallerySection>
