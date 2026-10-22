@@ -25,6 +25,13 @@ important exception that **`value` is a normal string**. The wrapper owns the
 native observable; do not pass `useNativeState` as the public field's value.
 There are no `NativeField`, `UniversalTextInput` or input-content variants.
 
+Keep this family to four files: `text-input.tsx` owns the public props, value
+synchronization, focus and composition; `text-input-native.ios.tsx` and
+`text-input-native.android.tsx` own native field appearance, flexible sizing and
+the trailing icon button; `text-input-native.d.ts` supplies their private shared
+contract. Keep these small native pieces together instead of adding separate
+modifier, icon-button or types files.
+
 Use the existing Host from `PageScreen`, `AuthScreenFrame` or native composition.
 At an RN boundary, supply `UniversalHost` explicitly. The field does not create
 a Host. Arrange native siblings with `Column`/`Row`, and use content buttons with
@@ -138,7 +145,7 @@ existing feature owns that semantic palette.
 The surface has a 48-point/dp minimum unless a height is explicitly supplied.
 iOS uses plain TextField/SecureField styling; both platforms keep a flexible
 editable area beside a fixed 48-point/dp trailing action. Preserve the existing
-[platform modifiers and icon adapters](../../../src/components/ui/text-input/).
+[native adapters](../../../src/components/ui/text-input/).
 Avoid clipping large text with a fixed height or replacing native hit areas.
 `onContentSizeChange` reports the inner native view's geometry, not the full
 label/helper wrapper or a pure text-content height. Do not add measurement or

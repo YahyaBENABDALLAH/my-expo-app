@@ -1,16 +1,22 @@
 import type { RowProps } from '@expo/ui';
+import { Button, HStack } from '@expo/ui/swift-ui';
 import {
-  accessibilityLabel,
+  accessibilityLabel as nativeAccessibilityLabel,
   background,
+  buttonStyle,
   clipShape,
+  contentShape,
+  disabled as nativeDisabled,
+  fixedSize,
   frame,
+  shapes,
   strokeBorder,
   textFieldStyle,
 } from '@expo/ui/swift-ui/modifiers';
+import type { TextInputIconButtonProps } from './text-input-native';
 
 // Both SecureField and TextField use the same unpadded native style.
 export const inputRowFlex = [textFieldStyle('plain'), frame({ maxWidth: Infinity })];
-export const rightIconLabel = (label: string) => [accessibilityLabel(label)];
 
 export function inputFieldAppearance(
   style: NonNullable<RowProps['style']>,
@@ -50,4 +56,30 @@ export function inputFieldAppearance(
         : []),
     ],
   };
+}
+
+export function TextInputIconButton({
+  children,
+  disabled,
+  onPress,
+  accessibilityLabel,
+  testID,
+}: TextInputIconButtonProps) {
+  return (
+    <Button
+      testID={testID}
+      onPress={disabled ? undefined : onPress}
+      modifiers={[
+        buttonStyle('plain'),
+        nativeDisabled(Boolean(disabled)),
+        fixedSize({ horizontal: true, vertical: true }),
+        ...(accessibilityLabel ? [nativeAccessibilityLabel(accessibilityLabel)] : []),
+      ]}
+    >
+      {/* Size the label itself so the flexible text field cannot compress the icon. */}
+      <HStack modifiers={[frame({ width: 48, height: 48 }), contentShape(shapes.rectangle())]}>
+        {children}
+      </HStack>
+    </Button>
+  );
 }

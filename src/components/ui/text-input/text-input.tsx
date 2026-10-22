@@ -13,8 +13,7 @@ import {
 import { useEffect, useRef, useState } from 'react';
 import { useHostColorScheme } from '../host/universal-host';
 import { nativeFillWidth } from '../native/native-fill-width';
-import { inputFieldAppearance, inputRowFlex } from './text-input-modifiers';
-import { TextInputIconButton } from './text-input-icon-button';
+import { inputFieldAppearance, inputRowFlex, TextInputIconButton } from './text-input-native';
 
 export type InputStatus = 'default' | 'error' | 'success' | 'warning';
 
