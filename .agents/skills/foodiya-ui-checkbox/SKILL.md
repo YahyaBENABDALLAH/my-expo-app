@@ -1,18 +1,55 @@
 ---
 name: foodiya-ui-checkbox
-description: 'Use or maintain Foodiya native checkboxes, controlled values, disabled state and change callbacks.'
+description: Compose or maintain Foodiya Checkbox choices with controlled booleans, translated labels, disabled guards and native Host styling. Use for checkbox usage and the in-app showcase.
 ---
 
 # Checkbox
 
-`checkbox.tsx` uses the universal Expo UI control and guards disabled callbacks. Checked, unchecked, label, and disabled colors come from the owning Host. iOS uses a native toggle with its system glass feedback on supported OS versions.
+Use `Checkbox` from `@components/ui` inside an existing `PageScreen` or
+`UniversalHost`. Follow [Foodiya implementation](../foodiya-implementation/SKILL.md)
+and [mobile UI requirements](../expo-mobile-ui-only/SKILL.md).
 
-Import from `@components/ui` and compose inside `UniversalHost`. The Host uses the shared light/dark scheme and theme tint; Host seedColor overrides remain available; use native modifiers only where exposed by the component API. No custom glass layer or Android glass imitation is added.
+## Contract
 
-Native story: [expo-ui/checkbox.stories.tsx](../../../.rnstorybook/stories/components/checkbox.stories.tsx). Light/dark and interaction fixtures remain available. JS checks cover public behavior and native module resolution; device appearance, glass and touch behavior still need iOS/Android verification.
+Read the [wrapper](../../../src/components/ui/checkbox/checkbox.tsx) and
+[installed props](../../../node_modules/@expo/ui/src/universal/Checkbox/types.ts).
+Required props are `value: boolean` and `onValueChange(next: boolean)`.
+Optional props are `label`, `disabled`, `testID` and native `modifiers`.
 
-See [native control themes](../../../docs/control-theme.md) and [UI guide](../../../docs/ui.md).
+```tsx
+<Checkbox
+  label={t('showcase.savePreference')}
+  value={checked}
+  onValueChange={setChecked}
+  testID="recipe-save-choice"
+/>
+```
 
-Follow the [implementation pattern](../foodiya-implementation/SKILL.md) and
-[mobile UI requirements](../expo-mobile-ui-only/SKILL.md). Local filenames in
-this guide refer to [src/components/ui/checkbox/](../../../src/components/ui/checkbox/).
+The caller owns `checked` and its setter. Use the callback's next value rather
+than toggling captured state. Keep independent choices independent; this control
+does not implement a radio group, mixed/indeterminate state or form validation.
+There are no `checked`, `onChange`, `style`, `color` or children props.
+
+## Composition
+
+- Supply a translated label. Do not nest the checkbox inside another clickable
+  button/row; retain its native semantics and touch target.
+- Set `disabled` for unavailable choices. The wrapper guards callbacks as well
+  as disabling the native control. A disabled selected value remains selected;
+  disabling does not clear state or persist a preference.
+- Appearance and tint come from the owning Host. Do not add another Host for an
+  ordinary field, emulate native glass, or introduce custom checkbox artwork.
+- Keep persistence and validation in the feature or existing form adapter.
+  Changing a demo choice must not silently update stored app preferences.
+
+## Showcase
+
+[UI showcase → Checkbox](../../../src/features/ui-showcase/checkbox-screen.tsx),
+route `/ui-component/checkbox`, covers independent choices, a wrapping label,
+reset, change counts and disabled checked/unchecked states. Check label/control
+activation, disabled suppression, RTL and large text on native devices.
+Static checks do not prove native appearance or accessibility.
+
+API reference checked for Expo SDK 57 / `@expo/ui` 57.0.21:
+[Checkbox](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/checkbox/).
+Recheck the installed version before changing native APIs.

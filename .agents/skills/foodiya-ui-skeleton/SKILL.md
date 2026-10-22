@@ -1,59 +1,75 @@
 ---
 name: foodiya-ui-skeleton
-description: 'Use or maintain Foodiya skeleton shapes, semantic surfaces, native hosting and reduced-motion pulse behavior.'
+description: Compose or maintain Foodiya SkeletonContent static native placeholders and hosted Skeleton pulses, supported shapes, reduced motion and focus handling. Use for loading placeholder composition and the in-app showcase.
 ---
 
-# Skeleton placeholders
+# Skeleton
 
-Exports: `Skeleton`, `SkeletonContent` and their types through the existing
-`index.ts`. `skeleton.tsx` owns presentation; `skeleton-modifiers.*` owns
-native shapes. There is no JavaScript pulse clock.
+Import `Skeleton`, `SkeletonContent` and their public types from
+`@components/ui`. Follow [Foodiya implementation](../foodiya-implementation/SKILL.md)
+and [mobile UI requirements](../expo-mobile-ui-only/SKILL.md).
+Read the [implementation/types](../../../src/components/ui/skeleton/skeleton.tsx)
+and [native shape adapters](../../../src/components/ui/skeleton/).
 
-Use `Skeleton` at an RN boundary and static `SkeletonContent` inside a Host.
-`SkeletonProps` includes `animate`; `SkeletonContentProps` intentionally does not.
-Shapes have no children or press handlers. Keep loading/error announcements in
-the owning query composition.
+## Choose the boundary and motion
 
-Supported style fields: `width`, `height`, `borderRadius`, `backgroundColor`
-and `opacity`. Numeric dimensions are native points/dp. Omitted width or
-`'100%'` fills a constrained parent; default height is 16. Other percentage
-sizes, flex styles and style arrays are unsupported.
+| Component         | Ownership and behavior                                                                       |
+| ----------------- | -------------------------------------------------------------------------------------------- |
+| `SkeletonContent` | Static shape inside an existing native Host. No timers, motion subscriptions or nested Host. |
+| `Skeleton`        | Standalone RN boundary with its own Host; pulses by default.                                 |
 
-The default shape uses 12-point corners, neutral `border` fill and 0.72 peak
-opacity. `Skeleton` animates its existing RN Host with Reanimated CSS keyframes:
-900 ms per direction, alternating between peak opacity and 45% of it. The opacity
-loop runs on the UI runtime without a JS timer, extra view, or periodic React renders.
-The shape itself stays in Expo UI. This uses native CSS-style animation properties,
-not a browser stylesheet.
+Both support `style`, `colorScheme` and `testID`. Only `Skeleton` supports
+`animate`; do not pass it to SkeletonContent. Shapes have no children or press
+handlers. Do not replace an ordinary native placeholder with an RN bridge
+merely to animate it.
 
-`SkeletonContent` stays static in its owning SwiftUI/Compose tree. Reanimated CSS
-cannot target that native modifier tree directly, and the installed Expo UI
-adapters do not expose an infinite pulse on both platforms. Content allocates no
-animation timers, motion subscriptions, or nested Hosts and retains the configured
-opacity. Use the standalone CSS `Skeleton` where animated placeholders are needed
-at an RN boundary.
+```tsx
+<Row spacing={spacing.md} modifiers={nativeFillWidth}>
+  <SkeletonContent style={{ width: 48, height: 48, borderRadius: radii.pill }} />
+  <Column spacing={spacing.sm} modifiers={nativeRowWeight}>
+    <SkeletonContent style={{ height: 20 }} />
+    <SkeletonContent style={{ width: 120, height: 12 }} />
+  </Column>
+</Row>
+```
 
-For standalone `Skeleton`, set `animate={false}` to bypass motion subscriptions;
-pass focus state to pause offscreen. Reduced motion/backgrounding restore its
-static appearance.
+## Supported shape style
 
-The development Home examples' static preview disappears ten seconds after mounting. That isolated
-timeout stays with the Home feature and does not restart on refresh/focus.
+The flat `SkeletonStyle` accepts only `width`, `height`, `borderRadius`,
+`backgroundColor` and `opacity`. Numeric dimensions are points/dp.
+Omitted width or `'100%'` fills a constrained parent; default height is 16.
+Other percentage sizes, flex styles, style arrays and arbitrary RN styles
+are unsupported. Use finite nonnegative geometry and opacity from 0 to 1.
 
-Native stories: [skeleton.stories.tsx](../../../.rnstorybook/stories/components/skeleton.stories.tsx).
-`Line`, `Avatar` and `ImagePlaceholder` expose flat, circular and rectangular
-placeholders using the existing dimensions/radius API. `Card` composes a static
-avatar, image and text placeholders inside one Host.
-`AnimationControls` exercises standalone CSS pause/resume, custom opacity and fill
-width alongside static hosted content. Device rendering and timing must also be
-checked on iOS and Android.
+Defaults use the shared control radius, theme `border` fill and 0.72 opacity.
+Override fill only with an intentional shared theme color. Full width needs
+a real parent constraint; fixed artwork and text rails should use useful
+dimensions rather than measurement state.
 
-The Home recipe-card composition story uses `HomeRecipeSkeletons` for two static
-cards inside its existing Host. Current product Home renders a sample catalog.
+## Motion and loading ownership
 
-Import public components from `@components/ui`; UI implementations import
-concrete files directly. [Back to the UI guide](../../../docs/ui.md).
+Standalone Skeleton animates its existing RN Host with Reanimated native
+CSS-style keyframes: 900 ms per direction, alternating to 45% opacity.
+This is not a browser stylesheet or JS interval. The native shape remains
+Expo UI content.
 
-Follow the [implementation pattern](../foodiya-implementation/SKILL.md) and
-[mobile UI requirements](../expo-mobile-ui-only/SKILL.md). Local filenames in
-this guide refer to [src/components/ui/skeleton/](../../../src/components/ui/skeleton/).
+Use `animate={false}` for a static standalone shape; pass route focus state
+when pausing an offscreen screen is needed. The shared motion hook also stops
+the pulse for reduced motion and background activity. Do not add another pulse
+clock, view layer or timer. SkeletonContent intentionally remains static.
+
+Keep loading announcements and query states in the
+[loading composition](../foodiya-ui-loading/SKILL.md). Skeletons do not express
+failure, successful empty results or a disabled/paused query. Preserve usable
+cached content during background refresh. Do not add artificial loading delays.
+
+## Showcase
+
+[UI showcase → Skeleton](../../../src/features/ui-showcase/skeleton-screen.tsx),
+route `/ui-component/skeleton`, covers line/avatar/image shapes, a static card,
+a content toggle and animated/static hosted previews. The toggle is local;
+there is no fake fetch or timeout.
+
+Check bounds, native colors, hidden decorative accessibility nodes, reduced
+motion, app background/resume and route focus on iOS/Android. A visible
+placeholder or static type check does not establish pulse timing on device.

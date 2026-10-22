@@ -1,18 +1,58 @@
 ---
 name: foodiya-ui-switch
-description: 'Use or maintain Foodiya native switches, controlled values, theme roles and disabled callbacks.'
+description: Compose or maintain Foodiya Switch settings with controlled boolean values, native labels, disabled guards and inherited Host appearance. Use for switch usage and its in-app showcase.
 ---
 
 # Switch
 
-`switch.tsx` uses the universal Expo UI control and guards disabled callbacks. The caller supplies value, label, callback, testID and optional modifiers. Colors and geometry inherit the Host; supported iOS toggles retain native glass feedback.
+Import `Switch` from `@components/ui`. Reuse the existing `PageScreen`,
+auth frame or `UniversalHost`; do not add a Host for each native setting.
+Follow [Foodiya implementation](../foodiya-implementation/SKILL.md) and
+[mobile UI requirements](../expo-mobile-ui-only/SKILL.md).
 
-Import from `@components/ui` and compose inside `UniversalHost`. The Host uses the shared light/dark scheme and theme tint; Host seedColor overrides remain available; use native modifiers only where exposed by the component API. No custom glass layer or Android glass imitation is added.
+## Contract
 
-Native story: [expo-ui/switch.stories.tsx](../../../.rnstorybook/stories/components/switch.stories.tsx). Light/dark and interaction fixtures remain available. JS checks cover public behavior and native module resolution; device appearance, glass and touch behavior still need iOS/Android verification.
+Read the [wrapper](../../../src/components/ui/switch/switch.tsx),
+[public type](../../../src/components/ui/switch/switch.types.ts) and
+[installed props](../../../node_modules/@expo/ui/src/universal/Switch/types.ts).
+Required: `value: boolean`, `onValueChange(next: boolean)`.
+Optional: translated `label`, `disabled`, `testID` and native `modifiers`.
 
-See [native control themes](../../../docs/control-theme.md) and [UI guide](../../../docs/ui.md).
+```tsx
+<Switch
+  label={t('showcase.notifications')}
+  value={enabled}
+  onValueChange={setEnabled}
+  testID="notification-preference"
+/>
+```
 
-Follow the [implementation pattern](../foodiya-implementation/SKILL.md) and
-[mobile UI requirements](../expo-mobile-ui-only/SKILL.md). Local filenames in
-this guide refer to [src/components/ui/switch/](../../../src/components/ui/switch/).
+The caller owns `enabled`; use the next boolean from the callback. There is no
+`checked`, `onChange`, `style`, `color`, `loading` or children API here.
+
+## Behavior and ownership
+
+Use a switch for a boolean setting that takes effect in the current workflow.
+Checkboxes express selection/choices. Neither control supplies persistence or
+validation; connect existing preference/form owners rather than introducing a
+second saved setting. A showcase changes local state only.
+
+`disabled` keeps the value visible, disables native editing and suppresses
+callbacks in the wrapper. Keep a disabled on value on; do not clear state as a
+side effect of disabling. Express pending availability through the owning
+workflow and its duplicate-action guard, not opacity alone.
+
+Supply a clear translated label, preserve the native hit area and avoid nesting
+inside another clickable row. Host/platform colors and native feedback remain
+the defaults, including supported iOS treatments. Do not add imitation glass
+or replace the native control to match screenshots across platforms.
+
+## Showcase
+
+[UI showcase → Switch](../../../src/features/ui-showcase/switch-screen.tsx),
+route `/ui-component/switch`, covers two independent settings, change counts,
+reset and disabled on/off states. Check label activation, disabled suppression,
+native accessibility state, light/dark, RTL and large text on iOS/Android.
+
+Checked for SDK 57 / `@expo/ui` 57.0.21:
+[Switch](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/switch/).

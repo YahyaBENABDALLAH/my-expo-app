@@ -1,18 +1,59 @@
 ---
 name: foodiya-ui-picker
-description: 'Use or maintain Foodiya typed native picker items, selection callbacks and disabled state.'
+description: Compose or maintain Foodiya Picker menus and iOS wheels with typed string/number items, controlled selection and disabled guards. Use for Picker.Item composition and the in-app showcase.
 ---
 
 # Picker
 
-The caller owns selectedValue and onValueChange and supplies Picker.Item children. Small platform adapters retain disabled selection guards, typed string/number values, fragment handling and Android anchor/option selectors. Android updates the selected label through native observable state and closes an open dropdown when disabled. Colors come from the Host. iOS menu triggers use native glass button style on iOS 26+ and automatic style on older versions; wheels retain their native style. Android always uses Material dropdowns.
+Import `Picker` and its public types from `@components/ui`, inside the existing
+Host. Follow [Foodiya implementation](../foodiya-implementation/SKILL.md) and
+[mobile UI requirements](../expo-mobile-ui-only/SKILL.md).
 
-Import from `@components/ui` and compose inside `UniversalHost`. The Host uses the shared light/dark scheme and theme tint; Host seedColor overrides remain available; use native modifiers only where exposed by the component API. No custom glass layer or Android glass imitation is added.
+## Contract
 
-Native story: [expo-ui/picker.stories.tsx](../../../.rnstorybook/stories/components/picker.stories.tsx). Light/dark and interaction fixtures remain available. JS checks cover public behavior and native module resolution; device appearance, glass and touch behavior still need iOS/Android verification.
+Read the [public declaration](../../../src/components/ui/picker/picker.d.ts) and
+both [iOS](../../../src/components/ui/picker/picker.ios.tsx) /
+[Android](../../../src/components/ui/picker/picker.android.tsx) implementations.
+Supported props are `selectedValue`, `onValueChange`, `children`,
+`appearance`, `enabled` and `testID`.
 
-See [native control themes](../../../docs/control-theme.md) and [UI guide](../../../docs/ui.md).
+```tsx
+<Picker selectedValue={servings} onValueChange={setServings} testID="recipe-servings">
+  <Picker.Item label={t('showcase.gallery.servings', { value: 1 })} value={1} />
+  <Picker.Item label={t('showcase.gallery.servings', { value: 2 })} value={2} />
+</Picker>
+```
 
-Follow the [implementation pattern](../foodiya-implementation/SKILL.md) and
-[mobile UI requirements](../expo-mobile-ui-only/SKILL.md). Local filenames in
-this guide refer to [src/components/ui/picker/](../../../src/components/ui/picker/).
+The consumer owns a string or number value. It must exactly match an item:
+`2` and `'2'` differ. Keep values/React keys stable and translate only labels.
+The callback receives the value directly, not an index, label or event.
+
+## Items and native behavior
+
+- Use `Picker.Item` markers directly or in supported fragments/arrays. They are
+  data markers, not arbitrary rendered rows. Wrapping an Item in a custom
+  component prevents the existing parser from recognizing it.
+- Keep item values unique. When options change, reconcile invalid selection in
+  the feature; do not leave a selected value absent from the options.
+- Set `enabled={false}` to disable. Both adapters guard selection; Android
+  closes an expanded dropdown when it becomes disabled. There is no `disabled`
+  prop or per-item disabled contract.
+- `appearance="menu"` is the default. `"wheel"` uses an iOS wheel; Android
+  retains a dropdown. Do not promise identical geometry across platforms.
+- There are no `style`, `modifiers`, `label`, `color` or `onChange` props
+  in this project picker contract. Put a visible translated label beside it
+  with native layout when needed.
+- Native colors follow the Host. The iOS menu adapter requests native glass
+  styling; retain the platform fallback and Android Material dropdown.
+- Android uses the supplied selector on its anchor and derives
+  `testID-option-index` for options. Do not use an option index as domain state.
+
+## Showcase
+
+[UI showcase → Picker](../../../src/features/ui-showcase/picker-screen.tsx),
+route `/ui-component/picker`, covers string menus, numeric wheel/dropdown
+selection, reset and disabled callback counts. Check updated labels after
+selection/language changes, popup dismissal, RTL, large text and native focus.
+
+Checked for SDK 57 / `@expo/ui` 57.0.21:
+[Picker](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/picker/).
