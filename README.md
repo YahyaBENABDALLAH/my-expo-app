@@ -1,4 +1,4 @@
-# Likan Expo app
+# Expo mobile starter
 
 An iOS and Android bootstrap application built with Expo SDK 57, Expo Router and native
 Expo UI.
@@ -16,7 +16,11 @@ npm ci
 npm start
 ```
 
-Set `EXPO_PUBLIC_API_URL` in `.env.local` and restart Metro after changing it.
+Copy `.env.example` to `.env.local` and select `APP_BRAND` and `APP_VARIANT`.
+The local default is the unlinked `template` brand. Use `APP_BRAND=likan` with an
+existing Likan development build. Set `EXPO_PUBLIC_API_URL` for the real backend.
+Restart Metro after changing brand or variant selection. See
+[brand configuration](docs/development.md#brand-and-environment-configuration).
 Use `npx expo install <package>` for SDK-compatible dependencies.
 Run `npm run typecheck` and `npm run lint` before finishing a change.
 

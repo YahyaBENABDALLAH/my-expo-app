@@ -8,6 +8,10 @@
       "developmentClient": true,
       "distribution": "internal",
       "environment": "development",
+      "env": {
+        "APP_BRAND": "likan",
+        "APP_VARIANT": "development"
+      },
       "ios": {
         "image": "macos-tahoe-26.6-xcode-27.1",
         "simulator": true
@@ -20,6 +24,8 @@
         "image": "macos-tahoe-26.6-xcode-27.1"
       },
       "env": {
+        "APP_BRAND": "likan",
+        "APP_VARIANT": "preview",
         "EXPO_PUBLIC_ENABLE_DEV_SCREENS": "true"
       }
     },
@@ -30,6 +36,8 @@
         "image": "macos-tahoe-26.6-xcode-27.1"
       },
       "env": {
+        "APP_BRAND": "likan",
+        "APP_VARIANT": "production",
         "EXPO_PUBLIC_ENABLE_DEV_SCREENS": "false"
       }
     }

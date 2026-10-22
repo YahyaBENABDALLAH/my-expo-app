@@ -18,6 +18,7 @@ shape; this is a responsibility pattern, not a request to restructure the app.
 | Shared native presentation            | `src/components/ui/<family>/`                                                 | Own rendering, controlled interactions, theme and platform adapters; leave feature orchestration with the consumer |
 | Shared preferences and infrastructure | Existing `src/context/`, `src/hooks/`, `src/lib/`, `src/services/auth/`       | Extend the current owner rather than creating a second theme, session, HTTP, or preference system                  |
 | Native component examples             | `.rnstorybook/`, `src/features/ui-showcase/`                                  | Keep story tooling outside production imports; distinguish starter showcase routes from isolated native fixtures   |
+| Brand and API configuration           | `config/`, `src/config/`, `src/services/api.config.ts`                        | Keep Node resolution outside native imports; project only public metadata and share the native-safe API policy     |
 
 The normal dependency direction is:
 

@@ -33,6 +33,13 @@ The starter retains authentication in `src/services/auth/` and generic request/q
 
 Create the mutation module only when there are supported writes. Keep services independent of React, navigation, feature modules and cache effects. Use exact module imports; keep all non-route code outside `src/app/`. Direct service calls do not maintain the query cache.
 
+Use `src/services/api.config.ts` for native API configuration and the shared
+`config/api.js` normalizer/timeout. Do not read the API environment independently
+in another transport. Refresh remains interceptor-free and must not import the
+authenticated `api.ts` client. The native read is lazy so local public previews
+can open without backend configuration; build-time production validation owns
+release prerequisites. See the [configuration boundaries](../foodiya-implementation/references/configuration.md).
+
 ## Validate I/O boundaries
 
 - Add a Zod response schema for every consumed JSON entity/auth response and attach it with the transport's `responseSchema` option. `apiClient` validates once before returning data to callers or TanStack Query. Do not cast an unvalidated response into a DTO, or repeat parsing in screens.

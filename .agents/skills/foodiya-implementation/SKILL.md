@@ -19,6 +19,7 @@ packages and current source determine available APIs.
 | Shared UI, theme, or native Storybook                   | [Mobile UI requirements](../expo-mobile-ui-only/SKILL.md) and [component library](../expo-universal-component-library/SKILL.md) |
 | Find a component's skill and source                     | The relevant row in [component skills](references/component-skills.md)                                                          |
 | Backend entity, response validation, query, or mutation | [API services](../expo-api-services/SKILL.md)                                                                                   |
+| Brand identity, native assets or API environment        | [Configuration boundaries](references/configuration.md)                                                                         |
 
 Read the relevant component skill, such as [buttons](../foodiya-ui-button/SKILL.md),
 when its family is involved. Each skill owns its component guidance; longer

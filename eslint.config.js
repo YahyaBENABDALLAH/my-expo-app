@@ -197,7 +197,7 @@ module.exports = defineConfig([
     rules: { 'no-restricted-imports': ['error', { paths: nativeControlImports }] },
   },
   {
-    files: ['*.config.js', 'scripts/**/*.js'],
+    files: ['*.config.js', 'config/**/*.js', 'scripts/**/*.js'],
     languageOptions: { sourceType: 'commonjs', globals: { __dirname: 'readonly' } },
   },
   prettierConfig,

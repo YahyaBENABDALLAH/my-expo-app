@@ -1,0 +1,29 @@
+{
+  "id": "likan",
+  "name": "Likan",
+  "slug": "likan",
+  "scheme": "myappexpo",
+  "icon": "./assets/foodiya.png",
+  "ios": {
+    "bundleIdentifier": "com.hyrkul.likan"
+  },
+  "android": {
+    "package": "com.hyrkul.likan",
+    "googleServicesFile": "./google-services.json",
+    "adaptiveIcon": {
+      "backgroundColor": "#D9FDD3",
+      "foregroundImage": "./assets/foodiya.png",
+      "backgroundImage": "./assets/foodiya.png",
+      "monochromeImage": "./assets/foodiya.png"
+    }
+  },
+  "splash": {
+    "image": "./assets/images/splash-icon.png",
+    "backgroundColor": "#FFFFFF",
+    "darkBackgroundColor": "#0B141A"
+  },
+  "eas": {
+    "owner": "ybenabdallah",
+    "projectId": "4e66f579-46fa-4b0d-a470-e9c4aa09ae45"
+  }
+}

@@ -1,5 +1,6 @@
 import { create } from 'axios';
 import type { TokenResponse } from '@/types/auth.types';
+import { DEFAULT_API_TIMEOUT_MS, getApiBaseUrl } from '../api.config';
 import { isSessionInvalid } from './auth.errors';
 import {
   assertSessionVersion,
@@ -11,8 +12,7 @@ import {
 
 // Raw transport prevents interceptor recursion.
 const refreshClient = create({
-  timeout: 10000,
-  baseURL: process.env.EXPO_PUBLIC_API_URL,
+  timeout: DEFAULT_API_TIMEOUT_MS,
   headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
 });
 
@@ -29,9 +29,11 @@ async function rotateToken(version: number) {
 
   let token: TokenResponse;
   try {
-    const response = await refreshClient.post<TokenResponse>('/api/auth/token/refresh', {
-      refreshToken: session.refreshToken,
-    });
+    const response = await refreshClient.post<TokenResponse>(
+      '/api/auth/token/refresh',
+      { refreshToken: session.refreshToken },
+      { baseURL: getApiBaseUrl() },
+    );
     token = response.data;
   } catch (error) {
     if (isSessionInvalid(error)) await clearAuthSession(version);

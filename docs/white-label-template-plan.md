@@ -18,8 +18,23 @@ contracts continue to belong to their existing skills. See
   verification workflow, stable native selectors and preview limitations.
 - Native startup/frame measurements remain pending before the motion work. No
   native interaction or performance result is claimed from these static checks.
-- Steps 2–12 remain planned. No application behavior, package versions or linked
-  cloud projects were changed in step 1.
+- Step 2 configuration implemented: `config/brands/` owns native identity/assets
+  and integration references; `app.config.js` resolves the selected brand. Local
+  default is the unlinked template; existing EAS profiles explicitly select Likan.
+  Likan bundle IDs, scheme and Firebase mapping are preserved. Variants within a
+  brand retain that identity rather than automatically adding suffixes.
+- `config/api.js` shares URL normalization and timeout policy between Node
+  validation and native transports; native environment reads remain lazy and
+  refresh remains interceptor-free. Production configuration requires explicit
+  brand, EAS references and API configuration.
+- Resolved Expo configs were checked for template/Likan development and Likan
+  production. Invalid selectors, missing release configuration/assets, malformed
+  identifiers/URLs and Firebase package mismatch were exercised. Android and iOS
+  Hermes exports succeed without backend configuration; native builds/devices and
+  live backend behavior remain unverified.
+- Steps 3–12 remain planned. In-app brand copy, custom launch artwork and heading
+  fonts are not yet connected to the manifest. Package versions and linked cloud
+  projects were not changed.
 
 ## Outcome and scope
 
@@ -165,12 +180,15 @@ Work:
 
 Acceptance:
 
-- [ ] Two brands resolve through configuration without screen edits.
-- [ ] Each intended client/variant has its own correct install identity.
-- [ ] A new client release cannot silently use the existing EAS/Firebase identity.
-- [ ] Unknown or incomplete release configuration fails with a useful diagnostic.
+- [x] Two brands resolve through configuration without screen edits.
+- [x] Each configured brand resolves its intended native identity; existing Likan
+      variants preserve their shared identity and integration mapping.
+- [x] The template has no inherited EAS/Firebase identity; production requires an
+      explicit brand and its release configuration.
+- [x] Unknown or incomplete release configuration fails with a useful diagnostic.
 - [ ] The fresh local template can open its public shell without backend credentials.
-- [ ] Ordinary API calls and refresh resolve the same configured origin/timeouts.
+- [x] Ordinary API calls and refresh share the origin/timeout resolver; live backend
+      verification remains pending.
 
 ### 3. Connect brand copy, fonts and artwork
 

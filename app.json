@@ -1,32 +1,17 @@
 {
   "expo": {
-    "name": "my-app-expo",
-    "slug": "likan",
     "version": "1.0.0",
     "platforms": ["ios", "android"],
     "orientation": "portrait",
-    "icon": "./assets/foodiya.png",
-    "scheme": "myappexpo",
     "userInterfaceStyle": "automatic",
     "ios": {
-      "icon": "./assets/foodiya.png",
       "supportsTablet": true,
-      "bundleIdentifier": "com.hyrkul.likan",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       }
     },
     "android": {
-      "icon": "./assets/foodiya.png",
-      "googleServicesFile": "./google-services.json",
-      "adaptiveIcon": {
-        "backgroundColor": "#D9FDD3",
-        "foregroundImage": "./assets/foodiya.png",
-        "backgroundImage": "./assets/foodiya.png",
-        "monochromeImage": "./assets/foodiya.png"
-      },
-      "predictiveBackGestureEnabled": false,
-      "package": "com.hyrkul.likan"
+      "predictiveBackGestureEnabled": false
     },
     "plugins": [
       "expo-router",
@@ -44,18 +29,6 @@
           "fonts": ["./assets/fonts/Inter-Black.otf"]
         }
       ],
-      [
-        "expo-splash-screen",
-        {
-          "backgroundColor": "#FFFFFF",
-          "dark": {
-            "backgroundColor": "#0B141A"
-          },
-          "image": "./assets/images/splash-icon.png",
-          "imageWidth": 200,
-          "resizeMode": "contain"
-        }
-      ],
       "expo-image",
       "expo-secure-store",
       "expo-sharing",
@@ -65,11 +38,7 @@
       "typedRoutes": true
     },
     "extra": {
-      "router": {},
-      "eas": {
-        "projectId": "4e66f579-46fa-4b0d-a470-e9c4aa09ae45"
-      }
-    },
-    "owner": "ybenabdallah"
+      "router": {}
+    }
   }
 }

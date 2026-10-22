@@ -5,7 +5,8 @@ import {
   assertSessionVersion,
 } from '@/services/auth/auth.session';
 import { isSessionInvalid, SessionChangedError } from '@/services/auth/auth.errors';
-import { ApiConfigurationError, ApiError, ApiResponseValidationError } from '@/services/api.error';
+import { ApiError, ApiResponseValidationError } from '@/services/api.error';
+import { DEFAULT_API_TIMEOUT_MS, getApiBaseUrl } from './api.config';
 import { requestNewToken } from '@/services/auth/auth.refresh';
 import i18n, { getCurrentLanguage } from '@/lib/i18n';
 import type { ApiErrorKind } from '@/types/api.types';
@@ -61,8 +62,6 @@ const STATUS_FALLBACKS: Record<number, string> = {
   500: 'api.server',
 };
 
-const DEFAULT_API_TIMEOUT_MS = 10000;
-
 function stringMessages(values: unknown[]) {
   return values.map((value) => (typeof value === 'string' ? value.trim() : '')).filter(Boolean);
 }
@@ -107,18 +106,6 @@ export function extractApiMessage(data: unknown): string | string[] | null {
   }
 
   return null;
-}
-
-function getBaseUrl(override?: string) {
-  const baseUrl = (override ?? process.env.EXPO_PUBLIC_API_URL)?.trim();
-
-  if (!baseUrl) {
-    throw new ApiConfigurationError();
-  }
-
-  let end = baseUrl.length;
-  while (end > 0 && baseUrl[end - 1] === '/') end--;
-  return baseUrl.slice(0, end);
 }
 
 function getDisplayMessage(status: number, data: unknown) {
@@ -259,7 +246,7 @@ export function createAxiosInstance(
   });
 
   instance.interceptors.request.use(async (config) => {
-    config.baseURL = getBaseUrl(config.baseURL ?? baseURL);
+    config.baseURL = getApiBaseUrl(config.baseURL ?? baseURL);
     return attachRequestMetadata(config, includeAuth);
   });
 
