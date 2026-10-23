@@ -156,8 +156,8 @@
     "otpAutoSubmit": "Your code verifies automatically after the sixth digit.",
     "otpDigit": "Digit {{index}} of {{count}}",
     "tryAnotherEmail": "Use another email",
-    "loginDescription": "Log in to discover and share your favorite recipes.",
-    "registerDescription": "Join our community and start your cooking journey.",
+    "loginDescription": "Sign in to access your account.",
+    "registerDescription": "Create your account to get started.",
     "profileSection": "Your profile",
     "optionalNames": "First and last names are optional.",
     "securitySection": "Account & security",
@@ -166,7 +166,6 @@
     "preferredLanguageHelp": "Choose the language for your account emails.",
     "accountIncludes": "Getting started",
     "registrationVerificationHelp": "We’ll email you a six-digit code to complete your registration.",
-    "registrationRecipesHelp": "Save your favorites and share your own recipes.",
     "enterPassword": "Enter your password",
     "createPassword": "Create a password",
     "confirmPassword": "Confirm password",
@@ -232,6 +231,7 @@
     "legalDescription": "End user license agreement",
     "headerMotion": "Header motion",
     "headerShapes": {
+      "default": "Default",
       "dunes": "Dunes",
       "ribbon": "Ribbon",
       "rain": "Rain"
@@ -675,7 +675,9 @@
     "tip": "Tip {{index}}",
     "homeExamples": "Recipe UI examples",
     "homeExamplesDescription": "Local sample cards, skeletons, and interactive controls for development. These examples do not change your recipe preferences.",
-    "floatingActions": "Floating actions"
+    "floatingActions": "Floating actions",
+    "queryStates": "Loading and retry",
+    "queryStatesHint": "Retry each section separately. Completing one leaves the other unchanged."
   },
   "examples": {
     "toast": "Avocado toast",

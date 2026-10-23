@@ -4,6 +4,7 @@ export interface NativeFloatingActionButtonProps {
   children: ReactNode;
   color: string;
   label: string;
+  testID: string;
   onPress: () => void;
   disabled?: boolean;
 }

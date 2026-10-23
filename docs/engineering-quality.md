@@ -1,6 +1,10 @@
-# Engineering quality and product cleanup
+# Engineering quality report — 2026-10-11
 
-Automated suites have been removed. Run `npm run check` for TypeScript, lint and formatting. The dated verification results below describe historical suites.
+This is a historical report. Its recipe screens, startup timings and automated
+suites describe the state recorded below. Current ownership and commands live in
+[architecture](architecture.md), [development](development.md) and the
+[implementation plan](white-label-template-plan.md). Automated suites are removed;
+`npm run check` runs TypeScript, lint and formatting.
 
 Verified 2026-10-11 against Expo SDK 57. The change preserves the existing feature
 architecture and native component library while improving product behavior and

@@ -21,10 +21,12 @@ function SwitchDemo(args: UniversalSwitchProps) {
           args.onValueChange(next);
         }}
       />
-      <Text testID={`${args.testID}-value`}>{`Value: ${value ? 'On' : 'Off'}`}</Text>
+      <Text
+        testID={args.testID ? `${args.testID}-value` : undefined}
+      >{`Value: ${value ? 'On' : 'Off'}`}</Text>
       <UniversalButton
         variant="secondary"
-        testID={`${args.testID}-reset`}
+        testID={args.testID ? `${args.testID}-reset` : undefined}
         label="Reset switch"
         colorScheme={args.colorScheme}
         disabled={args.disabled}

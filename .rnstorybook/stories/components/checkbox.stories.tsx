@@ -21,7 +21,9 @@ function CheckboxDemo(args: UniversalCheckboxProps) {
           args.onValueChange(next);
         }}
       />
-      <RNText testID={`${args.testID}-value`}>{`Value: ${value ? 'Checked' : 'Unchecked'}`}</RNText>
+      <RNText
+        testID={args.testID ? `${args.testID}-value` : undefined}
+      >{`Value: ${value ? 'Checked' : 'Unchecked'}`}</RNText>
       <RNText variant="caption">
         Android uses a checkbox. iOS uses its native toggle appearance.
       </RNText>

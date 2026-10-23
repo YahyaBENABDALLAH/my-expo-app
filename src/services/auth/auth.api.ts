@@ -6,6 +6,7 @@ import {
   messageResponseSchema,
 } from '@/validation/schemas/api/auth';
 import type { ApiReadOptions } from '../request-utils';
+import { DEFAULT_API_TIMEOUT_MS } from '../api.config';
 import type {
   AuthFlowResponse,
   ConfirmRegistrationRequest,
@@ -76,6 +77,10 @@ export function me(options: ApiReadOptions = {}): Promise<CurrentIdentityRespons
   });
 }
 
-export async function logout(): Promise<void> {
-  await apiClient.post<void>('/api/auth/logout');
+/** Revoke only the captured session; no live credentials, refresh or cache effects. */
+export async function logout(accessToken: string): Promise<void> {
+  await authClient.post<void>('/api/auth/logout', undefined, {
+    headers: { Authorization: `Bearer ${accessToken}` },
+    timeoutMs: DEFAULT_API_TIMEOUT_MS,
+  });
 }

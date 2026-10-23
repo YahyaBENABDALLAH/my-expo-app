@@ -44,7 +44,7 @@ function ListDemo({
   const [refreshCount, setRefreshCount] = useState(0);
   return (
     <View style={{ gap: 16 }}>
-      <RNText testID={`${args.testID}-status`}>
+      <RNText testID={args.testID ? `${args.testID}-status` : undefined}>
         {`Selected row: ${selected ?? 'None'} · Refresh count: ${refreshCount}`}
       </RNText>
       <UniversalList
@@ -60,14 +60,16 @@ function ListDemo({
         }
       >
         {itemCount === 0 ? (
-          <ListItem testID={`${args.testID}-empty`}>
-            <Text testID={`${args.testID}-empty-text`}>No items available</Text>
+          <ListItem testID={args.testID ? `${args.testID}-empty` : undefined}>
+            <Text testID={args.testID ? `${args.testID}-empty-text` : undefined}>
+              No items available
+            </Text>
           </ListItem>
         ) : null}
         {Array.from({ length: itemCount }, (_, i) => (
           <ListItem
             key={i}
-            testID={`${args.testID}-row-${i + 1}`}
+            testID={args.testID ? `${args.testID}-row-${i + 1}` : undefined}
             supportingText={supportingText ? `Supporting details for item ${i + 1}` : undefined}
             onPress={
               disabledRows
@@ -84,14 +86,16 @@ function ListDemo({
                   name={leadingIcon}
                   size={24}
                   color={colors.text}
-                  testID={`${args.testID}-row-${i + 1}-icon`}
+                  testID={args.testID ? `${args.testID}-row-${i + 1}-icon` : undefined}
                 />
               </ListItem.Leading>
             ) : null}
-            <Text testID={`${args.testID}-row-${i + 1}-label`}>{`Item ${i + 1}`}</Text>
+            <Text
+              testID={args.testID ? `${args.testID}-row-${i + 1}-label` : undefined}
+            >{`Item ${i + 1}`}</Text>
             {showTrailing ? (
               <ListItem.Trailing>
-                <Text testID={`${args.testID}-row-${i + 1}-trailing`}>
+                <Text testID={args.testID ? `${args.testID}-row-${i + 1}-trailing` : undefined}>
                   {selected === i + 1 ? 'Selected' : 'Open'}
                 </Text>
               </ListItem.Trailing>

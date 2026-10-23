@@ -15,7 +15,7 @@ function SpacerDemo({ colorScheme, seedColor, direction, ...args }: DemoProps) {
   const Container = direction === 'horizontal' ? Row : Column;
   return (
     <Host
-      testID={`${args.testID}-container`}
+      testID={args.testID ? `${args.testID}-container` : undefined}
       collapsable={false}
       matchContents={{ vertical: true }}
       colorScheme={colorScheme}
@@ -32,7 +32,7 @@ function SpacerDemo({ colorScheme, seedColor, direction, ...args }: DemoProps) {
         }}
       >
         <Text
-          testID={`${args.testID}-start`}
+          testID={args.testID ? `${args.testID}-start` : undefined}
           style={{ padding: 8, backgroundColor: colors.primaryContainer, borderRadius: 8 }}
           textStyle={{ color: colors.onPrimaryContainer }}
         >
@@ -40,7 +40,7 @@ function SpacerDemo({ colorScheme, seedColor, direction, ...args }: DemoProps) {
         </Text>
         <Spacer {...args} />
         <Text
-          testID={`${args.testID}-end`}
+          testID={args.testID ? `${args.testID}-end` : undefined}
           style={{ padding: 8, backgroundColor: colors.primaryContainer, borderRadius: 8 }}
           textStyle={{ color: colors.onPrimaryContainer }}
         >

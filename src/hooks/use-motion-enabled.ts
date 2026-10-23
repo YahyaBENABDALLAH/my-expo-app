@@ -82,6 +82,10 @@ export function useAppReducedMotion() {
   return useMotionState(true).reducedMotion;
 }
 
+export function useAppActive() {
+  return useMotionState(true).active;
+}
+
 export function useMotionEnabled(visible = true) {
   const state = useMotionState(visible);
   return visible && state.ready && state.active && !state.reducedMotion;

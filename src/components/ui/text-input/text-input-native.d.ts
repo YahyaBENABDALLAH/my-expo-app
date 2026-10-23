@@ -3,6 +3,9 @@ import type { ReactElement, ReactNode } from 'react';
 
 // Metro selects the native implementation; this file supplies the shared types.
 export declare const inputRowFlex: NonNullable<TextInputProps['modifiers']>;
+export declare function inputAccessibilityModifiers(
+  label?: string,
+): NonNullable<TextInputProps['modifiers']>;
 export declare function inputFieldAppearance(
   style: NonNullable<RowProps['style']>,
 ): Pick<RowProps, 'style' | 'modifiers'>;

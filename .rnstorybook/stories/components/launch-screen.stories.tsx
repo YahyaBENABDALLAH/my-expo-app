@@ -8,9 +8,11 @@ import { getAppBrand } from '@/config/brand';
 function LaunchDemo({
   reducedMotion = false,
   waiting = false,
+  mode = 'branded',
 }: {
   reducedMotion?: boolean;
   waiting?: boolean;
+  mode?: 'minimal' | 'branded';
 }) {
   const [presented, setPresented] = useState(true);
   const brand = getAppBrand();
@@ -31,7 +33,7 @@ function LaunchDemo({
           testID="launch-preview-replay"
           onPress={() => setPresented(true)}
         />
-        {presented ? <LaunchScreen exiting={!waiting} onExitComplete={finish} /> : null}
+        {presented ? <LaunchScreen mode={mode} exiting={!waiting} onExitComplete={finish} /> : null}
       </View>
     </ThemePreferencesProvider>
   );
@@ -40,10 +42,13 @@ function LaunchDemo({
 const meta = {
   title: 'Components/Launch Screen',
   component: LaunchDemo,
-  args: { reducedMotion: false, waiting: false },
+  args: { reducedMotion: false, waiting: false, mode: 'branded' },
+  argTypes: { mode: { control: 'select', options: ['minimal', 'branded'] } },
 } satisfies Meta<typeof LaunchDemo>;
 export default meta;
 type Story = StoryObj<typeof meta>;
 export const Ready: Story = {};
 export const Waiting: Story = { args: { waiting: true } };
 export const ReducedMotion: Story = { args: { reducedMotion: true } };
+export const MinimalReady: Story = { args: { mode: 'minimal' } };
+export const MinimalWaiting: Story = { args: { mode: 'minimal', waiting: true } };

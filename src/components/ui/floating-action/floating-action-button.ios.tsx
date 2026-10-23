@@ -17,10 +17,11 @@ export function NativeFloatingActionButton({
   label,
   onPress,
   disabled,
+  testID,
 }: NativeFloatingActionButtonProps) {
   return (
     <Button
-      testID="tab-context-action"
+      testID={testID}
       onPress={disabled ? undefined : onPress}
       modifiers={[
         buttonStyle('plain'),

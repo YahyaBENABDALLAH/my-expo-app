@@ -6,20 +6,38 @@ import { View } from 'react-native';
 function FloatingDemo({
   kind = 'create',
   disabled = false,
+  repeated = false,
 }: {
   kind?: FloatingActionKind;
   disabled?: boolean;
+  repeated?: boolean;
 }) {
   const [presses, setPresses] = useState(0);
+  const [secondaryPresses, setSecondaryPresses] = useState(0);
   return (
     <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', gap: 16 }}>
       <FloatingAction
         kind={kind}
         label="Count action"
+        testID={repeated ? 'floating-demo-first' : undefined}
         disabled={disabled}
         onPress={() => setPresses((value) => value + 1)}
       />
       <UniversalText testID="floating-demo-count">{`Actions: ${presses}`}</UniversalText>
+      {repeated && (
+        <>
+          <FloatingAction
+            kind="submit"
+            label="Count second action"
+            testID="floating-demo-second"
+            disabled={disabled}
+            onPress={() => setSecondaryPresses((value) => value + 1)}
+          />
+          <UniversalText testID="floating-demo-second-count">
+            {`Second actions: ${secondaryPresses}`}
+          </UniversalText>
+        </>
+      )}
     </View>
   );
 }
@@ -39,3 +57,4 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 export const Interactive: Story = {};
 export const Disabled: Story = { args: { disabled: true } };
+export const RepeatedActions: Story = { args: { repeated: true } };

@@ -24,7 +24,8 @@ Apply the sibling [mobile UI requirements](../expo-mobile-ui-only/SKILL.md): iOS
 - Loading uses native `LoadingIndicator` platform adapters, `LoadingContent` inside a Host and `LoadingScreen` at a route/Suspense boundary. Exercise disabled, offline, initial failure, empty success, cached refresh and refresh failure in composition stories.
 - Every new or changed reusable component must have a discoverable native Storybook story. Infrastructure and compound slots may use a focused composition story rather than standalone wrappers.
 - Follow [native stories and verification](references/storybook-testing.md): deterministic fixtures, explicit state, stable actionable selectors and manual native verification. Automated suites are absent; do not add a runner or restore old test commands unless requested.
-- Keep stories and development tooling out of production imports. Inspect the existing Metro/Storybook setup before changing bundle selection.
+- Keep Storybook imports in `.rnstorybook/` and `src/features/storybook/`. The catalog flag owns links and protected route access; it does not strip showcase code. Use the documented `npm run storybook` opt-in for retained fixtures. Inspect both release graphs before claiming tooling exclusion.
+- Follow the [adapter responsibilities and upgrade checklist](../../../docs/ui.md#adapter-responsibilities-and-upgrade-review) when changing Expo UI/Router versions. Review the intentional pins together, reproduce the original native width case, and verify both platform adapters on matching builds. Wrappers need a concrete project responsibility or demonstrated upstream gap; direct primitive exports stay direct.
 - Do not claim a story proves device behavior or that a screenshot is an automated regression test without a comparison mechanism.
 
 ## Completion

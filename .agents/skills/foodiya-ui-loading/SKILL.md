@@ -31,6 +31,22 @@ Verify these state combinations manually; automated suites have been removed.
 
 Queries and retry work remain in the feature; these components present them.
 
+`QueryContent.testID` is an optional instance prefix. Supply distinct stable IDs
+when two queries coexist: owned nodes append `-error`, `-retry`, `-offline`,
+`-loading` and `-idle`; the root Column uses the prefix itself. Without a prefix,
+the existing `query-error`, `query-offline`, `query-idle` and `loading-state`
+selectors remain, and retry uses `query-retry`. The retry ID reaches the native
+button; root/status IDs identify layout or messages. Keep retry disabled while
+fetching, disabled by prerequisites or paused offline. Do not derive IDs from
+translations, random values or array positions.
+
+The in-app [Loading and retry page](../../../src/features/ui-showcase/loading-screen.tsx),
+route `/ui-component/loading`, presents two independent local retry examples.
+The retained `RepeatedQueries` story uses that page; other state fixtures retain
+the default IDs. Check independent activation and native naming, focus order,
+large text and offline/pending retry suppression on both platforms. Registration
+and exports do not establish those device results.
+
 The initial-error fixture exports `ErrorState` (display name Error), avoiding a
 built-in name collision. Its existing selector is `expo-ui-loading-state--error-state`.
 

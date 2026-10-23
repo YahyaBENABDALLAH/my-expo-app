@@ -6,6 +6,8 @@
   "icon": "./assets/foodiya.png",
   "presentation": {
     "palette": "ux",
+    "header": "dunes",
+    "launch": "branded",
     "headingFont": "interBlack",
     "launchArtwork": "bluePepe"
   },

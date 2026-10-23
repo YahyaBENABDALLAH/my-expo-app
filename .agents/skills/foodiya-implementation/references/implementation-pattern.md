@@ -13,7 +13,7 @@ shape; this is a responsibility pattern, not a request to restructure the app.
 | Feature workflow                      | A colocated `use-<workflow>.ts` or existing feature context                   | Own draft transitions, prerequisite reads, submission coordination, and success navigation                         |
 | Pure domain rules                     | Feature domain files and `src/validation/schemas/`                            | Validate and normalize values without rendering, transport, or storage                                             |
 | Response contracts                    | `src/validation/schemas/api/`, `src/types/`                                   | Define runtime schemas and matching DTOs at the I/O boundary                                                       |
-| Entity transport                      | `src/services/<entity>/<entity>.service.ts`                                   | Use the existing HTTP client; preserve endpoint and payload contracts                                              |
+| Entity transport                      | Existing entity `.api.ts` or `.service.ts` in `src/services/<entity>/`        | Use the existing HTTP client; preserve endpoint and payload contracts                                              |
 | Remote-state policy                   | Entity `.queries.ts`, `.mutations.ts`, `.hooks.ts`; existing feature adapters | Own keys, cancellation, pagination, session guards, and successful cache maintenance                               |
 | Shared native presentation            | `src/components/ui/<family>/`                                                 | Own rendering, controlled interactions, theme and platform adapters; leave feature orchestration with the consumer |
 | Shared preferences and infrastructure | Existing `src/context/`, `src/hooks/`, `src/lib/`, `src/services/auth/`       | Extend the current owner rather than creating a second theme, session, HTTP, or preference system                  |
@@ -33,6 +33,11 @@ Services must not import feature UI. Pure domain rules must not depend on React,
 Expo, query caches, or I/O. Within a feature, reuse existing adapters rather than
 adding another transport path. See the maintained
 [architecture guide](../../../../docs/architecture.md) for enforced boundaries.
+Its lint scopes cover current screen/route presentation, both transport suffixes,
+schemas/DTOs/mappers, shared UI and raw refresh. Keep a small documented endpoint
+submission inside the existing `useAuthForm` consumer when that is the complete
+workflow. Recovery's confirmation and challenge-keyed completion guards already
+belong there; do not move them merely to make an import glob pass.
 
 ## Implement a coherent feature slice
 
@@ -56,7 +61,11 @@ adding another transport path. See the maintained
 
 Use the existing authentication workflow in
 `src/features/auth/auth-flow.context.tsx`, transport in `src/services/auth/`,
-and `currentIdentityQuery` for current examples. Recipe-specific workflows and
+and `currentIdentityQuery` for current examples. Its pure `auth.mapper.ts` maps
+Identity wire tokens to the frontend session schema in
+`src/validation/schemas/auth-session.ts`; storage/refresh/logout stay with their
+existing auth owners. Do not introduce a repository or DI container for those
+boundaries. Recipe-specific workflows and
 entity services have been removed from this starter. Generic query, mutation,
 pagination and invalidation utilities remain available for future backend work.
 

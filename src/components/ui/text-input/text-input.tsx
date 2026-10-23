@@ -13,7 +13,12 @@ import {
 import { useEffect, useRef, useState } from 'react';
 import { useHostColorScheme } from '../host/universal-host';
 import { nativeFillWidth } from '../native/native-fill-width';
-import { inputFieldAppearance, inputRowFlex, TextInputIconButton } from './text-input-native';
+import {
+  inputAccessibilityModifiers,
+  inputFieldAppearance,
+  inputRowFlex,
+  TextInputIconButton,
+} from './text-input-native';
 
 export type InputStatus = 'default' | 'error' | 'success' | 'warning';
 
@@ -92,7 +97,11 @@ export function TextInput({
     <ExpoTextInput
       {...inputProps}
       value={nativeValue}
-      modifiers={[...inputRowFlex, ...(inputProps.modifiers ?? [])]}
+      modifiers={[
+        ...inputRowFlex,
+        ...inputAccessibilityModifiers(label),
+        ...(inputProps.modifiers ?? []),
+      ]}
       readOnly={readOnly}
       editable={disabled ? false : editable}
       placeholderTextColor={inputProps.placeholderTextColor ?? colors.muted}

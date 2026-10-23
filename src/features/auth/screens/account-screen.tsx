@@ -43,6 +43,7 @@ export function AccountScreen() {
             <Text>{t('account.refreshFailed')}</Text>
             <UniversalButtonContent
               variant="secondary"
+              testID="auth-account-retry"
               disabled={identity.isFetching || identity.fetchStatus === 'paused'}
               label={t('account.retryProfile')}
               onPress={() => void onRefresh()}
@@ -57,9 +58,10 @@ export function AccountScreen() {
           disabled={logout.isPending}
           onPress={() => logout.mutate()}
         />
-        {logout.error ? <Text>{t('account.signOutFailed')}</Text> : null}
+        {logout.error ? <Text testID="auth-logout-error">{t('account.signOutFailed')}</Text> : null}
         <UniversalButtonContent
           variant="link"
+          testID="auth-account-home"
           label={t('common.home')}
           onPress={() => router.replace('/')}
         />

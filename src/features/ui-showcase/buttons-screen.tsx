@@ -4,6 +4,7 @@ import { View } from 'react-native';
 import {
   Column,
   FloatingAction,
+  FloatingActionButton,
   Icon,
   LoadingContent,
   PageScreen,
@@ -132,6 +133,21 @@ export default function ButtonsScreen() {
             />
           </View>
         </RNHostView>
+        <Row spacing={spacing.lg}>
+          <FloatingActionButton
+            kind="submit"
+            label={t('showcase.buttonGallery.save')}
+            testID="demo-floating-save"
+            onPress={() => recordPress('showcase.buttonGallery.save')}
+          />
+          <FloatingActionButton
+            kind="submit"
+            label={t('showcase.disabledAction')}
+            testID="demo-floating-disabled"
+            disabled
+            onPress={() => recordPress('showcase.disabledAction')}
+          />
+        </Row>
       </GallerySection>
       <GallerySection
         title={t('showcase.buttonGallery.interaction')}

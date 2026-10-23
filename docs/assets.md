@@ -9,10 +9,10 @@ owns literal Metro imports and the small selection helpers used by the root,
 auth headings and launch screen. Native modules never import the Node resolver
 or full brand manifests.
 
-| Brand      | Heading font                           | In-app launch artwork                |
-| ---------- | -------------------------------------- | ------------------------------------ |
-| `likan`    | Bundled Inter Black for French/English | `assets/animations/blue-pepe.lottie` |
-| `template` | Native system typography               | `assets/images/icon.png`             |
+| Brand      | Heading font                           | Registered launch artwork            | Launch mode |
+| ---------- | -------------------------------------- | ------------------------------------ | ----------- |
+| `likan`    | Bundled Inter Black for French/English | `assets/animations/blue-pepe.lottie` | Branded     |
+| `template` | Native system typography               | `assets/images/icon.png`             | Minimal     |
 
 The template image is an existing Expo placeholder. Replace it with client artwork
 before distribution. Native app/adaptive icons and the native splash are separate
@@ -24,6 +24,12 @@ manifest fields; changing in-app artwork does not update those assets.
 The root's `useFonts` map uses the same selection; system typography produces an
 empty map. Auth and launch use platform family names from the metadata. Other
 text controls keep native typography.
+
+If loading the optional heading font fails, startup continues with native
+typography. The helper returns a family only after its runtime font is loaded;
+the native splash cannot remain held behind a font-error boundary. Minimal
+launch does not mount the registered artwork, though its literal asset remains
+bundled for branded previews. See the [launch contract](../.agents/skills/foodiya-ui-launch-screen/SKILL.md).
 
 Android derives its embedded family from the filename. iOS uses the font's
 embedded name, which can differ. The supplied file's PostScript name is
@@ -61,6 +67,9 @@ tenant switching.
 Header paths for Dunes, Ribbon and Rain remain in the shared page geometry.
 `assets/images/header-motion/rain.svg` is a static snapshot; production builds its
 animated paths and native blur mask from numeric commands. Removed Smoke and
-Water SVGs are no longer bundled. The configurable launch artwork keeps the
-existing hold/exit timing; launch modes and performance changes belong to their
-later implementation step.
+Water SVGs are no longer bundled. Dunes, Ribbon, Rain and the iOS SVG material
+mask are retained. The branded launch edge keeps cached paths and its drift;
+minimal launch does not mount artwork or that edge. The existing
+[page](../.agents/skills/foodiya-ui-page/references/page-guide.md) and
+[launch](../.agents/skills/foodiya-ui-launch-screen/SKILL.md) skills own these
+presentation contracts.

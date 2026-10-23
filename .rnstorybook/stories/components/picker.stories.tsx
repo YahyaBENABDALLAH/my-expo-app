@@ -27,11 +27,13 @@ function PickerDemo(args: UniversalPickerProps) {
           args.onValueChange(next);
         }}
       />
-      <Text testID={`${args.testID}-value`}>{`Selected: ${String(selectedValue)}`}</Text>
+      <Text
+        testID={args.testID ? `${args.testID}-value` : undefined}
+      >{`Selected: ${String(selectedValue)}`}</Text>
       <UniversalButton
         variant="secondary"
         label="Reset selection"
-        testID={`${args.testID}-reset`}
+        testID={args.testID ? `${args.testID}-reset` : undefined}
         colorScheme={args.colorScheme}
         disabled={!args.enabled}
         onPress={() => setSelectedValue(args.selectedValue)}

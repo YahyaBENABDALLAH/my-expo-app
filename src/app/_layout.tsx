@@ -38,6 +38,8 @@ import { useThemeColors } from '@/hooks/use-theme';
 import { screenInsets } from '@/lib/screen-insets';
 import { getBrandFonts } from '@/config/brand-assets';
 import { getAppBrand } from '@/config/brand';
+import { StartupLayoutContext } from '@/context/startup-layout.context';
+import { developerScreensEnabled, storybookEnabled } from '@/config/developer-tools';
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -59,12 +61,9 @@ const brandFonts = getBrandFonts(brand);
 export default function RootLayout() {
   const [loaded, error] = useFonts(brandFonts);
 
-  // Expo Router uses Error Boundaries to catch errors in the navigation tree.
-  useEffect(() => {
-    if (error) throw error;
-  }, [error]);
-
-  if (!loaded) {
+  // A failed optional heading font falls back to native typography instead of
+  // leaving an error boundary behind the held native splash.
+  if (!loaded && !error) {
     return null;
   }
 
@@ -73,6 +72,7 @@ export default function RootLayout() {
       <LanguageProvider>
         <ThemePreferencesProvider
           initialTheme={brand.presentation.palette}
+          initialHeaderShape={brand.presentation.header}
           persistHeaderMotion
           persistAppearance
         >
@@ -102,31 +102,55 @@ function RootLayoutContent() {
   }, [appearancePreference, appearanceReady]);
   const colorScheme = useColorScheme();
   const colors = useThemeColors(colorScheme);
-  const [showBrandScreen, setShowBrandScreen] = useState(true);
+  const [showLaunchScreen, setShowLaunchScreen] = useState(true);
   const { restoring, requireAuth } = useAuthGuards();
   const pathname = usePathname();
-  const expanded = pathname === '/login' && !requireAuth;
+  const animatedHeader = headerShape !== 'default';
+  const expanded = animatedHeader && pathname === '/login' && !requireAuth;
+  const reducedMotion = useAppReducedMotion();
   const [loginWaveComplete, setLoginWaveComplete] = useState(true);
-  if (expanded && !showBrandScreen && loginWaveComplete) setLoginWaveComplete(false);
-  const holdLogin = !showBrandScreen && pathname === '/login' && requireAuth && !loginWaveComplete;
+  if (expanded && !reducedMotion && !showLaunchScreen && loginWaveComplete)
+    setLoginWaveComplete(false);
+  const holdLogin =
+    animatedHeader &&
+    !reducedMotion &&
+    !showLaunchScreen &&
+    pathname === '/login' &&
+    requireAuth &&
+    !loginWaveComplete;
   const finishLoginWave = useCallback(() => setLoginWaveComplete(true), []);
   const { error } = useAuthContext();
   const { ready: languageReady } = useLanguage();
-  const animatePageArtwork = !showBrandScreen;
-  const reducedMotion = useAppReducedMotion();
+  const animatePageArtwork = !showLaunchScreen;
+  const preferencesReady = appearanceReady && languageReady && headerMotionReady;
+  const startupReady = preferencesReady && !restoring && !error;
   // Restoration failures must expose their retry UI instead of keeping the launch overlay.
-  const ready =
-    appearanceReady && languageReady && headerMotionReady && (!restoring || Boolean(error));
-  const finishBrandScreen = useCallback(() => setShowBrandScreen(false), []);
-  const revealBrandScreen = useCallback(() => {
+  const canReveal = preferencesReady && (!restoring || Boolean(error));
+  const layoutPhase = restoring ? (error ? 'recovery' : null) : 'ready';
+  const [laidOutPhase, setLaidOutPhase] = useState<typeof layoutPhase>(null);
+  if (layoutPhase === null && laidOutPhase !== null) setLaidOutPhase(null);
+  const onInitialLayout = useCallback(() => {
+    if (layoutPhase) setLaidOutPhase(layoutPhase);
+  }, [layoutPhase]);
+  const initialLayoutReady = layoutPhase !== null && laidOutPhase === layoutPhase;
+  const finishLaunchScreen = useCallback(() => setShowLaunchScreen(false), []);
+  const revealLaunchScreen = useCallback(() => {
     SplashScreen.hide();
   }, []);
-  useStoreUpdates(!showBrandScreen);
+  useStoreUpdates(startupReady && initialLayoutReady && !showLaunchScreen);
 
   return (
     <LoginTransitionContext.Provider value={holdLogin}>
       <View
-        testID={ready && !showBrandScreen ? 'app-ready' : undefined}
+        testID={
+          !showLaunchScreen && initialLayoutReady
+            ? startupReady
+              ? 'app-ready'
+              : error
+                ? 'app-recovery'
+                : undefined
+            : undefined
+        }
         collapsable={false}
         style={{ flex: 1, backgroundColor: colors.background }}
       >
@@ -138,16 +162,19 @@ function RootLayoutContent() {
           expanded={expanded}
           onCollapseComplete={finishLoginWave}
         >
-          {ready || !showBrandScreen ? <RootLayoutNav holdLogin={holdLogin} /> : null}
+          <StartupLayoutContext.Provider value={onInitialLayout}>
+            {canReveal || !showLaunchScreen ? <RootLayoutNav holdLogin={holdLogin} /> : null}
+          </StartupLayoutContext.Provider>
         </PageMotionOverlay>
-        {showBrandScreen && appearanceReady && (
+        {showLaunchScreen && appearanceReady && (
           <LaunchScreen
-            exiting={ready}
-            onReady={revealBrandScreen}
-            onExitComplete={finishBrandScreen}
+            mode={error ? 'minimal' : brand.presentation.launch}
+            exiting={canReveal && initialLayoutReady}
+            onReady={revealLaunchScreen}
+            onExitComplete={finishLaunchScreen}
           />
         )}
-        {!showBrandScreen && <AlertHost />}
+        {!showLaunchScreen && <AlertHost />}
       </View>
     </LoginTransitionContext.Provider>
   );
@@ -186,6 +213,7 @@ function RootLayoutNav({ holdLogin }: { holdLogin: boolean }) {
                 {error ? (
                   <UniversalButtonContent
                     variant="secondary"
+                    testID="session-restore-retry"
                     label={t('common.tryAgain')}
                     onPress={retryRestore}
                   />
@@ -210,8 +238,13 @@ function RootLayoutNav({ holdLogin }: { holdLogin: boolean }) {
         }}
       >
         <Stack.Screen name="index" />
-        <Stack.Screen name="ui" />
-        <Stack.Screen name="ui-component/[name]" />
+        <Stack.Protected guard={developerScreensEnabled}>
+          <Stack.Screen name="ui" />
+          <Stack.Screen name="ui-component/[name]" />
+        </Stack.Protected>
+        <Stack.Protected guard={storybookEnabled}>
+          <Stack.Screen name="storybook" />
+        </Stack.Protected>
         <Stack.Screen name="settings" />
         <Stack.Protected guard={requireNoAuth || holdLogin}>
           <Stack.Screen name="(auth)" />

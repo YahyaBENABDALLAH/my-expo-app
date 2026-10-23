@@ -11,6 +11,7 @@ import {
 import { useState } from 'react';
 import { View } from 'react-native';
 import type { Meta, StoryObj } from '@storybook/react-native';
+import LoadingScreen from '@/features/ui-showcase/loading-screen';
 
 type State =
   'loading' | 'offline' | 'disabled' | 'error' | 'empty' | 'ready' | 'refreshing' | 'refresh-error';
@@ -49,6 +50,7 @@ function LoadingDemo({ state: initial, colorScheme }: Props) {
           <UniversalButtonContent
             variant="secondary"
             label="Start loading"
+            testID="loading-demo-start"
             onPress={() => setState('loading')}
           />
           <UniversalButtonContent
@@ -60,6 +62,7 @@ function LoadingDemo({ state: initial, colorScheme }: Props) {
           <UniversalButtonContent
             variant="secondary"
             label="Go offline"
+            testID="loading-demo-offline"
             onPress={() => setState('offline')}
           />
         </Column>
@@ -106,3 +109,5 @@ export const Loading: Story = {};
 export const ErrorState: Story = { name: 'Error', args: { state: 'error' } };
 
 export const Refreshing: Story = { args: { state: 'refreshing' } };
+
+export const RepeatedQueries: Story = { render: () => <LoadingScreen /> };

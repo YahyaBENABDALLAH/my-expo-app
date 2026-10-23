@@ -17,7 +17,7 @@ function ColumnDemo({ itemCount, nested, ...args }: DemoProps) {
       {Array.from({ length: itemCount }, (_, i) => (
         <Text
           key={i}
-          testID={`${args.testID}-item-${i + 1}`}
+          testID={args.testID ? `${args.testID}-item-${i + 1}` : undefined}
           style={{ padding: 12, borderRadius: 8, backgroundColor: colors.primaryContainer }}
           textStyle={{ color: colors.onPrimaryContainer, fontSize: 16 }}
         >{`Item ${i + 1}`}</Text>

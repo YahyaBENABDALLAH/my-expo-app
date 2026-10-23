@@ -24,6 +24,10 @@ Restart Metro after changing brand or variant selection. See
 Use `npx expo install <package>` for SDK-compatible dependencies.
 Run `npm run typecheck` and `npm run lint` before finishing a change.
 
+Enable `EXPO_PUBLIC_ENABLE_DEV_SCREENS=true` to browse the native catalog, or use
+`npm run storybook` for the development-only fixture browser and Controls.
+See [component previews](docs/storybook.md) for matching build/brand setup.
+
 ## Find the guidance
 
 - [Documentation index](docs/index.md): setup, architecture, UI, releases and reports.

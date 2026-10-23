@@ -16,7 +16,7 @@ markers. Caller props, colors and modifier order pass through; the Android test
 selector is appended after caller modifiers. Native row colors and
 supporting/accessory typography inherit the Host.
 
-Registration uses two informational rows in
+Registration uses a verification information row in
 [register-screen.tsx](../../../src/features/auth/screens/register-screen.tsx).
 The [list showcase](../../../src/features/ui-showcase/list-screen.tsx) also uses
 the same component. Settings uses its own `SettingsRow` composition.

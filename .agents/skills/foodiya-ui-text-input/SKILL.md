@@ -151,10 +151,24 @@ Avoid clipping large text with a fixed height or replacing native hit areas.
 label/helper wrapper or a pure text-content height. Do not add measurement or
 delayed mounts for ordinary fields.
 
-Translate labels, helpers and action names in English, French and Arabic. A
-visible label is a separate native Text node, not proof of a screen-reader label
-association; check VoiceOver/TalkBack naming and focus. Add accessibility support
-through the shared adapters if needed rather than passing unsupported props.
+Translate labels, helpers and action names in English, French and Arabic.
+The visible `label` also reaches the inner editable control through the existing
+native adapters: SwiftUI `accessibilityLabel` and Compose
+`semantics({ contentDescription: label })`. Caller field modifiers follow that
+default. The separate label Text remains; field `testID` still reaches the
+editable control, and its optional label/helper/icon suffixes are conditional.
+IDs are machine identifiers, never spoken names. Keep a visible translated label
+for each field; there is no public `accessibilityLabel` prop in Expo's universal
+input. Do not turn a selector into a fallback name or clear native editable,
+password or value semantics.
+
+Check VoiceOver/TalkBack names, value announcements and focus order on device,
+including duplicate label stops, secure reveal and disabled/read-only fields.
+Expo's Android universal field maps noneditable input to a read-only
+`BasicTextField`; it does not expose that native field's `enabled` prop. The
+wrapper prevents edits and trailing actions when disabled, but a distinct spoken
+disabled state is an upstream compatibility gap. Do not claim that state from
+opacity or `editable={false}`. Native spoken output remains unverified by types.
 Use logical leading/trailing icons and keep native text direction unless the
 content has a specific directional requirement. Keep errors understandable in
 text as well as color, allow helpers to wrap, and check large text and RTL.

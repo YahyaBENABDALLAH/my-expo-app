@@ -108,7 +108,7 @@ export function FormTextInput<T extends FieldValues>({
       {password && passwordToggle === 'button' ? (
         <Column alignment="end" modifiers={nativeFillWidthEnd}>
           <UniversalButtonContent
-            testID={`${testID}-visibility`}
+            testID={testID ? `${testID}-visibility` : undefined}
             variant="link"
             disabled={props.disabled}
             label={passwordActionLabel}

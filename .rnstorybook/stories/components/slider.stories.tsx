@@ -13,7 +13,7 @@ function SliderDemo(args: UniversalSliderProps) {
   const [value, setValue] = useState(args.value);
   return (
     <View style={{ gap: 16 }}>
-      <Text testID={`${args.testID}-value`}>
+      <Text testID={args.testID ? `${args.testID}-value` : undefined}>
         {`Value: ${Number(value.toFixed(2))} · Range: ${args.min}–${args.max}`}
       </Text>
       <UniversalSlider
@@ -26,7 +26,7 @@ function SliderDemo(args: UniversalSliderProps) {
       />
       <UniversalButton
         variant="secondary"
-        testID={`${args.testID}-reset`}
+        testID={args.testID ? `${args.testID}-reset` : undefined}
         label="Reset slider"
         colorScheme={args.colorScheme}
         disabled={args.disabled}

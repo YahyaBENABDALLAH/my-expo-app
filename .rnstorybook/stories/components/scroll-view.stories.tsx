@@ -18,11 +18,15 @@ function ScrollViewDemo({ itemCount, onItemPress, ...args }: DemoProps) {
   const Container = args.direction === 'horizontal' ? Row : Column;
   return (
     <UniversalScrollView {...args}>
-      <Container spacing={12} style={{ padding: 12 }} testID={`${args.testID}-content`}>
+      <Container
+        spacing={12}
+        style={{ padding: 12 }}
+        testID={args.testID ? `${args.testID}-content` : undefined}
+      >
         {Array.from({ length: itemCount }, (_, i) => (
           <Text
             key={i}
-            testID={`${args.testID}-item-${i + 1}`}
+            testID={args.testID ? `${args.testID}-item-${i + 1}` : undefined}
             onPress={args.disabled ? undefined : () => onItemPress(i + 1)}
             style={{
               width: 220,

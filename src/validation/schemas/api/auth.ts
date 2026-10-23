@@ -57,25 +57,4 @@ export const currentIdentityResponseSchema = z.looseObject({
   appVersion: z.string().nullable(),
 });
 
-export const authUserSchema = z.object({
-  uuid: identifier,
-  userName: z.string().nullable().optional(),
-  firstName: z.string().nullable().optional(),
-  lastName: z.string().nullable().optional(),
-  email: z.string().nullable().optional(),
-  profileImageUrl: z.string().nullable().optional(),
-  isActive: z.boolean().optional(),
-  role: z.string().nullable().optional(),
-  isChef: z.boolean().optional(),
-  chefProfileUuid: identifier.nullable().optional(),
-});
-
-/** Stored frontend format; separate from wire responses. */
-export const authSessionSchema = z.object({
-  accessToken: z.string().trim().min(1),
-  refreshToken: z.string().trim().min(1).nullable(),
-  expiresAtUtc: timestamp.nullable(),
-  user: authUserSchema.nullable(),
-});
-
 export const messageResponseSchema = z.looseObject({ message: z.string() });

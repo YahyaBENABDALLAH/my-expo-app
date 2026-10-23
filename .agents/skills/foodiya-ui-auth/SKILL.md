@@ -33,7 +33,14 @@ its system canvas so the page's theme background remains visible between groups.
 Compose `UniversalTextContent` and `UniversalButtonContent` inside the frame.
 Buttons use the shared theme tokens and still require an explicit `variant`.
 
-Keep session operations, validation and form state in the auth feature.
+Keep validation/form coordination in the auth feature and session I/O in the
+existing auth services. Registration's getting-started section retains only the
+verification information; do not promise recipe publishing, favorites or product
+roles in this generic starter. Auth copy is neutral in English, French and Arabic.
+Account keeps `auth-logout`; its `auth-logout-error` message and retry remain when
+durable storage deletion fails. Background revocation does not keep the button
+pending after local sign-out. The [API guide](../../../docs/api-services.md#session-model-and-logout)
+owns that lifecycle and its backend/native verification limits.
 
 The wordmark comes from `getAppBrand().name`, uppercased for this frame.
 `getBrandHeadingFont` selects the configured platform family for the current

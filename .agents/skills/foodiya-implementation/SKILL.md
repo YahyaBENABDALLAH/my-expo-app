@@ -1,6 +1,6 @@
 ---
 name: foodiya-implementation
-description: Implement or change features in this Foodiya repository using its existing routes, feature workflows, services, native UI, and localization boundaries. Use for application implementation patterns and component-skill selection; SDK upgrades and EAS delivery use the Expo skills.
+description: Implement or change features in this Foodiya repository using its existing routes, feature workflows, services, native UI, and localization boundaries. Use for application implementation patterns, ESLint architecture boundaries and component-skill selection; SDK upgrades and EAS delivery use the Expo skills.
 ---
 
 # Foodiya implementation
@@ -42,6 +42,12 @@ for project guides. Do not duplicate this material in source-folder READMEs.
   The API skill owns their detailed implementation rules.
 - Extend the current pattern without reorganizing unrelated features or adding
   generic repositories, extra barrels, or new libraries just to fit an example.
+- Preserve the [enforced import boundaries](../../../docs/architecture.md#enforced-import-boundaries).
+  Extend `restrictImports` when changing an ESLint scope so shared native-control,
+  route and Storybook policies survive flat-config replacement. Keep small recovery
+  submissions in the existing form flow; extract a workflow for actual coordination,
+  not to satisfy a filename pattern. Use the existing
+  [client setup checklist](../../../docs/development.md#client-setup-checklist) for a new brand.
 
 ## Verify and finish
 
@@ -55,7 +61,8 @@ Automated suites and Maestro flows are absent. Keep stable native selectors and
 do not add a test runner or restore historical test commands unless requested.
 Update native examples for reusable UI changes and run
 `npm run storybook:generate` when story files change. Follow the current
-[preview workflow](../../../docs/storybook.md); registration alone does not make
-retained fixtures runnable. Report static checks, live-backend verification and
+[preview workflow](../../../docs/storybook.md): the catalog flag controls links and
+protected routes; `npm run storybook` exposes the development-only fixture entry.
+Registration alone does not establish device behavior. Report static checks, live-backend verification and
 native device observations separately. Update the existing guide or component
 skill when its implemented contract changes.

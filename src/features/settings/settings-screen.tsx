@@ -32,6 +32,7 @@ import i18n, { SUPPORTED_LANGUAGES, type Language } from '@/lib/i18n';
 import { version as appVersion } from '../../../package.json';
 import { HeaderMotionPicker } from './header-motion-picker';
 import { SettingsRow } from './settings-row';
+import { developerScreensEnabled } from '@/config/developer-tools';
 
 const languageKeys: Record<Language, string> = {
   fr: 'common.french',
@@ -141,14 +142,16 @@ export function SettingsPage({
                 }
               />
             </FieldGroup.Section>
-            <FieldGroup.Section title={t('settings.components')} titleUppercase>
-              <SettingsRow
-                label={t('settings.componentList')}
-                testID="app-settings-component-list"
-                onPress={() => router.push('/ui')}
-                trailing={chevron}
-              />
-            </FieldGroup.Section>
+            {developerScreensEnabled && (
+              <FieldGroup.Section title={t('settings.components')} titleUppercase>
+                <SettingsRow
+                  label={t('settings.componentList')}
+                  testID="app-settings-component-list"
+                  onPress={() => router.push('/ui')}
+                  trailing={chevron}
+                />
+              </FieldGroup.Section>
+            )}
             <FieldGroup.Section title={t('settings.about')} titleUppercase>
               <SettingsRow label={t('settings.appVersion')} detail={appVersion} />
             </FieldGroup.Section>

@@ -13,6 +13,7 @@ export type FloatingActionButtonProps = {
   onPress: () => void;
   disabled?: boolean;
   colorScheme?: 'light' | 'dark';
+  testID?: string;
 };
 
 const filters = Icon.select({
@@ -46,10 +47,12 @@ export function FloatingActionButton({
   onPress,
   disabled,
   colorScheme,
+  testID = 'tab-context-action',
 }: FloatingActionButtonProps) {
   const colors = useThemeColors(useHostColorScheme(colorScheme));
   return (
     <NativeFloatingActionButton
+      testID={testID}
       label={label}
       onPress={onPress}
       disabled={disabled}

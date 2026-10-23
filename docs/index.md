@@ -30,10 +30,7 @@ skills; [documentation ownership](documentation.md) explains where to update eac
 
 ## Builds and engineering
 
-- [Development and preview guest browsing](development-guest-mode.md)
 - [EAS development builds](eas-development-builds.md)
-- [Cleanup and build verification — 2026-10-10](build-verification.md)
-- [Engineering quality and product cleanup](engineering-quality.md)
 - [White-label template implementation plan](white-label-template-plan.md)
 - [Local SonarQube analysis](sonarqube.md)
 
@@ -46,6 +43,9 @@ skills; [documentation ownership](documentation.md) explains where to update eac
 These describe earlier project states and verification limits. Use the current
 guides and source for implementation decisions.
 
+- [Retired development guest browsing](development-guest-mode.md)
+- [Cleanup and build verification — 2026-10-10](build-verification.md)
+- [Engineering quality report — 2026-10-11](engineering-quality.md)
 - [Code quality report](code-quality-report.md)
 - [Global check report](global-check-report.md)
 - [global project audit 2026 10 16](global-project-audit-2026-10-16.md)

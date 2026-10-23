@@ -4,6 +4,7 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
   useRef,
   useState,
@@ -18,6 +19,7 @@ import { PageHeaderTouchShield } from './page-header-touch-shield';
 import { PageWaveContext } from './page-wave-context';
 import { useThemeColors } from '@/hooks/use-theme';
 import { useHostColorScheme } from '../host/universal-host';
+import { StartupLayoutContext } from '@/context/startup-layout.context';
 
 const PageHeaderInsetContext = createContext(0);
 
@@ -46,6 +48,11 @@ export function PageFrame({
   scrollsBehindHeader?: boolean;
 }>) {
   const colors = useThemeColors(useHostColorScheme(colorScheme));
+  const onStartupLayout = useContext(StartupLayoutContext);
+  const laidOut = useRef(false);
+  useEffect(() => {
+    if (laidOut.current) onStartupLayout?.();
+  }, [onStartupLayout]);
   const insets = useSafeAreaInsets();
   const blurHeader = headerBlur && Boolean(title);
   const scrollHeader = blurHeader && scrollsBehindHeader && !headerOverlay;
@@ -91,7 +98,13 @@ export function PageFrame({
   );
   const ContentView = blurHeader ? BlurTargetView : View;
   return (
-    <View style={{ flex: 1, backgroundColor: colors.background }}>
+    <View
+      style={{ flex: 1, backgroundColor: colors.background }}
+      onLayout={() => {
+        laidOut.current = true;
+        onStartupLayout?.();
+      }}
+    >
       {!floating && header}
       <SafeAreaInsetsContext.Provider value={contentInsets}>
         <PageHeaderInsetContext.Provider value={scrollHeader ? headerHeight : 0}>

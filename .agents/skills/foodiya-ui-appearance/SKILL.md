@@ -36,11 +36,16 @@ resumes live native appearance after a fixed choice. Language restores
 through the existing provider; French, English and Arabic use dictionary autonyms
 and Arabic changes live RTL without remounting forms.
 
-HeaderMotionPicker offers Dunes, Ribbon and Rain. The root provider's
+HeaderMotionPicker offers Default, Dunes, Ribbon and Rain. Default uses the
+rectangular native header; the other choices retain their animated artwork and
+iOS SVG mask. Both manifests select Dunes initially through `presentation.header`.
+The root provider's
 `persistHeaderMotion` also opts into saving the Reduce Motion boolean. Header
 motion uses `appHeaderMotion`; reduction uses `appReducedMotion`. Restoration
-joins launch readiness, validates stored values and defaults removed effects to
-Dunes. Writes are serialized. Persistence flags default to false; local Storybook
+joins launch readiness, validates stored styles and retains the configured initial
+style when storage is missing/invalid/unavailable. The storage key is unchanged,
+so existing Dunes/Ribbon/Rain choices survive. Reads wait for queued writes and
+writes are serialized. Persistence flags default to false; local Storybook
 and Text preview providers remain in memory and must not write app preferences.
 
 Settings has a labeled native `Switch` with selector `app-settings-reduce-motion`.
@@ -48,8 +53,10 @@ On freezes custom header, Lottie, skeleton and OTP artwork and
 disables stack motion; Off enables custom animation. Until explicitly selected,
 the system setting is observed live. `useAppReducedMotion` and `useMotionEnabled`
 are the shared readers; activity/visibility checks remain in force. Root config
-aligns Reanimated with this preference. The two-second launch hold is retained
-even when reduction skips the slide.
+aligns Reanimated with this preference. Branded launch retains its two-second
+hold when reduction skips the slide; minimal launch adds no hold. See the
+[launch contract](../foodiya-ui-launch-screen/SKILL.md) for modes, recovery and
+the separate `app-ready`/`app-recovery` layout conditions.
 
 Settings contains real Account/sign-in navigation, appearance, language, showcase
 navigation and app version. Placeholder notification/account/legal rows are gone.

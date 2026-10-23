@@ -1,4 +1,4 @@
-import type { FontSource } from 'expo-font';
+import { isLoaded, type FontSource } from 'expo-font';
 import { Platform } from 'react-native';
 import bluePepe from '@assets/animations/blue-pepe.lottie';
 import assets from '../../config/brand-assets.json';
@@ -25,6 +25,7 @@ export function getBrandFonts(brand: AppBrand = getAppBrand()): Record<string, F
 /** Unsupported scripts keep native fallback instead of forcing a Latin font. */
 export function getBrandHeadingFont(language: string, brand: AppBrand = getAppBrand()) {
   const font = assets.headingFonts[brand.presentation.headingFont];
+  if (font.runtimeName && !isLoaded(font.runtimeName)) return undefined;
   if (!font.languages.some((supported) => supported === language)) return undefined;
   return (Platform.OS === 'ios' ? font.nativeFamily.ios : font.nativeFamily.android) ?? undefined;
 }

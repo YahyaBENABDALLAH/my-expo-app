@@ -6,6 +6,8 @@
   "icon": "./assets/images/icon.png",
   "presentation": {
     "palette": "ux",
+    "header": "dunes",
+    "launch": "minimal",
     "headingFont": "system",
     "launchArtwork": "templateIcon"
   },

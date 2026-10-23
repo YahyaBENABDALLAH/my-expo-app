@@ -22,6 +22,7 @@ function NativeFormDemo({
   frameColorScheme,
   grouped = false,
   viewportHeight,
+  fieldSelectors = true,
 }: {
   pending?: boolean;
   icons?: boolean;
@@ -30,6 +31,7 @@ function NativeFormDemo({
   frameColorScheme?: 'light' | 'dark';
   grouped?: boolean;
   viewportHeight?: number;
+  fieldSelectors?: boolean;
 }) {
   const [submissions, setSubmissions] = useState(0);
   const form = useForm<LoginFormValues>({
@@ -50,7 +52,7 @@ function NativeFormDemo({
             ? Icon.select({ ios: 'person', android: require('@expo/material-symbols/person.xml') })
             : undefined
         }
-        testID="native-form-login"
+        testID={fieldSelectors ? 'native-form-login' : undefined}
         disabled={pending}
         autoCapitalize="none"
         returnKeyType="next"
@@ -67,7 +69,7 @@ function NativeFormDemo({
             : undefined
         }
         passwordToggle={icons ? 'icon' : 'button'}
-        testID="native-form-password"
+        testID={fieldSelectors ? 'native-form-password' : undefined}
         password
         disabled={pending}
         onEdited={() => {}}
@@ -126,6 +128,8 @@ type Story = StoryObj<typeof meta>;
 export const SharedHost: Story = {};
 
 export const Pending: Story = { args: { pending: true } };
+
+export const WithoutFieldSelectors: Story = { args: { fieldSelectors: false } };
 
 export const GroupedForm: Story = { args: { grouped: true } };
 

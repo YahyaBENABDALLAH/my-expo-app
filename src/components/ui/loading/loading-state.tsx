@@ -83,23 +83,27 @@ export function QueryContent<T>({
   children,
   disabledMessage,
   emptyMessage,
+  testID,
 }: {
   query: ContentQuery<T>;
   empty?: boolean;
   disabledMessage?: string;
   emptyMessage?: string;
+  /** Prefix for this composition's status and retry controls. */
+  testID?: string;
   children: ReactNode;
 }) {
   const { t } = useTranslation();
   return (
-    <Column spacing={spacing.lg}>
+    <Column spacing={spacing.lg} testID={testID}>
       {query.error ? (
         <>
-          <Text testID="query-error">
+          <Text testID={testID ? `${testID}-error` : 'query-error'}>
             {query.data === undefined ? t('query.failed') : t('query.refreshFailed')}
           </Text>
           <UniversalButtonContent
             variant="secondary"
+            testID={testID ? `${testID}-retry` : 'query-retry'}
             label={t('common.retry')}
             onPress={() => {
               void query.refetch();
@@ -109,17 +113,18 @@ export function QueryContent<T>({
         </>
       ) : null}
       {query.fetchStatus === 'paused' ? (
-        <Text testID="query-offline">
+        <Text testID={testID ? `${testID}-offline` : 'query-offline'}>
           {query.data === undefined ? t('query.offline') : t('query.offlineCached')}
         </Text>
       ) : null}
       {query.fetchStatus === 'fetching' ? (
         <LoadingContent
+          testID={testID ? `${testID}-loading` : undefined}
           label={query.data === undefined ? t('common.loading') : t('common.refreshing')}
         />
       ) : null}
       {query.data === undefined && !query.error && query.fetchStatus === 'idle' ? (
-        <Text testID="query-idle">
+        <Text testID={testID ? `${testID}-idle` : 'query-idle'}>
           {query.isEnabled ? t('query.waiting') : (disabledMessage ?? t('query.disabled'))}
         </Text>
       ) : null}

@@ -4,7 +4,7 @@ import { queryClient } from '@/lib/react-query';
 import { SessionChangedError } from './auth.errors';
 import type { AuthSession, AuthUser } from '@/types/auth-session.types';
 import type { TokenResponse } from '@/types/auth.types';
-import { authSessionSchema, tokenResponseSchema } from '@/validation/schemas/api/auth';
+import { normalizeAuthSession } from './auth.mapper';
 
 export type { AuthSession } from '@/types/auth-session.types';
 
@@ -12,6 +12,7 @@ const STORAGE_KEY = 'auth.session';
 let currentSession: AuthSession | null | undefined;
 let sessionVersion = 0;
 let storageQueue: Promise<unknown> = Promise.resolve();
+let pendingClear: { version: number; clearVersion: number; promise: Promise<void> } | null = null;
 type SessionEvent = { session: AuthSession | null; reason: 'updated' | 'cleared' };
 const listeners = new Set<(event: SessionEvent) => void>();
 
@@ -21,6 +22,11 @@ export function getSessionVersion() {
 
 export function assertSessionVersion(version: number) {
   if (version !== sessionVersion) throw new SessionChangedError();
+}
+
+/** Source generation whose durable removal still owns the temporary cleared state. */
+export function isSessionClearing(version: number) {
+  return pendingClear?.version === version && pendingClear.clearVersion === sessionVersion;
 }
 
 function queueStorage<T>(operation: () => Promise<T>): Promise<T> {
@@ -40,31 +46,6 @@ export function subscribeAuthSession(listener: (event: SessionEvent) => void) {
   };
 }
 
-function normalizeSession(data: unknown): AuthSession {
-  if (data && typeof data === 'object' && 'accessTokenExpiresAtUtc' in data) {
-    // Retain restoration support for the previous wire-token storage format.
-    const token = tokenResponseSchema.safeParse(data);
-    if (!token.success) throw new Error('Invalid authentication response.');
-    const value = token.data;
-    return {
-      accessToken: value.accessToken,
-      refreshToken: value.refreshToken,
-      expiresAtUtc: value.accessTokenExpiresAtUtc,
-      user: {
-        uuid: value.userId,
-        email: value.email,
-        firstName: value.firstName,
-        lastName: value.lastName,
-        role: value.roles[0] ?? null,
-        isChef: value.roles.some((role) => role.toUpperCase() === 'CHEF'),
-      },
-    };
-  }
-  const stored = authSessionSchema.safeParse(data);
-  if (!stored.success) throw new Error('Invalid saved authentication session.');
-  return stored.data;
-}
-
 export async function getAuthSession(): Promise<AuthSession | null> {
   if (currentSession !== undefined) return currentSession;
   const version = sessionVersion;
@@ -77,7 +58,7 @@ export async function getAuthSession(): Promise<AuthSession | null> {
     return currentSession;
   }
   try {
-    currentSession = normalizeSession(JSON.parse(raw));
+    currentSession = normalizeAuthSession(JSON.parse(raw));
     return currentSession;
   } catch {
     await clearAuthSession(version);
@@ -91,11 +72,11 @@ export async function getAccessToken() {
 
 /** Serialize the entire token pair in one storage write. */
 export function persistAuthSession(data: TokenResponse | AuthSession, version = sessionVersion) {
-  const session = normalizeSession(data);
+  const session = normalizeAuthSession(data);
   return queueStorage(async () => {
     assertSessionVersion(version);
     const previousUser = currentSession?.user;
-    if (previousUser && session.user?.uuid === previousUser.uuid) {
+    if (previousUser && session.user.uuid === previousUser.uuid) {
       const nextUser = { ...previousUser, ...session.user };
       session.user = Object.keys(nextUser).every(
         (key) => nextUser[key as keyof AuthUser] === previousUser[key as keyof AuthUser],
@@ -115,7 +96,7 @@ export function persistAuthSession(data: TokenResponse | AuthSession, version = 
 export async function establishAuthSession(token: TokenResponse, expectedVersion: number) {
   assertSessionVersion(expectedVersion);
   // Validate before starting a new session generation.
-  normalizeSession(token);
+  normalizeAuthSession(token);
   const version = ++sessionVersion;
   queryClient.clear();
   const session = await persistAuthSession(token, version);
@@ -126,8 +107,8 @@ export async function establishAuthSession(token: TokenResponse, expectedVersion
 export function updateAuthUser(updates: Partial<AuthUser>, expectedVersion = sessionVersion) {
   return queueStorage(async () => {
     assertSessionVersion(expectedVersion);
-    if (!currentSession?.user) throw new Error('account.loginUpdate');
-    const session = normalizeSession({
+    if (!currentSession) throw new Error('account.loginUpdate');
+    const session = normalizeAuthSession({
       ...currentSession,
       user: { ...currentSession.user, ...updates },
     });
@@ -140,29 +121,35 @@ export function updateAuthUser(updates: Partial<AuthUser>, expectedVersion = ses
 }
 
 /** Publish sign-out only after the stored credentials are durably removed. */
-export async function clearAuthSession(expectedVersion = sessionVersion) {
-  if (expectedVersion !== sessionVersion) return;
+export function clearAuthSession(expectedVersion = sessionVersion): Promise<void> {
+  if (
+    pendingClear?.clearVersion === sessionVersion &&
+    (expectedVersion === pendingClear.version || expectedVersion === pendingClear.clearVersion)
+  )
+    return pendingClear.promise;
+  if (expectedVersion !== sessionVersion) return Promise.resolve();
   const previousSession = currentSession;
   const clearVersion = ++sessionVersion;
 
   // Stop new requests from using credentials while durable cleanup is pending.
   currentSession = null;
 
-  try {
-    await queueStorage(() => SecureStore.deleteItemAsync(STORAGE_KEY));
-  } catch (error) {
-    // The UI has not received a cleared event, so restore the matching session
-    // and let the caller show a retryable logout failure.
-    if (sessionVersion === clearVersion) {
+  const promise = queueStorage(() => SecureStore.deleteItemAsync(STORAGE_KEY))
+    .catch((error: unknown) => {
+      // Restore only this generation after a storage failure; newer sessions win.
+      if (sessionVersion !== clearVersion) throw new SessionChangedError();
       sessionVersion = expectedVersion;
       currentSession = previousSession;
-    }
-    throw error;
-  }
-
-  // A newer session owns application state from this point onward.
-  if (sessionVersion !== clearVersion) return;
-  queryClient.clear();
-
-  publish('cleared');
+      throw error;
+    })
+    .then(() => {
+      if (sessionVersion !== clearVersion) return;
+      queryClient.clear();
+      publish('cleared');
+    })
+    .finally(() => {
+      if (pendingClear?.promise === promise) pendingClear = null;
+    });
+  pendingClear = { version: expectedVersion, clearVersion, promise };
+  return promise;
 }

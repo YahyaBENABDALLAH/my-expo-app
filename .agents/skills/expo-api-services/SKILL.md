@@ -1,6 +1,6 @@
 ---
 name: expo-api-services
-description: "Create or update this project's entity API services, DTOs, TanStack Query options, hooks and cache invalidation. Use when adding an entity, changing backend endpoints or payloads, adding documented writes, or fixing service pagination, cancellation or cache behavior. Authentication lifecycle and native UI have separate workflows."
+description: "Create or update this project's API services, DTOs, response/session boundaries, TanStack Query options, hooks and cache invalidation. Use for endpoint contracts, auth transport/session mapping/logout, documented writes, pagination, cancellation and cache behavior. Extend the existing auth lifecycle; native UI uses its component skills."
 ---
 
 # Expo API Services
@@ -21,17 +21,25 @@ Use Context7 for TanStack Query or Axios API syntax when needed: resolve the lib
 
 The starter retains authentication in `src/services/auth/` and generic request/query/mutation/invalidation helpers in `src/services/`. Recipe-specific services and DTOs have been removed. Use `auth.api.ts`, `auth.queries.ts` and the generic helpers as current examples; add a feature entity only for a real backend contract.
 
-| Location                                    | Responsibility                                                     |
-| ------------------------------------------- | ------------------------------------------------------------------ |
-| `src/types/<entity>.types.ts`               | Item, list query/result and supported write DTOs                   |
-| `src/validation/schemas/api/<entity>.ts`    | Runtime response shape; item DTOs infer from these Zod schemas     |
-| `src/lib/api-query-keys.ts`                 | Pure entity key factory and any additional endpoint keys           |
-| `src/services/<entity>/<entity>.service.ts` | HTTP through `apiClient`; request normalization and paths          |
-| `<entity>.queries.ts`                       | Typed list/detail/infinite options and additional documented reads |
-| `<entity>.mutations.ts`                     | Supported writes and mandatory cache maintenance                   |
-| `<entity>.hooks.ts`                         | Query hooks, supported mutation hooks and entity invalidation      |
+| Location                                   | Responsibility                                                     |
+| ------------------------------------------ | ------------------------------------------------------------------ |
+| `src/types/<entity>.types.ts`              | Item, list query/result and supported write DTOs                   |
+| `src/validation/schemas/api/<entity>.ts`   | Runtime response shape; item DTOs infer from these Zod schemas     |
+| `src/lib/api-query-keys.ts`                | Pure entity key factory and any additional endpoint keys           |
+| Existing entity `.api.ts` or `.service.ts` | HTTP through `apiClient`; request normalization and paths          |
+| `<entity>.queries.ts`                      | Typed list/detail/infinite options and additional documented reads |
+| `<entity>.mutations.ts`                    | Supported writes and mandatory cache maintenance                   |
+| `<entity>.hooks.ts`                        | Query hooks, supported mutation hooks and entity invalidation      |
 
 Create the mutation module only when there are supported writes. Keep services independent of React, navigation, feature modules and cache effects. Use exact module imports; keep all non-route code outside `src/app/`. Direct service calls do not maintain the query cache.
+
+Both transport suffixes share the existing ESLint boundary. General query hooks,
+session storage, device metadata and auth lifecycle have their own current owners;
+do not apply the entity-transport rule to every service file. Schemas, DTOs and
+`.mapper.ts` modules have the pure-module policy. Preserve shared restrictions
+when extending flat-config scopes and verify allowed/forbidden cases without
+adding a runner. See the canonical
+[architecture boundaries](../../../docs/architecture.md#enforced-import-boundaries).
 
 Use `src/services/api.config.ts` for native API configuration and the shared
 `config/api.js` normalizer/timeout. Do not read the API environment independently
@@ -45,7 +53,8 @@ release prerequisites. See the [configuration boundaries](../foodiya-implementat
 - Add a Zod response schema for every consumed JSON entity/auth response and attach it with the transport's `responseSchema` option. `apiClient` validates once before returning data to callers or TanStack Query. Do not cast an unvalidated response into a DTO, or repeat parsing in screens.
 - Infer item/auth response DTOs from the schema. Preserve documented required fields, optional fields and nullability. Use `z.looseObject` for additive entity/profile fields; validate pagination integers and boolean flags with `paginatedResponseSchema`. Avoid restricting identifier/date formats beyond the established backend contract.
 - Malformed successful responses become `ApiResponseValidationError` with a safe message and no raw payload, token values or Zod input attached. The shared query retry policy does not retry this error. Do not invalidate or seed caches from malformed write responses, and do not automatically repeat authenticated writes.
-- Validate both stored canonical sessions and supported legacy token responses in `auth.session.ts`, before persistence/restoration. Require a nonempty user identifier and tokens, correctly typed metadata and ISO token expirations. Corrupt stored sessions are removed; invalid updates must preserve the previous valid session. Keep the existing generation, serialization and token-rotation failure safeguards.
+- Keep Identity wire schemas in `validation/schemas/api/auth.ts`. Frontend storage/display schemas live in `validation/schemas/auth-session.ts`; `auth.mapper.ts` validates/maps fresh tokens and supported legacy records without I/O. Canonical sessions require a nonempty access token and identified user. Preserve explicitly supported nullable refresh/expiry metadata for older canonical records; non-null tokens/dates must remain valid. Backend `roles` stay in wire DTOs, without unused frontend chef/role flags. Corrupt stored sessions are removed; invalid updates preserve the previous valid session and generation.
+- Logout captures the access-token string and checks ownership after its asynchronous read, then awaits durable local deletion/cache cleanup. Start bounded revocation afterward with an explicit captured bearer on the existing unauthenticated client; do not await it, refresh it, read live credentials or alert a new account on failure. Repeated local clears share the owning promise; same-generation deletion failure restores retryable local state, while stale failure cannot restore another account. See [session lifecycle](../../../docs/api-services.md#session-model-and-logout) for limits and manual checks.
 
 ## Preserve query behavior
 

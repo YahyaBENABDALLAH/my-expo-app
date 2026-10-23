@@ -21,9 +21,9 @@ function CollapsibleDemo({ content, ...args }: DemoProps) {
         args.onOpenChange(next);
       }}
     >
-      <Column testID={`${args.testID}-content`} spacing={8}>
+      <Column testID={args.testID ? `${args.testID}-content` : undefined} spacing={8}>
         <Text
-          testID={`${args.testID}-text`}
+          testID={args.testID ? `${args.testID}-text` : undefined}
           textStyle={{
             fontSize: 16,
           }}

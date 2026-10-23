@@ -25,11 +25,18 @@ Non-password fields retain caller-supplied secure-entry and trailing-icon props.
 Password toggles preserve the native value, ref and validation lifecycle.
 Error messages take priority over helpers and render only when present. Messages
 wrap naturally without reserving empty space. Selectors retain the supplied field
-ID with `-error` or `-helper` suffixes.
+ID with `-error` or `-helper` suffixes. The text password toggle appends
+`-visibility`; the icon toggle uses the input's `-right-icon`. Derive these only
+when the optional field ID is present; omission leaves them unassigned rather
+than producing `undefined-*`. Supply explicit field IDs for application actions.
+Translated Show/Hide password names remain independent of selectors and update
+with visibility. The shared field forwards its visible label as its native
+editable-control name; see the input skill for native verification limits.
 
 Existing [auth stories](../../../.rnstorybook/stories/forms/auth-screen.stories.tsx)
-cover FormTextInput/FormSubmit; page stories (retired fixture)
-cover ordinary string inputs. See the [input guide](../foodiya-ui-text-input/SKILL.md) and
+cover FormTextInput/FormSubmit, including `WithoutFieldSelectors` for optional-ID
+omission. The in-app Text input page covers ordinary string inputs. See the
+[input guide](../foodiya-ui-text-input/SKILL.md) and
 [UI guide](../../../docs/ui.md).
 
 Follow the [implementation pattern](../foodiya-implementation/SKILL.md) and

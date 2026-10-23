@@ -120,6 +120,7 @@ export function VerifyEmailScreen() {
       </Column>
       <UniversalButtonContent
         variant="link"
+        testID="auth-verify-login"
         label={t('auth.backToSignIn')}
         disabled={busy}
         onPress={() => {

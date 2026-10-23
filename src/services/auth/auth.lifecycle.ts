@@ -2,6 +2,8 @@ import {
   establishAuthSession,
   getAuthSession,
   getSessionVersion,
+  assertSessionVersion,
+  isSessionClearing,
   clearAuthSession,
 } from './auth.session';
 import { requestNewToken } from './auth.refresh';
@@ -12,16 +14,28 @@ export { establishAuthSession as establishSession };
 
 let pendingLogout: { version: number; promise: Promise<void> } | null = null;
 
-/** Remote revocation is best effort; local removal must finish even offline. */
+async function endSession(version: number) {
+  const accessToken = (await getAuthSession())?.accessToken;
+  assertSessionVersion(version);
+  await clearAuthSession(version);
+  if (accessToken) {
+    void logout(accessToken).catch(() => {
+      // Local sign-out is complete. An old revoke failure must not alert a new account.
+    });
+  }
+}
+
+/** Complete durable local sign-out without waiting for best-effort revocation. */
 export function signOut(): Promise<void> {
   const version = getSessionVersion();
-  if (pendingLogout?.version === version) return pendingLogout.promise;
-  const promise = logout()
-    .catch(reportErrorAlert)
-    .then(() => clearAuthSession(version))
-    .finally(() => {
-      if (pendingLogout?.promise === promise) pendingLogout = null;
-    });
+  if (
+    pendingLogout &&
+    (pendingLogout.version === version || isSessionClearing(pendingLogout.version))
+  )
+    return pendingLogout.promise;
+  const promise = endSession(version).finally(() => {
+    if (pendingLogout?.promise === promise) pendingLogout = null;
+  });
   pendingLogout = { version, promise };
   return promise;
 }

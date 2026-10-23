@@ -5,6 +5,7 @@ import Animated, { useAnimatedProps } from 'react-native-reanimated';
 import Svg, { G, Path, type GProps, type PathProps } from 'react-native-svg';
 import { UniversalHost } from '../host/universal-host';
 import type { PageWaveSurfaceProps } from './page-wave-surface.types';
+import { vectorPathToSvg } from './page-header-shapes';
 
 const AnimatedGroup = Animated.createAnimatedComponent(G);
 const AnimatedPath = Animated.createAnimatedComponent(Path);
@@ -26,8 +27,13 @@ export function PageWaveSurface({
   reduceTransparency,
 }: PageWaveSurfaceProps) {
   const { fit, backDrift, frontDrift } = wave;
-  const frontPathProps = useAnimatedProps<PathProps>(() => ({ d: wave.frontSvg.get() }));
-  const backPathProps = useAnimatedProps<PathProps>(() => ({ d: wave.backSvg.get() }));
+  // Serialize only where SVG is rendered; Android and launch edges keep numeric paths.
+  const frontPathProps = useAnimatedProps<PathProps>(() => ({
+    d: vectorPathToSvg(wave.frontContour.get()),
+  }));
+  const backPathProps = useAnimatedProps<PathProps>(() => ({
+    d: vectorPathToSvg(wave.backContour.get()),
+  }));
   const fitProps = useAnimatedProps<GProps>(
     () => {
       const transform = fit.get();

@@ -1,34 +1,76 @@
 import { useThemeColors } from '@/hooks/use-theme';
 import { Canvas, Group, LinearGradient, Path } from '@shopify/react-native-skia';
-import type { ReactNode } from 'react';
+import { useLayoutEffect, useState, type ReactNode } from 'react';
 import { View } from 'react-native';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { PageWaveContext } from './page-wave-context';
 import { PAGE_WAVE_HEIGHT, usePageWaveMotion } from './use-page-wave-motion';
 import type { PageHeaderShape } from './page-header-shapes';
+import type { PageHeaderStyle } from '@/constants/header-motion';
 
 export { PAGE_WAVE_HEIGHT } from './use-page-wave-motion';
 export type { PageHeaderShape } from './page-header-shapes';
+export type { PageHeaderStyle } from '@/constants/header-motion';
 
 /** Header waves are absolute decoration; their SVG bounds never reserve content space. */
+type PageMotionOverlayProps = {
+  animate?: boolean;
+  colorScheme?: 'light' | 'dark';
+  variant?: 'overlay' | 'splash';
+  shape?: PageHeaderStyle;
+  expanded?: boolean;
+  onCollapseComplete?: () => void;
+  children?: ReactNode;
+  visible?: boolean;
+};
+
 export function PageMotionOverlay({
+  children,
+  shape,
+  variant = 'overlay',
+  visible = true,
+  ...props
+}: PageMotionOverlayProps) {
+  const [motion, setMotion] = useState<ReturnType<typeof usePageWaveMotion> | null>(null);
+  const waves = variant === 'splash' || shape !== 'default';
+  const artwork = waves ? (
+    <PageMotionArtwork
+      {...props}
+      shape={shape === 'default' ? undefined : shape}
+      variant={variant}
+      visible={visible}
+      onMotion={variant === 'splash' ? undefined : setMotion}
+    />
+  ) : null;
+
+  // Keep navigation at the same position when changing the header style.
+  // Only the decoration mounts/unmounts; geometry updates publish before paint.
+  return (
+    <PageWaveContext.Provider value={waves && visible && variant !== 'splash' ? motion : null}>
+      {children !== undefined ? (
+        <View style={{ flex: 1 }}>
+          {children}
+          {artwork}
+        </View>
+      ) : (
+        artwork
+      )}
+    </PageWaveContext.Provider>
+  );
+}
+
+function PageMotionArtwork({
   animate = true,
   colorScheme,
   variant = 'overlay',
   shape,
   expanded = false,
   onCollapseComplete,
-  children,
   visible = true,
-}: {
-  animate?: boolean;
-  colorScheme?: 'light' | 'dark';
-  variant?: 'overlay' | 'splash';
+  onMotion,
+}: Omit<PageMotionOverlayProps, 'shape' | 'children'> & {
   shape?: PageHeaderShape;
-  expanded?: boolean;
-  onCollapseComplete?: () => void;
-  children?: ReactNode;
-  visible?: boolean;
+  onMotion?: (motion: ReturnType<typeof usePageWaveMotion> | null) => void;
 }) {
   const scheme = useColorScheme(colorScheme);
   const colors = useThemeColors(scheme);
@@ -40,6 +82,10 @@ export function PageMotionOverlay({
     shape,
     onCollapseComplete,
   });
+  useLayoutEffect(() => {
+    onMotion?.(motion);
+    return () => onMotion?.(null);
+  }, [motion, onMotion]);
   const {
     frontWave,
     backWave,
@@ -111,16 +157,5 @@ export function PageMotionOverlay({
     </View>
   ) : null;
 
-  return (
-    <PageWaveContext.Provider value={visible && !splash ? motion : null}>
-      {children !== undefined ? (
-        <View style={{ flex: 1 }}>
-          {children}
-          {artwork}
-        </View>
-      ) : (
-        artwork
-      )}
-    </PageWaveContext.Provider>
-  );
+  return artwork;
 }

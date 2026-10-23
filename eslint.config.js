@@ -29,19 +29,71 @@ const nativeControlImports = [
 // include these shared boundaries so a later override cannot reopen them.
 const sharedImportPatterns = [
   {
-    group: ['@storybook', '@storybook/*', 'storybook/*', '**/.rnstorybook', '**/.rnstorybook/**'],
-    message: 'Keep Storybook imports in src/features/storybook and .rnstorybook.',
-  },
-  {
     group: ['@/app/**', '**/app/**'],
     message: 'Import feature modules instead of route files.',
   },
 ];
+const storybookImportPatterns = [
+  {
+    regex: '^(?:@storybook(?:/|$)|storybook(?:/|$))|(?:^|/)\\.rnstorybook(?:/|$)',
+    message: 'Keep Storybook imports in src/features/storybook and .rnstorybook.',
+  },
+];
+const serviceImportPatterns = [
+  {
+    group: [
+      '@/features/**',
+      '@/components/**',
+      '@components/**',
+      '@/context/**',
+      '**/features/**',
+      '**/components/**',
+      '**/context/**',
+    ],
+    message: 'Services must not depend on feature presentation or UI contexts.',
+  },
+];
+const cacheImportPatterns = [
+  {
+    regex:
+      '(^|/)(?:react-query|query-(?:utils|hooks|invalidation|refresh)|[^/]+\\.(?:queries|mutations|hooks))(?:\\.[cm]?[jt]sx?)?$',
+    message: 'Query/cache effects belong in query/mutation modules and their consumers.',
+  },
+];
+const transportImportPatterns = [
+  ...serviceImportPatterns,
+  ...cacheImportPatterns,
+  {
+    group: [
+      'react',
+      'react/**',
+      'react-native',
+      'react-native/**',
+      'expo*',
+      '@expo/**',
+      '@tanstack/**',
+    ],
+    message:
+      'Entity transport owns HTTP contracts; React, navigation and cache effects belong in consumers or query/mutation modules.',
+  },
+];
+const screenFiles = [
+  'src/app/**/*.{ts,tsx}',
+  'src/features/**/*screen*.{ts,tsx}',
+  'src/features/**/screens/**/*.{ts,tsx}',
+];
 
-function restrictImports(patterns = []) {
+function restrictImports(patterns = [], { allowStorybook = false } = {}) {
   return [
     'error',
-    { paths: nativeControlImports, patterns: [...sharedImportPatterns, ...patterns] },
+    {
+      paths: nativeControlImports,
+      patterns: [
+        ...sharedImportPatterns,
+        ...(allowStorybook ? [] : storybookImportPatterns),
+        ...patterns,
+      ],
+    },
   ];
 }
 
@@ -62,28 +114,45 @@ module.exports = defineConfig([
   },
   {
     files: ['src/**/*.{ts,tsx}'],
-    ignores: ['src/features/storybook/**'],
     rules: { 'no-restricted-imports': restrictImports() },
   },
   {
-    files: ['src/features/recipes/*screen*.tsx'],
+    files: ['src/features/storybook/**/*.{ts,tsx}'],
+    rules: { 'no-restricted-imports': restrictImports([], { allowStorybook: true }) },
+  },
+  {
+    files: screenFiles,
+    // These entry points intentionally compose the developer catalog/fixtures.
+    ignores: [
+      'src/app/ui.tsx',
+      'src/app/ui-component/**',
+      'src/app/storybook.tsx',
+      'src/features/ui-showcase/**',
+      'src/features/pages/screens.tsx',
+      'src/features/storybook/**',
+    ],
     rules: {
       'no-restricted-imports': restrictImports([
         {
-          group: [
-            '@/services/api',
-            '**/services/api',
-            './recipe.api',
-            '@react-native-async-storage/async-storage',
-            '@/services/auth/auth.session',
-            '**/services/auth/auth.session',
-          ],
+          regex:
+            '(^|/)(?:services/(?:api|api\\.config|request-utils)|auth\\.session)(?:\\.[cm]?[jt]sx?)?$',
           message:
-            'Screens compose feature queries/mutations; transport, storage and session writes belong in feature adapters.',
+            'Screens consume endpoint functions and feature workflows; low-level HTTP configuration and session storage belong in their existing owners.',
         },
         {
-          group: ['@/features/ui-showcase/**', '**/ui-showcase/**'],
-          message: 'Keep sample content in the UI showcase; product screens render real data.',
+          group: ['axios', 'axios/**', 'expo-secure-store', '@react-native-async-storage/**'],
+          message:
+            'Screens do not own HTTP clients or persisted storage. Use the existing workflow or preference owner.',
+        },
+        {
+          group: [
+            '@/features/ui-showcase/**',
+            '**/ui-showcase/**',
+            '@/features/storybook/**',
+            '**/features/storybook/**',
+          ],
+          message:
+            'Keep developer examples in their catalog/Storybook entries; product screens render real data.',
         },
       ]),
     },
@@ -91,70 +160,82 @@ module.exports = defineConfig([
   {
     files: ['src/services/**/*.{ts,tsx}'],
     rules: {
-      'no-restricted-imports': restrictImports([
-        {
-          group: [
-            '@/features/**',
-            '@/components/**',
-            '@components/**',
-            '@/context/**',
-            '**/features/**',
-            '**/components/**',
-            '**/context/**',
-          ],
-          message: 'Infrastructure must not depend on screens or UI.',
-        },
-      ]),
+      'no-restricted-imports': restrictImports(serviceImportPatterns),
     },
   },
   {
-    files: ['src/services/**/*.service.ts'],
+    files: ['src/services/**/*.{service,api}.{ts,tsx}'],
+    rules: {
+      'no-restricted-imports': restrictImports(transportImportPatterns),
+    },
+  },
+  {
+    files: ['src/services/auth/auth.refresh.ts'],
     rules: {
       'no-restricted-imports': restrictImports([
+        ...serviceImportPatterns,
         {
-          group: [
-            'react',
-            '@tanstack/**',
-            'expo-router',
-            '@/features/**',
-            '@/components/**',
-            '@components/**',
-            '@/context/**',
-            '**/features/**',
-            '**/components/**',
-            '**/context/**',
-          ],
+          regex: '(^|/)(?:api|auth\\.api|auth\\.lifecycle)(?:\\.[cm]?[jt]sx?)?$',
           message:
-            'Entity services own transport contracts; rendering and cache effects belong in consumers and query/mutation modules.',
+            'Refresh must keep its raw transport independent of the authenticated client, auth endpoints and lifecycle to avoid interceptor cycles.',
         },
       ]),
     },
   },
   {
     files: [
-      'src/features/recipes/recipe-draft.ts',
-      'src/features/recipes/chef-profile.ts',
-      'src/features/recipes/query-keys.ts',
+      'src/validation/schemas/**/*.{ts,tsx}',
+      'src/types/**/*.{ts,tsx}',
+      'src/**/*.mapper.{ts,tsx}',
+      'src/lib/api-query-keys.ts',
+      'src/config/developer-tools.ts',
     ],
     rules: {
       'no-restricted-imports': restrictImports([
+        ...cacheImportPatterns,
+        {
+          regex:
+            '(^|/)(?:api|api\\.config|auth\\.(?:session|refresh|lifecycle)|device-installation|[^/]+\\.(?:api|service))(?:\\.[cm]?[jt]sx?)?$',
+          message:
+            'Pure modules must not import transport, native storage or auth lifecycle owners.',
+        },
+        {
+          regex:
+            '(^|/)(?:lib/(?:i18n|alerts|error-alerts)|config/(?:brand|brand-assets))(?:\\.[cm]?[jt]sx?)?$',
+          message:
+            'Pure modules must not import native brand accessors, initialized translation or feedback state.',
+        },
         {
           group: [
             'react',
+            'react/**',
+            'react-i18next',
+            'react-hook-form',
             'react-native',
+            'react-native/**',
             'expo*',
             '@expo/**',
             '@tanstack/**',
-            '@react-native-async-storage/**',
+            '@react-native*/**',
+            'axios',
+            'axios/**',
+            'node:*',
+            'fs',
+            'fs/**',
             '@/services/**',
+            '@/features/**',
+            '@/hooks/**',
             '@/context/**',
             '@/components/**',
             '@components/**',
             '**/services/**',
+            '**/features/**',
+            '**/hooks/**',
             '**/context/**',
             '**/components/**',
           ],
-          message: 'Domain rules and cache identifiers stay independent of rendering and I/O.',
+          message:
+            'Schemas, DTOs, mappers and pure configuration stay independent of rendering, query caches and I/O.',
         },
       ]),
     },
@@ -185,9 +266,19 @@ module.exports = defineConfig([
     rules: {
       'no-restricted-imports': restrictImports([
         {
-          group: ['@/features/**', '**/features/**', '@components/ui'],
+          group: [
+            '@/features/**',
+            '**/features/**',
+            '@components/ui',
+            '@/services/**',
+            '**/services/**',
+            'axios',
+            'axios/**',
+            'expo-secure-store',
+            '@react-native-async-storage/**',
+          ],
           message:
-            'UI implementations import siblings directly and stay independent of feature workflows and route modules.',
+            'UI implementations import siblings directly and receive workflow/data callbacks; keep feature orchestration, transport and storage outside shared UI.',
         },
       ]),
     },

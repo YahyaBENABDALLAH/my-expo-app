@@ -8,6 +8,7 @@ export function NativeFloatingActionButton({
   label,
   onPress,
   disabled,
+  testID: id,
 }: NativeFloatingActionButtonProps) {
   return (
     <Button
@@ -21,11 +22,7 @@ export function NativeFloatingActionButton({
         disabledContainerColor: color,
       }}
       contentPadding={{ start: 0, end: 0, top: 0, bottom: 0 }}
-      modifiers={[
-        size(76, 76),
-        testID('tab-context-action'),
-        semantics({ contentDescription: label }),
-      ]}
+      modifiers={[size(76, 76), testID(id), semantics({ contentDescription: label })]}
     >
       {children}
     </Button>

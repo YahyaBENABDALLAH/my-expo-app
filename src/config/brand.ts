@@ -2,6 +2,7 @@ import Constants from 'expo-constants';
 import { z } from 'zod';
 import assets from '../../config/brand-assets.json';
 import { themes, type ThemeId } from '@/constants/themes/index';
+import { isHeaderStyle, type PageHeaderStyle } from '@/constants/header-motion';
 
 export type HeadingFontId = keyof typeof assets.headingFonts;
 export type LaunchArtworkId = keyof typeof assets.launchArtworks;
@@ -11,6 +12,8 @@ const publicBrandSchema = z.object({
   name: z.string().min(1),
   variant: z.enum(['development', 'preview', 'production']),
   presentation: z.object({
+    header: z.custom<PageHeaderStyle>(isHeaderStyle),
+    launch: z.enum(['minimal', 'branded']),
     palette: z.custom<ThemeId>(
       (value) => typeof value === 'string' && Object.hasOwn(themes, value),
     ),

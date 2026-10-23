@@ -18,6 +18,10 @@ import type { TextInputIconButtonProps } from './text-input-native';
 // Both SecureField and TextField use the same unpadded native style.
 export const inputRowFlex = [textFieldStyle('plain'), frame({ maxWidth: Infinity })];
 
+export function inputAccessibilityModifiers(label?: string) {
+  return label ? [nativeAccessibilityLabel(label)] : [];
+}
+
 export function inputFieldAppearance(
   style: NonNullable<RowProps['style']>,
 ): Pick<RowProps, 'style' | 'modifiers'> {

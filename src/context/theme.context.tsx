@@ -12,8 +12,8 @@ import { themes, type ThemeId } from '@/constants/themes/index';
 import type { AppColorScheme } from '@/constants/themes/tokens';
 import {
   DEFAULT_HEADER_SHAPE,
-  isHeaderShape,
-  type PageHeaderShape,
+  isHeaderStyle,
+  type PageHeaderStyle,
 } from '@/constants/header-motion';
 
 const HEADER_STORAGE_KEY = 'appHeaderMotion';
@@ -33,8 +33,8 @@ interface ThemeSettings {
   setThemeId: (theme: ThemeId) => void;
   setColorScheme: (scheme: ColorSchemePreference) => void;
   appearanceReady: boolean;
-  headerShape: PageHeaderShape;
-  setHeaderShape: (shape: PageHeaderShape) => void;
+  headerShape: PageHeaderStyle;
+  setHeaderShape: (shape: PageHeaderStyle) => void;
   headerMotionReady: boolean;
   reducedMotion: boolean | null;
   setReducedMotion: (reduced: boolean) => void;
@@ -55,7 +55,7 @@ export function ThemePreferencesProvider({
 }: PropsWithChildren<{
   initialTheme?: ThemeId;
   initialColorScheme?: ColorSchemePreference;
-  initialHeaderShape?: PageHeaderShape;
+  initialHeaderShape?: PageHeaderStyle;
   initialReducedMotion?: boolean | null;
   persistHeaderMotion?: boolean;
   /** Only the app root persists appearance; isolated previews stay in memory. */
@@ -91,13 +91,16 @@ export function ThemePreferencesProvider({
   useEffect(() => {
     if (!persistHeaderMotion) return;
     let active = true;
-    void Promise.all([
-      AsyncStorage.getItem(HEADER_STORAGE_KEY),
-      AsyncStorage.getItem(REDUCED_MOTION_STORAGE_KEY),
-    ])
+    void preferencePersistence
+      .then(() =>
+        Promise.all([
+          AsyncStorage.getItem(HEADER_STORAGE_KEY),
+          AsyncStorage.getItem(REDUCED_MOTION_STORAGE_KEY),
+        ]),
+      )
       .then(([stored, reduced]) => {
         if (!active) return;
-        if (isHeaderShape(stored)) updateHeaderShape(stored);
+        if (isHeaderStyle(stored)) updateHeaderShape(stored);
         if (reduced === 'true' || reduced === 'false') updateReducedMotion(reduced === 'true');
       })
       .catch(() => {
@@ -131,8 +134,8 @@ export function ThemePreferencesProvider({
     [appearanceReady, persistAppearance],
   );
   const setHeaderShape = useCallback(
-    (shape: PageHeaderShape) => {
-      if (!headerMotionReady || !isHeaderShape(shape)) return;
+    (shape: PageHeaderStyle) => {
+      if (!headerMotionReady || !isHeaderStyle(shape)) return;
       updateHeaderShape(shape);
       if (persistHeaderMotion) {
         preferencePersistence = preferencePersistence

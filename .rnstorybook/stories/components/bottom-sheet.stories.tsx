@@ -33,7 +33,7 @@ function BottomSheetDemo({ title, content, onOpen, onClose, ...args }: DemoProps
     <View style={{ gap: 20 }}>
       <UniversalButton
         variant="secondary"
-        testID={`${args.testID}-open`}
+        testID={args.testID ? `${args.testID}-open` : undefined}
         label="Open bottom sheet"
         colorScheme={args.colorScheme}
         onPress={() => {
@@ -41,7 +41,10 @@ function BottomSheetDemo({ title, content, onOpen, onClose, ...args }: DemoProps
           onOpen();
         }}
       />
-      <UniversalText testID={`${args.testID}-state`} colorScheme={args.colorScheme}>
+      <UniversalText
+        testID={args.testID ? `${args.testID}-state` : undefined}
+        colorScheme={args.colorScheme}
+      >
         {`State: ${isPresented ? 'Open' : 'Closed'}. Swipe down or tap Close to dismiss.`}
       </UniversalText>
       <UniversalText colorScheme={args.colorScheme}>
@@ -56,20 +59,27 @@ function BottomSheetDemo({ title, content, onOpen, onClose, ...args }: DemoProps
           args.onDismiss();
         }}
       >
-        <Column testID={`${args.testID}-content`} spacing={16} modifiers={nativeFillWidth}>
+        <Column
+          testID={args.testID ? `${args.testID}-content` : undefined}
+          spacing={16}
+          modifiers={nativeFillWidth}
+        >
           <UniversalTextContent
-            testID={`${args.testID}-title`}
+            testID={args.testID ? `${args.testID}-title` : undefined}
             textStyle={{ fontSize: 24, fontWeight: '700' }}
           >
             {title}
           </UniversalTextContent>
-          <UniversalTextContent testID={`${args.testID}-description`} textStyle={{ fontSize: 16 }}>
+          <UniversalTextContent
+            testID={args.testID ? `${args.testID}-description` : undefined}
+            textStyle={{ fontSize: 16 }}
+          >
             {content}
           </UniversalTextContent>
           <UniversalButtonContent
             variant="secondary"
             fullWidth
-            testID={`${args.testID}-close`}
+            testID={args.testID ? `${args.testID}-close` : undefined}
             label="Close"
             onPress={() => {
               setIsPresented(false);

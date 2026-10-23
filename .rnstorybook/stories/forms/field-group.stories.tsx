@@ -51,7 +51,7 @@ function FieldGroupDemo({
   return (
     <UniversalFieldGroup {...args}>
       <FieldGroup.Section
-        testID={`${args.testID}-preferences`}
+        testID={args.testID ? `${args.testID}-preferences` : undefined}
         title={title}
         titleUppercase={titleUppercase}
       >
@@ -61,7 +61,7 @@ function FieldGroupDemo({
           </FieldGroup.SectionHeader>
         ) : null}
         <Switch
-          testID={`${args.testID}-notifications`}
+          testID={args.testID ? `${args.testID}-notifications` : undefined}
           label="Notifications"
           value={notify}
           disabled={args.disabled}
@@ -72,7 +72,7 @@ function FieldGroupDemo({
         />
         {!singleRow ? (
           <Checkbox
-            testID={`${args.testID}-terms`}
+            testID={args.testID ? `${args.testID}-terms` : undefined}
             label="Accept terms"
             value={checked}
             disabled={args.disabled}
@@ -82,7 +82,7 @@ function FieldGroupDemo({
             }}
           />
         ) : null}
-        <Text testID={`${args.testID}-state`}>
+        <Text testID={args.testID ? `${args.testID}-state` : undefined}>
           {`Notifications: ${notify ? 'On' : 'Off'} · Terms: ${checked ? 'Accepted' : 'Not accepted'}`}
         </Text>
         {footer ? (
@@ -93,14 +93,16 @@ function FieldGroupDemo({
       </FieldGroup.Section>
       {showSecondSection ? (
         <FieldGroup.Section
-          testID={`${args.testID}-audio`}
+          testID={args.testID ? `${args.testID}-audio` : undefined}
           title="Audio"
           titleUppercase={titleUppercase}
         >
           <Column spacing={8}>
-            <Text testID={`${args.testID}-volume-value`}>{`Volume: ${Math.round(level)}%`}</Text>
+            <Text
+              testID={args.testID ? `${args.testID}-volume-value` : undefined}
+            >{`Volume: ${Math.round(level)}%`}</Text>
             <Slider
-              testID={`${args.testID}-volume`}
+              testID={args.testID ? `${args.testID}-volume` : undefined}
               value={level}
               min={0}
               max={100}

@@ -19,7 +19,6 @@ import {
   drawVectorPath,
   headerContour,
   HEADER_MOTION_PERIOD,
-  vectorPathToSvg,
   type PageHeaderShape,
 } from './page-header-shapes';
 import { headerDetails } from './page-header-details';
@@ -72,8 +71,13 @@ export function usePageWaveMotion({
   );
   const phase = useSharedValue(0);
   const fillEdge = -height / scaleY;
-  const frontContour = useDerivedValue(() => headerContour(shape, phase.get(), 0, fillEdge));
-  const backContour = useDerivedValue(() => headerContour(shape, phase.get(), 1, fillEdge));
+  // Splash artwork uses cached paths; it never subscribes these contours to the clock.
+  const frontContour = useDerivedValue(() =>
+    splash ? [] : headerContour(shape, phase.get(), 0, fillEdge),
+  );
+  const backContour = useDerivedValue(() =>
+    splash ? [] : headerContour(shape, phase.get(), 1, fillEdge),
+  );
   const frontWave = usePathValue((builder) => {
     'worklet';
     if (splashPaths) builder.addPath(splashPaths.front);
@@ -89,8 +93,6 @@ export function usePageWaveMotion({
     if (!splash) drawVectorPath(builder, headerDetails(shape, phase.get()));
   });
   const detailOpacity = useDerivedValue(() => 0.28);
-  const frontSvg = useDerivedValue(() => vectorPathToSvg(frontContour.get()));
-  const backSvg = useDerivedValue(() => vectorPathToSvg(backContour.get()));
   const width = useSharedValue(0);
   const offset = useSharedValue(target);
 
@@ -151,19 +153,21 @@ export function usePageWaveMotion({
   );
   // Header paths deform locally. Only the splash retains its original rigid drift.
   const frontDrift = useDerivedValue(() => {
+    if (!splash) return [{ translateX: 0 }, { translateY: 0 }, { scaleY: 1 }, { scaleX: 1 }];
     const movement = Math.sin(((phase.get() * 1000) / WAVE_DURATION_MS) * 2 * Math.PI);
     return [
-      { translateX: splash ? movement * 40 * horizontalDirection : 0 },
-      { translateY: splash ? movement * 2 : 0 },
+      { translateX: movement * 40 * horizontalDirection },
+      { translateY: movement * 2 },
       { scaleY: 1 },
       { scaleX: 1 },
     ];
   });
   const backDrift = useDerivedValue(() => {
+    if (!splash) return [{ translateX: 0 }, { translateY: 0 }, { scaleY: 1 }, { scaleX: 1 }];
     const movement = Math.sin(((phase.get() * 1000) / WAVE_DURATION_MS) * 2 * Math.PI);
     return [
-      { translateX: splash ? -movement * 50 * horizontalDirection : 0 },
-      { translateY: splash ? -movement * 3 : 0 },
+      { translateX: -movement * 50 * horizontalDirection },
+      { translateY: -movement * 3 },
       { scaleY: 1 },
       { scaleX: 1 },
     ];
@@ -176,8 +180,8 @@ export function usePageWaveMotion({
       detailOpacity,
       frontWave,
       backWave,
-      frontSvg,
-      backSvg,
+      frontContour,
+      backContour,
       fit,
       gradientStart,
       gradientEnd: vec(0, splash ? 0 : HEADER_WAVE_HEIGHT),
@@ -194,8 +198,8 @@ export function usePageWaveMotion({
       detailOpacity,
       frontWave,
       backWave,
-      frontSvg,
-      backSvg,
+      frontContour,
+      backContour,
       fit,
       gradientStart,
       frontDrift,

@@ -31,22 +31,27 @@ its height to the shared wave. Safe-area changes apply to the retained title
 height immediately. Titleless frames keep their existing safe-area-only layout.
 `Components/Page Header/NavigationContinuity` remounts Home and Details beneath
 one paused wave to inspect first-render height and Back round trips.
-The page-frame fixtures cover incomplete layout, initial clearance, valid growth
-and shrinkage, and measurements from inactive screens. These checks use mocked
-native boundaries; device layout and transition appearance remain manual checks.
+Earlier page-frame fixtures covered incomplete layout and measurements with
+mocked native boundaries; those suites are retired. Current native layout and
+transition appearance remain manual checks.
 
 `PageMotionOverlay` wraps root navigation with `PageWaveContext`. The header uses
 original cubic vector artwork with independently moving control points. The leading
 40% stays level beneath the title/back button; only the trailing surface deforms.
-Dunes (the default), Ribbon and Rain are the supported effects. Rain adds twelve staggered falling drops and impact ripples.
+Dunes, Ribbon and Rain remain the animated effects; both manifests still select
+Dunes initially. Settings also offers Default, the ordinary rectangular native
+header with no decorative motion. Rain adds twelve staggered falling drops and impact ripples.
 The shared active-time clock drives all paths on the UI thread. Skia uses numeric
 `usePathValue` builders without SVG parsing; the iOS native material mask receives
-animated SVG `d` values from the same control points. Android uses the same Skia
-paths for its mask. No animation frame sets React state. RTL mirrors the whole
+animated SVG `d` values from the same control points. SVG serialization lives only
+in the iOS surface's unconditional `useAnimatedProps` callbacks; Android uses
+numeric Skia paths and never serializes header SVG. Splash uses cached paths and
+never evaluates the deforming header contours. No animation frame sets React state. RTL mirrors the whole
 artwork. The header stays within its measured bounds and adds no content spacing.
 Settings → Appearance → Header motion uses a native menu picker to select an effect.
 The change is immediate throughout the app and is saved in AsyncStorage. Restoration
-finishes beneath the launch screen; invalid/unavailable storage falls back to Dunes.
+finishes beneath the launch screen; invalid/unavailable storage retains the
+configured initial style (currently Dunes).
 Storybook's local preference provider never reads or writes this saved preference.
 Static SVG counterparts are in `assets/images/header-motion/`; production animates
 those vector contours and details through the shared geometry helpers.
@@ -59,6 +64,16 @@ paused time, and a delayed frame advances by at most 64 ms to avoid a sudden jum
 The optional `children` slot supplies this context to local previews; `visible`
 hides the artwork and mask without remounting navigation. Splash waves keep their
 existing opaque fills and do not supply a blur mask.
+
+`PageMotionOverlay.shape` accepts the three contours or `'default'`. The outer
+provider and children keep the same React position across style changes; only
+the private artwork component mounts/unmounts. That component publishes its
+stable motion object before paint on geometry changes, never per animation
+frame. Default mounts no wave hook, frame clock, canvas or SVG mask; its touch
+shield is an ordinary View and its existing rectangular native blur retains
+measured height, safe areas, scrolling, accessibility and the back control.
+Pausing or hiding an animated header keeps its phase; selecting Default releases
+that wave instance and choosing an animated style again starts a fresh phase.
 
 On iOS, `page-wave-surface.ios.tsx` renders an Expo UI SwiftUI `ultraThin` material
 inside a native SwiftUI mask. An animated SVG uses the same wave path strings and
@@ -143,11 +158,18 @@ Login uses it while signed out. Successful login raises
 the wave to the header over one second. Opening Register and returning to Login
 use the same slower transition. `onCollapseComplete` releases navigation only
 after a completed rise, so Home cannot interrupt the successful-login animation.
-Reduced motion snaps to the destination and releases navigation immediately;
-the splash keeps its usual position. `Pages/Shared Skia motion/Login` previews
-the transition with a repeatable button.
+Reduced motion snaps to the destination and releases navigation immediately.
+Default also bypasses the login wave hold because no completion callback will
+run. The auth request and duplicate-submit guards remain with the feature, and
+the splash keeps its usual position. Historical Shared Skia motion fixtures
+predate the current starter; use actual Login for the native auth transition.
 The root mounts it above navigation and enables it on Android and iOS after the
 launch screen exits. It retains its activity and reduced-motion guards.
+
+Retained `PlainHeader` and `ChangeHeaderStyle` compositions cover Default and live
+Dunes/Default switching. The latter toggles through its counted Back control;
+verify that the draft, content count and scroll position survive. Retained
+registration is not a runnable Storybook route or evidence of native behavior.
 Navigation themes, stack content and tab scenes use the active theme's opaque
 `background` token so outgoing text cannot show through an incoming screen.
 Frames, headers and page content reveal their owning scene's background;

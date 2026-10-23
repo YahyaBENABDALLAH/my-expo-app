@@ -41,14 +41,24 @@ selection. A remounted root reads after earlier queued writes have finished.
 
 The root waits for appearance restoration before mounting its custom launch
 overlay. That overlay's first native layout hides the native splash; language,
-header/motion and session readiness still govern its exit. This gates the first
+header/motion, session resolution and the initial page frame's native layout
+govern its exit. This gates the first
 app presentation; the OS's initial native splash appearance remains native.
 Explicit component and Host scheme overrides retain their existing priority.
 
 Language uses its existing saved provider. Header effect and the explicit motion
-choice still restore before launch completion. Unsupported saved header effects
-fall back to Dunes. Persistence remains opt-in; preview providers use neither
+choice still restore before launch completion. Header choices include Default,
+Dunes, Ribbon and Rain; unsupported saved values retain the manifest's initial
+style (currently Dunes). Default avoids mounting the wave/canvas/mask while
+retaining the rectangular native header. Existing animated choices and saved
+values are preserved. Persistence remains opt-in; preview providers use neither
 storage flag. The palette itself is never saved as a user preference.
+
+The [launch contract](../.agents/skills/foodiya-ui-launch-screen/SKILL.md) defines
+minimal/branded presentation, optional-font fallback, foreground timing and the
+separate successful `app-ready` and failed-restoration `app-recovery` selectors.
+Recovery skips the branding delay. Source checks do not establish native startup
+timing or frame rates.
 
 ## Text foregrounds and verification
 

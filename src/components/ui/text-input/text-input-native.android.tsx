@@ -12,6 +12,10 @@ import type { TextInputIconButtonProps } from './text-input-native';
 
 export const inputRowFlex = [weight(1)];
 
+export function inputAccessibilityModifiers(label?: string) {
+  return label ? [semantics({ contentDescription: label })] : [];
+}
+
 export function inputFieldAppearance(
   style: NonNullable<RowProps['style']>,
 ): Pick<RowProps, 'style' | 'modifiers'> {

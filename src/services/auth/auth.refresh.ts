@@ -36,6 +36,7 @@ async function rotateToken(version: number) {
     );
     token = response.data;
   } catch (error) {
+    assertSessionVersion(version);
     if (isSessionInvalid(error)) await clearAuthSession(version);
     throw error;
   }
@@ -44,6 +45,7 @@ async function rotateToken(version: number) {
   try {
     await persistAuthSession(token, version);
   } catch (error) {
+    assertSessionVersion(version);
     // Rotation consumes the old refresh token; discard it if saving fails.
     await clearAuthSession(version);
     throw error;

@@ -7,6 +7,7 @@ import {
 
 export type UniversalCollapsibleProps = CollapsibleProps & UniversalThemeProps;
 
+/** The Host ID identifies this fixture's layout, not its native disclosure header. */
 export function UniversalCollapsible({
   colorScheme,
   seedColor,

@@ -10,7 +10,9 @@
       "environment": "development",
       "env": {
         "APP_BRAND": "likan",
-        "APP_VARIANT": "development"
+        "APP_VARIANT": "development",
+        "EXPO_PUBLIC_ENABLE_DEV_SCREENS": "true",
+        "EXPO_PUBLIC_STORYBOOK_ENABLED": "false"
       },
       "ios": {
         "image": "macos-tahoe-26.6-xcode-27.1",
@@ -26,7 +28,8 @@
       "env": {
         "APP_BRAND": "likan",
         "APP_VARIANT": "preview",
-        "EXPO_PUBLIC_ENABLE_DEV_SCREENS": "true"
+        "EXPO_PUBLIC_ENABLE_DEV_SCREENS": "true",
+        "EXPO_PUBLIC_STORYBOOK_ENABLED": "false"
       }
     },
     "production": {
@@ -38,7 +41,8 @@
       "env": {
         "APP_BRAND": "likan",
         "APP_VARIANT": "production",
-        "EXPO_PUBLIC_ENABLE_DEV_SCREENS": "false"
+        "EXPO_PUBLIC_ENABLE_DEV_SCREENS": "false",
+        "EXPO_PUBLIC_STORYBOOK_ENABLED": "false"
       }
     }
   },

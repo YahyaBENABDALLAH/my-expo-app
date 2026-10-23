@@ -156,8 +156,8 @@
     "otpAutoSubmit": "Le code est vérifié automatiquement après le sixième chiffre.",
     "otpDigit": "Chiffre {{index}} sur {{count}}",
     "tryAnotherEmail": "Utiliser un autre e-mail",
-    "loginDescription": "Connectez-vous pour découvrir et partager vos recettes préférées.",
-    "registerDescription": "Rejoignez notre communauté et commencez votre aventure culinaire.",
+    "loginDescription": "Connectez-vous pour accéder à votre compte.",
+    "registerDescription": "Créez votre compte pour commencer.",
     "profileSection": "Votre profil",
     "optionalNames": "Le prénom et le nom sont facultatifs.",
     "securitySection": "Compte et sécurité",
@@ -166,7 +166,6 @@
     "preferredLanguageHelp": "Choisissez la langue des e-mails liés à votre compte.",
     "accountIncludes": "Pour commencer",
     "registrationVerificationHelp": "Nous vous enverrons un code à six chiffres par e-mail pour finaliser votre inscription.",
-    "registrationRecipesHelp": "Enregistrez vos favoris et partagez vos propres recettes.",
     "enterPassword": "Saisissez votre mot de passe",
     "createPassword": "Créez un mot de passe",
     "confirmPassword": "Confirmez le mot de passe",
@@ -232,6 +231,7 @@
     "legalDescription": "Accord de licence d’utilisateur final",
     "headerMotion": "Animation de l’en-tête",
     "headerShapes": {
+      "default": "Par défaut",
       "dunes": "Dunes",
       "ribbon": "Ruban",
       "rain": "Pluie"
@@ -675,7 +675,9 @@
     "tip": "Conseil {{index}}",
     "homeExamples": "Exemples d’interface de recettes",
     "homeExamplesDescription": "Cartes locales, squelettes et contrôles interactifs pour le développement. Ces exemples ne modifient pas vos préférences de recettes.",
-    "floatingActions": "Actions flottantes"
+    "floatingActions": "Actions flottantes",
+    "queryStates": "Chargement et nouvelle tentative",
+    "queryStatesHint": "Réessayez chaque section séparément. Terminer l’une laisse l’autre inchangée."
   },
   "examples": {
     "toast": "Tartine d’avocat",

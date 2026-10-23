@@ -76,7 +76,141 @@ contracts continue to belong to their existing skills. See
   component skills describe the current ownership; dimensions, edge activation,
   live Arabic and physical RTL clipping still need native device checks. No
   connected native target was available.
-- Steps 6–12 remain planned. Package versions and linked cloud projects were not
+- Step 6 source integration implemented on 2026-10-23: recovery/account/verification
+  actions and shared query retry expose explicit IDs. Optional password and
+  Collapsible fixture suffixes are conditional. Query content accepts an instance
+  prefix; floating actions accept an explicit ID while preserving their default.
+  Visible input labels reach native editable-control naming modifiers through
+  the existing platform adapters. No new wrapper family, package or test runner
+  is introduced. Component skills own these contracts and their limits.
+- The in-app Loading and retry page and retained RepeatedQueries fixture share
+  two independent local examples. Buttons preserves its existing floating action
+  and adds explicit enabled/disabled content actions; retained RepeatedActions
+  covers independent standalone counts. WithoutFieldSelectors covers omitted
+  form IDs. These examples support manual checks; they are not native execution.
+- Step 6 upstream gaps: Collapsible has no supported header-specific selector;
+  an outer Host/Column ID does not solve that. Android's universal input maps
+  noneditable to read-only without exposing native enabled state. VoiceOver/
+  TalkBack output, focus, large text, RTL and activation remain pending. No
+  connected native device target is available in this session.
+- Step 6 verification: `npm run check`, native story registration, locale-key
+  parity, changed skill metadata and local documentation links pass. A type-aware
+  review of 222 maintained source/fixture files found 47 more nullable ID suffixes
+  in retained fixtures; these now omit derived IDs when their prefix is absent.
+  No unguarded nullable template ID remains in that review. All targeted auth/
+  root form and button actions have explicit IDs in source. Android and iOS
+  Hermes exports pass without backend configuration; source-map checks match
+  the current shared controls/screens and the appropriate platform adapters,
+  with Storybook and the Node brand resolver excluded. These checks do not close
+  the native acceptance criteria below.
+- Step 7 source integration implemented on 2026-10-23 with the requested animated
+  SVG/header behavior retained. Both manifests still select Dunes; Settings adds
+  a saved Default rectangular header through the existing preference owner. Its
+  wave/clock/canvas/mask unmount while the navigation subtree keeps its position.
+  Animated pauses preserve their phase; re-enabling from Default starts a new
+  wave instance. Header geometry, SVG assets, native blur and interaction remain.
+- Common motion now publishes numeric contours. Only the iOS native material
+  mask serializes SVG, through its existing animated-prop callbacks. Android
+  consumes numeric Skia paths; cached launch paths skip header contours/details.
+  Header-only identity drift no longer reads the frame clock. React state only
+  publishes geometry/lifecycle changes, never individual animation frames.
+- `presentation.launch` selects minimal for the neutral template and branded for
+  Likan. Branded retains the two-second foreground hold and two-second upward
+  exit; backgrounding pauses the hold/exit. Recovery uses minimal presentation.
+  `app-ready` now requires successful hydration/auth, launch exit and initial page
+  frame layout; restoration failure exposes `app-recovery`. Optional font errors
+  use native typography. Default/reduced-motion login cannot await a wave that
+  will not complete. Native startup, saved-style changes, login/recovery, focus,
+  large text, RTL and background/reduced-motion observations remain pending.
+- Step 7 verification: `npm run check`, story registration, locale-key parity,
+  changed skill metadata and local links pass. All eight header/launch pairs are
+  accepted; invalid/missing presentation fields produce field-specific errors.
+  Resolved template/Likan development and Likan production configs preserve
+  identity and project references. All four local Android/iOS Hermes exports pass
+  without API credentials. Each map matches 13 current startup/motion sources,
+  selects its native surface and excludes Storybook/Node resolution. Source
+  review finds exactly two SVG-serialization calls, both in the iOS surface;
+  the original contour/detail geometry is unchanged. No native target was
+  connected, so no startup-duration or frame-rate improvement is claimed.
+- Step 8 source integration implemented on 2026-10-23: frontend session schemas
+  now require an identified user and live separately from unchanged Identity wire
+  schemas/DTOs. A pure auth mapper retains legacy wire-token restoration and
+  canonical nullable refresh/expiry metadata, strips old unused role/chef flags,
+  and rejects invalid updates before persistence. Neutral auth copy replaces
+  recipe promises; registration's obsolete recipe-info row is retired.
+- Logout captures the old access-token string and checks its generation, awaits
+  durable local deletion/cache cleanup, then starts bounded revocation with the
+  explicit captured bearer on the existing unauthenticated client. Remote failure
+  is consumed; it cannot refresh, read new credentials or mutate session/cache
+  state. Matching clear/logout calls share pending work. Same-generation storage
+  failure remains retryable through `auth-logout`/`auth-logout-error`; stale
+  completion/failure cannot restore or clear a newer account. Refresh retains its
+  raw transport and now checks generation before failure cleanup as well.
+- Step 8 verification: `npm run check` passes. Fifteen isolated JavaScript
+  scenarios using in-memory native-storage/network adapters pass for legacy and
+  malformed records, invalid updates, delayed/failed revoke, rapid taps, failed
+  deletion/retry, overlapping account changes, refresh deduplication, temporary
+  failure, invalid sessions and rotation persistence failure. They execute actual
+  auth modules with simulated I/O, issue no backend requests and add no test files
+  or runner. Four wire response schemas and the wire DTO file remain unchanged;
+  locale parity, pure-module imports and changed skill/link validation pass.
+- Step 8 Android and iOS Hermes exports pass without backend configuration.
+  Their source maps match all nine changed auth/schema/screen modules and exclude
+  Storybook and the Node brand resolver. Packages and wire DTOs are unchanged.
+- Native SecureStore failures, Account navigation/feedback and live revocation
+  remain unverified because no native target/backend flow was available. Expired
+  or rejected access tokens, offline operation and process termination can prevent
+  remote revocation; no unsupported refresh-token logout contract is invented.
+- Step 9 source integration implemented on 2026-10-23: the existing public
+  developer-screen flag now owns Home/Settings catalog links and protected root
+  routes. The default is disabled; EAS development/preview enable the catalog and
+  production disables it. An explicit `__DEV__` Storybook route and cross-platform
+  launcher expose retained fixtures, Controls and canvas links. The route reuses
+  PageFrame for cold-link startup readiness and Back navigation. Both embedded
+  profile flags and the exact local launch workflow are documented.
+- Step 9 maintains direct primitive exports and documents concrete wrapper
+  responsibilities plus the native adapter upgrade checklist. The deliberate
+  Expo UI/Router pins remain unchanged. Catalog route hiding is explicitly
+  separate from code removal: 22 showcase modules remain in each inspected client
+  graph. Storybook sources are absent from client and preview release exports,
+  including the client check with their public opt-in set to true.
+- Step 9 verification: `npm run check`, story registration, 24 isolated flag/Home
+  combinations, all three protected-route declarations and launcher forwarding/
+  environment isolation checks pass. Actual Expo-manifest development bundle URLs
+  return HTTP 200 for Android and iOS with Storybook and retained fixtures present.
+  Release source maps are checked separately from those development bundles.
+  Final Hermes inspection confirms catalog/Storybook values of false/false in
+  client bundles and true/false in preview bundles on both platforms. A clean
+  export corrects an observed SDK 57 transform-cache reuse after changing flags;
+  the preview guide now requires `--clear` for that switch and compiled-value
+  inspection, since original source-map text alone cannot prove flag values.
+  No suite/runner, dependency version, native primitive wrapper or cloud operation
+  is added. Native cold/direct links, Back, Controls, state retention, layout and
+  device interactions remain unverified.
+- Step 10 source enforcement implemented on 2026-10-23: retired recipe lint scopes
+  are replaced with current route/screen, service `.api.ts`/`.service.ts`, pure
+  schema/DTO/mapper/key/preview-flag and shared-UI boundaries. Common native-control,
+  route and Storybook restrictions survive scoped overrides. The Storybook feature
+  retains a narrow import exception; catalog/preview composition entries have
+  explicit scope exceptions. Raw refresh also rejects imports that would connect it
+  back to authenticated transport/auth lifecycle.
+- Current recovery submissions remain in their existing `useAuthForm` consumers,
+  preserving challenge keys and completion guards; no runtime refactor was needed.
+  Architecture and implementation/API skills describe the enforced scopes and
+  their static-analysis limits. The existing development guide now has a client
+  setup checklist linking asset, appearance, preview and native upgrade ownership.
+  Auth guidance reflects the implemented reset screen and pending delivery contract;
+  dated engineering/build/guest-mode material is clearly historical in the index.
+- Step 10 import probes pass for 361 isolated allowed/forbidden cases, including
+  both transport suffixes, future screen path conventions, pure modules, UI, raw
+  refresh, shared-policy composition and legitimate preview/auth consumers. No
+  probe files or runner are added. Runtime modules, packages, native animations,
+  wire DTOs and backend behavior are unchanged by this enforcement/docs step.
+- Step 10 verification: `npm run check` and `git diff --check` pass. Changed skill
+  metadata and 125 local documentation links validate. This step changes static
+  enforcement and guidance; native interaction, backend delivery and performance
+  evidence remain with Steps 11–12.
+- Steps 11–12 remain planned. Package versions and linked cloud projects were not
   changed. Both brands' font rendering, artwork and Arabic readability still
   require matching native builds/device checks.
 
@@ -375,12 +509,48 @@ Work:
 Acceptance:
 
 - [ ] Every application-critical action has a stable, actionable native selector.
-- [ ] No generated selector contains `undefined` or depends on language.
-- [ ] Repeated compositions can be distinguished on one screen.
-- [ ] Remaining upstream selector limitations are listed explicitly.
+- [x] Optional suffixes in maintained source/fixtures are guarded; new IDs are
+      language-independent. Native identifier observation remains pending.
+- [x] Repeated query/floating-action compositions accept distinct explicit IDs
+      and have manual examples. Native lookup/activation remains pending.
+- [x] Remaining upstream selector limitations are listed explicitly.
 - [ ] VoiceOver/TalkBack names remain understandable independently of test IDs.
 
+Source review confirms the targeted auth/recovery actions use the existing
+native button adapters: iOS receives `testID` on Button, Android applies its
+Compose `testID` modifier to the interactive control. Existing password-icon,
+floating-action and page-back controls keep translated native action names and
+disabled guards. Input labels now reach the native field separately from IDs.
+The installed Android semantics implementation adds the description without
+clearing editable/value/password semantics. Native announcements still need
+observation, including whether the separate visible label adds a focus stop.
+
+Compatibility gaps remain explicit:
+
+- `@expo/ui` 57.0.21 universal Collapsible exposes no header ID/slot. The lower
+  iOS DisclosureGroup label slot accepts only children and a group ID addresses
+  the whole disclosure; Android creates its clickable header internally. Keep
+  the native export and request a header-specific identifier on both platforms
+  that preserves expansion/accessibility. The showcase external toggle has its
+  own selector and does not stand in for header verification.
+- Android universal TextInput exposes `editable`/`readOnly`, not the underlying
+  BasicTextField's `enabled` state. Disabled input remains noneditable and its
+  trailing action cannot activate; a distinct native disabled announcement needs
+  an upstream API and TalkBack verification. Do not replace the native field or
+  clear semantics merely to change its announcement.
+
+Manual closure: on both native platforms, locate and activate recovery/profile
+retries, Home and verification cancellation by ID. Repeat two query retries and
+two floating actions independently, with pending/disabled/offline suppression.
+Inspect omitted field IDs for absent suffixes, then check VoiceOver/TalkBack
+names/values, secure reveal, focus order, large text and Arabic/RTL. A screenshot
+or successful bundle export alone cannot close these checks.
+
 ### 7. Make startup and header motion configurable and cheaper
+
+Implementation follows the user's clarification to keep animated SVG and header
+artwork. Both brands keep Dunes as their configured initial header. Default is a
+saved optional rectangular style, not removal of the three animated choices.
 
 **Files:** `src/app/_layout.tsx`, launch screen, page frame/motion/surface modules,
 `src/hooks/use-motion-enabled.ts`, existing header/launch examples.
@@ -415,17 +585,31 @@ Work:
 
 Acceptance:
 
-- [ ] Minimal mode introduces no configured branding wait after startup readiness.
-- [ ] Configured branded timing remains available and is accurately documented.
+- [x] Minimal mode has no configured branding hold/slide in source; observed
+      native startup duration remains pending.
+- [x] Configured branded timing remains available and is documented; foreground
+      stopwatch/background-resume observations remain pending.
 - [ ] Restore failure exposes retry and does not expose `app-ready` prematurely.
 - [ ] Login succeeds in static and animated modes without a stuck transition.
-- [ ] Android performs no unused SVG serialization for the header.
-- [ ] Static splash does not execute unused animated header contour/serialization work.
+- [x] Android's exported surface has no header SVG-serialization call; native
+      frame-rate measurements remain pending.
+- [x] Cached splash paths bypass deforming header contours/details and SVG
+      serialization in source; native frame measurements remain pending.
 - [ ] Background and reduced-motion behavior remains correct.
 
 Update the existing launch/mobile/appearance contracts when implementing the new
-defaults. Current skills explicitly require the existing launch timing; it is a
-deliberate behavior change, not an undocumented bug fix.
+defaults. The launch/page/appearance/mobile skills now describe the implemented
+modes and readiness. The neutral template's shorter launch is deliberate; Likan
+keeps branded timing. Retained PlainHeader, ChangeHeaderStyle, MinimalReady and
+MinimalWaiting fixtures support manual checks without adding a test runner.
+Story registration alone did not expose a route in Step 7; Step 9 adds an explicit
+development entry. Native behavior still requires the matching device/build.
+
+The startup layout signal comes from the initial PageFrame's native outer layout.
+It does not establish that every nested native text/field has painted, every
+background request completed or a native interaction/performance check passed.
+Keep the remaining native acceptance observations open until measured on matching
+builds. Source-verified items above describe code paths, not measured timings.
 
 ### 8. Improve auth boundaries and local logout
 
@@ -472,12 +656,24 @@ refresh, so that change could create an initialization cycle and refresh recursi
 
 Acceptance:
 
-- [ ] Slow/offline server logout does not delay successful local durable sign-out.
-- [ ] An old revoke response cannot affect a new account or show it an old error.
-- [ ] Storage deletion failure remains visible and retryable.
-- [ ] Session generations, refresh deduplication, rotation safety and cache cleanup
-      remain in place.
-- [ ] Wire DTOs remain compatible; frontend models no longer imply unused product roles.
+- [x] Local logout completes with delayed/unavailable revocation in isolated
+      JavaScript checks; native timing remains pending.
+- [x] Captured old-token revocation leaves a newer session/cache/alert state intact
+      in source review and simulated late-401 checks.
+- [x] Same-generation deletion failure preserves the account and retry in isolated
+      checks; `auth-logout-error` identifies its UI message. Native observation is pending.
+- [x] Isolated checks retain generation ownership, refresh deduplication, rotation
+      failure cleanup and cache isolation. Native storage behavior remains pending.
+- [x] Wire DTOs and consumed response schemas are unchanged; frontend models no
+      longer imply unused product roles.
+
+The maintained [session/lifecycle guide](api-services.md#session-model-and-logout)
+owns the implemented ordering, storage compatibility and backend limitations.
+These source/isolated results do not establish native SecureStore behavior or
+server-side revocation. With matching iOS/Android builds and a real account,
+complete offline/slow logout, new-login overlap, deletion failure/retry and cached
+identity/refresh checks before closing native verification. No automated suite or
+production fake session is introduced.
 
 ### 9. Make component maintenance runnable and upgrade boundaries honest
 
@@ -510,12 +706,15 @@ Work:
 
 Acceptance:
 
-- [ ] A developer can open the maintained examples using documented commands.
-- [ ] Disabled catalog URLs do not expose the examples in a client build.
-- [ ] Production bundles contain no Storybook integration.
-- [ ] Any stronger claim about stripping showcase code is supported by its artifact.
-- [ ] Every custom wrapper has a concrete responsibility and a maintained owner.
-- [ ] SDK upgrades include native adapter review rather than only compilation.
+- [x] Catalog and opt-in Storybook entries have documented launch commands; native
+      screen execution still needs a matching device/build.
+- [x] The disabled catalog routes have a shared source guard and their navigation
+      links are hidden; installed-device direct-link behavior remains unverified.
+- [x] Inspected Android/iOS release graphs contain no Storybook integration.
+- [x] Showcase modules are explicitly retained; no code-stripping claim is made.
+- [x] Existing custom wrappers have documented concrete responsibilities and owners.
+- [x] The upgrade checklist requires native adapter review and original-case
+      reproduction; this step does not change package versions.
 
 ### 10. Refresh architecture enforcement and documentation
 
@@ -541,10 +740,13 @@ Work:
 
 Acceptance:
 
-- [ ] Rules cover real current source and legitimate workflows still pass.
-- [ ] A new screen has one clear path to UI, workflow and data access.
-- [ ] Documentation explains brand setup and native upgrades without historical scripts.
-- [ ] No new repository/container/base-component hierarchy exists without a concrete need.
+- [x] Rules cover current source and legitimate auth/preview workflows; isolated
+      forbidden/allowed import probes verify the scopes and shared-policy composition.
+- [x] Architecture and skills explain the route/screen/workflow/UI/transport path,
+      keeping small existing form consumers intact.
+- [x] The client setup checklist links current brand, asset, appearance, preview
+      and native adapter upgrade guidance; dated reports are marked historical.
+- [x] No repository/container/base-component hierarchy or runtime rewrite is added.
 
 ### 11. Verify native behavior and establish a performance baseline
 

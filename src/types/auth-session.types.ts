@@ -1,5 +1,5 @@
 import type { z } from 'zod';
-import type { authUserSchema, authSessionSchema } from '@/validation/schemas/api/auth';
+import type { authUserSchema, authSessionSchema } from '@/validation/schemas/auth-session';
 /** Frontend display model, not a Foodiya.Identity response DTO. */
 export type AuthUser = z.infer<typeof authUserSchema>;
 

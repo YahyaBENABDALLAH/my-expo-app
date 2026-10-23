@@ -8,6 +8,7 @@ import {
   UniversalHost,
   UniversalButtonContent,
   UniversalTextContent as Text,
+  TextInput,
   usePageHeaderInset,
 } from '@components/ui';
 import type { Meta, StoryObj } from '@storybook/react-native';
@@ -17,7 +18,7 @@ import { SafeAreaInsetsContext, useSafeAreaInsets } from 'react-native-safe-area
 import { useThemeColors } from '@/hooks/use-theme';
 import { LayoutDirectionProvider } from '@/context/layout-direction.context';
 import { spacing, radii } from '@/constants/layout';
-import { DEFAULT_HEADER_SHAPE, HEADER_SHAPES } from '@/constants/header-motion';
+import { DEFAULT_HEADER_SHAPE, HEADER_STYLES } from '@/constants/header-motion';
 
 function HeaderContent({
   colorScheme,
@@ -32,6 +33,7 @@ function HeaderContent({
   const headerInset = usePageHeaderInset();
   const insets = useSafeAreaInsets();
   const [contentPresses, setContentPresses] = useState(0);
+  const [draft, setDraft] = useState('');
   return (
     <UniversalHost
       colorScheme={colorScheme}
@@ -46,6 +48,12 @@ function HeaderContent({
           style={{ padding: 0, paddingTop: headerInset + insets.top }}
         >
           <PageSection>
+            <TextInput
+              label="Retained draft"
+              value={draft}
+              onChangeText={setDraft}
+              testID="page-header-draft"
+            />
             {onNavigate ? (
               <UniversalButtonContent
                 variant="secondary"
@@ -115,8 +123,8 @@ const meta = {
     showBack: { control: 'boolean' },
     shape: {
       control: 'select',
-      options: HEADER_SHAPES,
-      description: 'Header contour, shared by the artwork and native blur mask.',
+      options: HEADER_STYLES,
+      description: 'Default uses a rectangular header; waves retain the shared artwork and mask.',
     },
   },
   decorators: [
@@ -148,6 +156,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {};
+export const PlainHeader: Story = { args: { shape: 'default', scrollsBehindHeader: true } };
 export const Home: Story = {
   args: { title: 'Accueil', showBack: false, scrollsBehindHeader: true },
 };
@@ -202,4 +211,37 @@ export const WithoutWaves: Story = { parameters: { withoutWaves: true } };
 export const ExpandedLogin: Story = {
   args: { title: 'Login', showBack: false },
   parameters: { expandedWaves: true },
+};
+
+function HeaderStyleSwitchDemo({ colorScheme }: { colorScheme?: 'light' | 'dark' }) {
+  const [plain, setPlain] = useState(false);
+  const [presses, setPresses] = useState(0);
+  return (
+    <PageMotionOverlay shape={plain ? 'default' : 'dunes'} colorScheme={colorScheme}>
+      <PageFrame
+        title="Change header style"
+        colorScheme={colorScheme}
+        scrollsBehindHeader
+        onBack={() => {
+          setPlain((value) => !value);
+          setPresses((value) => value + 1);
+        }}
+      >
+        <HeaderContent colorScheme={colorScheme} presses={presses} />
+      </PageFrame>
+    </PageMotionOverlay>
+  );
+}
+
+export const ChangeHeaderStyle: Story = {
+  args: { shape: 'default' },
+  render: ({ colorScheme }) => <HeaderStyleSwitchDemo colorScheme={colorScheme} />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Type a draft and press the back control to switch between Dunes and Default. The draft, content count and scroll position must survive.',
+      },
+    },
+  },
 };

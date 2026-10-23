@@ -191,12 +191,6 @@ export function RegisterScreen() {
         >
           {t('auth.verifyEmailTitle')}
         </ListItem>
-        <ListItem
-          testID="auth-register-recipes-info"
-          supportingText={t('auth.registrationRecipesHelp')}
-        >
-          {t('common.myRecipes')}
-        </ListItem>
       </FieldGroup.Section>
       <FieldGroup.Section>
         <Column spacing={spacing.md} modifiers={nativeFillWidth}>

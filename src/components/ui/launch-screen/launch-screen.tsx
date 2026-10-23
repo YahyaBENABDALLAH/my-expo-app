@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { useThemeColors } from '@/hooks/use-theme';
 import { Column, RNHostView, Spacer } from '@expo/ui';
-import { useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import LottieView from 'lottie-react-native';
 import { Image } from 'expo-image';
 import { View, useWindowDimensions } from 'react-native';
@@ -21,21 +21,49 @@ import { useColorScheme } from '@/hooks/use-color-scheme';
 import { getAppBrand } from '@/config/brand';
 import { getBrandHeadingFont, getBrandLaunchArtwork } from '@/config/brand-assets';
 import { useLanguage } from '@/context/language.context';
-import { useAppReducedMotion, useMotionEnabled } from '@/hooks/use-motion-enabled';
+import { useAppActive, useAppReducedMotion, useMotionEnabled } from '@/hooks/use-motion-enabled';
 import { UniversalHost } from '../host/universal-host';
 import { UniversalTextContent } from '../text/universal-text';
 import { nativeFillSize } from '../native/native-fill-width';
 import { PageMotionOverlay, PAGE_WAVE_HEIGHT as WAVE_HEIGHT } from '../page/page-motion-overlay';
+import { LoadingScreen } from '../loading/loading-state';
 
-export function LaunchScreen({
-  exiting,
-  onReady,
-  onExitComplete,
-}: {
+type LaunchScreenProps = {
+  mode?: 'minimal' | 'branded';
   exiting: boolean;
   onReady?: () => void;
   onExitComplete: () => void;
-}) {
+};
+
+export function LaunchScreen({ mode = 'branded', ...props }: LaunchScreenProps) {
+  return mode === 'minimal' ? (
+    <MinimalLaunchScreen {...props} />
+  ) : (
+    <BrandedLaunchScreen {...props} />
+  );
+}
+
+function MinimalLaunchScreen({ exiting, onReady, onExitComplete }: LaunchScreenProps) {
+  const active = useAppActive();
+  const [laidOut, setLaidOut] = useState(false);
+  useEffect(() => {
+    if (exiting && laidOut && active) onExitComplete();
+  }, [exiting, laidOut, active, onExitComplete]);
+  return (
+    <View
+      testID="app-launch-minimal"
+      style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
+      onLayout={() => {
+        setLaidOut(true);
+        onReady?.();
+      }}
+    >
+      <LoadingScreen />
+    </View>
+  );
+}
+
+function BrandedLaunchScreen({ exiting, onReady, onExitComplete }: LaunchScreenProps) {
   const { t } = useTranslation();
   const { language } = useLanguage();
   const brand = getAppBrand();
@@ -44,6 +72,7 @@ export function LaunchScreen({
   const scheme = useColorScheme();
   const colors = useThemeColors(scheme);
   const reducedMotion = useAppReducedMotion();
+  const active = useAppActive();
   const animate = useMotionEnabled();
   const artwork = useRef<LottieView>(null);
   const { width, height } = useWindowDimensions();
@@ -57,6 +86,14 @@ export function LaunchScreen({
     ),
   );
   const offsetY = useSharedValue(0);
+  const remainingHold = useRef(2_000);
+  const [holdComplete, setHoldComplete] = useState(false);
+  const completed = useRef(false);
+  const finish = useCallback(() => {
+    if (completed.current) return;
+    completed.current = true;
+    onExitComplete();
+  }, [onExitComplete]);
 
   useEffect(() => {
     if (animate) artwork.current?.play();
@@ -64,33 +101,43 @@ export function LaunchScreen({
   }, [animate, launchArtwork.source]);
 
   useEffect(() => {
-    if (!exiting) return;
+    if (!exiting || !active || holdComplete) return;
 
-    // The launch hold also applies when artwork is static.
+    // Count foreground time only; the branded hold still applies with Reduce Motion.
+    const startedAt = Date.now();
     const hold = setTimeout(() => {
-      if (reducedMotion) {
-        onExitComplete();
-        return;
-      }
-      offsetY.set(
-        withTiming(
-          -(height + WAVE_HEIGHT),
-          {
-            duration: 2_000,
-            easing: Easing.bezier(0.77, 0, 0.175, 1),
-            reduceMotion: ReduceMotion.Never,
-          },
-          (finished) => {
-            if (finished) scheduleOnRN(onExitComplete);
-          },
-        ),
-      );
-    }, 2_000);
+      remainingHold.current = 0;
+      setHoldComplete(true);
+    }, remainingHold.current);
     return () => {
       clearTimeout(hold);
-      cancelAnimation(offsetY);
+      remainingHold.current = Math.max(0, remainingHold.current - (Date.now() - startedAt));
     };
-  }, [exiting, height, offsetY, onExitComplete, reducedMotion]);
+  }, [exiting, active, holdComplete]);
+
+  useEffect(() => {
+    if (!exiting || !active || !holdComplete) return;
+    if (reducedMotion) {
+      finish();
+      return;
+    }
+    const distance = height + WAVE_HEIGHT;
+    const remaining = Math.max(0, Math.min(1, 1 + offsetY.get() / distance));
+    offsetY.set(
+      withTiming(
+        -distance,
+        {
+          duration: 2_000 * remaining,
+          easing: Easing.bezier(0.77, 0, 0.175, 1),
+          reduceMotion: ReduceMotion.Never,
+        },
+        (finished) => {
+          if (finished) scheduleOnRN(finish);
+        },
+      ),
+    );
+    return () => cancelAnimation(offsetY);
+  }, [exiting, active, holdComplete, height, offsetY, finish, reducedMotion]);
 
   const exitStyle = useAnimatedStyle(() => ({
     transform: [{ translateY: offsetY.get() }],

@@ -15,4 +15,5 @@ export const componentPages = [
   { name: 'skeleton', label: 'showcase.skeleton', testID: 'page-action-skeleton' },
   { name: 'list', label: 'showcase.list', testID: 'page-action-list-rows' },
   { name: 'tokens', label: 'showcase.tokens', testID: 'page-action-theme-tokens' },
+  { name: 'loading', label: 'showcase.queryStates', testID: 'page-action-loading' },
 ] as const;

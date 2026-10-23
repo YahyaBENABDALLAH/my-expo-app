@@ -45,9 +45,20 @@ comparison pending in the [implementation plan](white-label-template-plan.md).
 `app.json` owns shared native settings. `config/brands/*.json` owns each brand's
 name, slug, URL scheme, bundle/application IDs, app/adaptive icons, native splash
 and optional integration references. Its presentation IDs select the fixed
-palette, heading fonts and in-app launch artwork. `config/brand.js` validates and resolves the
+palette, heading fonts, in-app launch artwork, initial header style and launch
+mode. `config/brand.js` validates and resolves the
 selected manifest for `app.config.js`. Register a new manifest in its small
 registry; do not copy identity fields into screens or the shared app config.
+
+`presentation.header` accepts `default`, `dunes`, `ribbon` or `rain`. Both current
+brands retain Dunes; a saved Settings choice overrides the configured initial
+style. Default uses the rectangular native header, and all three animated choices
+remain available. `presentation.launch` accepts `minimal` (the neutral template)
+or `branded` (Likan). Minimal adds no artificial startup wait; branded keeps its
+artwork and exit. Restart Metro after changing these public metadata fields.
+See the [page](../.agents/skills/foodiya-ui-page/references/page-guide.md) and
+[launch](../.agents/skills/foodiya-ui-launch-screen/SKILL.md) contracts for native
+behavior and readiness. Saved header choices use the existing storage key.
 
 Set these selectors in `.env.local` for local Expo commands:
 
@@ -56,12 +67,14 @@ APP_BRAND=template
 APP_VARIANT=development
 ```
 
-| Setting                       | Values and behavior                                                                        |
-| ----------------------------- | ------------------------------------------------------------------------------------------ |
-| `APP_BRAND`                   | `template` (local default) or `likan`; unknown IDs fail configuration                      |
-| `APP_VARIANT`                 | `development` (default), `preview` or `production`; independent of brand and `NODE_ENV`    |
-| `EXPO_PUBLIC_API_URL`         | Absolute HTTP(S) backend base URL; omit locally to browse public screens without a backend |
-| `GOOGLE_MAPS_ANDROID_API_KEY` | Optional key restricted to the selected brand's Android package                            |
+| Setting                          | Values and behavior                                                                        |
+| -------------------------------- | ------------------------------------------------------------------------------------------ |
+| `APP_BRAND`                      | `template` (local default) or `likan`; unknown IDs fail configuration                      |
+| `APP_VARIANT`                    | `development` (default), `preview` or `production`; independent of brand and `NODE_ENV`    |
+| `EXPO_PUBLIC_API_URL`            | Absolute HTTP(S) backend base URL; omit locally to browse public screens without a backend |
+| `GOOGLE_MAPS_ANDROID_API_KEY`    | Optional key restricted to the selected brand's Android package                            |
+| `EXPO_PUBLIC_ENABLE_DEV_SCREENS` | Exact `true` enables catalog links/routes; absent or other values disable them             |
+| `EXPO_PUBLIC_STORYBOOK_ENABLED`  | Exact `true` opts into the Storybook route in development mode only                        |
 
 `template` uses `com.example.mobiletemplate` / `expomobiletemplate`, generic
 existing Expo artwork, and no EAS owner/project or Firebase file. `likan` retains
@@ -108,28 +121,32 @@ Restart Metro after selecting a brand, and use a native build with the matching
 embedded fonts. Arabic retains native fallback. The configured palette stays
 fixed; user System/Light/Dark appearance is saved by the existing provider.
 Component previews can select palettes locally without changing app preferences.
-See [appearance setup and verification](appearance-themes.md). Launch modes and
-catalog capabilities remain with their existing owners until their implementation
-steps.
+See [appearance setup and verification](appearance-themes.md), the
+[launch contract](../.agents/skills/foodiya-ui-launch-screen/SKILL.md) and
+[preview capabilities](storybook.md). These preview flags are build/update choices,
+not persisted user settings. EAS development/preview enable the catalog; production
+disables it. All profiles disable Storybook in their embedded bundles.
 
 References: [Expo dynamic configuration](https://docs.expo.dev/workflow/configuration/)
 and [app variants](https://docs.expo.dev/tutorial/eas/multiple-app-variants/).
 
 ## Starter screens
 
-Home (`/`), UI showcase (`/ui` and `/ui-component/[name]`) and Settings (`/settings`)
-are public. Account (`/account`) requires a real authenticated session. Login,
+Home (`/`) and Settings (`/settings`) are public. UI showcase (`/ui` and
+`/ui-component/[name]`) requires the catalog flag; disabled direct URLs fall back
+to Home. Account (`/account`) requires a real authenticated session. Login,
 registration, verification and password recovery retain their real backend flows.
 The admin/admin shortcut and development guest authentication have been removed.
 
-Home links to the showcase, Settings and Account/sign-in. Settings exposes working
+Home links to the enabled previews, Settings and Account/sign-in. Settings exposes working
 preferences and the app version. There are no recipe, onboarding, map, Skia,
 device-information, health-check or development-directory screens.
 
-The routed Storybook screen and Metro integration are removed. Its packages,
-scripts and native source fixtures remain available for component maintenance;
-`npm run storybook` currently starts Metro without a routed Storybook UI. The
-in-app component catalog is the template's interactive component browser.
+The in-app catalog is the ordinary component browser. `npm run storybook` starts
+Metro with an explicit development-only `/storybook` entry and Home link for the
+retained Controls/fixtures. See [component previews](storybook.md) for exact launch
+commands and native verification. Protected catalog routes retain their source
+modules in client bundles; Storybook integration is excluded from release graphs.
 
 ## Source layout
 
@@ -140,3 +157,31 @@ for future backend features. Recipe-specific services, DTOs and workflows are go
 
 Before native testing, use an SDK-compatible development build. Static checks and
 JavaScript exports do not establish native interaction, timing or live backend behavior.
+
+## Client setup checklist
+
+1. Add and register the client's manifest through the existing
+   [brand configuration](#brand-and-environment-configuration). Set its own native
+   identifiers, scheme, assets and integration references; keep existing client
+   identities intact. Select that brand/variant consistently in local commands
+   and the intended EAS profile/environment.
+2. Register required palette/font/artwork IDs with their existing owners. Follow
+   [asset setup](assets.md) and [appearance policy](appearance-themes.md); verify
+   Arabic fallback and saved System/Light/Dark preferences. Native asset/font or
+   identity changes require a matching native build.
+3. Copy `.env.example` to `.env.local`, select the brand/variant and configure the
+   device-reachable API origin and any required integration key. Keep secrets out
+   of public environment values/metadata. Use your client's EAS owner/project and
+   environment for production; the default template is deliberately unlinked.
+4. Resolve `npx expo config --type public` with the intended selectors. Review
+   identity, assets and public metadata before building; this read-only check
+   does not prove backend access, signing or installed native behavior.
+5. Leave preview flags false for the client bundle, or explicitly enable the
+   catalog/Storybook for maintenance using the [preview guide](storybook.md).
+   Clear Metro's cache when switching flags and verify release source graphs
+   and compiled flag values as documented there.
+6. Run `npm run check`, then exercise auth, preferences, keyboard/RTL,
+   accessibility and retained animations on matching iOS/Android builds. Keep
+   native and live-backend results separate from static/export checks. For any
+   SDK/Expo UI change, follow the [adapter upgrade checklist](ui.md#adapter-responsibilities-and-upgrade-review)
+   and review the UI/Router pins together.

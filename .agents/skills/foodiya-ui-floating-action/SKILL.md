@@ -19,11 +19,14 @@ Render a static 76-point/dp circle with a 28-point/dp icon. There is no Skia,
 custom animation, artwork layer or `animate` prop. Native button interaction
 feedback remains. The surface uses `primary` with `onPrimary` content; disabled
 controls use `controlDisabledSurface` and `controlDisabledContent` and suppress
-activation. Keep the `tab-context-action` selector and translated native label.
+activation. Keep the default `tab-context-action` selector and translated native
+label. An explicit `testID` replaces that default on the actual SwiftUI/Compose
+button, not the Host. Supply distinct stable IDs for multiple instances; never
+use the test ID as the spoken label.
 
 `kind` selects `create`, `continue`, `filters`, `active-filters`, `liked`,
 `profile` or `submit`; profile retains its existing platform glyphs. `label` and
-`onPress` are required. `disabled` and `colorScheme` are optional.
+`onPress` are required. `disabled`, `colorScheme` and `testID` are optional.
 
 Android must pass `Shape.Circle({ radius: 1 })`: the installed native ShapeRecord
 defaults its radius to zero, which clips both the icon and touch shape down to
@@ -34,10 +37,13 @@ fixed-size `UniversalHost` for a React Native boundary and retains native haptic
 feedback on activation. Both honor the owning Host or explicit color scheme.
 The consumer owns positioning, route-specific actions and asynchronous guards.
 
-The starter Buttons showcase renders the retained FloatingAction and counts presses. Route-specific actions stay in the consumer. Removed recipe navigation does not own this component.
+The starter Buttons showcase preserves the standalone default ID and adds named
+content actions with explicit IDs, including a disabled action. Its count and
+last-action text distinguish activation. Route-specific actions stay in the consumer.
 
 The [native story](../../../.rnstorybook/stories/components/floating-action.stories.tsx)
-has Interactive and Disabled examples with counted activation. Controls select
+has Interactive, Disabled and RepeatedActions examples with independent counts.
+The repeated fixture uses explicit IDs for both standalone actions. Controls select
 all seven action kinds; reduced-motion setup is unnecessary for this static control.
 Automated suites have been removed; existing test IDs remain for future tests.
 Manually check upper/lower edge taps, single activation, disabled suppression,

@@ -156,8 +156,8 @@
     "otpAutoSubmit": "يتم التحقق تلقائياً بعد إدخال الرقم السادس.",
     "otpDigit": "الرقم {{index}} من {{count}}",
     "tryAnotherEmail": "استخدام بريد إلكتروني آخر",
-    "loginDescription": "سجّل الدخول لاكتشاف وصفاتك المفضلة ومشاركتها.",
-    "registerDescription": "انضم إلى مجتمعنا وابدأ رحلتك في الطبخ.",
+    "loginDescription": "سجّل الدخول للوصول إلى حسابك.",
+    "registerDescription": "أنشئ حسابك للبدء.",
     "profileSection": "ملفك الشخصي",
     "optionalNames": "الاسم الأول واسم العائلة اختياريان.",
     "securitySection": "الحساب والأمان",
@@ -166,7 +166,6 @@
     "preferredLanguageHelp": "اختر لغة رسائل البريد الإلكتروني المتعلقة بحسابك.",
     "accountIncludes": "البدء",
     "registrationVerificationHelp": "سنرسل رمزًا من ستة أرقام إلى بريدك الإلكتروني لإكمال التسجيل.",
-    "registrationRecipesHelp": "احفظ وصفاتك المفضلة وشارك وصفاتك الخاصة.",
     "enterPassword": "أدخل كلمة المرور",
     "createPassword": "أنشئ كلمة مرور",
     "confirmPassword": "تأكيد كلمة المرور",
@@ -232,6 +231,7 @@
     "legalDescription": "اتفاقية ترخيص المستخدم النهائي",
     "headerMotion": "حركة الترويسة",
     "headerShapes": {
+      "default": "افتراضي",
       "dunes": "كثبان",
       "ribbon": "شريط",
       "rain": "مطر"
@@ -675,7 +675,9 @@
     "tip": "النصيحة {{index}}",
     "homeExamples": "أمثلة واجهة الوصفات",
     "homeExamplesDescription": "بطاقات محلية وهياكل تحميل وعناصر تحكّم تفاعلية للتطوير. لا تغيّر هذه الأمثلة تفضيلات الوصفات لديك.",
-    "floatingActions": "الإجراءات العائمة"
+    "floatingActions": "الإجراءات العائمة",
+    "queryStates": "التحميل وإعادة المحاولة",
+    "queryStatesHint": "أعد المحاولة في كل قسم على حدة. إكمال أحدهما لا يغيّر الآخر."
   },
   "examples": {
     "toast": "خبز بالأفوكادو",

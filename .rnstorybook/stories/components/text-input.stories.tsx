@@ -29,7 +29,10 @@ const selectionNote =
 /** Story-only RN boundary; application fields compose inside their existing Host. */
 function InputPreview(props: TextInputProps) {
   return (
-    <Host colorScheme={props.colorScheme} testID={`${props.testID}-container`}>
+    <Host
+      colorScheme={props.colorScheme}
+      testID={props.testID ? `${props.testID}-container` : undefined}
+    >
       <TextInput {...props} />
     </Host>
   );
@@ -132,7 +135,10 @@ const meta = {
   },
   decorators: [
     (Story, context) => (
-      <View testID={`${context.args.testID}-canvas`} style={{ flex: 1, padding: 24 }}>
+      <View
+        testID={context.args.testID ? `${context.args.testID}-canvas` : undefined}
+        style={{ flex: 1, padding: 24 }}
+      >
         <Story />
       </View>
     ),
@@ -195,10 +201,12 @@ function IconInputDemo(args: TextInputProps) {
         style={{ width: '100%' }}
       >
         <Column spacing={10}>
-          <Text testID={`${args.testID}-press-count`}>{`Right icon presses: ${pressCount}`}</Text>
+          <Text
+            testID={args.testID ? `${args.testID}-press-count` : undefined}
+          >{`Right icon presses: ${pressCount}`}</Text>
           <UniversalButtonContent
             variant="secondary"
-            testID={`${args.testID}-toggle-disabled`}
+            testID={args.testID ? `${args.testID}-toggle-disabled` : undefined}
             label={disabled ? 'Enable input' : 'Disable input'}
             onPress={() => setDisabled((current) => !current)}
           />
@@ -325,13 +333,13 @@ function InputActionsDemo(args: TextInputProps) {
         colorScheme={args.colorScheme}
         style={{ width: '100%' }}
       >
-        <Column testID={`${args.testID}-actions`} spacing={10}>
-          <Text testID={`${args.testID}-focus-state`}>
+        <Column testID={args.testID ? `${args.testID}-actions` : undefined} spacing={10}>
+          <Text testID={args.testID ? `${args.testID}-focus-state` : undefined}>
             {focused ? 'Input focused' : 'Input blurred'}
           </Text>
           <UniversalButtonContent
             variant="secondary"
-            testID={`${args.testID}-focus`}
+            testID={args.testID ? `${args.testID}-focus` : undefined}
             label="Focus"
             onPress={() => {
               action('focus button pressed')();
@@ -340,7 +348,7 @@ function InputActionsDemo(args: TextInputProps) {
           />
           <UniversalButtonContent
             variant="secondary"
-            testID={`${args.testID}-blur`}
+            testID={args.testID ? `${args.testID}-blur` : undefined}
             label="Blur"
             onPress={() => {
               action('blur button pressed')();
@@ -349,7 +357,7 @@ function InputActionsDemo(args: TextInputProps) {
           />
           <UniversalButtonContent
             variant="secondary"
-            testID={`${args.testID}-clear`}
+            testID={args.testID ? `${args.testID}-clear` : undefined}
             label="Clear"
             onPress={() => {
               action('clear button pressed')();
@@ -358,7 +366,7 @@ function InputActionsDemo(args: TextInputProps) {
           />
           <UniversalButtonContent
             variant="secondary"
-            testID={`${args.testID}-select`}
+            testID={args.testID ? `${args.testID}-select` : undefined}
             label="Select first five characters"
             onPress={() => {
               action('select button pressed')();
@@ -394,11 +402,13 @@ function ControlledInputDemo(args: TextInputProps) {
         colorScheme={args.colorScheme}
         style={{ width: '100%' }}
       >
-        <Column testID={`${args.testID}-actions`} spacing={10}>
-          <Text testID={`${args.testID}-description`}>{`Controlled value: ${value}`}</Text>
+        <Column testID={args.testID ? `${args.testID}-actions` : undefined} spacing={10}>
+          <Text
+            testID={args.testID ? `${args.testID}-description` : undefined}
+          >{`Controlled value: ${value}`}</Text>
           <UniversalButtonContent
             variant="secondary"
-            testID={`${args.testID}-set-value`}
+            testID={args.testID ? `${args.testID}-set-value` : undefined}
             label="Set value from JavaScript"
             onPress={() => {
               action('set value button pressed')();
@@ -407,7 +417,7 @@ function ControlledInputDemo(args: TextInputProps) {
           />
           <UniversalButtonContent
             variant="secondary"
-            testID={`${args.testID}-reset`}
+            testID={args.testID ? `${args.testID}-reset` : undefined}
             label="Reset value"
             onPress={() => {
               action('reset button pressed')();
