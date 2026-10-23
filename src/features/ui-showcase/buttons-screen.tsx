@@ -40,11 +40,11 @@ const variants = [
 
 const starIcon = Icon.select({
   ios: 'star.fill',
-  android: import('@expo/material-symbols/star.xml'),
+  android: require('@expo/material-symbols/star.xml'),
 });
 const checkIcon = Icon.select({
   ios: 'checkmark',
-  android: import('@expo/material-symbols/check.xml'),
+  android: require('@expo/material-symbols/check.xml'),
 });
 
 const iconPlacements = [
