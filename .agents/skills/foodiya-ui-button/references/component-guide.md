@@ -2,7 +2,7 @@
 
 Import `UniversalButton`, `UniversalButtonContent` and their types from
 `@components/ui`. Both render native Expo UI controls. `UniversalButton` owns a
-Host at a React Native boundary; use `UniversalButtonContent` inside an existing
+`UniversalHost` at a React Native boundary; use `UniversalButtonContent` inside an existing
 Host. Each resolves theme colors once before passing props to the same native
 renderer.
 
@@ -36,7 +36,8 @@ status colors, and surfaceVariant/text for glass. This prevents secondary and
 status actions from inheriting the Host's primary accent. UX Template retains
 its black/white primary in both appearances. Supplying either color prop skips
 those defaults. Hosted content follows `useHostColorScheme`;
-standalone controls use their explicit scheme. Both public controls and their
+standalone controls use their explicit or inherited scheme, also provided to
+custom descendants by their shared Host. Both public controls and their
 types live in `universal-button.tsx`, alongside their private color resolver.
 Native controls own feedback and disabled styling.
 
@@ -63,6 +64,11 @@ observable press counts. Controls expose width, radius, padding and colors.
 All button stories exercise component defaults without injecting a preview-only
 palette. `SemanticVariantsLight` and `SemanticVariantsDark` compare all nine
 variants under the selected theme, with disabled actions and observable counts.
+`StandaloneHostLight` and `StandaloneHostDark` reuse the same standalone section
+as the Buttons page: explicit light/dark, inherited intrinsic sizing, physical
+diagonal corners, disabled activation, child context and a live RTL toggle.
+The new shared Host preserves the existing action/container selectors and native
+renderer behavior; repeat native geometry checks after this migration.
 
 Automated button suites have been removed. Use the native stories to check
 count/reset, light/dark appearance, disabled actions, diagonal edge taps and

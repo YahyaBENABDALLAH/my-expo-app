@@ -243,7 +243,7 @@
     "light": "Light"
   },
   "account": {
-    "signedIn": "You are logged in. Welcome to Likan.",
+    "signedIn": "You are logged in. Welcome to {{brandName}}.",
     "guestDescription": "Sign in to view a real account.",
     "loadingProfile": "Loading your profile…",
     "offline": "You are offline. Showing your saved account.",
@@ -370,7 +370,7 @@
     "home": "Go home"
   },
   "launch": {
-    "loading": "Likan is loading"
+    "loading": "{{brandName}} is loading"
   },
   "showcase": {
     "fieldGroupGallery": {
@@ -440,6 +440,12 @@
       "showMore": "Show longer content",
       "text": "Text",
       "textDescription": "Compare typography, semantic colors, wrapping and native versus hosted text.",
+      "previewAppearance": "Preview appearance",
+      "previewAppearanceHint": "These controls affect only this text preview. Your saved app appearance and configured brand stay the same.",
+      "primaryAction": "Try the primary button",
+      "textOverrides": "Explicit text colors",
+      "appearanceOverride": "The appearance color overrides the primary tone.",
+      "styleOverride": "The final text style overrides the appearance color.",
       "typography": "Typography",
       "tones": "Semantic tones",
       "tonesHint": "Each foreground comes from the active theme. Color does not replace a clear message.",
@@ -566,9 +572,11 @@
       "roomyPadding": "Roomy padding · 24",
       "colors": "Explicit semantic colors",
       "colorsHint": "Accent and label colors use matching pairs from the active theme.",
-      "standalone": "Standalone button · light",
-      "standaloneHint": "Independent light appearance with diagonal corners. The other two corners stay square.",
-      "lightCorners": "Light · diagonal corners"
+      "standalone": "Standalone buttons",
+      "standaloneHint": "Compare forced and inherited appearance, widths and disabled actions. Labels report their own appearance and direction; diagonal corners stay on the same physical sides.",
+      "lightCorners": "Light · diagonal corners",
+      "darkCorners": "Dark · diagonal corners",
+      "hostLabel": "{{label}} · {{scheme}} · {{direction}}"
     },
     "checkboxDescription": "Selected and disabled native checkbox states.",
     "savePreference": "Save this preference",
@@ -718,10 +726,6 @@
     "security": "A small step to keep your account safe",
     "openDemo": "Open OTP bottom sheet",
     "demoHint": "UI preview · Enter 123456 to try the success animation."
-  },
-  "brand": {
-    "name": "Likan",
-    "wordmark": "LIKAN"
   },
   "starter": {
     "homeDescription": "A starting point for your app. Explore the native components, adjust your preferences, or sign in to your backend."

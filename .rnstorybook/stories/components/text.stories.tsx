@@ -1,6 +1,7 @@
 import { UniversalText } from '@components/ui';
 import type { Meta, StoryObj } from '@storybook/react-native';
 import { NativeStoryFrame } from '../../components/native-story-frame';
+import TextScreen from '@/features/ui-showcase/text-screen';
 
 const meta = {
   title: 'Components/Text',
@@ -72,4 +73,16 @@ export const Error: Story = {
 };
 export const Info: Story = {
   args: { variant: 'body', tone: 'info', children: 'Your draft is available offline.' },
+};
+
+export const ThemeComparison: Story = {
+  render: () => <TextScreen />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Change the local palette and appearance; compare all text tones on three page surfaces, explicit overrides and the filled primary button. The action count survives changes and saved app preferences stay untouched.',
+      },
+    },
+  },
 };

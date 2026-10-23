@@ -7,6 +7,18 @@ caller colors retain their existing override behavior. The native button stories
 use these same defaults and provide light/dark comparisons of all nine variants.
 Native geometry, disabled suppression and feedback remain platform-owned.
 
+Text's primary tone uses `tint`, preserving readable UX dark foregrounds while
+the primary button fill stays black. The configured app palette stays fixed;
+saved appearance and isolated palette previews follow the
+[appearance guide](appearance-themes.md).
+
+Standalone buttons now use the same project Host as other hosted controls.
+Their explicit/inherited appearance reaches custom icon/text descendants, while
+the shared Host supplies live direction and native tint. Intrinsic/full-width
+constraints and physical corner clipping retain their existing implementation.
+The [button skill](../.agents/skills/foodiya-ui-button/SKILL.md) owns the contract
+and manual native checks for this migration.
+
 The original UX Template correction (2026-10-16) supplies a black primary with
 white labels in both appearances. It fixed a native white fill with an unreadable
 white label observed in the production Buttons page in dark mode.

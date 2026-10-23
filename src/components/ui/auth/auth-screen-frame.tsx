@@ -1,7 +1,6 @@
-import { useTranslation } from 'react-i18next';
 import { Column } from '@expo/ui';
 import { useState, type PropsWithChildren, type ReactNode } from 'react';
-import { KeyboardAvoidingView, Platform } from 'react-native';
+import { KeyboardAvoidingView } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAppTheme } from '@/hooks/use-theme';
 import {
@@ -19,6 +18,8 @@ import { spacing } from '@/constants/layout';
 import { PageSection } from '../page/page-section';
 import { pageFormModifiers } from '../page/page-form-modifiers';
 import { screenInsets } from '@/lib/screen-insets';
+import { getAppBrand } from '@/config/brand';
+import { getBrandHeadingFont } from '@/config/brand-assets';
 
 /** Owns the native Host; children must stay in the Expo UI rendering tree. */
 export function AuthScreenFrame({
@@ -54,17 +55,25 @@ function AuthScreenContent({
 }>) {
   const insets = useSafeAreaInsets();
   const { language } = useLanguage();
-  const { t } = useTranslation();
+  const brand = getAppBrand();
   const { colors, scheme } = useAppTheme(useHostColorScheme(colorScheme));
   const [viewportHeight, setViewportHeight] = useState(0);
-  const platformHeadingFont = Platform.OS === 'android' ? 'Inter-Black' : 'InterBlack';
-  const headingFont = language === 'ar' ? undefined : platformHeadingFont;
+  const headingFont = getBrandHeadingFont(language, brand);
   const heading = (
     <Column spacing={spacing.md} modifiers={nativeFillWidth}>
-      <Text variant="caption" fontWeight="700" textStyle={{ color: colors.tint }}>
-        {t('brand.wordmark')}
+      <Text
+        variant="caption"
+        fontWeight="700"
+        textStyle={{ color: colors.tint }}
+        testID={`${testID}-brand`}
+      >
+        {brand.name.toUpperCase()}
       </Text>
-      <Text variant="heading" textStyle={{ fontFamily: headingFont, fontSize: 32, lineHeight: 38 }}>
+      <Text
+        variant="heading"
+        textStyle={{ fontFamily: headingFont, fontSize: 32, lineHeight: 38 }}
+        testID={`${testID}-title`}
+      >
         {title}
       </Text>
       <Text textStyle={{ color: colors.muted, lineHeight: 24 }}>{description}</Text>

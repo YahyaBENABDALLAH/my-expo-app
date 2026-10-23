@@ -35,9 +35,13 @@ Buttons use the shared theme tokens and still require an explicit `variant`.
 
 Keep session operations, validation and form state in the auth feature.
 
-Heading font selection preserves the native Android/iOS font names and leaves
-Arabic to its existing font fallback. Keyboard and safe-area layout stay in the
-same frame.
+The wordmark comes from `getAppBrand().name`, uppercased for this frame.
+`getBrandHeadingFont` selects the configured platform family for the current
+language; the system-font selection and Arabic use native fallback. The root
+loads the selected font map. Keep font/asset setup with the
+[configuration owner](../foodiya-implementation/references/configuration.md).
+The wordmark and title selectors are `${testID}-brand` and `${testID}-title`.
+Keyboard and safe-area layout stay in the same frame.
 
 Login supplies `LoginPreferences` in the top bar: a labeled language button on
 the physical left and the shared System/Light Mode/Dark Mode native picker on
@@ -50,8 +54,12 @@ hidden. Native light/dark appearance follows the app preference; the sheet adds
 no styling, sizing, padding, colors or content Host.
 The picker shows the existing app color-scheme preference. System follows live
 device appearance; Light Mode and Dark Mode stay fixed until another choice is
-selected. Choosing System again resumes automatic detection. Brand selection
-stays in App Settings.
+selected. Choosing System again resumes automatic detection. The app root saves
+this preference; the picker disables until appearance restoration is ready.
+The configured brand palette stays fixed. Demo palette controls belong only to
+isolated component previews. Follow the
+[appearance contract](../foodiya-ui-appearance/SKILL.md) for persistence and reveal
+readiness.
 
 The language action uses the shared `UniversalButtonContent` with `variant="link"`
 and a translated label. It reuses the owning Host and disables activation until
@@ -68,7 +76,9 @@ device checks. Existing test IDs are retained for future tests.
 Existing composition story: [auth-screen.stories.tsx](../../../.rnstorybook/stories/forms/auth-screen.stories.tsx).
 The `viewportHeight` Control exercises overflow in a 360-point/dp viewport;
 `GroupedForm` exercises the registration container. Appearance and helper text
-Controls exercise the same centered frame.
+Controls exercise the same centered frame. The configured build brand supplies
+the wordmark and heading font; fixture registration does not verify either
+platform's font rendering.
 
 Manual iPad Pro 13-inch / iPadOS 27 checks verified centered Login and Register's
 scrolling through to both actions. Full software-keyboard, narrow-window and

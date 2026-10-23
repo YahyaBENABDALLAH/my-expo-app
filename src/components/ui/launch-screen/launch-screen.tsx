@@ -3,6 +3,7 @@ import { useThemeColors } from '@/hooks/use-theme';
 import { Column, RNHostView, Spacer } from '@expo/ui';
 import { useEffect, useRef } from 'react';
 import LottieView from 'lottie-react-native';
+import { Image } from 'expo-image';
 import { View, useWindowDimensions } from 'react-native';
 import Animated, {
   Easing,
@@ -17,15 +18,14 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { screenInsets } from '@/lib/screen-insets';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 
-import bluePepe from '@assets/animations/blue-pepe.lottie';
+import { getAppBrand } from '@/config/brand';
+import { getBrandHeadingFont, getBrandLaunchArtwork } from '@/config/brand-assets';
+import { useLanguage } from '@/context/language.context';
 import { useAppReducedMotion, useMotionEnabled } from '@/hooks/use-motion-enabled';
 import { UniversalHost } from '../host/universal-host';
 import { UniversalTextContent } from '../text/universal-text';
 import { nativeFillSize } from '../native/native-fill-width';
 import { PageMotionOverlay, PAGE_WAVE_HEIGHT as WAVE_HEIGHT } from '../page/page-motion-overlay';
-
-// LottieView accepts Metro's numeric asset ID on native, though its source type omits it.
-const bluePepeSource = bluePepe as unknown as string;
 
 export function LaunchScreen({
   exiting,
@@ -37,6 +37,10 @@ export function LaunchScreen({
   onExitComplete: () => void;
 }) {
   const { t } = useTranslation();
+  const { language } = useLanguage();
+  const brand = getAppBrand();
+  const launchArtwork = getBrandLaunchArtwork(brand);
+  const headingFont = getBrandHeadingFont(language, brand);
   const scheme = useColorScheme();
   const colors = useThemeColors(scheme);
   const reducedMotion = useAppReducedMotion();
@@ -57,7 +61,7 @@ export function LaunchScreen({
   useEffect(() => {
     if (animate) artwork.current?.play();
     else artwork.current?.pause();
-  }, [animate]);
+  }, [animate, launchArtwork.source]);
 
   useEffect(() => {
     if (!exiting) return;
@@ -97,7 +101,7 @@ export function LaunchScreen({
       testID="app-brand-screen"
       onLayout={onReady}
       accessible
-      accessibilityLabel={t('launch.loading')}
+      accessibilityLabel={t('launch.loading', { brandName: brand.name })}
       pointerEvents="auto"
       style={[
         {
@@ -126,19 +130,32 @@ export function LaunchScreen({
           <Column alignment="center" spacing={16} modifiers={nativeFillSize}>
             <Spacer flexible />
             <RNHostView matchContents>
-              <LottieView
-                ref={artwork}
-                source={bluePepeSource}
-                autoPlay={false}
-                loop={animate}
-                style={{ width: artworkSize, height: artworkSize }}
-              />
+              {launchArtwork.type === 'lottie' ? (
+                <LottieView
+                  ref={artwork}
+                  // Native Lottie accepts Metro's numeric asset ID; its source type omits it.
+                  source={launchArtwork.source as unknown as string}
+                  autoPlay={false}
+                  loop={animate}
+                  style={{ width: artworkSize, height: artworkSize }}
+                  testID="app-brand-artwork"
+                />
+              ) : (
+                <Image
+                  source={launchArtwork.source}
+                  contentFit="contain"
+                  style={{ width: artworkSize, height: artworkSize }}
+                  testID="app-brand-artwork"
+                  accessible={false}
+                />
+              )}
             </RNHostView>
             <UniversalTextContent
               colorScheme={scheme}
-              textStyle={{ fontFamily: 'Inter-Black', fontSize: 28 }}
+              textStyle={{ fontFamily: headingFont, fontSize: 28, fontWeight: '900' }}
+              testID="app-brand-name"
             >
-              {t('brand.name')}
+              {brand.name}
             </UniversalTextContent>
             <Spacer flexible />
           </Column>

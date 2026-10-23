@@ -25,7 +25,7 @@ function OtpDemo({
   resendCooldownSeconds = 0,
   requestFailure,
   resendFailure,
-  recipient = 'hello@likan.app',
+  recipient = 'hello@example.com',
 }: DemoProps) {
   const [open, setOpen] = useState(false);
   const [resends, setResends] = useState(0);

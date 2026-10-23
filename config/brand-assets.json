@@ -1,0 +1,26 @@
+{
+  "headingFonts": {
+    "system": {
+      "file": null,
+      "runtimeName": null,
+      "nativeFamily": { "ios": null, "android": null },
+      "languages": []
+    },
+    "interBlack": {
+      "file": "./assets/fonts/Inter-Black.otf",
+      "runtimeName": "Inter-Black",
+      "nativeFamily": { "ios": "Inter-Black", "android": "Inter-Black" },
+      "languages": ["en", "fr"]
+    }
+  },
+  "launchArtworks": {
+    "bluePepe": {
+      "type": "lottie",
+      "file": "./assets/animations/blue-pepe.lottie"
+    },
+    "templateIcon": {
+      "type": "image",
+      "file": "./assets/images/icon.png"
+    }
+  }
+}

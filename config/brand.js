@@ -2,6 +2,7 @@ const { statSync, readFileSync } = require('node:fs');
 const path = require('node:path');
 const { z } = require('zod');
 const { resolveApiBaseUrl } = require('./api');
+const assets = require('./brand-assets.json');
 
 const brands = {
   likan: require('./brands/likan.json'),
@@ -16,6 +17,11 @@ const brandSchema = z.strictObject({
   slug: z.string().regex(/^[a-z0-9][a-z0-9-]*$/),
   scheme: z.string().regex(/^[a-z][a-z0-9+.-]*$/),
   icon: asset,
+  presentation: z.strictObject({
+    palette: z.enum(['ux', 'instagram']),
+    headingFont: z.string().refine((id) => Object.hasOwn(assets.headingFonts, id)),
+    launchArtwork: z.string().refine((id) => Object.hasOwn(assets.launchArtworks, id)),
+  }),
   ios: z.strictObject({
     bundleIdentifier: z.string().regex(/^[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)+$/),
   }),
@@ -81,6 +87,10 @@ function resolveBrand(env = process.env) {
 
   requireAsset(brand.icon, 'icon');
   requireAsset(brand.splash.image, 'splash.image');
+  const headingFont = assets.headingFonts[brand.presentation.headingFont];
+  const launchArtwork = assets.launchArtworks[brand.presentation.launchArtwork];
+  if (headingFont.file) requireAsset(headingFont.file, 'presentation.headingFont');
+  requireAsset(launchArtwork.file, 'presentation.launchArtwork');
   for (const field of ['foregroundImage', 'backgroundImage', 'monochromeImage']) {
     requireAsset(brand.android.adaptiveIcon[field], `android.adaptiveIcon.${field}`);
   }

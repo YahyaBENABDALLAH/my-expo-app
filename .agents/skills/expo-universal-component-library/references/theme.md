@@ -14,7 +14,8 @@ application styling and compatibility, but standard controls no longer map them.
 
 ## Existing sources
 
-- `src/constants/colors.ts`: shared light/dark app palette and `buttonSeedColors` semantic seeds.
+- `src/constants/themes/`: palette registry and semantic tokens; `colors.ts` retains only compatibility defaults.
+- `src/context/theme.context.tsx`: configured root palette, opt-in saved appearance and isolated preview preferences.
 - `src/hooks/use-theme.ts`: shared theme colors; compose with `useHostColorScheme` for controls inside a native Host.
 - `src/components/ui/host/types.ts`: shared `colorScheme`, `seedColor`, and `testID` props.
 - `src/components/ui/host/universal-host.tsx`: native Host wrapper, scheme selection, and sizing defaults.
@@ -25,13 +26,17 @@ All themes resolve semantic button token pairs in the [shared button implementat
 
 Use semantic roles already present: `background`, `surface`, `text`, `muted`, `border`, `tint`, `error`, `success`, and `warning`. Keep explicit light/dark variants for intentional brand colors. Repeated layout/typography values may become shared tokens when actually needed; leave native typography, shape, elevation, and press feedback at their defaults unless behavior requires a change.
 
+Text's primary tone uses `tint`, not the `primary` filled-action surface.
+Preserve `primary`/`onPrimary` and explicit text override precedence. Use the
+[Text contract](../../foodiya-ui-text/SKILL.md) for the exact mapping and preview.
+
 Host `colorScheme` selects appearance. Host `seedColor` derives Android Material colors and sets iOS native tint; it does not promise the exact same color for every native control. See [SDK 57 Host](https://docs.expo.dev/versions/v57.0.0/sdk/ui/universal/host/). Use the installed API's real color hooks/props when mapping tokens; do not invent universal `containerColor` props or treat `UniversalStyle` as full RN styling.
 
 Buttons preserve native colors, shape, padding, clickable bounds, disabled treatment and feedback unless a caller supplies an override. Do not paint a larger outer background around a smaller native clickable control. Legacy size/rounded props have been removed.
 
 Every `UniversalButton` or `UniversalButtonContent` call requires `variant`. Use [the button skill](../../foodiya-ui-button/SKILL.md) for the current nine variants, native style mapping and supported geometry. Native disabled colors/opacity and press feedback remain platform-owned. Specialized icon and navigation buttons keep their explicitly selected native style.
 
-`UniversalHost` provides its resolved scheme through React context for styled text, loading content and button token resolution through `useHostColorScheme`. Native appearance also follows the owning native Host. `UniversalButton` owns a plain Expo UI Host at an RN boundary with an optional light/dark override; `UniversalButtonContent` composes within an existing Host and has no scheme prop. Full-width buttons make the label/native surface fill together; inline buttons keep native intrinsic size.
+`UniversalHost` provides its resolved scheme through React context for styled text, loading content and button token resolution through `useHostColorScheme`. Native appearance also follows the owning native Host. `UniversalButton` reuses one `UniversalHost` at an RN boundary, so native appearance and custom descendants share its explicit/inherited scheme and live direction. `UniversalButtonContent` composes within an existing Host and has no scheme prop. Full-width buttons make the label/native surface fill together; intrinsic buttons use inline hosting. See the [button contract](../../foodiya-ui-button/SKILL.md) for geometry and override details.
 
 ## Documentation and story requirements
 

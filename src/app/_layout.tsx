@@ -36,6 +36,8 @@ import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useStoreUpdates } from '@/hooks/use-store-updates';
 import { useThemeColors } from '@/hooks/use-theme';
 import { screenInsets } from '@/lib/screen-insets';
+import { getBrandFonts } from '@/config/brand-assets';
+import { getAppBrand } from '@/config/brand';
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -51,11 +53,11 @@ SplashScreen.preventAutoHideAsync().catch(() => {
   // The splash may already be hidden during a development reload.
 });
 SplashScreen.setOptions({ duration: 0, fade: false });
+const brand = getAppBrand();
+const brandFonts = getBrandFonts(brand);
 
 export default function RootLayout() {
-  const [loaded, error] = useFonts({
-    'Inter-Black': require('@assets/fonts/Inter-Black.otf'),
-  });
+  const [loaded, error] = useFonts(brandFonts);
 
   // Expo Router uses Error Boundaries to catch errors in the navigation tree.
   useEffect(() => {
@@ -69,7 +71,11 @@ export default function RootLayout() {
   return (
     <LayoutDirectionProvider>
       <LanguageProvider>
-        <ThemePreferencesProvider persistHeaderMotion>
+        <ThemePreferencesProvider
+          initialTheme={brand.presentation.palette}
+          persistHeaderMotion
+          persistAppearance
+        >
           <AppQueryProvider>
             <AuthProvider>
               <RootLayoutContent />
@@ -84,14 +90,16 @@ export default function RootLayout() {
 function RootLayoutContent() {
   const {
     colorScheme: appearancePreference,
+    appearanceReady,
     headerShape,
     headerMotionReady = true,
   } = useThemeSettings();
   useEffect(() => {
+    if (!appearanceReady) return;
     Appearance.setColorScheme(
       appearancePreference === 'system' ? 'unspecified' : appearancePreference,
     );
-  }, [appearancePreference]);
+  }, [appearancePreference, appearanceReady]);
   const colorScheme = useColorScheme();
   const colors = useThemeColors(colorScheme);
   const [showBrandScreen, setShowBrandScreen] = useState(true);
@@ -107,7 +115,8 @@ function RootLayoutContent() {
   const animatePageArtwork = !showBrandScreen;
   const reducedMotion = useAppReducedMotion();
   // Restoration failures must expose their retry UI instead of keeping the launch overlay.
-  const ready = languageReady && headerMotionReady && (!restoring || Boolean(error));
+  const ready =
+    appearanceReady && languageReady && headerMotionReady && (!restoring || Boolean(error));
   const finishBrandScreen = useCallback(() => setShowBrandScreen(false), []);
   const revealBrandScreen = useCallback(() => {
     SplashScreen.hide();
@@ -131,7 +140,7 @@ function RootLayoutContent() {
         >
           {ready || !showBrandScreen ? <RootLayoutNav holdLogin={holdLogin} /> : null}
         </PageMotionOverlay>
-        {showBrandScreen && (
+        {showBrandScreen && appearanceReady && (
           <LaunchScreen
             exiting={ready}
             onReady={revealBrandScreen}

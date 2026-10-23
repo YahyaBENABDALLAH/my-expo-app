@@ -243,7 +243,7 @@
     "light": "Clair"
   },
   "account": {
-    "signedIn": "Vous êtes connecté. Bienvenue sur Likan.",
+    "signedIn": "Vous êtes connecté. Bienvenue sur {{brandName}}.",
     "guestDescription": "Connectez-vous pour consulter votre compte.",
     "loadingProfile": "Chargement de votre profil…",
     "offline": "Vous êtes hors ligne. Affichage de votre compte enregistré.",
@@ -370,7 +370,7 @@
     "home": "Aller à l’accueil"
   },
   "launch": {
-    "loading": "Chargement de Likan"
+    "loading": "Chargement de {{brandName}}"
   },
   "showcase": {
     "fieldGroupGallery": {
@@ -440,6 +440,12 @@
       "showMore": "Afficher un contenu plus long",
       "text": "Texte",
       "textDescription": "Comparez la typographie, les couleurs sémantiques, le retour à la ligne et les modes d’hébergement du texte.",
+      "previewAppearance": "Apparence de l’aperçu",
+      "previewAppearanceHint": "Ces contrôles modifient uniquement cet aperçu de texte. L’apparence enregistrée et la marque configurée de l’application restent identiques.",
+      "primaryAction": "Essayer le bouton principal",
+      "textOverrides": "Couleurs de texte explicites",
+      "appearanceOverride": "La couleur d’apparence remplace le ton principal.",
+      "styleOverride": "Le style de texte final remplace la couleur d’apparence.",
       "typography": "Typographie",
       "tones": "Tons sémantiques",
       "tonesHint": "Chaque couleur vient du thème actif. La couleur ne remplace pas un message clair.",
@@ -566,9 +572,11 @@
       "roomyPadding": "Espacement généreux · 24",
       "colors": "Couleurs sémantiques explicites",
       "colorsHint": "Les couleurs d’accent et de texte utilisent des paires assorties du thème actif.",
-      "standalone": "Bouton autonome · clair",
-      "standaloneHint": "Apparence claire indépendante avec des coins diagonaux. Les deux autres coins restent carrés.",
-      "lightCorners": "Clair · coins diagonaux"
+      "standalone": "Boutons autonomes",
+      "standaloneHint": "Comparez les apparences forcées ou héritées, les largeurs et les actions désactivées. Les libellés indiquent leur apparence et leur direction ; les coins diagonaux restent sur les mêmes côtés physiques.",
+      "lightCorners": "Clair · coins diagonaux",
+      "darkCorners": "Sombre · coins diagonaux",
+      "hostLabel": "{{label}} · {{scheme}} · {{direction}}"
     },
     "checkboxDescription": "États sélectionnés et désactivés des cases natives.",
     "savePreference": "Enregistrer cette préférence",
@@ -718,10 +726,6 @@
     "security": "Un petit geste pour protéger votre compte",
     "openDemo": "Ouvrir la feuille de code OTP",
     "demoHint": "Aperçu de l'interface · Saisissez 123456 pour voir l'animation de réussite."
-  },
-  "brand": {
-    "name": "Likan",
-    "wordmark": "LIKAN"
   },
   "starter": {
     "homeDescription": "Le point de départ de votre application. Explorez les composants natifs, ajustez vos préférences ou connectez-vous à votre serveur."

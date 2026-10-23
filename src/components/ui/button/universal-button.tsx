@@ -1,7 +1,6 @@
-import { Host } from '@expo/ui';
 import type { ReactNode } from 'react';
 import { useAppTheme } from '@/hooks/use-theme';
-import { useHostColorScheme } from '../host/universal-host';
+import { UniversalHost, useHostColorScheme } from '../host/universal-host';
 import { NativeButtonContent } from './universal-button-content';
 
 export type UniversalButtonVariant =
@@ -81,8 +80,9 @@ export function UniversalButtonContent(props: UniversalButtonContentProps) {
 export function UniversalButton({ colorScheme, cornerRadii, ...props }: UniversalButtonProps) {
   const colors = useButtonColors({ ...props, colorScheme });
   return (
-    <Host
+    <UniversalHost
       testID={props.testID ? `${props.testID}-container` : undefined}
+      inline={!props.fullWidth}
       matchContents={props.fullWidth ? { vertical: true } : true}
       style={[
         props.fullWidth ? { width: '100%' } : undefined,
@@ -103,6 +103,6 @@ export function UniversalButton({ colorScheme, cornerRadii, ...props }: Universa
         {...colors}
         borderRadius={cornerRadii ? 0 : props.borderRadius}
       />
-    </Host>
+    </UniversalHost>
   );
 }

@@ -88,7 +88,7 @@ function NativeFormDemo({
         colorScheme={frameColorScheme ?? colorScheme}
         grouped={grouped}
         title="One native Host"
-        description="Fields reserve no empty message space. Errors and hints wrap below their input when present; validation provides error haptics."
+        description="The configured brand owns the header name and heading font. Fields reserve no empty message space; errors and hints wrap below their input."
       >
         {grouped ? <FieldGroup.Section title="Account">{fields}</FieldGroup.Section> : fields}
       </AuthScreenFrame>

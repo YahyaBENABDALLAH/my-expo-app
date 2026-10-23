@@ -4,6 +4,11 @@
   "slug": "likan",
   "scheme": "myappexpo",
   "icon": "./assets/foodiya.png",
+  "presentation": {
+    "palette": "ux",
+    "headingFont": "interBlack",
+    "launchArtwork": "bluePepe"
+  },
   "ios": {
     "bundleIdentifier": "com.hyrkul.likan"
   },

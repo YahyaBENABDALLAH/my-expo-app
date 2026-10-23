@@ -28,9 +28,17 @@ Supported `variant` values are `heading`, `title`, `subtitle`, `body`,
 `label` and `caption`. Omit variant/font overrides to keep native typography.
 Presets set size/weight only; no line height is calculated.
 
+Brand typography is selected by the existing asset helper for auth and launch
+headings. Preserve native typography elsewhere. Unsupported languages, including
+Arabic for the bundled Inter font, use native fallback. Keep asset and family
+registration with the [configuration owner](../foodiya-implementation/references/configuration.md).
+
 `tone` selects foreground independently: `default`, `muted`, `primary`,
 `secondary`, `success`, `warning`, `error` or `info`.
-Default maps to the theme's `text` token. Content resolves its owning Host's
+Default maps to `text`; primary maps to the foreground accent `tint`. Keep
+`primary`/`onPrimary` for filled buttons: a fill can deliberately stay black in
+dark mode and is not an ordinary text foreground. Other tones use their matching
+semantic tokens. Content resolves its owning Host's
 scheme unless explicitly overridden.
 
 ```tsx
@@ -70,6 +78,18 @@ the existing native/preset behavior without a specific need.
 [UI showcase → Text](../../../src/features/ui-showcase/text-screen.tsx), route
 `/ui-component/text`, compares all six variants, all eight tones, wrapping,
 two-line truncation, native/custom typography and standalone hosting.
+Its isolated palette/appearance controls compare every tone on `background`,
+`surface` and `surfaceRaised`, explicit appearance/style color precedence and a
+counted primary button. The existing `demo-text-tone-*` selectors remain on the
+background samples; other surfaces add their role to the selector. Override
+samples use `demo-text-appearance-override` and `demo-text-style-override`.
+The retained `Components/Text/ThemeComparison` story uses the same composition.
+Only the color-sample area has an isolated provider. It re-enters native UI
+through an explicit-scheme `UniversalHost` after `HostedPreview`'s RN bridge;
+page chrome and the other text examples keep the app's configured appearance.
+Follow the [appearance contract](../foodiya-ui-appearance/SKILL.md) for preview
+isolation and saved app preferences. Static palette contrast checks do not verify
+native glass, arbitrary overrides or text drawn over artwork.
 Check light/dark, RTL, large text, truncation and contrast on native devices.
 
 Checked for SDK 57 / `@expo/ui` 57.0.21:

@@ -23,12 +23,6 @@
           }
         }
       ],
-      [
-        "expo-font",
-        {
-          "fonts": ["./assets/fonts/Inter-Black.otf"]
-        }
-      ],
       "expo-image",
       "expo-secure-store",
       "expo-sharing",

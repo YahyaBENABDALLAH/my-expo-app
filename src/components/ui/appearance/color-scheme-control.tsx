@@ -8,12 +8,13 @@ export function ColorSchemeControl({
   testID?: string;
 }) {
   const { t } = useTranslation();
-  const { colorScheme, setColorScheme } = useThemeSettings();
+  const { colorScheme, setColorScheme, appearanceReady } = useThemeSettings();
   return (
     <Picker<ColorSchemePreference>
       selectedValue={colorScheme}
       onValueChange={setColorScheme}
       appearance="menu"
+      enabled={appearanceReady}
       testID={testID}
     >
       <Picker.Item label={t('common.systemMode')} value="system" />

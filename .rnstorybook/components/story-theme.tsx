@@ -28,6 +28,7 @@ export function StoryTheme({
       key={`${themeId}-${colorScheme}`}
       initialTheme={themeId}
       initialColorScheme={colorScheme}
+      allowThemeSelection
     >
       <StoryCanvas restoreColorScheme={appColorScheme}>{children}</StoryCanvas>
     </ThemePreferencesProvider>

@@ -4,6 +4,11 @@
   "slug": "expo-mobile-template",
   "scheme": "expomobiletemplate",
   "icon": "./assets/images/icon.png",
+  "presentation": {
+    "palette": "ux",
+    "headingFont": "system",
+    "launchArtwork": "templateIcon"
+  },
   "ios": {
     "bundleIdentifier": "com.example.mobiletemplate"
   },

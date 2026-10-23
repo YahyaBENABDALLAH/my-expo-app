@@ -32,9 +32,53 @@ contracts continue to belong to their existing skills. See
   identifiers/URLs and Firebase package mismatch were exercised. Android and iOS
   Hermes exports succeed without backend configuration; native builds/devices and
   live backend behavior remain unverified.
-- Steps 3–12 remain planned. In-app brand copy, custom launch artwork and heading
-  fonts are not yet connected to the manifest. Package versions and linked cloud
-  projects were not changed.
+- Step 3 source integration implemented on 2026-10-23: public presentation IDs
+  select app-owned copy, heading fonts and launch artwork. Likan uses bundled
+  Inter Black and Lottie; the neutral template uses native typography and an
+  existing Expo placeholder image. Arabic retains native heading fallback.
+  Literal Metro imports stay separate from Node config and manifests. Component
+  skills and setup guides describe these owners and native-build requirements.
+- Step 3 verification: `npm run check` and native story registration passed.
+  Actual template/Likan Expo configs select the expected font plugin files and
+  public presentation IDs. Locale keys and both brand messages match in all
+  three languages; invalid presentation IDs and missing/out-of-project files
+  produce actionable diagnostics. All four local Android/iOS Hermes exports
+  succeeded without API credentials. Their bytecode contains the public asset
+  registry, and source maps exclude the Node brand resolver. All registered
+  assets are bundled; asset removal is not an outcome of this step. No connected
+  native device target was available to this session.
+- Step 4 source integration implemented on 2026-10-23: primary text uses `tint`,
+  and primary buttons retain their existing fill/foreground pair. Each manifest
+  selects a fixed palette; the root guards palette changes. System/Light/Dark
+  user appearance restores through the existing theme provider and joins launch
+  reveal readiness. Preview providers stay in memory. Palette controls moved
+  from Settings to the isolated Text showcase, which also compares three page
+  surfaces, color overrides and a counted primary button.
+- Step 4 configuration/contrast checks passed: both brands resolve their intended
+  palette with automatic native appearance; registered palettes are accepted,
+  unknown IDs are rejected and all three dictionaries retain matching keys.
+  All 96 explicit text/surface pairs exceed 4.5:1. UX dark primary text changes
+  from 1.11:1 to 18.88:1 against its background; black/white primary buttons
+  remain 21:1. Android and iOS Hermes exports succeed. Native restart, live
+  System changes, storage recovery, local overrides and first-reveal checks
+  remain pending; no connected device target was available.
+- Step 5 source integration implemented on 2026-10-23: standalone buttons reuse
+  the existing `UniversalHost` at the same boundary. Inline sizing preserves
+  intrinsic behavior; the existing full-width match policy, selector suffix,
+  physical corner styles and native radius handling are unchanged. The public
+  API, color resolver and both native renderers are unchanged. Custom children
+  now receive the shared Host's scheme and live direction context.
+- The Buttons page and retained `StandaloneHostLight`/`StandaloneHostDark`
+  fixtures share one preview composition for forced schemes, inherited intrinsic
+  width, diagonal corners and disabled activation. A local RTL toggle and action
+  counter support manual verification. Typecheck, zero-warning lint, registration,
+  locale/interpolation checks and both native Hermes exports passed. Updated
+  component skills describe the current ownership; dimensions, edge activation,
+  live Arabic and physical RTL clipping still need native device checks. No
+  connected native target was available.
+- Steps 6–12 remain planned. Package versions and linked cloud projects were not
+  changed. Both brands' font rendering, artwork and Arabic readability still
+  require matching native builds/device checks.
 
 ## Outcome and scope
 
@@ -192,7 +236,8 @@ Acceptance:
 
 ### 3. Connect brand copy, fonts and artwork
 
-**Files:** `src/shared/locales/{en,fr,ar}.json`, `src/app/_layout.tsx`,
+**Files:** `config/brand-assets.json`, `config/brands/`, `app.config.js`,
+`src/config/brand-assets.ts`, `src/shared/locales/{en,fr,ar}.json`, `src/app/_layout.tsx`,
 `src/components/ui/auth/auth-screen-frame.tsx`,
 `src/components/ui/launch-screen/launch-screen.tsx`, `docs/assets.md`.
 
@@ -206,19 +251,20 @@ Work:
   `require` calls. Do not construct a dynamic `require(manifest.assetPath)`.
 - Keep native config asset paths and runtime asset IDs coordinated without
   duplicating palette definitions or creating a generic asset-loading framework.
-- Preserve distinct native font names: the current auth frame intentionally uses
-  `InterBlack` on iOS and `Inter-Black` on Android. Validate embedded font metadata
-  and native rendering before replacing these with a shared alias.
+- Keep font names explicit per platform and inspect embedded font metadata. The
+  supplied file's PostScript name is `Inter-Black`; the old iOS `InterBlack` alias
+  does not occur in its name table. The registry now uses `Inter-Black` for both
+  platforms while retaining separate entries. Native rendering is still pending.
 - Preserve readable Arabic fallback fonts unless a client provides an Arabic-capable
   family. Do not apply a Latin-only brand font to every native text control.
 - Document which icon/font/plugin changes require a new native build.
 
 Acceptance:
 
-- [ ] A second brand changes app-owned copy, launch artwork and supported heading
-      fonts without editing screen implementations.
-- [ ] No previous client name appears in generic app-owned user messages.
-- [ ] French, English and Arabic retain matching translation/interpolation keys.
+- [x] A second brand selects app-owned copy, launch artwork and supported heading
+      fonts through configuration without editing screen implementations.
+- [x] No previous client name appears in generic app-owned user messages.
+- [x] French, English and Arabic retain matching translation/interpolation keys.
 - [ ] Native headings and Arabic text are readable on both platforms.
 
 ### 4. Repair text semantics and clarify preferences
@@ -226,7 +272,8 @@ Acceptance:
 **Files:** `src/components/ui/text/universal-text.tsx`,
 `src/constants/themes/tokens.ts`, existing palettes,
 `src/context/theme.context.tsx`, `src/features/settings/`,
-`src/features/ui-showcase/text-screen.tsx`.
+`src/features/ui-showcase/text-screen.tsx`, `config/brands/`,
+`config/brand.js`, `src/config/brand.ts`, `src/app/_layout.tsx`.
 
 Work:
 
@@ -240,26 +287,35 @@ Work:
 4. Make configured brand identity the production default. Keep the UX/Instagram
    switcher in developer/component previews; it should not compete with a client's
    configured identity in ordinary settings.
-5. Treat current session-only theme/appearance behavior accurately. Recommended
-   template default: fixed configured brand, saved `system`/`light`/`dark` user
-   appearance preference. Reuse existing restoration/write patterns if persistence
-   is added; validate stored values and keep isolated preview providers in memory.
+5. Use a fixed configured palette with saved `system`/`light`/`dark` user
+   appearance. Reuse the existing restoration/write patterns, validate stored
+   values and keep isolated preview providers in memory. Missing/invalid data or
+   failed reads retain System at the root; failed writes keep the current session
+   usable and leave restart behavior tied to the last successful save.
 6. Include appearance hydration in reveal readiness when needed to prevent a
    wrong-scheme first frame. Retain existing language/header/motion restoration.
    Avoid a generic preference manager for a few scalar settings.
 
 Acceptance:
 
-- [ ] UX dark primary text no longer resolves to black on its near-black background.
-- [ ] Existing black primary buttons retain their intended white labels.
+- [x] UX dark primary text resolves through tint rather than black on its near-black background.
+- [x] Existing black primary buttons retain their white foreground tokens.
 - [ ] Explicit local theme overrides remain deterministic.
 - [ ] Appearance restart behavior matches the chosen documented policy.
-- [ ] Production users cannot select another client's/demo brand.
+- [x] Ordinary Settings cannot change the configured root brand/palette; demo
+      selection is isolated to component previews.
+
+The first two checks describe source mappings and calculated token contrast.
+Device checks for local overrides, native button appearance, saved appearance,
+live System changes and launch reveal remain open. See
+[appearance verification](appearance-themes.md).
 
 ### 5. Unify standalone Host behavior without changing button geometry
 
 **Files:** `src/components/ui/button/universal-button.tsx`,
-`src/components/ui/host/universal-host.tsx`, existing button examples/stories.
+existing `src/components/ui/host/universal-host.tsx` owner,
+`src/features/ui-showcase/buttons-screen.tsx`,
+`.rnstorybook/stories/components/button.stories.tsx` and matching component skills.
 
 Work:
 
@@ -281,7 +337,15 @@ Acceptance:
 - [ ] Live Arabic switching updates custom icon/text order correctly.
 - [ ] Physical corner clipping is preserved in both directions.
 - [ ] Edge taps activate once; disabled taps never invoke the action.
-- [ ] No additional nested Host is introduced.
+- [x] No additional nested Host is introduced; the shared owner replaces the raw
+      Host, and content buttons remain Host-free.
+
+Source integration and static exports are complete. The other acceptance items
+are native observations; do not mark them verified from prop forwarding or
+fixture registration. The existing light action selector remains, and the shared
+preview adds forced dark, inherited intrinsic and disabled cases with child
+scheme/direction labels. Repeat both native appearances and directions with
+actual edge taps and larger text before closing those checks.
 
 ### 6. Finish the selector and accessibility contract
 

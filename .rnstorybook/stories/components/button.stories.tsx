@@ -6,12 +6,20 @@ import {
   UniversalTextContent,
   UniversalText,
   UniversalHost,
+  PageScreen,
+  PageSection,
+  Switch,
 } from '@components/ui';
 import type { Meta, StoryObj } from '@storybook/react-native';
 import { useState } from 'react';
 import { action } from 'storybook/actions';
 import { NativeStoryFrame } from '../../components/native-story-frame';
 import type { StoryThemeProps } from '../../components/story-theme';
+import { StandaloneButtonPreview } from '@/features/ui-showcase/buttons-screen';
+import {
+  LayoutDirectionProvider,
+  useLayoutDirectionSettings,
+} from '@/context/layout-direction.context';
 
 function ButtonDemo(args: UniversalButtonProps) {
   const [presses, setPresses] = useState(0);
@@ -198,4 +206,52 @@ export const SemanticVariantsLight: Story = {
 export const SemanticVariantsDark: Story = {
   args: { colorScheme: 'dark' },
   render: (args) => <SemanticVariantsDemo colorScheme={args.colorScheme} />,
+};
+
+function StandaloneHostDemo({ colorScheme }: Pick<UniversalButtonProps, 'colorScheme'>) {
+  return (
+    <LayoutDirectionProvider initialDirection="ltr">
+      <StandaloneHostContent colorScheme={colorScheme} />
+    </LayoutDirectionProvider>
+  );
+}
+
+function StandaloneHostContent({ colorScheme }: Pick<UniversalButtonProps, 'colorScheme'>) {
+  const [presses, setPresses] = useState(0);
+  const { direction, setDirection } = useLayoutDirectionSettings();
+  return (
+    <PageScreen
+      title="Standalone button Hosts"
+      description="Change direction without resetting the count. Compare each label's scheme with its forced or inherited Host; press button edges and the disabled action."
+      colorScheme={colorScheme}
+      showBack={false}
+    >
+      <PageSection>
+        <Switch
+          label="Right-to-left preview"
+          value={direction === 'rtl'}
+          onValueChange={(rtl) => setDirection(rtl ? 'rtl' : 'ltr')}
+          testID="button-host-rtl"
+        />
+        <UniversalTextContent testID="button-host-presses">{`Presses: ${presses}`}</UniversalTextContent>
+        <UniversalButtonContent
+          variant="link"
+          label="Reset count"
+          testID="button-host-reset"
+          onPress={() => setPresses(0)}
+        />
+      </PageSection>
+      <StandaloneButtonPreview onPress={() => setPresses((value) => value + 1)} />
+    </PageScreen>
+  );
+}
+
+export const StandaloneHostLight: Story = {
+  args: { colorScheme: 'light' },
+  render: (args) => <StandaloneHostDemo colorScheme={args.colorScheme} />,
+};
+
+export const StandaloneHostDark: Story = {
+  args: { colorScheme: 'dark' },
+  render: (args) => <StandaloneHostDemo colorScheme={args.colorScheme} />,
 };

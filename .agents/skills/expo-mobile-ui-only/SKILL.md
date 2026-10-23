@@ -32,7 +32,7 @@ Build this project for iOS and Android. Keep implementations simple and prioriti
 - Prefer native defaults. Avoid decorative animations, additional visual layers, layout measurement state, and extra dependencies unless needed for the requested behavior.
 - Keep state local and minimal. Do not add memoization or complex abstractions without a demonstrated reason.
 - Use Expo UI native progress controls for loading. A disabled query is waiting for a prerequisite; an offline paused query is waiting for connectivity. Neither means loading. Keep cached content during refresh, show persistent failure context with a retry control, and show an empty state only after a successful result.
-- Keep the requested Lottie launch presentation: after readiness, hold for two seconds and slide out over two seconds. Reduced motion preserves the hold and skips the slide. Restoration failures must expose recovery.
+- Keep the configured launch artwork and current timing: after readiness, hold for two seconds and slide out over two seconds. Reduced motion preserves the hold and skips the slide. Use the existing brand asset helper for bundled Lottie/image selection. Restoration failures must expose recovery.
 - Remove obsolete web branches and unused adapters after checking all consumers. Retain cancellation, session-generation, serialized storage and duplicate-submission safeguards; their complexity addresses tested races.
 - Adapt useful behavior and visual intent from `Reference/` while following these project constraints.
 

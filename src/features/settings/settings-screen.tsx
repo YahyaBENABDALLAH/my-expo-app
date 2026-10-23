@@ -32,7 +32,6 @@ import i18n, { SUPPORTED_LANGUAGES, type Language } from '@/lib/i18n';
 import { version as appVersion } from '../../../package.json';
 import { HeaderMotionPicker } from './header-motion-picker';
 import { SettingsRow } from './settings-row';
-import { ThemePicker } from './theme-picker';
 
 const languageKeys: Record<Language, string> = {
   fr: 'common.french',
@@ -117,7 +116,6 @@ export function SettingsPage({
               titleUppercase
               testID="app-settings-appearance"
             >
-              <SettingsRow label={t('common.theme')} trailing={<ThemePicker />} />
               <SettingsRow label={t('common.colorScheme')} trailing={<ColorSchemeControl />} />
               <SettingsRow label={t('settings.headerMotion')} trailing={<HeaderMotionPicker />} />
               <Switch

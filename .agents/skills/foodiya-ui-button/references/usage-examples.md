@@ -98,7 +98,10 @@ export function NativeActionGroup(props: {
 ## Standalone button in an existing React Native boundary
 
 Use this pattern where RN infrastructure already owns the layout, such as an
-overlay or footer. The button creates its Host. Keep screen-level safe-area and
+overlay or footer. The button creates one `UniversalHost`, including its scheme
+and direction contexts. Custom descendants see the button's explicit scheme;
+read that context inside the descendant, not in the parent returning the button.
+Keep screen-level safe-area and
 keyboard handling in their existing owners. Omitting `fullWidth` retains
 intrinsic sizing. Geometry overrides are optional, not new global defaults.
 

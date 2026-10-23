@@ -17,11 +17,13 @@ import {
   nativeFillWidth,
   nativeRowWeight,
   useHostColorScheme,
+  useHostLayoutDirection,
   type UniversalButtonContentProps,
   type UniversalButtonVariant,
 } from '@components/ui';
 import { radii, spacing } from '@/constants/layout';
-import { useAppTheme, useThemeColors } from '@/hooks/use-theme';
+import { useThemeColors } from '@/hooks/use-theme';
+import { HostedPreview } from './hosted-preview';
 
 const variants = [
   'primary',
@@ -314,7 +316,7 @@ export default function ButtonsScreen() {
       </GallerySection>
 
       <SemanticColorButtons onPress={recordPress} />
-      <StandaloneButton onPress={recordPress} />
+      <StandaloneButtonPreview onPress={recordPress} />
 
       <PageSection>
         <UniversalTextContent testID="demo-button-count-footer">
@@ -433,34 +435,91 @@ function SemanticColorButtons({ onPress }: { onPress: (labelKey: string) => void
   );
 }
 
-function StandaloneButton({ onPress }: { onPress: (labelKey: string) => void }) {
+/** Shared with the native fixture; these controls cross a real RN boundary. */
+export function StandaloneButtonPreview({ onPress }: { onPress: (labelKey: string) => void }) {
   const { t } = useTranslation();
-  const { colors } = useAppTheme('light');
+  const lightColors = useThemeColors('light');
+  const darkColors = useThemeColors('dark');
   return (
     <GallerySection
       title={t('showcase.buttonGallery.standalone')}
       description={t('showcase.buttonGallery.standaloneHint')}
     >
-      <RNHostView matchContents>
-        <View style={{ width: '100%', backgroundColor: colors.background, padding: spacing.lg }}>
+      <HostedPreview>
+        <View
+          style={{ width: '100%', backgroundColor: lightColors.background, padding: spacing.lg }}
+        >
           <UniversalButton
             variant="primary"
             colorScheme="light"
-            color={colors.primary}
-            contentColor={colors.onPrimary}
             contentPadding={spacing.lg}
             cornerRadii={{ topLeft: radii.card, bottomRight: radii.card }}
             fullWidth
             testID="demo-button-standalone-light"
             onPress={() => onPress('showcase.buttonGallery.lightCorners')}
           >
-            <Row spacing={spacing.sm} alignment="center">
-              <Icon name={starIcon} size={18} />
-              <Text>{t('showcase.buttonGallery.lightCorners')}</Text>
-            </Row>
+            <StandaloneButtonLabel
+              label={t('showcase.buttonGallery.lightCorners')}
+              testID="demo-button-standalone-light-label"
+            />
           </UniversalButton>
         </View>
-      </RNHostView>
+        <View
+          style={{ width: '100%', backgroundColor: darkColors.background, padding: spacing.lg }}
+        >
+          <UniversalButton
+            variant="primary"
+            colorScheme="dark"
+            contentPadding={spacing.lg}
+            cornerRadii={{ topLeft: radii.card, bottomRight: radii.card }}
+            fullWidth
+            testID="demo-button-standalone-dark"
+            onPress={() => onPress('showcase.buttonGallery.darkCorners')}
+          >
+            <StandaloneButtonLabel
+              label={t('showcase.buttonGallery.darkCorners')}
+              testID="demo-button-standalone-dark-label"
+            />
+          </UniversalButton>
+        </View>
+        <UniversalButton
+          variant="primary"
+          testID="demo-button-standalone-inline"
+          onPress={() => onPress('showcase.buttonGallery.fitContent')}
+        >
+          <StandaloneButtonLabel
+            label={t('showcase.buttonGallery.fitContent')}
+            testID="demo-button-standalone-inline-label"
+          />
+        </UniversalButton>
+        <UniversalButton
+          variant="primary"
+          disabled
+          fullWidth
+          label={t('showcase.disabledAction')}
+          testID="demo-button-standalone-disabled"
+          onPress={() => onPress('showcase.disabledAction')}
+        />
+      </HostedPreview>
     </GallerySection>
+  );
+}
+
+function StandaloneButtonLabel({ label, testID }: { label: string; testID: string }) {
+  const { t } = useTranslation();
+  const scheme = useHostColorScheme();
+  const direction = useHostLayoutDirection();
+  const colors = useThemeColors(scheme);
+  return (
+    <Row spacing={spacing.sm} alignment="center">
+      <Icon name={starIcon} size={18} color={colors.onPrimary} />
+      <Text testID={testID} textStyle={{ color: colors.onPrimary }}>
+        {t('showcase.buttonGallery.hostLabel', {
+          label,
+          scheme: t(`appearance.${scheme}`),
+          direction: direction === 'rightToLeft' ? 'RTL' : 'LTR',
+        })}
+      </Text>
+    </Row>
   );
 }

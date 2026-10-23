@@ -68,7 +68,7 @@ export function UniversalTextContent({
         ...(weight === undefined ? {} : { fontWeight: weight }),
         color:
           (activeColorScheme === 'dark' ? darkColor : lightColor) ??
-          colors[tone === 'default' ? 'text' : tone],
+          colors[tone === 'default' ? 'text' : tone === 'primary' ? 'tint' : tone],
         ...textStyle,
       }}
     />

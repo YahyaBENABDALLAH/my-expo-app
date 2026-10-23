@@ -24,6 +24,11 @@ The [showcase bridge](../../../src/features/ui-showcase/hosted-preview.tsx)
 exists specifically to demonstrate these real boundaries with an explicit width.
 Do not add bridges to ordinary native layout.
 
+Standalone `UniversalButton` reuses this owner at its RN boundary, with inline
+sizing for intrinsic width. A content button still adds no Host. Follow the
+[button contract](../foodiya-ui-button/SKILL.md) for its per-axis sizing, physical
+corner clipping and custom-child examples; do not add a second Host around it.
+
 ## Sizing defaults
 
 | Configuration             | Default matchContents | Geometry                                               |

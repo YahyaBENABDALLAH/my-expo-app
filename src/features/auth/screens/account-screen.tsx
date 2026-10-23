@@ -13,9 +13,11 @@ import { router } from 'expo-router';
 import { useScreenRefresh } from '@/hooks/use-screen-refresh';
 import { useAuthContext } from '@/context/auth.context';
 import { currentIdentityQuery } from '@/services/auth/auth.queries';
+import { getAppBrand } from '@/config/brand';
 
 export function AccountScreen() {
   const { t } = useTranslation();
+  const brand = getAppBrand();
   const { user, signOut } = useAuthContext();
   const options = currentIdentityQuery(user?.uuid);
   const identity = useQuery(options);
@@ -30,7 +32,7 @@ export function AccountScreen() {
       testID="auth-account"
       onRefresh={user?.uuid && !logout.isPending ? onRefresh : undefined}
       title={name || t('common.account')}
-      description={t('account.signedIn')}
+      description={t('account.signedIn', { brandName: brand.name })}
     >
       <Column spacing={spacing.lg} modifiers={nativeFillWidth}>
         <Text>{identity.data?.email ?? user?.email ?? ''}</Text>

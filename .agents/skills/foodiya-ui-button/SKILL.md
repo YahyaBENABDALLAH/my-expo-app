@@ -60,6 +60,14 @@ Do not add a hosted standalone button inside ordinary native content, or put a
 content button directly into RN without a Host. See
 [usage examples](references/usage-examples.md) for each composition.
 
+`UniversalButton` owns one `UniversalHost`, replacing the previous raw Host at
+the same RN boundary. Its explicit scheme reaches both native appearance and
+custom children's project context; omitted values inherit the nearest project
+Host, then app preferences. The shared owner supplies live direction and the
+theme tint. Intrinsic buttons use inline hosting; full-width buttons retain
+their existing per-axis sizing. Keep the detailed geometry and override rules
+in [props and styling](references/props-and-styling.md).
+
 ## Select an explicit intent
 
 `variant` is required on both public buttons. These are the current supported
@@ -132,5 +140,16 @@ including SemanticVariantsLight and SemanticVariantsDark. Run `npm run typecheck
 and `npm run lint`; regenerate registration with `npm run storybook:generate`
 when stories change. Automated suites and Maestro flows have been removed;
 keep existing selectors and report native device verification separately.
+`StandaloneHostLight` and `StandaloneHostDark` reuse the production Buttons
+showcase's `StandaloneButtonPreview`. Its custom labels read their own Host's
+scheme/direction, forced light/dark cases retain physical diagonal clipping,
+an inherited case keeps intrinsic width, and a disabled action must not count.
+The fixture's `button-host-rtl` toggle changes direction without remounting the
+buttons; `button-host-presses` and `button-host-reset` expose count/reset.
+The routed Buttons page retains `demo-button-standalone-light`; dark, inline
+and disabled cases use the corresponding suffixes. Label selectors add `-label`.
+Check native upper/lower/side edges, large text, live Arabic, app/Host scheme
+differences and both palettes. Registration and exports do not prove those
+native behaviors; the current Host migration still needs device verification.
 For skill-only changes, validate metadata, links, and examples against the current
 types without claiming native device verification.

@@ -1,6 +1,6 @@
 # Native authentication
 
-The iOS/Android auth screens adapt `Reference/`'s palette, spacing, decorative heading font, and form layout. Each `AuthScreenFrame` owns one `@expo/ui` Host with the app scheme and seed color. Native ScrollView and Column layouts contain host-free UniversalTextContent, UniversalButtonContent, FormTextInput, and FormSubmit content. React Native keyboard avoidance stays outside the Host. The Likan brand stays in the screen header.
+The iOS/Android auth screens share native form layout and the configured brand's wordmark and heading font. Each `AuthScreenFrame` owns one `@expo/ui` Host with the app scheme and seed color. Native ScrollView and Column layouts contain host-free UniversalTextContent, UniversalButtonContent, FormTextInput, and FormSubmit content. React Native keyboard avoidance stays outside the Host. [Bundled assets](assets.md) explains font selection and Arabic fallback.
 
 The shared [auth UI family](../src/components/ui/auth/) owns the screen frame.
 Login owns its [preferences bar](../src/features/auth/login-preferences.tsx)
@@ -25,9 +25,9 @@ Auth buttons use native SwiftUI/Compose controls with shared semantic button tok
 
 ## Configuration
 
-Development builds accept `admin` / `admin` on Login to simulate success and open
-Home using the existing temporary guest mode. No API request or token storage is
-involved. Other credentials use normal validation and authentication.
+Login uses normal validation and real authentication in every build. There is
+no local credential bypass or development guest session. Public starter screens
+can open without backend credentials; Account requires a real session.
 
 After successful login, the form stays disabled while the wave rises for one
 second. Navigation opens Home when the animation completes. Reduced motion skips

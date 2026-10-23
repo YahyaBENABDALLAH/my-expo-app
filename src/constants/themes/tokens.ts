@@ -2,6 +2,7 @@ export type AppColorScheme = 'light' | 'dark';
 
 /** Every brand defines the same semantic roles in both appearances. */
 export interface SemanticColors {
+  /** Filled action surface; foreground text uses tint instead. */
   primary: string;
   primaryPressed: string;
   primaryContainer: string;
@@ -19,6 +20,7 @@ export interface SemanticColors {
   muted: string;
   border: string;
   divider: string;
+  /** Foreground accent for primary text, links and native tint. */
   tint: string;
   selection: string;
   overlay: string;

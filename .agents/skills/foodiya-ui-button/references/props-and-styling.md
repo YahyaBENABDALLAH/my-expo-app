@@ -59,12 +59,20 @@ buttons and a content-color fallback for outlined/text buttons. It does not
 expose an Android outline-color override. Native controls own pressed and
 disabled treatments. Custom-colored children can override inherited label color.
 
-`UniversalButton` owns a raw Expo `Host`, not `UniversalHost`. It forwards its
-explicit `colorScheme`, sets intrinsic/full-width sizing, and resolves semantic colors
-once. It does not independently provide the project's Host React contexts or
-explicit layout-direction/seed-color props. For a group requiring shared app
-scheme, tint, and live direction, prefer `UniversalHost` with content buttons;
-do not infer identical theming solely from the word "universal".
+`UniversalButton` owns one `UniversalHost`. Its optional `colorScheme` selects
+both the native scheme and the context seen by custom descendants. Omitted
+scheme/direction inherit the nearest project Host, then app preferences. The
+shared owner supplies the theme's tint as its native seed. Button semantic
+colors still resolve once; caller colors keep the precedence above.
+
+Intrinsic buttons use `inline` and `matchContents={true}`; full-width buttons use
+`matchContents={{ vertical: true }}` and retain the full-width constraint. Keep
+the existing `testID-container`, physical corner clip styles, and square native
+renderer when `cornerRadii` is supplied. This replaces the raw Host at the same
+boundary; it must not wrap that Host in another Host or change native geometry.
+For several controls sharing one native tree, use one owner with content buttons.
+The [Host contract](../../foodiya-ui-host/SKILL.md) explains inheritance and where
+to read a newly created owner's context.
 
 `UniversalButtonContent` inherits the nearest project's Host scheme. Put a forced
 scheme on the owning `UniversalHost`, not on the content button. A raw native

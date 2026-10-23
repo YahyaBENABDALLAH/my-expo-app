@@ -44,7 +44,8 @@ comparison pending in the [implementation plan](white-label-template-plan.md).
 
 `app.json` owns shared native settings. `config/brands/*.json` owns each brand's
 name, slug, URL scheme, bundle/application IDs, app/adaptive icons, native splash
-and optional integration references. `config/brand.js` validates and resolves the
+and optional integration references. Its presentation IDs select the fixed
+palette, heading fonts and in-app launch artwork. `config/brand.js` validates and resolves the
 selected manifest for `app.config.js`. Register a new manifest in its small
 registry; do not copy identity fields into screens or the shared app config.
 
@@ -90,20 +91,26 @@ $env:APP_VARIANT = 'development'
 npm start
 ```
 
-Changing native identity, icons or native splash configuration requires a matching
+Changing native identity, icons, native splash or embedded fonts requires a matching
 native build. To use a previously installed Likan client, select `likan` before
 starting Metro. The local template can resolve and export without API credentials;
 auth actions require a real backend and show safe configuration feedback otherwise.
 
-Only `{ id, name, variant }` is projected to `extra.brand` for native consumers.
+Only `{ id, name, variant, presentation }` is projected to `extra.brand` for native consumers.
 Read it through `src/config/brand.ts`; do not import Node config/manifests into
 native application modules. Do not put credentials into this public metadata or
 `EXPO_PUBLIC_` values. The common API normalizer is intentionally native-safe.
 
-This step configures native identity/assets and the public metadata boundary.
-In-app translated brand copy, custom launch artwork and native heading fonts are
-connected in step 3. Appearance defaults, launch modes and catalog capabilities
-remain with their existing owners until their implementation steps.
+App-owned translated messages interpolate the public name; auth and launch use
+the selected heading font and artwork. Public asset metadata and literal native
+imports have separate small owners described in [bundled assets](assets.md).
+Restart Metro after selecting a brand, and use a native build with the matching
+embedded fonts. Arabic retains native fallback. The configured palette stays
+fixed; user System/Light/Dark appearance is saved by the existing provider.
+Component previews can select palettes locally without changing app preferences.
+See [appearance setup and verification](appearance-themes.md). Launch modes and
+catalog capabilities remain with their existing owners until their implementation
+steps.
 
 References: [Expo dynamic configuration](https://docs.expo.dev/workflow/configuration/)
 and [app variants](https://docs.expo.dev/tutorial/eas/multiple-app-variants/).
