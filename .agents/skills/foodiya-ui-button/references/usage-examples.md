@@ -234,7 +234,7 @@ import { spacing } from '@/constants/layout';
 
 const favoriteIcon = Icon.select({
   ios: 'star.fill',
-  android: import('@expo/material-symbols/star.xml'),
+  android: require('@expo/material-symbols/star.xml'),
 });
 
 export function FavoriteAction(props: { label: string; disabled?: boolean; onPress: () => void }) {

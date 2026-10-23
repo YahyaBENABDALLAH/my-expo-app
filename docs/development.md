@@ -104,6 +104,34 @@ $env:APP_VARIANT = 'development'
 npm start
 ```
 
+Commands such as `npx eas-cli@latest build:run` resolve the EAS project from the
+local brand. Metro reads the selectors in `.env.local`, but EAS CLI project lookup
+also needs them set explicitly for the command. For the existing Likan project on
+macOS (zsh/bash), use inline selectors:
+
+```bash
+APP_BRAND=likan APP_VARIANT=development npx eas-cli@latest project:info
+APP_BRAND=likan APP_VARIANT=development npx eas-cli@latest build:run --platform ios --profile development --latest
+```
+
+The first command must identify `@ybenabdallah/likan` with the project ID from
+`config/brands/likan.json`. If EAS asks to configure `expo-mobile-template`, cancel
+that command and select `likan` explicitly. The template has a separate identity.
+
+On Windows PowerShell:
+
+```powershell
+$env:APP_BRAND = 'likan'
+$env:APP_VARIANT = 'development'
+npx eas-cli@latest build:run --platform android --profile development --latest
+```
+
+Its project ID remains in `config/brands/likan.json`. The default `template` is
+unlinked. `build:run` installs an existing development build; its profile filter
+does not select the brand, load that build profile's environment or create a new
+build. Use the current CLI because `eas.json` specifies a minimum version that an
+older global `eas` installation may not satisfy.
+
 Changing native identity, icons, native splash or embedded fonts requires a matching
 native build. To use a previously installed Likan client, select `likan` before
 starting Metro. The local template can resolve and export without API credentials;
